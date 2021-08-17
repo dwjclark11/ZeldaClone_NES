@@ -709,26 +709,29 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::uniqu
 		
 		
 	const auto& transform = entity.GetComponent<TransformComponent>();
-		
-	// TODO: Create variables that let us know what the current inventory 
-		
-	bool hasBoomerang = false;
-	bool hasSword = true;
-	bool hasMagicRod = false;
-	bool hasBombs = false;
-	bool hasFood = false;
-	bool hasFlute = false;
-	bool hasRaft = false;
-	bool hasLadder = false;
-	bool hasBlueRing = false;
-	bool hasRedRing = false;
-	bool hasBow = false;
-	bool hasShield = false;
-	bool hasPowerBraclet = false;
-	bool hasMap = false;
-	bool hasBluePotion = false;
-	bool hasRedPotion = false;
-	bool hasMasterKey = false;
+	
+	// Local variables that are based on the game Items
+	bool hasBoomerang = Game::Instance()->GetGameItems().woodBoomerang;
+	bool hasMagicBoomerang = Game::Instance()->GetGameItems().magicBoomerang;
+	bool hasSword = Game::Instance()->GetGameItems().woodSword;
+	bool hasMagicSword = Game::Instance()->GetGameItems().magicSword;
+	bool hasMagicRod = Game::Instance()->GetGameItems().magicRod;
+	bool hasBombs = Game::Instance()->GetGameItems().bombs;
+	bool hasFood = Game::Instance()->GetGameItems().food;
+	bool hasFlute = Game::Instance()->GetGameItems().flute;
+	bool hasRaft = Game::Instance()->GetGameItems().raft;
+	bool hasLadder = Game::Instance()->GetGameItems().ladder;
+	bool hasBlueRing = Game::Instance()->GetGameItems().blueRing;
+	bool hasRedRing = Game::Instance()->GetGameItems().redRing;
+	bool hasBow = Game::Instance()->GetGameItems().bow;
+	bool hasMagicBow = Game::Instance()->GetGameItems().magicBow;
+	bool hasShield = Game::Instance()->GetGameItems().shield;
+	bool hasMagicShield = Game::Instance()->GetGameItems().magicShield;
+	bool hasPowerBraclet = Game::Instance()->GetGameItems().powerBraclet;
+	bool hasMap = Game::Instance()->GetGameItems().map;
+	bool hasBluePotion = Game::Instance()->GetGameItems().bluePotion;
+	bool hasRedPotion = Game::Instance()->GetGameItems().redPotion;
+	bool hasMasterKey = Game::Instance()->GetGameItems().masterKey;
 	int numRupees = GameState::totalRupees;
 	int numBombs = GameState::totalBombs;
 	int numArrows = 10;
@@ -809,6 +812,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::uniqu
 	file.close();
 }
 
+// This is for a new player -->Default values for items
 void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& newName)
 {
 	Logger::Err("In Save Player to Lua Table Function");

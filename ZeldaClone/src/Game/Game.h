@@ -33,6 +33,24 @@ struct GameItems
 	bool woodSword;
 	bool steelSword;
 	bool magicSword;
+	bool woodBoomerang;
+	bool magicBoomerang;
+	bool magicRod;
+	bool bombs;
+	bool flute;
+	bool raft;
+	bool ladder;
+	bool blueRing;
+	bool redRing;
+	bool bow;
+	bool magicBow;
+	bool shield;
+	bool magicShield;
+	bool map;
+	bool powerBraclet;
+	bool masterKey;
+	bool bluePotion;
+	bool redPotion;
 };
 
 class Game
@@ -81,6 +99,7 @@ public:
 	GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } // Move Semantics?
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
+
 	GameItems GetGameItems() { return mGameItems; }
 	unsigned& GetPlayerNum();
 	glm::vec2& GetPlayerPos() { return mPlayerPos; }
@@ -106,6 +125,7 @@ private:
 	SDL_Event sdlEvent;
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
+
 	GameItems mGameItems;
 	glm::vec2 mPlayerPos;
 };
