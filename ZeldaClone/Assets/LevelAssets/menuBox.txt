@@ -1,0 +1,6 @@
+lines lines 16 16 0 0 0 86 135 4 4 0 1 7
+lines lines 16 16 0 0 0 500 135 4 4 0 1 2
+lines lines 16 16 0 0 0 726 135 4 4 0 1 5
+lines lines 16 16 0 0 0 86 814 4 4 0 1 25
+lines lines 16 16 0 16 0 890 170 4 4 1 0 20
+lines lines 16 16 0 16 0 50 170 4 4 1 0 20
