@@ -986,8 +986,25 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> hasItems = player["items"];
 		if (hasItems != sol::nullopt)
 		{ 
-			// TODO: Create variables to hold the items that the player has currently obtained
-			Logger::Err("Needs to be set up");
+			Game::Instance()->GetGameItems().woodBoomerang = player["items"]["boomerang"].get_or(false);
+			Game::Instance()->GetGameItems().magicBoomerang = player["items"]["magic_boomerang"].get_or(false);
+			Game::Instance()->GetGameItems().woodSword = player["items"]["wood_sword"].get_or(false);
+			Game::Instance()->GetGameItems().steelSword = player["items"]["steel_sword"].get_or(false);
+			Game::Instance()->GetGameItems().magicSword = player["items"]["magic_sword"].get_or(false);
+			Game::Instance()->GetGameItems().bombs = player["items"]["bombs"].get_or(false);
+			Game::Instance()->GetGameItems().food = player["items"]["food"].get_or(false);
+			Game::Instance()->GetGameItems().flute = player["items"]["flute"].get_or(false);
+			Game::Instance()->GetGameItems().raft = player["items"]["raft"].get_or(false);
+			Game::Instance()->GetGameItems().ladder = player["items"]["ladder"].get_or(false);
+			Game::Instance()->GetGameItems().bow = player["items"]["bow_wood"].get_or(false);
+			Game::Instance()->GetGameItems().magicBow = player["items"]["bow_magic"].get_or(false);
+			Game::Instance()->GetGameItems().shield = player["items"]["shield"].get_or(false);
+			Game::Instance()->GetGameItems().magicShield = player["items"]["magic_shield"].get_or(false);
+			Game::Instance()->GetGameItems().powerBraclet = player["items"]["power_braclet"].get_or(false);
+			Game::Instance()->GetGameItems().map = player["items"]["map"].get_or(false);
+			Game::Instance()->GetGameItems().bluePotion = player["items"]["blue_potion"].get_or(false);
+			Game::Instance()->GetGameItems().redPotion = player["items"]["red_potion"].get_or(false);
+			Game::Instance()->GetGameItems().masterKey = player["items"]["master_key"].get_or(false);
 		}
 
 		// Inventory

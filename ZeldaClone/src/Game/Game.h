@@ -38,6 +38,7 @@ struct GameItems
 	bool magicRod;
 	bool bombs;
 	bool flute;
+	bool food;
 	bool raft;
 	bool ladder;
 	bool blueRing;
@@ -100,7 +101,7 @@ public:
 	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } // Move Semantics?
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
 
-	GameItems GetGameItems() { return mGameItems; }
+	GameItems& GetGameItems() { return mGameItems; }
 	unsigned& GetPlayerNum();
 	glm::vec2& GetPlayerPos() { return mPlayerPos; }
 	double& GetDeltaTime();

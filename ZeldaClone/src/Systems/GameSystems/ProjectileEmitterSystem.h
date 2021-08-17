@@ -115,9 +115,9 @@ public:
 		{
 			if (entity.HasTag("player"))
 			{
+				// The playerSet is setting the position of the player for the boomerang to come back to in the update function
 				if (!playerSet && attrib.group == "boomerang")
 				{
-					Logger::Log("IN HERE");
 					playerPosition = entity.GetComponent<TransformComponent>().position;
 					playerSet = true;
 				}
@@ -143,6 +143,7 @@ public:
 					attrib.duration = projectileEmitter.projectileDuration;
 				}
 
+				// Create direction variables the change the velocity direction based on which way we are facing
 				int directionX = 0;
 				int directionY = 0;
 
@@ -230,14 +231,15 @@ public:
 					newItem.AddComponent<RigidBodyComponent>(projectileVelocity);
 					newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
 				}
+				// Does the projectile have an animation component?
 				if (attrib.animation)
 				{
+					// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
 					newItem.AddComponent<AnimationComponent>(attrib.numFrames, 20, attrib.vertical, true);
 				}
 				projectileEmitter.isFriendly = true;
 				newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
-				newItem.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, attrib.duration);
-				newItem.AddComponent<ProjectileEmitterComponent>();
+				newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0,attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
 				newItem.AddComponent<GameComponent>();
 			}
 		}
@@ -424,12 +426,14 @@ public:
 		}
 		else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
 		{
-			ItemAttrib beam("projectile", "Sword", 16, 16, 0, 0, 4, glm::vec2(4,4), glm::vec2(35, 45), glm::vec2(40, 25), glm::vec2(15, 30), glm::vec2(65, 30), 
-				glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(25, 0), glm::vec2(25, 20), glm::vec2(15, 30), glm::vec2(10, 30), 3000, true, true);
 			UseSword();
 			// If the player life is full, allow sword beam projectile
 			if (fullLife)
 			{
+				// Create Sword beam projectile
+				ItemAttrib beam("projectile", "Sword", 16, 16, 0, 0, 4, glm::vec2(4, 4), glm::vec2(35, 45), glm::vec2(40, 25), glm::vec2(15, 30), glm::vec2(65, 30),
+					glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(25, 0), glm::vec2(25, 20), glm::vec2(15, 30), glm::vec2(10, 30), 3000, true, true);
+
 				UseItem(beam);
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_shoot", 0, 1);
 			}

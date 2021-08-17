@@ -46,7 +46,6 @@ public:
 
 	void Update(SDL_Rect& camera)
 	{
-		Logger::Log("Position" + std::to_string(Game::Instance()->windowHeight / 6 + (Game::Instance()->tilePixels * Game::Instance()->gameScale) + 64));
 		for (auto entity : GetSystemEntities())
 		{
 			

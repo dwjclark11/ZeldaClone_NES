@@ -47,7 +47,7 @@ public:
 
 		if (b.BelongsToGroup("projectile") && a.BelongsToGroup("enemies")) OnPlayerProjectileHitsEnemy(b, a);
 		if (b.BelongsToGroup("enemies") && a.BelongsToGroup("colliders")) OnEnemyHitsObstacle(b, a);
-		if ((a.BelongsToGroup("projectile") || a.HasTag("the_sword")) && b.BelongsToGroup("enemies")) OnEnemyHitsPlayerProjectile(a, b);
+		if (a.BelongsToGroup("enemies") && (b.BelongsToGroup("projectile") || b.HasTag("the_sword"))) OnEnemyHitsPlayerProjectile(a, b);
 		if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("projectile") || a.HasTag("the_sword"))) OnEnemyHitsPlayerProjectile(b, a);
 	}
 
@@ -142,7 +142,7 @@ public:
 	
 	void OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 	{
-		if (enemy.BelongsToGroup("enemies") && !hitEnemyTimerStarted && projectile.HasTag("the_sword"))
+		if (enemy.BelongsToGroup("enemies") && !hitEnemyTimerStarted && (projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")))
 		{
 			auto& health = enemy.GetComponent<HealthComponent>();
 			auto& enemyTransform = enemy.GetComponent<TransformComponent>();
