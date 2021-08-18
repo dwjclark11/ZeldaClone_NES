@@ -48,26 +48,8 @@ public:
 			Game::Instance()->SetCameraX(-16);
 			break;
 
-		case SDLK_UP:
-			MouseControlSystem::imageSrcY -= 16;
-			break;
-
-		case SDLK_RIGHT:
-			MouseControlSystem::imageSrcX += 16;
-			break;
-
-		case SDLK_DOWN:
-
-			MouseControlSystem::imageSrcY += 16;
-			break;
-
-		case SDLK_LEFT:
-			MouseControlSystem::imageSrcX -= 16;
-			break;
-
 		case SDLK_c:
 			MouseControlSystem::isCollision = !MouseControlSystem::isCollision;
-		//	if (MouseControlSystem::createBoxCollider) MouseControlSystem::isCollision = true;
 			break;
 
 		case SDLK_l:

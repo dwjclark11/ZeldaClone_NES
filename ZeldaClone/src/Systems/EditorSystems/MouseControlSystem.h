@@ -5,6 +5,7 @@
 #include "../Components/TriggerBoxComponent.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/EditorComponent.h"
 #include <SDL.h>
 #include <glm/glm.hpp>
 #include <SDL_ttf.h>
@@ -104,8 +105,8 @@ public:
 				tile.Group("tiles");
 				tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 					glm::vec2(tileScaleX, tileScaleY), 0.0);
-				//tile.AddComponent<SpriteComponent>(imageID, mouseRectX, mouseRectY, MouseControlSystem::layer, false, imageSrcX, imageSrcY);
-
+				tile.AddComponent<SpriteComponent>(imageID, mouseRectX, mouseRectY, MouseControlSystem::layer, false, imageSrcX, imageSrcY);
+				tile.AddComponent<EditorComponent>();
 				if (isCollision)
 				{
 					tile.AddComponent<BoxColliderComponent>(boxColliderWidth, boxColliderHeight, glm::vec2(boxColliderOffsetX, boxColliderOffsetY));

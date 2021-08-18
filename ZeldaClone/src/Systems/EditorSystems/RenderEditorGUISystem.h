@@ -368,8 +368,8 @@ public:
 		static int zIndex = 0;
 		static int scaleX = 1;
 		static int scaleY = 1;
-		static int mouseRectX = 32;
-		static int mouseRectY = 32;
+		static int mouseRectX = 16;
+		static int mouseRectY = 16;
 		static int boxColliderWidth = 0;
 		static int boxColliderHeight = 0;
 		static int boxColliderOffsetX = 0;
@@ -388,30 +388,9 @@ public:
 			ImGui::SliderInt("Y Scale", &scaleY, 1, 10);
 		}
 		ImGui::Spacing();
-
-		if (ImGui::CollapsingHeader("Music", ImGuiTreeNodeFlags_DefaultOpen));
-		{
-			//ImGui::Combo("Sprite Type", &item_type, sprite_names, IM_ARRAYSIZE(sprite_names), IM_ARRAYSIZE(sprite_names));
-			ImGui::SliderInt("Volume", &volume, 1, 100);
-			
-			if (ImGui::Button("  Pause Music  "))
-			{
-				Mix_PauseMusic();
-			}
-			if (ImGui::Button(" Resume Music  "))
-			{
-				Mix_ResumeMusic();
-			}
-			if (ImGui::Button("   Stop Music  "))
-			{
-				Mix_HaltMusic();
-			}
-			
-			Mix_VolumeMusic(volume);
-		}
-
 		ImGui::Spacing();
 
+		ImGui::Checkbox("Box Collider", &MouseControlSystem::isCollision);
 		if (ImGui::CollapsingHeader("Box Collider Components", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::SliderInt("Box Width", &boxColliderWidth, 1, 96);
@@ -421,10 +400,10 @@ public:
 		}
 		if (ImGui::CollapsingHeader("Mouse Box Size", ImGuiTreeNodeFlags_DefaultOpen))
 		{
-
 			ImGui::SliderInt("Mouse Rect X", &mouseRectX, 8, 128);
 			ImGui::SliderInt("Mouse Rect Y", &mouseRectY, 8, 128);
 		}
+
 		ImGui::Spacing();
 		if (ImGui::Button("Set Tile Attributes"))
 		{
@@ -451,23 +430,43 @@ public:
 	void ImageBox( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 	{
 		assetManager->GetTexture(MouseControlSystem::imageID);
-		static int  my_image_width = 256 * 3;
-		static int my_image_height = 192 * 3;
+		static int  my_image_width = 288 * 4;
+		static int my_image_height = 128 * 4;
 		const ImVec2 vec1(10, 10);
 		const ImVec2 vec2(30, 30);
 		ImGui::Begin("Texture");
 		ImGui::Image(assetManager->GetTexture(MouseControlSystem::imageID), ImVec2(my_image_width, my_image_height));
-
-
-		auto draw_list = ImGui::GetWindowDrawList();
-		if (ImGui::IsItemHovered()) {
-			if (ImGui::IsMouseClicked(0))
+		int mouseposX = ImGui::GetMousePos().x - 456;
+		int mouseposY = ImGui::GetMousePos().y - 21;
+		/*
+			768 x 576
+		*/
+		//Logger::Log("X: " + std::to_string(mouseposX) + ", Y : " + std::to_string(mouseposY));
+		for (int i = 0; i < 16; i++)
+		{
+			for (int j = 0; j < 12; j++)
 			{
-				Logger::Log(std::to_string(ImGui::GetMousePos().x) + std::to_string(ImGui::GetMousePos().y));
+				auto draw_list = ImGui::GetWindowDrawList();
+				if (mouseposX >= (my_image_width / 16) * i && mouseposX <= (my_image_width / 16) + ((my_image_width / 16) * i))
+				{
+					if (mouseposY >= (my_image_height / 8) * j && mouseposY <= (my_image_height / 8) + ((my_image_height / 8) * j))
+					{
+						if (ImGui::IsItemHovered()) {
+							if (ImGui::IsMouseClicked(0))
+							{
+								Logger::Log("X: " + std::to_string(i) + ", Y : " + std::to_string(j));
+								MouseControlSystem::imageSrcX = i * 16;
+								MouseControlSystem::imageSrcY = j * 16;
+							}
+						}
+					}
+				}
 			}
-
 		}
 		////ImDrawList::AddLine
 		ImGui::End();
+
+		ImGui::Begin("Mouse Image");
+		
 	}
 };

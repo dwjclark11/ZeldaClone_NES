@@ -3,6 +3,7 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/KeyboardControlComponent.h"
+#include "../Components/EditorComponent.h"
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -71,7 +72,7 @@ void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetMan
 		tile.Group(group);
 		tile.AddComponent<SpriteComponent>("image-Name", tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
-		
+		tile.AddComponent<EditorComponent>();
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{
@@ -127,7 +128,7 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 		object.Group(group);
 		object.AddComponent<SpriteComponent>(assetID, tileSize, tileSize, zIndex, false, srcRectX, srcRectY);
 		object.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
-		
+		object.AddComponent<EditorComponent>();
 		// If the obstacle has a collider, add a BoxColliderComponent
 		if (collider)
 		{
@@ -219,8 +220,17 @@ void EditorFileLoader::SaveTilemap(std::string filepath, const std::unique_ptr<A
 				std::string group = "tiles";
 				auto& tile = entity.GetComponent<SpriteComponent>();
 				auto& transform = entity.GetComponent<TransformComponent>();
-				auto collision = entity.GetComponent<BoxColliderComponent>();
+				auto collision = BoxColliderComponent(); 
+
+				if (entity.HasComponent<BoxColliderComponent>())
+					collision = entity.GetComponent<BoxColliderComponent>();
 				
+				if (entity.HasComponent<EditorComponent>())
+				{
+					Logger::Err("Removed Editor Component");
+					entity.RemoveComponent<EditorComponent>();
+				}
+
 				// Save to the mapfile
 				mapFile << group << " " << tile.width << " "<< tile.height << " " << tile.srcRect.y << " " << tile.srcRect.x << " " << tile.layer << " " <<
 					transform.position.x << " " << transform.position.y << " " << transform.scale.x << " " << transform.scale.y << " ";

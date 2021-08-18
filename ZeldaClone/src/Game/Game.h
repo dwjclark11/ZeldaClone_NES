@@ -87,6 +87,7 @@ public:
 	
 	// Getters and Setters of objects to be used through-out the game
 	SDL_Renderer* GetRenderer() const { return mRenderer; }
+	SDL_Window* GetWindow() { return mWindow;  }
 	SDL_Rect& GetCamera();
 	void SetCameraY(int change);
 	void SetCameraX(int change);
