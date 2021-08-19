@@ -9,6 +9,9 @@
 #include <imgui/imgui_stdlib.h>
 #include <fstream>
 #include "../Game/Game.h"
+#include <winsock.h>
+#include <fstream>
+#include <iostream>
 
 class RenderEditorGUISystem : public System
 {
@@ -19,6 +22,7 @@ private:
 	std::ofstream saveFile;
 	EditorFileLoader loader;
 	MouseControlSystem choices;
+	static unsigned int imageWidth, imageHeight;
 
 public:
 	struct Funcs
@@ -173,6 +177,16 @@ public:
 			choices.SetImageName(imageName);
 			Logger::Log(choices.GetImageName());
 			MouseControlSystem::imageID = loader.SetName(imageName);
+
+			std::ifstream image(imageName);
+			image.seekg(16);
+			image.read((char*)&imageWidth, 4);
+			image.read((char*)&imageHeight, 4);
+
+			imageWidth = ntohl(imageWidth);
+			imageHeight = ntohl(imageHeight);
+
+			
 
 			// Check to see if the String is Empty!!
 			if (!imageName.empty())
@@ -404,7 +418,13 @@ public:
 			ImGui::SliderInt("Mouse Rect Y", &mouseRectY, 8, 128);
 		}
 
+		if(ImGui::InputInt("Z-Index", &MouseControlSystem::layer, 1, 1));
+		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
+		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;
+
 		ImGui::Spacing();
+		ImGui::Spacing();
+
 		if (ImGui::Button("Set Tile Attributes"))
 		{
 			if (scaleX == 0) noScaleX = true;
@@ -423,50 +443,72 @@ public:
 
 		}
 
+		const char* triggers[] = { "NO_TRIGGER", "SECRET_AREA",  "ENTER_DUNGEON", "BURN_BUSHES", "PUSH_ROCKS", "CAMERA_RIGHT", "TRAP", "HIDDEN_SWITCH", "HIDDEN_OBJECT" };
+		const const char* current_item = nullptr;
+
+		if (ImGui::BeginCombo("Trigger Types", current_item))
+		{
+			for (int n = 0; n < IM_ARRAYSIZE(triggers); n++)
+			{
+				bool is_selected = (current_item == triggers[n]);
+				if (ImGui::Selectable(triggers[n], is_selected))
+				{
+					current_item = triggers[n];
+				}
+				if (is_selected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+		}ImGui::EndCombo();
+
+
+
 		// Warning Messages if Enemy Creation Fails
 		if (noScaleX) ImGui::Text("Please Put in X Scale");
 		if (noScaleY) ImGui::Text("Please Put in Y Scale");
 	}
+
 	void ImageBox( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 	{
 		assetManager->GetTexture(MouseControlSystem::imageID);
-		static int  my_image_width = 288 * 4;
-		static int my_image_height = 128 * 4;
-		const ImVec2 vec1(10, 10);
-		const ImVec2 vec2(30, 30);
+		int  my_image_width = imageWidth * Game::gameScale;
+		int my_image_height = imageHeight * Game::gameScale;
+
 		ImGui::Begin("Texture");
 		ImGui::Image(assetManager->GetTexture(MouseControlSystem::imageID), ImVec2(my_image_width, my_image_height));
-		int mouseposX = ImGui::GetMousePos().x - 456;
-		int mouseposY = ImGui::GetMousePos().y - 21;
-		/*
-			768 x 576
-		*/
-		//Logger::Log("X: " + std::to_string(mouseposX) + ", Y : " + std::to_string(mouseposY));
-		for (int i = 0; i < 16; i++)
+		int mouseposX = ImGui::GetMousePos().x - 376;
+		int mouseposY = ImGui::GetMousePos().y - 31;
+
+		if (my_image_width > 0 && my_image_height > 0 && MouseControlSystem::mouseRectX > 0 && MouseControlSystem::mouseRectY > 0)
 		{
-			for (int j = 0; j < 12; j++)
+			int rows = (my_image_height / (MouseControlSystem::mouseRectY * Game::gameScale));
+			int col = (my_image_width / (MouseControlSystem::mouseRectX * Game::gameScale));
+
+			for (int i = 0; i < col; i++)
 			{
-				auto draw_list = ImGui::GetWindowDrawList();
-				if (mouseposX >= (my_image_width / 16) * i && mouseposX <= (my_image_width / 16) + ((my_image_width / 16) * i))
+				for (int j = 0; j < rows; j++)
 				{
-					if (mouseposY >= (my_image_height / 8) * j && mouseposY <= (my_image_height / 8) + ((my_image_height / 8) * j))
+					auto draw_list = ImGui::GetWindowDrawList();
+					if (mouseposX >= (my_image_width / col) * i && mouseposX <= (my_image_width / col) + ((my_image_width / col) * i))
 					{
-						if (ImGui::IsItemHovered()) {
-							if (ImGui::IsMouseClicked(0))
-							{
-								Logger::Log("X: " + std::to_string(i) + ", Y : " + std::to_string(j));
-								MouseControlSystem::imageSrcX = i * 16;
-								MouseControlSystem::imageSrcY = j * 16;
+						if (mouseposY >= (my_image_height / rows) * j && mouseposY <= (my_image_height / rows) + ((my_image_height / rows) * j))
+						{
+							if (ImGui::IsItemHovered()) {
+								if (ImGui::IsMouseClicked(0))
+								{
+									Logger::Log("X: " + std::to_string(i) + ", Y : " + std::to_string(j));
+									MouseControlSystem::imageSrcX = i * MouseControlSystem::mouseRectX;
+									MouseControlSystem::imageSrcY = j * MouseControlSystem::mouseRectY;
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-		////ImDrawList::AddLine
-		ImGui::End();
-
-		ImGui::Begin("Mouse Image");
-		
 	}
 };
+
+unsigned int RenderEditorGUISystem::imageWidth = 0;
+unsigned int RenderEditorGUISystem::imageHeight = 0;

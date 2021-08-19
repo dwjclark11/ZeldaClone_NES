@@ -32,7 +32,7 @@ public:
 	static bool createBoxCollider;
 	static bool gridSnap;
 	static std::string imageID;
-	static unsigned layer;
+	static int layer;
 	static unsigned triggerNum;
 	static TriggerType triggerType;
 	static int triggerLevelNum;
@@ -274,7 +274,8 @@ public:
 				tile.Group("tiles");
 				tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 					glm::vec2(tileScaleX, tileScaleY), 0.0);
-				//tile.AddComponent<SpriteComponent>(imageID, mouseRectX, mouseRectY, MouseControlSystem::layer, false, imageSrcX, imageSrcY);
+				tile.AddComponent<SpriteComponent>(imageID, mouseRectX, mouseRectY, MouseControlSystem::layer, false, imageSrcX, imageSrcY);
+				tile.AddComponent<EditorComponent>();
 
 				if (isCollision)
 				{
@@ -285,7 +286,6 @@ public:
 					tile.AddComponent<BoxColliderComponent>(boxColliderWidth, boxColliderHeight, glm::vec2(boxColliderOffsetX, boxColliderOffsetY));
 					tile.Group("trigger");
 				}
-				Logger::Log("Left Pressed");
 				leftPressed = true;
 			}
 			if (event.button.button == SDL_BUTTON_RIGHT)
@@ -717,7 +717,7 @@ int MouseControlSystem::boxColliderWidth = 0;
 int MouseControlSystem::boxColliderHeight = 0;
 int MouseControlSystem::boxColliderOffsetX = 0;
 int MouseControlSystem::boxColliderOffsetY = 0;
-unsigned MouseControlSystem::layer = 0;
+int MouseControlSystem::layer = 0;
 bool MouseControlSystem::isCollision = false;
 bool MouseControlSystem::isTrigger = false;
 bool MouseControlSystem::createTile = false;

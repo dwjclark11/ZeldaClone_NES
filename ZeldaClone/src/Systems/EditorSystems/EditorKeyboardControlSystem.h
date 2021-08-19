@@ -123,10 +123,7 @@ public:
 		if (Game::Instance()->GetCamera().y < -100) Game::Instance()->GetCamera().y = -100;
 		if (Game::Instance()->GetCamera().x > levelWidth - Game::Instance()->GetCamera().w) Game::Instance()->GetCamera().x = levelWidth - Game::Instance()->GetCamera().w;
 		if (Game::Instance()->GetCamera().y > levelHeight - Game::Instance()->GetCamera().h) Game::Instance()->GetCamera().y = levelHeight - Game::Instance()->GetCamera().h;
-		if (MouseControlSystem::imageSrcY < 0) MouseControlSystem::imageSrcY = 0;
-		if (MouseControlSystem::imageSrcY > 64) MouseControlSystem::imageSrcY = 64;
-		if (MouseControlSystem::imageSrcX < 0) MouseControlSystem::imageSrcX = 0;
-		if (MouseControlSystem::imageSrcX > 288) MouseControlSystem::imageSrcX = 288;
+
 		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
 		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;
 	}
