@@ -16,3 +16,11 @@ This game/engine includes the following:
 ![Clone_Editor](https://user-images.githubusercontent.com/63356975/130303677-08d6fdc8-6f66-490b-ba8a-df98e0a7192a.png)
 
 ![zelda_clone](https://user-images.githubusercontent.com/63356975/130304810-ad7e5efe-b8a2-4fd1-ab23-6c624646fd57.png)
+
+There are still a lot of bugs that must be fixed to have a properly working demo.
+
+Some desired functionalities are:
+        - A functional AI State Machine for entities/enemies done in Lua
+        - An animation editor in the tilemap editor that allows you to load sprites and change animiation speeds to the desired speed rather than 
+        recompiling to try.
+        - 
