@@ -46,8 +46,7 @@ public:
 			return ImGui::InputTextMultiline(label, my_str->begin(), (size_t)my_str->size(), size, flags | ImGuiInputTextFlags_CallbackResize, Funcs::MyResizeCallback, (void*)my_str);
 		}
 	};
-
-	// Setup the IMGUI Style in the Constructor
+	// Setup the IMGUI Style in the Constructor --> Change to it's own style function?
 	RenderEditorGUISystem()
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -151,6 +150,7 @@ public:
 				}
 			}
 		}
+		
 		if (ImGui::MenuItem("Load Image"))
 		{
 			imageName = dialog.OpenImage();
@@ -172,22 +172,30 @@ public:
 
 		if (ImGui::MenuItem("Load Mouse Image"))
 		{
+			// Open a file dialog and assign the return directory to the imageName
 			imageName = dialog.OpenImage();
-
+			
 			choices.SetImageName(imageName);
 			Logger::Log(choices.GetImageName());
+			
+			// Strip the image name of the directory strings leaving just the name 
 			MouseControlSystem::imageID = loader.SetName(imageName);
-
+			
+			// Read the image PNG file 
 			std::ifstream image(imageName);
+			// The width is 16 bytes in and is 4 bytes long the height comes 
+			// right after at 20. Also 4 bytes
 			image.seekg(16);
+			// Assign the values of the File header to the given varaibles
 			image.read((char*)&imageWidth, 4);
 			image.read((char*)&imageHeight, 4);
-
+			
+			// We must now rearrange the varialbes from Network byte order to host byte order.
+			// Big-Endian to Little-Endian so we can use the values.
 			imageWidth = ntohl(imageWidth);
 			imageHeight = ntohl(imageHeight);
 
 			
-
 			// Check to see if the String is Empty!!
 			if (!imageName.empty())
 			{
@@ -295,8 +303,7 @@ public:
 					loader.SaveTilemap(saveAsFile, assetManager, renderer);
 				}
 			}
-
-			if (MouseControlSystem::createObstacles)
+			else if (MouseControlSystem::createObstacles)
 			{
 				std::string saveAsFile = dialog.SaveObjFile();
 				if (!saveAsFile.empty())
@@ -305,18 +312,45 @@ public:
 					loader.SaveObjectMap(saveAsFile, assetManager, renderer);
 				}
 			}
-
-			if (MouseControlSystem::createBoxCollider)
+			else if (MouseControlSystem::createBoxCollider)
 			{
 				std::string saveAsFile = dialog.SaveBoxColliderFile();
 				if (!saveAsFile.empty())
 				{
 					Logger::Err("SavedCollider");
-					loader.SaveBoxColliderMap(saveAsFile, assetManager, renderer);
+					//loader.SaveBoxColliderMap(saveAsFile, assetManager, renderer);
 					loader.SaveBoxColliderMapToLuaFile(saveAsFile, assetManager, renderer);
 				}
 			}
+			else if (MouseControlSystem::createEnemy)
+			{
+				std::string saveAsFile = dialog.SaveBoxColliderFile();
+				if (!saveAsFile.empty())
+				{
+					Logger::Err("SavedCollider");
+					//loader.SaveBoxColliderMap(saveAsFile, assetManager, renderer);
+					loader.SaveEnemiesToLuaFile(saveAsFile);
+				}
+
+			}
 		}
+		
+		// Change the canvas size 
+		if (ImGui::CollapsingHeader("Canvas Size", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// Test to see if the canvas slider will be a divided evenly by 16
+			if (ImGui::SliderInt("Canvas Width", &MouseControlSystem::CanvasWidth, 256, 20000))
+			{
+				MouseControlSystem::CanvasWidth /= 16;
+				MouseControlSystem::CanvasWidth *= 16;
+			}
+			if (ImGui::SliderInt("Canvas Height", &MouseControlSystem::CanvasHeight, 240, 20000))
+			{
+				MouseControlSystem::CanvasHeight /= 16;
+				MouseControlSystem::CanvasHeight *= 16;
+			}
+		}
+
 
 		if (ImGui::Button("Create Tiles"))
 		{
@@ -339,7 +373,7 @@ public:
 				MouseControlSystem::createBoxCollider = false;
 			}
 		}
-		if (ImGui::Button("Create Colliders"))
+		if (ImGui::Button("Create Colliders/Triggers"))
 		{
 			MouseControlSystem::createBoxCollider = !MouseControlSystem::createBoxCollider;
 
@@ -347,6 +381,18 @@ public:
 			{
 				MouseControlSystem::createTile = false;
 				MouseControlSystem::createObstacles = false;
+			}
+		}
+
+		if (ImGui::Button("Create Enemies"))
+		{
+			MouseControlSystem::createEnemy = !MouseControlSystem::createEnemy;
+
+			if (MouseControlSystem::createEnemy)
+			{
+				MouseControlSystem::createTile = false;
+				MouseControlSystem::createObstacles = false;
+				MouseControlSystem::createBoxCollider = false;
 			}
 		}
 
@@ -375,6 +421,7 @@ public:
 		if (MouseControlSystem::createTile) ImGui::Text("CURRENTLT CREATING TILES!");
 		if (MouseControlSystem::createObstacles) ImGui::Text("CURRENTLT CREATING OBSTACLES!");
 		if (MouseControlSystem::createBoxCollider) ImGui::Text("CURRENTLT CREATING BOX COLLIDERS!");
+		if (MouseControlSystem::createEnemy) ImGui::Text("CURRENTLT CREATING ENEMIES!");
 	}
 	void ShowMenuTile( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 	{
@@ -388,7 +435,7 @@ public:
 		static int boxColliderHeight = 0;
 		static int boxColliderOffsetX = 0;
 		static int boxColliderOffsetY = 0;
-
+		static bool layer = false;
 		// Music Variables
 		static int volume = 0;
 
@@ -412,13 +459,37 @@ public:
 			ImGui::SliderInt("Box OffsetX", &boxColliderOffsetX, -96, 96);
 			ImGui::SliderInt("Box OffsetY", &boxColliderOffsetY, -96, 96);
 		}
+
+		if (MouseControlSystem::createEnemy)
+		{
+			ImGui::Checkbox("Animation", &MouseControlSystem::animation);
+			
+			if (MouseControlSystem::animation)
+			{
+				if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
+				{
+					if (ImGui::InputInt("Frame Rate Speed", &MouseControlSystem::animationFrameRateSpeed, 0, 1));
+					if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
+					if (MouseControlSystem::layer > 20) MouseControlSystem::layer = 20;
+					if (ImGui::InputInt("Number of Frames", &MouseControlSystem::animationNumFrames, 0, 1));
+					if (MouseControlSystem::layer < 0) MouseControlSystem::animationNumFrames = 0;
+					if (MouseControlSystem::layer > 20) MouseControlSystem::animationNumFrames = 20;
+					if (ImGui::InputInt("Frame Offset", &MouseControlSystem::animationFrameOffset, 0, 1));
+
+					ImGui::Checkbox("Vertical", &MouseControlSystem::animationVerticalScroll); 
+					ImGui::SameLine();
+					ImGui::Checkbox("Looped", &MouseControlSystem::animationLooped);
+				}
+			}
+		}
+
 		if (ImGui::CollapsingHeader("Mouse Box Size", ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			ImGui::SliderInt("Mouse Rect X", &mouseRectX, 8, 128);
 			ImGui::SliderInt("Mouse Rect Y", &mouseRectY, 8, 128);
 		}
 
-		if(ImGui::InputInt("Z-Index", &MouseControlSystem::layer, 1, 1));
+		if(ImGui::InputInt("Z-Index", &MouseControlSystem::layer, 0, 1));
 		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
 		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;
 
@@ -444,7 +515,7 @@ public:
 		}
 
 		const char* triggers[] = { "NO_TRIGGER", "SECRET_AREA",  "ENTER_DUNGEON", "BURN_BUSHES", "PUSH_ROCKS", "CAMERA_RIGHT", "TRAP", "HIDDEN_SWITCH", "HIDDEN_OBJECT" };
-		const const char* current_item = nullptr;
+		const char* current_item = nullptr;
 
 		if (ImGui::BeginCombo("Trigger Types", current_item))
 		{
@@ -459,27 +530,76 @@ public:
 				{
 					ImGui::SetItemDefaultFocus();
 				}
+				if (current_item == "NO_TRIGGER")
+				{
+					MouseControlSystem::triggerType = NO_TRIGGER;
+				}
+				else if (current_item == "SECRET_AREA")
+				{
+					MouseControlSystem::triggerType = SECRET_AREA;
+				}
+				else if (current_item == "ENTER_DUNGEON")
+				{
+					MouseControlSystem::triggerType = ENTER_DUNGEON;
+				}
+				else if (current_item == "BURN_BUSHES")
+				{
+					MouseControlSystem::triggerType = BURN_BUSHES;
+				}
+				else if (current_item == "PUSH_ROCKS")
+				{
+					MouseControlSystem::triggerType = PUSH_ROCKS;
+				}
+				else if (current_item == "CAMERA_RIGHT")
+				{
+					MouseControlSystem::triggerType = CAMERA_RIGHT;
+				}
+				else if (current_item == "TRAP")
+				{
+					MouseControlSystem::triggerType = TRAP;
+				}
+				else if (current_item == "HIDDEN_SWITCH")
+				{
+					MouseControlSystem::triggerType = HIDDEN_SWITCH;
+				}
+				else if (current_item == "HIDDEN_OBJECT")
+				{
+					MouseControlSystem::triggerType = HIDDEN_OBJECT;
+				}
 			}
 		}ImGui::EndCombo();
-
-
-
+		
 		// Warning Messages if Enemy Creation Fails
 		if (noScaleX) ImGui::Text("Please Put in X Scale");
 		if (noScaleY) ImGui::Text("Please Put in Y Scale");
 	}
-
+	
+	// The image Box is the holder of the Tilemap/Object selector
+	// The functionality is you click on the image and it determines the height/width/scale/offset based on the 
+	// Selections made above!
 	void ImageBox( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 	{
+		// Get the Desired texture
 		assetManager->GetTexture(MouseControlSystem::imageID);
+		
+		// Set the image Width/Height based on the obtain values from the file and the current game scale
 		int  my_image_width = imageWidth * Game::gameScale;
 		int my_image_height = imageHeight * Game::gameScale;
-
+		
 		ImGui::Begin("Texture");
 		ImGui::Image(assetManager->GetTexture(MouseControlSystem::imageID), ImVec2(my_image_width, my_image_height));
+		
+		// This is for the mouse Offset for the image --> Still needs to be refined --> Currently Hackish
+		
+		/*
+			TODO: Make the ImGui Window changes sizes based on the image size * game Scale values
+			TODO: Rather get the mouse Pos Relative to the current ImGui window!
+		*/
+		
 		int mouseposX = ImGui::GetMousePos().x - 376;
 		int mouseposY = ImGui::GetMousePos().y - 31;
-
+		
+		// Clamp --> To make sure that we are not dividing by zero value!
 		if (my_image_width > 0 && my_image_height > 0 && MouseControlSystem::mouseRectX > 0 && MouseControlSystem::mouseRectY > 0)
 		{
 			int rows = (my_image_height / (MouseControlSystem::mouseRectY * Game::gameScale));
@@ -490,15 +610,17 @@ public:
 				for (int j = 0; j < rows; j++)
 				{
 					auto draw_list = ImGui::GetWindowDrawList();
+					// Check to see if we are in the area of the desired 2D tile/object
 					if (mouseposX >= (my_image_width / col) * i && mouseposX <= (my_image_width / col) + ((my_image_width / col) * i))
 					{
 						if (mouseposY >= (my_image_height / rows) * j && mouseposY <= (my_image_height / rows) + ((my_image_height / rows) * j))
 						{
-							if (ImGui::IsItemHovered()) {
+							if (ImGui::IsItemHovered()) 
+							{
 								if (ImGui::IsMouseClicked(0))
 								{
 									Logger::Log("X: " + std::to_string(i) + ", Y : " + std::to_string(j));
-									MouseControlSystem::imageSrcX = i * MouseControlSystem::mouseRectX;
+									MouseControlSystem::imageSrcX = i * MouseControlSystem::mouseRectX; // The actual size of the sprite [16 x 16],[32 x 32] etc
 									MouseControlSystem::imageSrcY = j * MouseControlSystem::mouseRectY;
 								}
 							}

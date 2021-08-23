@@ -23,7 +23,8 @@ public:
 	void SaveObjectMap(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void SaveBoxColliderMap(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void SaveBoxColliderMapToLuaFile(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
-	
+	void SaveEnemiesToLuaFile(std::string filepath);
+
 	// Setters
 	void SetFileName(std::string filename);
 	void SetImageName(std::string imageName);

@@ -10,6 +10,9 @@
 #include "../Components/MenuComponent.h"
 #include "../Components/TileComponent.h"
 #include "../Components/GameComponent.h"
+#include "../Components/ScriptComponent.h"
+#include "../Components/ProjectileEmitterComponent.h"
+#include "../Components/CameraFollowComponent.h"
 #include "../States/NameState.h"
 #include "../States/MenuState.h"
 #include "../States/GameState.h"
@@ -1135,7 +1138,86 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 					);
 			}
 
+			// Keyboard Control Component
+			sol::optional<sol::table> keyboard = entity["components"]["keyboard_control"];
+			if (keyboard != sol::nullopt)
+			{
+				newEntity.AddComponent<KeyboardControlComponent>(
+					glm::vec2(
+						entity["components"]["keyboard_control"]["up_velocity"]["x"].get_or(0),
+						entity["components"]["keyboard_control"]["up_velocity"]["y"].get_or(0)
+					),
+					glm::vec2(
+						entity["components"]["keyboard_control"]["right_velocity"]["x"].get_or(0),
+						entity["components"]["keyboard_control"]["right_velocity"]["y"].get_or(0)
+					),
+					glm::vec2(
+						entity["components"]["keyboard_control"]["down_velocity"]["x"].get_or(0),
+						entity["components"]["keyboard_control"]["down_velocity"]["y"].get_or(0)
+					),
+					glm::vec2(
+						entity["components"]["keyboard_control"]["left_velocity"]["x"].get_or(0),
+						entity["components"]["keyboard_control"]["left_velocity"]["y"].get_or(0)
+					));
+			}
 
+			// Health Component int healthPercentage = 9, int maxHearts = 3
+			sol::optional<sol::table> health = entity["components"]["health"];
+			if (health != sol::nullopt)
+			{
+				newEntity.AddComponent<HealthComponent>(
+					entity["components"]["health"]["health_percentage"].get_or(100),
+					entity["components"]["health"]["max_hearts"].get_or(3)
+					);
+			}
+
+			// Game Component // For rendering in the gameState!
+			sol::optional<sol::table> game_state = entity["components"]["game_state"];
+			if (game_state != sol::nullopt)
+			{
+				newEntity.AddComponent<GameComponent>();
+			}
+
+			// Box Collider width, height, glm::vec2 offset 
+			sol::optional<sol::table> box_collider = entity["components"]["box_collider"];
+			if (box_collider != sol::nullopt)
+			{
+				newEntity.AddComponent<BoxColliderComponent>(
+					entity["components"]["box_collider"]["width"].get_or(16),
+					entity["components"]["box_collider"]["height"].get_or(16),
+					glm::vec2(
+						entity["componets"]["box_collider"]["offset"]["x"].get_or(0),
+						entity["componets"]["box_collider"]["offset"]["y"].get_or(0)
+					));
+			}
+			// Projectile Emitter  
+			sol::optional<sol::table> projectile = entity["components"]["projectile_emitter"];
+			if (projectile != sol::nullopt)
+			{
+				newEntity.AddComponent<ProjectileEmitterComponent>(
+					glm::vec2(
+						entity["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
+						entity["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
+					),
+					entity["components"]["projectile_emitter"]["repeat_freq"].get_or(0),
+					entity["components"]["projectile_emitter"]["duration"].get_or(10000),
+					entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
+					entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
+					);
+			}
+			// Camera Follow
+			sol::optional<sol::table> camera = entity["components"]["camera_follow"];
+			if (camera != sol::nullopt)
+			{
+				newEntity.AddComponent<CameraFollowComponent>();
+			}
+			// Script Component
+			sol::optional<sol::table> script = entity["components"]["on_update_script"];
+			if (script != sol::nullopt)
+			{
+				sol::function func = entity["components"]["on_update_script"][0];
+				newEntity.AddComponent<ScriptComponent>(func);
+			}
 		}
 	}
 }

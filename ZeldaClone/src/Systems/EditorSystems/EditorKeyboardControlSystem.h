@@ -19,8 +19,9 @@ private:
 public:
 	EditorKeyboardControlSystem()
 	{
-		levelWidth = 16384;
-		levelHeight = 8000;
+		// These are magic numbers That should not be used!
+		levelWidth = MouseControlSystem::CanvasWidth;
+		levelHeight = MouseControlSystem::CanvasHeight;
 	}
 
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
@@ -32,26 +33,27 @@ public:
 	{
 		switch (event.symbol)
 		{
+		// Move the camera UP
 		case SDLK_w:
-			Game::Instance()->SetCameraY(-16);
+			Game::Instance()->SetCameraY(-16); // Why 16? Should be based on the sprite_size*scale
 			break;
-
+		// Move the camera RIGHT
 		case SDLK_d:
 			Game::Instance()->SetCameraX(16);
 			break;
-
+		// Move the camera DOWN
 		case SDLK_s:
 			Game::Instance()->SetCameraY(16);
 			break;
-
+		// Move the camera LEFT
 		case SDLK_a:
 			Game::Instance()->SetCameraX(-16);
 			break;
-
+		// Toggle the Collision
 		case SDLK_c:
-			MouseControlSystem::isCollision = !MouseControlSystem::isCollision;
+			MouseControlSystem::isCollision = !MouseControlSystem::isCollision; // Also changed with the editor ImGui!!
 			break;
-
+		// Change the layer of the Object/Tile/Enemy etc!
 		case SDLK_l:
 			MouseControlSystem::layer++;
 			break;
@@ -59,27 +61,27 @@ public:
 		case SDLK_k:
 			MouseControlSystem::layer--;
 			break;
-
+		// Toggle the trigger
 		case SDLK_t:
 			MouseControlSystem::isTrigger = !MouseControlSystem::isTrigger;
 			break;
-
+		// I don't think this works yet!
 		case SDLK_F1:
 			FileDialogs::SaveFile();
 			break;
-
+		// Change the type of trigger --> This will be removed when drop-down list is funcitonal
 		case SDLK_m:
 			if(MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
 				MouseControlSystem::triggerLevelNum++;
 			break;
-
+		// Same as above
 		case SDLK_n:
 			if (MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
 				MouseControlSystem::triggerLevelNum--;
 			if (MouseControlSystem::triggerLevelNum-- < 0)
 				MouseControlSystem::triggerLevelNum = 0;
 			break;
-
+		// This will also be removed with the implementation of the drop-list stated above
 		case SDLK_SPACE:
 			MouseControlSystem::triggerNum += 1;
 			if (MouseControlSystem::triggerNum > 8) MouseControlSystem::triggerNum = 0;
@@ -118,11 +120,16 @@ public:
 			break;
 		}
 
-		// Clamps for Game Camera and Image Src Rec!!
-		if (Game::Instance()->GetCamera().x < -100) Game::Instance()->GetCamera().x = -100;
-		if (Game::Instance()->GetCamera().y < -100) Game::Instance()->GetCamera().y = -100;
-		if (Game::Instance()->GetCamera().x > levelWidth - Game::Instance()->GetCamera().w) Game::Instance()->GetCamera().x = levelWidth - Game::Instance()->GetCamera().w;
-		if (Game::Instance()->GetCamera().y > levelHeight - Game::Instance()->GetCamera().h) Game::Instance()->GetCamera().y = levelHeight - Game::Instance()->GetCamera().h;
+		// These are magic numbers That should not be used!
+		levelWidth = MouseControlSystem::CanvasWidth;
+		levelHeight = MouseControlSystem::CanvasHeight;
+
+
+		// Clamps for Game Camera and Image Src Rec!! --> This needs to be investigated further
+		if (Game::Instance()->GetCamera().x < -1000) Game::Instance()->GetCamera().x = -1000;
+		if (Game::Instance()->GetCamera().y < -1000) Game::Instance()->GetCamera().y = -1000;
+		if (Game::Instance()->GetCamera().x > (levelWidth - Game::Instance()->GetCamera().w ) + 1000) Game::Instance()->GetCamera().x = (levelWidth - Game::Instance()->GetCamera().w) + 1000;
+		if (Game::Instance()->GetCamera().y > (levelHeight - Game::Instance()->GetCamera().h) + 1000) Game::Instance()->GetCamera().y = (levelHeight - Game::Instance()->GetCamera().h) + 1000;
 
 		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
 		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;

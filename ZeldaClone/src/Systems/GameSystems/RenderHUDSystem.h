@@ -116,7 +116,6 @@ struct RenderHUDSystem : public System
 					transform.position.y = 40 + (Game::Instance()->GetPlayerPos().y * 16);
 				}
 
-
 				// Set the destination rect with the x, y position to be rendered
 				SDL_Rect dstRect = {
 					(transform.position.x),
@@ -131,7 +130,7 @@ struct RenderHUDSystem : public System
 					&srcRect,
 					&dstRect,
 					transform.rotation,
-					NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
+					NULL,					// The rotation is done on the center of the sprite, width / 2, height / 2
 					sprite.flip				// This is if we want to flup a sprite
 				);
 			}

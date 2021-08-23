@@ -4,7 +4,13 @@
 #include "../Components/CameraFollowComponent.h"
 #include <SDL.h>
 #include "../Game/Game.h"
-#include <Windows.h> 
+
+#ifdef WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#define Sleep(x) usleep((x)*1000)
+#endif
 
 class CameraMovementSystem : public System
 {

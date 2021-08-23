@@ -6,6 +6,10 @@
 #include "../AssetManager/AssetManager.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/EditorComponent.h"
+#include "../Components/ProjectileEmitterComponent.h"
+#include "../Components/AnimationComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Components/HealthComponent.h"
 #include <SDL.h>
 #include <glm/glm.hpp>
 #include <SDL_ttf.h>
@@ -18,24 +22,57 @@ public:
 	static int imageSrcY;
 	static int mouseRectX;
 	static int mouseRectY;
+
 	static int boxColliderWidth;
 	static int boxColliderHeight;
 	static int boxColliderOffsetX;
 	static int boxColliderOffsetY;
+	
 	static int tileScaleX;
 	static int tileScaleY;
+	
 	static int gridSize;
+
 	static bool isCollision;
 	static bool isTrigger;
+	
 	static bool createTile;
 	static bool createObstacles;
 	static bool createBoxCollider;
+	static bool createEnemy;
+	
+	// Animation  attributes
+	static bool animation;
+	static bool animationLooped;
+	static bool animationVerticalScroll;
+	static int animationFrameRateSpeed;
+	static int animationNumFrames;
+	static int animationFrameOffset;
+	
+	// Projectile Emitter
+	static bool projectile;
+	static glm::vec2 projectileVelocity;
+	static int projectileRepeatFrequency; 
+	static int projectileDuration; 
+	static int projectileHitPercentDamage; 
+	static bool projectileIsFriendly;
+
+	// Rigid Body
+	static bool rigidBody;
+	static glm::vec2 rigidBodyVelocity;
+
 	static bool gridSnap;
+
 	static std::string imageID;
 	static int layer;
 	static unsigned triggerNum;
 	static TriggerType triggerType;
 	static int triggerLevelNum;
+
+	static int CanvasWidth;
+	static int CanvasHeight;
+
+
 	MouseControlSystem()
 	{
 		mapSize = 100;
@@ -53,8 +90,10 @@ public:
 		if (createTile) CreateTile(assets, renderer, mouseBox, event, camera);
 		if (createObstacles) CreateObstacles(assets, renderer, mouseBox, event, camera);
 		if (createBoxCollider) CreateBoxCollider(assets, renderer, mouseBox, event, camera);
+		if (createEnemy) CreateEnemy(assets, renderer, mouseBox, event, camera);
 	}
-
+	
+	// Are we creating Tiles?
 	void CreateTile(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event,SDL_Rect& camera)
 	{
 		SDL_GetMouseState(&mousePosX, &mousePosY);
@@ -224,6 +263,7 @@ public:
 		SDL_RenderDrawRect(renderer, &mouseBox);
 	}
 
+	// Are we creating obstacles --> Tables/Box cases etc
 	void CreateObstacles(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera)
 	{
 		SDL_GetMouseState(&mousePosX, &mousePosY);
@@ -271,12 +311,13 @@ public:
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
 				Entity tile = Registry::Instance()->CreateEntity();
-				tile.Group("tiles");
+				tile.Group("tiles"); // Why tiles?
 				tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 					glm::vec2(tileScaleX, tileScaleY), 0.0);
+				// TODO: Add some sort of layer clamp for the obstacles!
 				tile.AddComponent<SpriteComponent>(imageID, mouseRectX, mouseRectY, MouseControlSystem::layer, false, imageSrcX, imageSrcY);
 				tile.AddComponent<EditorComponent>();
-
+				// Does the object have a box Collider?
 				if (isCollision)
 				{
 					tile.AddComponent<BoxColliderComponent>(boxColliderWidth, boxColliderHeight, glm::vec2(boxColliderOffsetX, boxColliderOffsetY));
@@ -288,6 +329,7 @@ public:
 				}
 				leftPressed = true;
 			}
+			// Remove the current Entity the mouse is hovering over
 			if (event.button.button == SDL_BUTTON_RIGHT)
 			{
 				for (auto entity : GetSystemEntities())
@@ -314,7 +356,7 @@ public:
 		SDL_Color white = { 255,255,255,255 };
 
 		// ====================================================================================================================
-		// Create Text
+		// Mouse Follow Create Text
 		// ====================================================================================================================
 		std::string collisionText = "Collision: " + std::to_string(isCollision);
 		std::string layerText = "Layer: " + std::to_string(layer);
@@ -668,7 +710,177 @@ public:
 		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
 		SDL_RenderDrawRect(renderer, &mouseBox);
 	}
+	
+	void CreateEnemy(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera)
+	{
+		SDL_GetMouseState(&mousePosX, &mousePosY);
 
+		mousePosX += camera.x;
+		mousePosY += camera.y;
+		mousePosScreen.x = mousePosX;
+		mousePosScreen.y = mousePosY;
+		mousePosGrid.x = static_cast<int>(mousePosScreen.x) * gridSize;
+		mousePosGrid.y = static_cast<int>(mousePosScreen.y) * gridSize;
+
+		if (mousePosScreen.x >= 0) mousePosGrid.x = (static_cast<int>(mousePosScreen.x)) / gridSize;
+		if (mousePosScreen.y >= 0) mousePosGrid.y = (static_cast<int>(mousePosScreen.y)) / gridSize;
+
+		mouseBox.x = (mousePosGrid.x * gridSize) - camera.x;
+		mouseBox.y = (mousePosGrid.y * gridSize) - camera.y;
+
+		SDL_Rect srcRect = {
+			imageSrcX,
+			imageSrcY,
+			mouseRectX,
+			mouseRectY
+		};
+
+		// Set the destination Rectangle with the x, y position to be rendererd;
+		SDL_Rect dstRect = {
+			mouseBox.x,
+			mouseBox.y,
+			mouseBox.w * mouseRectX * tileScaleX,
+			mouseBox.h * mouseRectY * tileScaleY
+		};
+
+		SDL_RenderCopyEx(
+			renderer,
+			assetManager->GetTexture(imageID),
+			&srcRect,
+			&dstRect,
+			0, // Passed as an angle in degrees
+			NULL,
+			SDL_FLIP_NONE
+		);
+
+		if (event.type == SDL_MOUSEBUTTONDOWN && !leftPressed)
+		{
+			if (event.button.button == SDL_BUTTON_LEFT)
+			{
+				Entity enemy = Registry::Instance()->CreateEntity();
+				enemy.Group("enemies");
+				enemy.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
+					glm::vec2(tileScaleX, tileScaleY), 0.0);
+				enemy.AddComponent<SpriteComponent>(imageID, mouseRectX, mouseRectY, MouseControlSystem::layer, false, imageSrcX, imageSrcY);
+				enemy.AddComponent<EditorComponent>();
+				enemy.AddComponent<HealthComponent>();
+				
+				if (isCollision)
+					enemy.AddComponent<BoxColliderComponent>(boxColliderWidth, boxColliderHeight, glm::vec2(boxColliderOffsetX, boxColliderOffsetY));
+				//if (rigidBody)
+					//enemy.AddComponent<RigidBodyComponent>(rigidBodyVelocity);
+				if (projectile)
+					enemy.AddComponent<ProjectileEmitterComponent>();
+				if (animation)
+					enemy.AddComponent<AnimationComponent>(animationNumFrames, animationFrameRateSpeed, animationVerticalScroll, animationLooped, animationFrameOffset);
+				
+				Logger::Log("Left Pressed");
+				leftPressed = true;
+			}
+			if (event.button.button == SDL_BUTTON_RIGHT)
+			{
+				for (auto entity : GetSystemEntities())
+				{
+					auto& transform = entity.GetComponent<TransformComponent>();
+
+					if (entity.BelongsToGroup("tiles") && transform.position.x == (mousePosGrid.x * gridSize)
+						&& transform.position.y == (mousePosGrid.y * gridSize) && !rightPressed)
+					{
+						entity.Kill();
+						rightPressed = true;
+						Logger::Err("Tile with ID: " + std::to_string(entity.GetID()) + " has been removed");
+					}
+				}
+			}
+		}
+		else if (event.type == SDL_MOUSEBUTTONUP)
+		{
+			leftPressed = false;
+			rightPressed = false;
+		}
+
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_Color white = { 255,255,255,255 };
+
+		// ====================================================================================================================
+		// Create Text
+		// ====================================================================================================================
+		std::string collisionText = "Collision: " + std::to_string(isCollision);
+		std::string layerText = "Layer: " + std::to_string(layer);
+		std::string tilePositionText = "X: " + std::to_string(static_cast<int>(mouseBox.x + camera.x) / gridSize)
+			+ ", Y: " + std::to_string(static_cast<int>(mouseBox.y + camera.y) / gridSize);
+
+		SDL_Surface* surface1 = TTF_RenderText_Blended(
+			assetManager->GetFont("charriot-font-20"),
+			collisionText.c_str(),
+			white);
+
+		SDL_Surface* surface2 = TTF_RenderText_Blended(
+			assetManager->GetFont("charriot-font-20"),
+			layerText.c_str(),
+			white);
+
+		SDL_Surface* surface3 = TTF_RenderText_Blended(
+			assetManager->GetFont("charriot-font-20"),
+			tilePositionText.c_str(),
+			white);
+
+		SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
+		SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, surface2);
+		SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, surface3);
+
+		// Free the surface
+		SDL_FreeSurface(surface1);
+		SDL_FreeSurface(surface2);
+		SDL_FreeSurface(surface3);
+
+		int labelWidth = 0;
+		int labelHeight = 0;
+
+		SDL_QueryTexture(texture1, NULL, NULL, &labelWidth, &labelHeight);
+		SDL_QueryTexture(texture2, NULL, NULL, &labelWidth, &labelHeight);
+		SDL_QueryTexture(texture3, NULL, NULL, &labelWidth, &labelHeight);
+
+		// Check Where the offset needs to be
+		if (mousePosX < 90) textOffsetX = 100;
+		if (mousePosX > 150) textOffsetX = -100;
+
+		SDL_Rect collisionTextRect = {
+			static_cast<int>(mouseBox.x) + textOffsetX,
+			static_cast<int>(mouseBox.y) + 15,
+			labelWidth,
+			labelHeight
+		};
+
+		SDL_Rect layerTextRext = {
+		static_cast<int>(mouseBox.x) + textOffsetX,
+		static_cast<int>(mouseBox.y) + 30,
+		labelWidth,
+		labelHeight
+		};
+
+		SDL_Rect positionTextRect = {
+		static_cast<int>(mouseBox.x) + textOffsetX,
+		static_cast<int>(mouseBox.y) - 0,
+		labelWidth,
+		labelHeight
+		};
+
+		// ====================================================================================================================
+		// Render Everything
+		// ====================================================================================================================
+		SDL_RenderCopy(renderer, texture1, NULL, &collisionTextRect);
+		SDL_RenderCopy(renderer, texture2, NULL, &layerTextRext);
+		SDL_RenderCopy(renderer, texture3, NULL, &positionTextRect);
+
+		SDL_DestroyTexture(texture1);
+		SDL_DestroyTexture(texture2);
+		SDL_DestroyTexture(texture3);
+
+		// Set MouseBox to red
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 0);
+		SDL_RenderDrawRect(renderer, &mouseBox);
+	}
 
 
 	void SetImageName(std::string imageName)
@@ -718,13 +930,40 @@ int MouseControlSystem::boxColliderHeight = 0;
 int MouseControlSystem::boxColliderOffsetX = 0;
 int MouseControlSystem::boxColliderOffsetY = 0;
 int MouseControlSystem::layer = 0;
+
 bool MouseControlSystem::isCollision = false;
 bool MouseControlSystem::isTrigger = false;
 bool MouseControlSystem::createTile = false;
 bool MouseControlSystem::createObstacles = false;
 bool MouseControlSystem::createBoxCollider = false;
+bool MouseControlSystem::createEnemy = false;
 bool MouseControlSystem::gridSnap = false;
+
+// Animation attributes --> Creating enemies
+bool MouseControlSystem::animation = false;
+bool MouseControlSystem::animationLooped = false;
+bool MouseControlSystem::animationVerticalScroll = false;
+int MouseControlSystem::animationFrameRateSpeed = 0;
+int MouseControlSystem::animationNumFrames = 0;
+int MouseControlSystem::animationFrameOffset = 0;
+
+// Projectile Emitter
+bool MouseControlSystem::projectile = false;
+glm::vec2 MouseControlSystem::projectileVelocity = glm::vec2(0, 0);
+int MouseControlSystem::projectileRepeatFrequency = 0;
+int MouseControlSystem::projectileDuration = 1000;
+int MouseControlSystem::projectileHitPercentDamage = 10;
+bool MouseControlSystem::projectileIsFriendly = false;
+
+// Rigid Body
+bool MouseControlSystem::rigidBody = false;
+glm::vec2 MouseControlSystem::rigidBodyVelocity = glm::vec2(10, 10);
+
+
 std::string MouseControlSystem::imageID = "";
 TriggerType MouseControlSystem::triggerType = NO_TRIGGER;
 unsigned MouseControlSystem::triggerNum = 0;
 int MouseControlSystem::triggerLevelNum = 0;
+
+int MouseControlSystem::CanvasWidth = 992;
+int MouseControlSystem::CanvasHeight = 992;

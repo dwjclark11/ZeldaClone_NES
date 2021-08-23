@@ -4,13 +4,14 @@
 #include <SDL_ttf.h>
 #include "../Utilities/Timer.h"
 #include "../States/GameState.h"
+#include "../States/EditorState.h"
 
 // Initialize all static variables
 Game* Game::pInstance = nullptr;
 int Game::gameScale = 4;
 int Game::tilePixels = 16;
 int Game::windowWidth = 256 * Game::gameScale;
-int Game::windowHeight = 240 * (Game::gameScale);
+int Game::windowHeight = 240 * Game::gameScale;
 bool Game::isDebug = true;
 
 // Constructor 
@@ -123,10 +124,11 @@ void Game::Initialize()
 	gameStateMachine = new GameStateMachine();
 	
 	// Push the title screen
-	gameStateMachine->PushState(new TitleState());
+	//gameStateMachine->PushState(new TitleState());
 
-	// Test
-	//gameStateMachine->PushState(new GameState());
+	// Unit Test --> Change to the state you want to work on
+	gameStateMachine->PushState(new EditorState());
+
 }
 
 void Game::Update()
@@ -215,6 +217,8 @@ void Game::Draw()
 	gameStateMachine->Render();
 
 	SDL_RenderPresent(mRenderer);
+
+
 }
 
 void Game::Shutdown()

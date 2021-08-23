@@ -12,7 +12,7 @@ player_data = {
     },
     components = {
       transform = {
-        position = { x = 7664.1, y = 5009.4}}
+        position = { x = 7550.0, y = 5009.4}}
     },
     items = {
       boomerang = false,

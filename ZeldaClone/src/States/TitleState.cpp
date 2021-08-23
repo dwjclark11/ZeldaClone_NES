@@ -96,6 +96,9 @@ bool TitleState::OnExit()
 	// Remove Assets/Entities from the game that are not needed anymore
 	Game::Instance()->GetSystem<RenderTitleSystem>().OnExit();
 	Game::Instance()->GetSystem<CameraMovementSystem>().OnExit();
+	
+	// Remove the Render Title System If we are not using it!
+	Registry::Instance()->RemoveSystem<RenderTitleSystem>();
 	return true;
 }
 

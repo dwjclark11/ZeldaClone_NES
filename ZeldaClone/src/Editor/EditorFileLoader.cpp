@@ -3,6 +3,10 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/KeyboardControlComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Components/AnimationComponent.h"
+#include "../Components/ScriptComponent.h"
+#include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/EditorComponent.h"
 #include <string>
 #include <iostream>
@@ -356,9 +360,10 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 	LuaTableWriter m_writer;
 	std::fstream file;
 	int i = 1;
-	
+	bool trigger = false;
+	Logger::Err("FilePath: " + filepath);
 	// open the file to save to
-	file.open(filepath);
+	file.open(filepath, std::ios::out);
 
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
@@ -374,7 +379,7 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 	{
 		for (auto entity : Registry::Instance()->GetEntitiesByGroup("colliders"))
 		{
-			Logger::Log("In the save");
+			Logger::Log("In the collider");
 			bool collider = false;
 			bool trigger = false;
 			std::string group = "colliders";
@@ -412,21 +417,26 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 			i++;
 		}
 	}
+	m_writer.WriteEndTable(false, file);
+	// Currently there is a glitch with the save --> There must be at least one trigger 
 	
 	// If there are triggers in the registry, save them to a lua file, using the LuaTableWriter
 	if (!Registry::Instance()->GetEntitiesByGroup("trigger").empty())
 	{
+		// reset i to 1
+		i = 1;
+		m_writer.WriteDeclareTable("triggers", file);
 		// Loop through all Triggers
 		for (auto entity : Registry::Instance()->GetEntitiesByGroup("trigger"))
 		{
+			Logger::Log("In the trigger");
 			bool collider = false;
 			bool trigger = true;
-			std::string group = "trigger";
 			
+			std::string group = "trigger";
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& trig = entity.GetComponent<TriggerBoxComponent>();
 			const auto& collision = entity.GetComponent<BoxColliderComponent>();
-			//std::string triggerType = ConvertToString(trig.triggerType);
 			
 			m_writer.WriteStartTable(i, false, file);
 			m_writer.WriteKeyAndQuotedValue("group", "trigger", file);
@@ -444,6 +454,8 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 			m_writer.WriteUnquotedValue(transform.rotation, false, file);
 			m_writer.WriteEndTable(true, file);
 			m_writer.WriteEndTable(false, file);
+			
+			// Write box Collider --> All triggers are box Colliders
 			m_writer.WriteDeclareTable("boxCollider", file);
 			m_writer.WriteKeyAndUnquotedValue("width", collision.width, file);
 			m_writer.WriteKeyAndUnquotedValue("height", collision.height, file);
@@ -451,22 +463,196 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 			m_writer.WriteKeyAndUnquotedValue("offset_y", collision.offset.y, file);
 			m_writer.WriteEndTable(true, file);
 			m_writer.WriteEndTable(false, file);
+			
+			// Add the type of trigger
 			m_writer.WriteDeclareTable("triggerComponent", file);
 			m_writer.WriteKeyAndUnquotedValue("type", trig.triggerType, file);
 			m_writer.WriteKeyAndUnquotedValue("transport_offset_x", trig.transportOffset.x, file);
 			m_writer.WriteKeyAndUnquotedValue("transport_offset_y", trig.transportOffset.y, file);
 			m_writer.WriteKeyAndUnquotedValue("level", trig.levelNum, file);
-			m_writer.WriteEndTable(false, file);
+			//m_writer.WriteEndTable(false, file);
 			m_writer.WriteEndTable(false, file);
 		
 			m_writer.WriteEndTableWithSeparator(false, file);
 			
+			// This is to number the triggers
 			i++;
 		}	
 	}
+
+	Logger::Log("Out the trigger written");
 	// Write the end of the tables and close the file
+	//m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
+	Logger::Log("Out the table written");
+	file.close();
+	
+}
+
+void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
+{
+	// Create variables
+	LuaTableWriter m_writer;
+	std::fstream file;
+	int i = 1;
+	bool trigger = false;
+	Logger::Err("FilePath: " + filepath);
+	// open the file to save to
+	file.open(filepath, std::ios::out);
+
+	// Start the Lua Table
+	m_writer.WriteStartDocument();
+
+	// Write a comment in Lua format
+	m_writer.WriteCommentSeparation(file);
+	m_writer.WriteCommentLine(filepath, file);
+	m_writer.WriteCommentSeparation(file);
+	m_writer.WriteDeclareTable("enemies", file);
+
+	// If there are colliders in the registry, save them to a lua file, using the LuaTableWriter
+	if (!Registry::Instance()->GetEntitiesByGroup("enemies").empty())
+	{
+		for (auto entity : Registry::Instance()->GetEntitiesByGroup("enemies"))
+		{
+			bool animation = false;
+			bool projectile = false;
+			bool script = false;
+			bool rigid = false;
+
+			auto animationComponent = AnimationComponent();
+			if (entity.HasComponent<AnimationComponent>())
+			{
+				animationComponent = entity.GetComponent<AnimationComponent>();
+				animation = true;
+			}
+
+			auto projectileEmitter = ProjectileEmitterComponent();
+			if (entity.HasComponent<ProjectileEmitterComponent>())
+			{
+				projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+				projectile = true;
+			}
+			
+			auto scriptComponent = ScriptComponent();
+			if (entity.HasComponent<ScriptComponent>())
+			{
+				scriptComponent = entity.GetComponent<ScriptComponent>();
+				script = true;
+			}
+
+			auto rigidbody = RigidBodyComponent();
+			if (entity.HasComponent<RigidBodyComponent>())
+			{
+				rigidbody = entity.GetComponent<RigidBodyComponent>();
+				rigid = true;
+			}
+
+			// All Enemies will have these Components
+			const auto& transform = entity.GetComponent<TransformComponent>();
+			const auto& collider = entity.GetComponent<BoxColliderComponent>();
+			//const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
+			const auto& sprite = entity.GetComponent<SpriteComponent>();
+
+			// Start the Components/Group Tables
+			m_writer.WriteStartTable(i, false, file);
+			m_writer.WriteKeyAndQuotedValue("group", "enemies", file);
+			m_writer.WriteDeclareTable("components", file);
+			m_writer.WriteDeclareTable("transform", file);
+			m_writer.WriteDeclareTable("position", file);
+			m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
+			m_writer.WriteKeyAndValue('y', transform.position.y, true, file);
+			m_writer.WriteEndTable(true, file);
+			m_writer.WriteDeclareTable("scale", file);
+			m_writer.WriteKeyAndValue('x', transform.scale.x, false, file);
+			m_writer.WriteKeyAndValue('y', transform.scale.y, true, file);
+			m_writer.WriteEndTable(true, file);
+			m_writer.WriteDeclareTable("rotation", file);
+			m_writer.WriteUnquotedValue(transform.rotation, false, file);
+			m_writer.WriteEndTable(true, file);
+			m_writer.WriteEndTable(false, file);
+
+			// Box Collider Component
+			m_writer.WriteDeclareTable("boxCollider", file);
+			m_writer.WriteKeyAndUnquotedValue("width", collider.width, file);
+			m_writer.WriteKeyAndUnquotedValue("height", collider.height, file);
+			m_writer.WriteKeyAndUnquotedValue("offset_x", collider.offset.x, file);
+			m_writer.WriteKeyAndUnquotedValue("offset_y", collider.offset.y, file);
+			m_writer.WriteEndTable(true, file);
+			m_writer.WriteEndTable(false, file);
+
+			// Sprite Component 
+			m_writer.WriteDeclareTable("sprite", file);
+			m_writer.WriteKeyAndQuotedValue("asset_id", sprite.assetID, file);
+			m_writer.WriteKeyAndUnquotedValue("width", sprite.width, file);
+			m_writer.WriteKeyAndUnquotedValue("height", sprite.height, file);
+			m_writer.WriteKeyAndUnquotedValue("z_index", sprite.layer, file);
+			m_writer.WriteKeyAndUnquotedValue("is_fixed", (sprite.isFixed ? "true" : "false"), file);
+			m_writer.WriteKeyAndUnquotedValue("src_rect_x", sprite.srcRect.x, file);
+			m_writer.WriteKeyAndUnquotedValue("src_rect_y", sprite.srcRect.y, file);
+			m_writer.WriteDeclareTable("offset", file);
+			m_writer.WriteKeyAndValue("x", sprite.offset.x, false, file);
+			m_writer.WriteKeyAndValue("y", sprite.offset.y, true, file);
+			m_writer.WriteEndTable(true, file);
+			m_writer.WriteEndTable(false, file);
+
+			// Rigidbody Component
+			if (rigid)
+			{
+				m_writer.WriteDeclareTable("rigid_body", file);
+				m_writer.WriteDeclareTable("velocity", file);
+				m_writer.WriteKeyAndValue("x", rigidbody.velocity.x, false, file);
+				m_writer.WriteKeyAndValue("y", rigidbody.velocity.y, true, file);
+				m_writer.WriteEndTable(true, file);
+				m_writer.WriteEndTable(true, file);
+				m_writer.WriteEndTable(false, file);
+			}
+
+			// Projectile Emitter Component 
+			if (projectile)
+			{
+				m_writer.WriteDeclareTable("projectil_emitter", file);
+				m_writer.WriteDeclareTable("projectile_velocity", file);
+				m_writer.WriteKeyAndValue("x", projectileEmitter.projectileVelocity.x, false, file);
+				m_writer.WriteKeyAndValue("y", projectileEmitter.projectileVelocity.y, true, file);
+				m_writer.WriteEndTable(true, file);
+				m_writer.WriteKeyAndUnquotedValue("repeat_frequency", projectileEmitter.repeatFrequency, file);
+				m_writer.WriteKeyAndUnquotedValue("projectile_duration", projectileEmitter.projectileDuration, file);
+				m_writer.WriteKeyAndUnquotedValue("hit_percent_damage", projectileEmitter.hitPercentDamage, file);
+				m_writer.WriteKeyAndUnquotedValue("is_fixed", (projectileEmitter.isFriendly ? "true" : "false"), file);
+				m_writer.WriteEndTable(true, file);
+				m_writer.WriteEndTable(false, file);
+			}
+
+			// Animation Component int numFrames = 1, int frameSpeedRate = 1, bool vertical = true, bool isLooped = true, int frameOffset = 0
+			if (animation)
+			{
+				m_writer.WriteDeclareTable("animation", file);
+				m_writer.WriteKeyAndUnquotedValue("num_frames", animationComponent.numFrames, file);
+				m_writer.WriteKeyAndUnquotedValue("frame_speed_rate", animationComponent.frameSpeedRate, file);
+				m_writer.WriteKeyAndUnquotedValue("vertical", (animationComponent.vertical ? "true" : "false"), file);
+				m_writer.WriteKeyAndUnquotedValue("looped", (animationComponent.isLooped ? "true" : "false"), file);
+				m_writer.WriteKeyAndUnquotedValue("frame_offset", animationComponent.frameOffset, file);
+				//m_writer.WriteEndTable(true, file);
+				m_writer.WriteEndTable(false, file);
+			}
+			// Script Component
+			if (script)
+			{
+				// TODO: Add a proper way to save the scripts to a lua table
+				// ImGui::EnterText? MultiText? 
+			}
+
+			m_writer.WriteEndTableWithSeparator(false, file);
+
+			i++;
+		}
+	}
+
+	Logger::Log("Out the trigger written");
+	// Write the end of the tables and close the file
+	//m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
+	Logger::Log("Out the table written");
 	file.close();
 }
 
