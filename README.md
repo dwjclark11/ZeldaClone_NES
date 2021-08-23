@@ -39,4 +39,7 @@ Some of the desired changes are:
 * Ability for user to change keys/gamepad controls (Currently Hard Coded)
 
 ## There are still a lot of bugs that must be fixed to have a properly working demo
+Some of the bugs are as follows:
+* SDL Window crashes when mouse goes outside of the zero boundaries -> Works fine otherwise
+* TODO: More to be listed
 
