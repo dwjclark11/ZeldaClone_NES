@@ -37,6 +37,7 @@ Some of the desired changes are:
 * Add enemies to any maps using the editor --> currently working on this!
 * Add a functional AI state machine with for entities/enemies done in lua
 * Ability for user to change keys/gamepad controls (Currently Hard Coded)
+* Currently not cross platform. FileDialogs, and system specifics need to be added. Already added a fix for Sleep() for linux.
 
 ## There are still a lot of bugs that must be fixed to have a properly working demo
 Some of the bugs are as follows:
