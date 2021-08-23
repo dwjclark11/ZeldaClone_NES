@@ -19,7 +19,7 @@ This project is created with:
 ## Game/Engine
 This game/engine includes the following:
 * An ECS (Entity Component System) to help manage entities, components, and systems that are in the game.
-#### A functioning Tilemap Editor that can create:
+* #### A functioning Tilemap Editor that can create:
         * Tilemaps 
         * colliders
         * triggers (transport/secret areas/ traps/ etc.)
