@@ -4,7 +4,7 @@
 * [Introduction](#introduction)
 * [Technologies](#technologies)
 * [Game/Engine](#gameengine)
-* [Desired Additions/Changes](#desired-additionalchanges)
+* [Desired Additions/Changes](#desired-additionschanges)
 
 ## Introduction
 This game was inspired by the 2D Game Engine course from Pikuma.com. Big thanks to Gustavo Pezzi for the inspiration. I have taken what I 
