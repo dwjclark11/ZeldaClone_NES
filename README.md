@@ -3,8 +3,8 @@
 ## Table of Contents
 * [Introduction](#introduction)
 * [Technologies](#technologies)
-* [Game/Engine](#game/engine)
-* [Desired Additions/Changes](#desired additions/changes)
+* [Game/Engine]
+* [Desired Additions/Changes]
 
 ## Introduction
 This game was inspired by the 2D Game Engine course from Pikuma.com. Big thanks to Gustavo Pezzi for the inspiration. I have taken what I 
