@@ -3,8 +3,8 @@
 ## Table of Contents
 * [Introduction](#introduction)
 * [Technologies](#technologies)
-* [Game/Engine](#game/engine)
-* [Desired Additions/Changes](#desired)
+* [Game/Engine](#Game/Engine)
+* [Desired Additions/Changes](#Desired Additions/Changes)
 
 ## Introduction
 This game was inspired by the 2D Game Engine course from Pikuma.com. Big thanks to Gustavo Pezzi for the inspiration. I have taken what I 
@@ -20,10 +20,10 @@ This project is created with:
 This game/engine includes the following:
 * An ECS (Entity Component System) to help manage entities, components, and systems that are in the game.
 * A functioning Tilemap Editor that can create:
-        * Tilemaps 
-        * colliders
-        * triggers (transport/secret areas/ traps/ etc.)
-        * Uses Dear ImGui as the user interface
+        ** Tilemaps 
+        ** colliders
+        ** triggers (transport/secret areas/ traps/ etc.)
+        ** Uses Dear ImGui as the user interface
         
 
 ![Clone_Editor](https://user-images.githubusercontent.com/63356975/130303677-08d6fdc8-6f66-490b-ba8a-df98e0a7192a.png)
