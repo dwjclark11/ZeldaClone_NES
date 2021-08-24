@@ -7,6 +7,7 @@
 #include "../Components/AnimationComponent.h"
 #include "../Components/ScriptComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
+#include "../Components/HealthComponent.h"
 #include "../Components/EditorComponent.h"
 #include <string>
 #include <iostream>
@@ -550,7 +551,7 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			// All Enemies will have these Components
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& collider = entity.GetComponent<BoxColliderComponent>();
-			//const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
+			const auto& health = entity.GetComponent<HealthComponent>();
 			const auto& sprite = entity.GetComponent<SpriteComponent>();
 
 			// Start the Components/Group Tables
@@ -572,12 +573,12 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			m_writer.WriteEndTable(false, file);
 
 			// Box Collider Component
-			m_writer.WriteDeclareTable("boxCollider", file);
+			m_writer.WriteDeclareTable("box_collider", file);
 			m_writer.WriteKeyAndUnquotedValue("width", collider.width, file);
 			m_writer.WriteKeyAndUnquotedValue("height", collider.height, file);
 			m_writer.WriteKeyAndUnquotedValue("offset_x", collider.offset.x, file);
 			m_writer.WriteKeyAndUnquotedValue("offset_y", collider.offset.y, file);
-			m_writer.WriteEndTable(true, file);
+			//m_writer.WriteEndTable(true, file);
 			m_writer.WriteEndTable(false, file);
 
 			// Sprite Component 
@@ -595,14 +596,21 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			m_writer.WriteEndTable(true, file);
 			m_writer.WriteEndTable(false, file);
 
+			// Health Component
+			m_writer.WriteDeclareTable("health", file);
+			m_writer.WriteKeyAndUnquotedValue("health_percentage", health.healthPercentage, file);
+			m_writer.WriteKeyAndUnquotedValue("max_hearts", health.maxHearts, file);
+			//m_writer.WriteEndTable(true, file);
+			m_writer.WriteEndTable(false, file);
+
 			// Rigidbody Component
 			if (rigid)
 			{
-				m_writer.WriteDeclareTable("rigid_body", file);
+				m_writer.WriteDeclareTable("rigidbody", file);
 				m_writer.WriteDeclareTable("velocity", file);
 				m_writer.WriteKeyAndValue("x", rigidbody.velocity.x, false, file);
 				m_writer.WriteKeyAndValue("y", rigidbody.velocity.y, true, file);
-				m_writer.WriteEndTable(true, file);
+				//m_writer.WriteEndTable(true, file);
 				m_writer.WriteEndTable(true, file);
 				m_writer.WriteEndTable(false, file);
 			}
@@ -610,15 +618,15 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			// Projectile Emitter Component 
 			if (projectile)
 			{
-				m_writer.WriteDeclareTable("projectil_emitter", file);
-				m_writer.WriteDeclareTable("projectile_velocity", file);
+				m_writer.WriteDeclareTable("projectile_emitter", file);
+				m_writer.WriteDeclareTable("velocity", file);
 				m_writer.WriteKeyAndValue("x", projectileEmitter.projectileVelocity.x, false, file);
 				m_writer.WriteKeyAndValue("y", projectileEmitter.projectileVelocity.y, true, file);
 				m_writer.WriteEndTable(true, file);
 				m_writer.WriteKeyAndUnquotedValue("repeat_frequency", projectileEmitter.repeatFrequency, file);
 				m_writer.WriteKeyAndUnquotedValue("projectile_duration", projectileEmitter.projectileDuration, file);
 				m_writer.WriteKeyAndUnquotedValue("hit_percent_damage", projectileEmitter.hitPercentDamage, file);
-				m_writer.WriteKeyAndUnquotedValue("is_fixed", (projectileEmitter.isFriendly ? "true" : "false"), file);
+				m_writer.WriteKeyAndUnquotedValue("is_friendly", (projectileEmitter.isFriendly ? "true" : "false"), file);
 				m_writer.WriteEndTable(true, file);
 				m_writer.WriteEndTable(false, file);
 			}
@@ -628,11 +636,11 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			{
 				m_writer.WriteDeclareTable("animation", file);
 				m_writer.WriteKeyAndUnquotedValue("num_frames", animationComponent.numFrames, file);
-				m_writer.WriteKeyAndUnquotedValue("frame_speed_rate", animationComponent.frameSpeedRate, file);
+				m_writer.WriteKeyAndUnquotedValue("frame_rate", animationComponent.frameSpeedRate, file);
 				m_writer.WriteKeyAndUnquotedValue("vertical", (animationComponent.vertical ? "true" : "false"), file);
 				m_writer.WriteKeyAndUnquotedValue("looped", (animationComponent.isLooped ? "true" : "false"), file);
 				m_writer.WriteKeyAndUnquotedValue("frame_offset", animationComponent.frameOffset, file);
-				//m_writer.WriteEndTable(true, file);
+				//m_writer.WriteEndTable(false, file);
 				m_writer.WriteEndTable(false, file);
 			}
 			// Script Component
@@ -641,16 +649,15 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 				// TODO: Add a proper way to save the scripts to a lua table
 				// ImGui::EnterText? MultiText? 
 			}
-
+			m_writer.WriteEndTable(false, file);
 			m_writer.WriteEndTableWithSeparator(false, file);
 
 			i++;
 		}
 	}
 
-	Logger::Log("Out the trigger written");
+	
 	// Write the end of the tables and close the file
-	//m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
 	Logger::Log("Out the table written");
 	file.close();

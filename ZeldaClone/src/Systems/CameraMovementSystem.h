@@ -35,7 +35,8 @@ public:
 		// Camera System
 		RequiredComponent<CameraFollowComponent>();
 		RequiredComponent<TransformComponent>();
-		
+		//RequiredComponent<SpriteComponent>();
+
 		// Initialize all the member variables
 		first = false;
 		west = false;
@@ -82,7 +83,7 @@ public:
 					the camera will scroll to the next panel at a speed of 24px per interval; The Game::Instance->GetCameraMoving() method
 					prevents the player from overstepping the camera.
 				*/
-				if (entity.HasTag("player"))
+				if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
 				{
 					if (!first)
 					{

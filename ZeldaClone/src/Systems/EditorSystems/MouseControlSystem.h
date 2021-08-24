@@ -768,7 +768,7 @@ public:
 				if (isCollision)
 					enemy.AddComponent<BoxColliderComponent>(boxColliderWidth, boxColliderHeight, glm::vec2(boxColliderOffsetX, boxColliderOffsetY));
 				//if (rigidBody)
-					//enemy.AddComponent<RigidBodyComponent>(rigidBodyVelocity);
+					enemy.AddComponent<RigidBodyComponent>(rigidBodyVelocity);
 				if (projectile)
 					enemy.AddComponent<ProjectileEmitterComponent>();
 				if (animation)

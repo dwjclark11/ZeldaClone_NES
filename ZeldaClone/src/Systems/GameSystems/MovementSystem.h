@@ -69,6 +69,14 @@ public:
 				{
 					sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
 				}
+				if (rigidBody.velocity.x > 0)
+				{
+					sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
+				}
+				if (rigidBody.velocity.x < 0)
+				{
+					sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
+				}
 			}
 		}
 	}
@@ -85,19 +93,43 @@ public:
 
 		if (a.BelongsToGroup("colliders") && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword"))) OnPlayerHitsObstacle(a, b);
 		if (b.BelongsToGroup("colliders") && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword"))) OnPlayerHitsObstacle(b, a);
-		if (a.BelongsToGroup("colliders") && b.BelongsToGroup("enemies")) OnEnemyHitsObstacle(a, b);
-		if (a.BelongsToGroup("enemies") && b.BelongsToGroup("colliders")) OnEnemyHitsObstacle(a, b);
+		if (b.BelongsToGroup("colliders") && a.BelongsToGroup("enemies")) OnEnemyHitsObstacle(a, b);
+		//if (a.BelongsToGroup("enemies") && b.BelongsToGroup("colliders")) OnEnemyHitsObstacle(a, b);
 
 	}
 
 	void OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 	{
-		
-			auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
-			//Logger::Log("IT FUCKING HIT");
+		auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
+		auto& transform = enemy.GetComponent<TransformComponent>();
+
+		if (obstacle.BelongsToGroup("colliders") && enemy.BelongsToGroup("enemies"))
+		{
 			if (enemy1Rigidbody.velocity.y > 0)
-				enemy1Rigidbody.velocity.y *= -1;
-		
+			{
+				transform.position.y -= 5;
+				enemy1Rigidbody.velocity.x = enemy1Rigidbody.velocity.y;
+				enemy1Rigidbody.velocity.y = 0;
+			}
+			else if (enemy1Rigidbody.velocity.y < 0)
+			{
+				transform.position.y += 5;
+				enemy1Rigidbody.velocity.x = enemy1Rigidbody.velocity.y;
+				enemy1Rigidbody.velocity.y = 0;
+			}
+			else if (enemy1Rigidbody.velocity.x > 0)
+			{
+				transform.position.x -= 5;
+				enemy1Rigidbody.velocity.y = -enemy1Rigidbody.velocity.x;
+				enemy1Rigidbody.velocity.x = 0;
+			}
+			else if (enemy1Rigidbody.velocity.x < 0)
+			{
+				transform.position.x += 5;
+				enemy1Rigidbody.velocity.y = enemy1Rigidbody.velocity.x;
+				enemy1Rigidbody.velocity.x = 0;
+			}
+		}
 	}
 
 	void OnPlayerHitsObstacle( Entity obstacle, Entity player)

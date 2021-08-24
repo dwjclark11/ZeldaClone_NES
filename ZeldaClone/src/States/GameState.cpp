@@ -85,6 +85,7 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance()->GetSystem<MovementSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<CollectItemSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
 	// Update the registry values
 	Registry::Instance()->Update();
@@ -95,7 +96,7 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().UpdateGamePad();
 	// Check to see if there are any events in the queue and execute them
-	Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	//Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 
 	Registry::Instance()->GetSystem<CollisionSystem>().Update(Game::Instance()->GetEventManager(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	Registry::Instance()->GetSystem<MovementSystem>().Update(deltaTime);
@@ -217,6 +218,7 @@ bool GameState::OnEnter()
 			//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 			loader.LoadPlayerDataFromLuaTable(lua, "save1");
 			loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+			
 		}
 		else if (Game::Instance()->GetPlayerNum() == 2)
 		{
@@ -257,9 +259,8 @@ bool GameState::OnEnter()
 
 		loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
 		loader.LoadHUDFromLuaTable(lua, "hud");
-		// =============================================================================================================================
-		// Add all Textures to the Asset Manager
-		// =============================================================================================================================
+		loader.LoadLevelFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
+
 		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 
 		// TODO: Refactor all entities below to a lua table

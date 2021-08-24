@@ -124,10 +124,10 @@ void Game::Initialize()
 	gameStateMachine = new GameStateMachine();
 	
 	// Push the title screen
-	//gameStateMachine->PushState(new TitleState());
+	gameStateMachine->PushState(new TitleState());
 
 	// Unit Test --> Change to the state you want to work on
-	gameStateMachine->PushState(new EditorState());
+	//gameStateMachine->PushState(new EditorState());
 
 }
 

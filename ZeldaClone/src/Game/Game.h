@@ -117,14 +117,17 @@ private:
 	bool keydown;
 	bool cameraMoving;
 	unsigned gamePlayerNum;
+	
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
 	GameStateMachine* gameStateMachine;
 	static Game* pInstance;
 	double deltaTime;
+
 	SDL_Rect camera;
 	SDL_Rect mouseBox;
 	SDL_Event sdlEvent;
+
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
 

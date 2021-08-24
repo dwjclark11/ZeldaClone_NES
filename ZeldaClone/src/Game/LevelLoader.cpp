@@ -1024,10 +1024,10 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 	}
 }
 
-void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<Registry>& registry, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager)
 {
-	sol::load_result script = lua.load_file("./Assets/Level/" + fileName + ".lua");
-
+	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
+	
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -1039,10 +1039,13 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/LevelFiles/" + fileName + ".lua");
+	lua.script_file("./Assets/Levels/" + fileName + ".lua");
+	Logger::Err("In Level File");
+	/*sol::table data = lua["level_data"];
+	sol::table entities = data["entities"];*/
 
-	sol::table data = lua["level_data"];
-	sol::table entities = data["entities"];
+	sol::table entities = lua["enemies"];
+
 	int i = 1;
 
 	while (true)
@@ -1051,28 +1054,27 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 		
 		if (hasEntity == sol::nullopt)
 		{
-			Logger::Err("There is no Level Data");
+			Logger::Err("There is no more Level Data");
 			break;
 		}
 		
 		sol::table entity = entities[i];
+		
+		Entity newEntity = Registry::Instance()->CreateEntity();
 
-		Entity newEntity = registry->CreateEntity();
-
-		// Tag 
-		sol::optional<sol::table> tag = entity["tag"];
-		if (tag != sol::nullopt)
-		{
-			newEntity.Tag(entity["tag"]);
-		}
+		//// Tag 
+		//
+		//if (entity["tag"] != sol::nullopt)
+		//{
+		//	newEntity.Tag(entity["tag"]);
+		//}
+		//else
+		//	Logger::Err("NO TAG");
 
 		// Group 
-		sol::optional<sol::table> group = entity["group"];
-		if (group != sol::nullopt)
-		{
-			newEntity.Group(entity["group"]);
-		}
-
+		newEntity.Group(entity["group"]);
+		
+		
 		// Components
 		sol::optional<sol::table> hasComponents = entity["components"];
 		if (hasComponents != sol::nullopt)
@@ -1081,6 +1083,7 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 			sol::optional<sol::table> transform = entity["components"]["transform"];
 			if (transform != sol::nullopt)
 			{
+				
 				newEntity.AddComponent<TransformComponent>(
 					glm::vec2(
 						entity["components"]["transform"]["position"]["x"],
@@ -1111,11 +1114,11 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 			if (sprite != sol::nullopt)
 			{
 				newEntity.AddComponent<SpriteComponent>(
-					entity["components"]["sprite"]["texture_asset_id"],
+					entity["components"]["sprite"]["asset_id"],
 					entity["components"]["sprite"]["width"],
 					entity["components"]["sprite"]["height"],
 					entity["components"]["sprite"]["z_index"].get_or(1), // Layer
-					entity["components"]["sprite"]["fixed"].get_or(false),
+					entity["components"]["sprite"]["is_fixed"].get_or(false),
 					entity["components"]["sprite"]["src_rect_x"].get_or(0),
 					entity["components"]["sprite"]["src_rect_y"].get_or(0),
 					glm::vec2(
@@ -1133,32 +1136,9 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 					entity["components"]["animation"]["num_frames"].get_or(1),
 					entity["components"]["animation"]["frame_rate"].get_or(1),
 					entity["components"]["animation"]["vertical"].get_or(false),
-					entity["components"]["animation"]["is_looped"].get_or(false),
+					entity["components"]["animation"]["looped"].get_or(false),
 					entity["components"]["animation"]["frame_offset"].get_or(0)
 					);
-			}
-
-			// Keyboard Control Component
-			sol::optional<sol::table> keyboard = entity["components"]["keyboard_control"];
-			if (keyboard != sol::nullopt)
-			{
-				newEntity.AddComponent<KeyboardControlComponent>(
-					glm::vec2(
-						entity["components"]["keyboard_control"]["up_velocity"]["x"].get_or(0),
-						entity["components"]["keyboard_control"]["up_velocity"]["y"].get_or(0)
-					),
-					glm::vec2(
-						entity["components"]["keyboard_control"]["right_velocity"]["x"].get_or(0),
-						entity["components"]["keyboard_control"]["right_velocity"]["y"].get_or(0)
-					),
-					glm::vec2(
-						entity["components"]["keyboard_control"]["down_velocity"]["x"].get_or(0),
-						entity["components"]["keyboard_control"]["down_velocity"]["y"].get_or(0)
-					),
-					glm::vec2(
-						entity["components"]["keyboard_control"]["left_velocity"]["x"].get_or(0),
-						entity["components"]["keyboard_control"]["left_velocity"]["y"].get_or(0)
-					));
 			}
 
 			// Health Component int healthPercentage = 9, int maxHearts = 3
@@ -1171,54 +1151,46 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 					);
 			}
 
-			// Game Component // For rendering in the gameState!
-			sol::optional<sol::table> game_state = entity["components"]["game_state"];
-			if (game_state != sol::nullopt)
-			{
-				newEntity.AddComponent<GameComponent>();
-			}
-
 			// Box Collider width, height, glm::vec2 offset 
 			sol::optional<sol::table> box_collider = entity["components"]["box_collider"];
 			if (box_collider != sol::nullopt)
 			{
+				Logger::Err("Has Box Collider Component");
 				newEntity.AddComponent<BoxColliderComponent>(
 					entity["components"]["box_collider"]["width"].get_or(16),
 					entity["components"]["box_collider"]["height"].get_or(16),
 					glm::vec2(
-						entity["componets"]["box_collider"]["offset"]["x"].get_or(0),
-						entity["componets"]["box_collider"]["offset"]["y"].get_or(0)
+						entity["componets"]["box_collider"]["offset_x"].get_or(0),
+						entity["componets"]["box_collider"]["offset_y"].get_or(0)
 					));
 			}
-			// Projectile Emitter  
-			sol::optional<sol::table> projectile = entity["components"]["projectile_emitter"];
-			if (projectile != sol::nullopt)
-			{
-				newEntity.AddComponent<ProjectileEmitterComponent>(
-					glm::vec2(
-						entity["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
-						entity["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
-					),
-					entity["components"]["projectile_emitter"]["repeat_freq"].get_or(0),
-					entity["components"]["projectile_emitter"]["duration"].get_or(10000),
-					entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
-					entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
-					);
-			}
-			// Camera Follow
-			sol::optional<sol::table> camera = entity["components"]["camera_follow"];
-			if (camera != sol::nullopt)
-			{
-				newEntity.AddComponent<CameraFollowComponent>();
-			}
+		//	// Projectile Emitter  
+		//	sol::optional<sol::table> projectile = entity["components"]["projectile_emitter"];
+		//	if (projectile != sol::nullopt)
+		//	{
+		//		newEntity.AddComponent<ProjectileEmitterComponent>(
+		//			glm::vec2(
+		//				entity["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
+		//				entity["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
+		//			),
+		//			entity["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
+		//			entity["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
+		//			entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
+		//			entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
+		//			);
+		//	}
+
 			// Script Component
-			sol::optional<sol::table> script = entity["components"]["on_update_script"];
+		/*	sol::optional<sol::table> script = entity["components"]["on_update_script"];
 			if (script != sol::nullopt)
 			{
 				sol::function func = entity["components"]["on_update_script"][0];
 				newEntity.AddComponent<ScriptComponent>(func);
-			}
+			}*/
+			newEntity.AddComponent<GameComponent>();
+			Logger::Err("Created Enemy");
 		}
+		i++;
 	}
 }
 
