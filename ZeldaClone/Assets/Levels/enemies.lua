@@ -192,7 +192,7 @@ enemies = {
         max_hearts = 3
       },
       rigidbody = {
-        velocity = { x = 10, y = 0}
+        velocity = { x = 50, y = 0}
       },
       animation = {
         num_frames = 2,

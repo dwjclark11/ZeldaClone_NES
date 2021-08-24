@@ -47,6 +47,7 @@ public:
 				{
 					continue;
 				}
+				//if (b.BelongsToGroup("enemies")) Logger::Err("Enemy Collide");
 
 				auto& bTransform = b.GetComponent<TransformComponent>();
 				auto& bCollider = b.GetComponent<BoxColliderComponent>();

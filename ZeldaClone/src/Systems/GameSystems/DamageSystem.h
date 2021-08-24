@@ -87,7 +87,7 @@ public:
 			if (proj.isFriendly)
 			{
 				enemyHealth.healthPercentage -= 1;
-
+				projectile.Kill();
 				// Move the enemy slightly away in the opposite direction of movement
 				if (enemyRigidbody.velocity.x > 0) enemyTransform.position.x -= 5;
 				if (enemyRigidbody.velocity.x < 0) enemyTransform.position.x += 5;

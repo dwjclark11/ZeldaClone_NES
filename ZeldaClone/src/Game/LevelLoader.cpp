@@ -1071,9 +1071,7 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 		//else
 		//	Logger::Err("NO TAG");
 
-		// Group 
-		newEntity.Group(entity["group"]);
-		
+	
 		
 		// Components
 		sol::optional<sol::table> hasComponents = entity["components"];
@@ -1083,7 +1081,6 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 			sol::optional<sol::table> transform = entity["components"]["transform"];
 			if (transform != sol::nullopt)
 			{
-				
 				newEntity.AddComponent<TransformComponent>(
 					glm::vec2(
 						entity["components"]["transform"]["position"]["x"],
@@ -1188,6 +1185,9 @@ void LevelLoader::LoadLevelFromLuaTable(sol::state& lua, std::string fileName, c
 				newEntity.AddComponent<ScriptComponent>(func);
 			}*/
 			newEntity.AddComponent<GameComponent>();
+			// Group 
+			newEntity.Group(entity["group"]);
+
 			Logger::Err("Created Enemy");
 		}
 		i++;
@@ -1233,18 +1233,14 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 		if (tag != sol::nullopt)
 		{
 			newHUDObject.Tag(hudData["tag"]);
-			if (newHUDObject.HasTag("heart1"))
-			{
+			std::string temp = hudData["tag"];
+
+			if (temp == "heart1")
 				newHUDObject.AddComponent<HealthComponent>(0);
-			}
-			if (newHUDObject.HasTag("heart2"))
-			{
+			else if (temp == "heart2")
 				newHUDObject.AddComponent<HealthComponent>(0);
-			}
-			if (newHUDObject.HasTag("heart3"))
-			{
+			else if (temp == "heart3")
 				newHUDObject.AddComponent<HealthComponent>(0);
-			}
 		}
 
 		// Add Group if there is one

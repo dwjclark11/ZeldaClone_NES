@@ -91,48 +91,80 @@ public:
 		Entity a = colEvent.a;
 		Entity b = colEvent.b;
 
-		if (a.BelongsToGroup("colliders") && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword"))) OnPlayerHitsObstacle(a, b);
-		if (b.BelongsToGroup("colliders") && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword"))) OnPlayerHitsObstacle(b, a);
-		if (b.BelongsToGroup("colliders") && a.BelongsToGroup("enemies")) OnEnemyHitsObstacle(a, b);
-		//if (a.BelongsToGroup("enemies") && b.BelongsToGroup("colliders")) OnEnemyHitsObstacle(a, b);
+		if (a.BelongsToGroup("colliders") && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword"))) OnPlayerHitsObstacleA(a, b);
+		if (b.BelongsToGroup("colliders") && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword"))) OnPlayerHitsObstacleB(a, b);
+		if (b.BelongsToGroup("colliders") && a.BelongsToGroup("enemies")) OnEnemyHitsObstacleA(a, b);
+		if (b.BelongsToGroup("enemies") && a.BelongsToGroup("colliders")) OnEnemyHitsObstacleB(a, b);
 
 	}
 
-	void OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
+	void OnEnemyHitsObstacleA(Entity enemy, Entity obstacle)
 	{
 		auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
 		auto& transform = enemy.GetComponent<TransformComponent>();
-
 		if (obstacle.BelongsToGroup("colliders") && enemy.BelongsToGroup("enemies"))
 		{
 			if (enemy1Rigidbody.velocity.y > 0)
 			{
-				transform.position.y -= 5;
+				transform.position.y -= 10;
 				enemy1Rigidbody.velocity.x = enemy1Rigidbody.velocity.y;
 				enemy1Rigidbody.velocity.y = 0;
 			}
 			else if (enemy1Rigidbody.velocity.y < 0)
 			{
-				transform.position.y += 5;
+				transform.position.y += 10;
 				enemy1Rigidbody.velocity.x = enemy1Rigidbody.velocity.y;
 				enemy1Rigidbody.velocity.y = 0;
 			}
 			else if (enemy1Rigidbody.velocity.x > 0)
 			{
-				transform.position.x -= 5;
+				transform.position.x -= 10;
 				enemy1Rigidbody.velocity.y = -enemy1Rigidbody.velocity.x;
 				enemy1Rigidbody.velocity.x = 0;
 			}
 			else if (enemy1Rigidbody.velocity.x < 0)
 			{
-				transform.position.x += 5;
+				transform.position.x += 10;
 				enemy1Rigidbody.velocity.y = enemy1Rigidbody.velocity.x;
 				enemy1Rigidbody.velocity.x = 0;
 			}
 		}
 	}
 
-	void OnPlayerHitsObstacle( Entity obstacle, Entity player)
+	void OnEnemyHitsObstacleB(Entity obstacle, Entity enemy)
+	{
+		auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
+		auto& transform = enemy.GetComponent<TransformComponent>();
+		if (obstacle.BelongsToGroup("colliders") && enemy.BelongsToGroup("enemies"))
+		{
+			if (enemy1Rigidbody.velocity.y > 0)
+			{
+				transform.position.y -= 10;
+				enemy1Rigidbody.velocity.x = -enemy1Rigidbody.velocity.y;
+				enemy1Rigidbody.velocity.y = 0;
+			}
+			else if (enemy1Rigidbody.velocity.y < 0)
+			{
+				transform.position.y += 10;
+				enemy1Rigidbody.velocity.x = enemy1Rigidbody.velocity.y;
+				enemy1Rigidbody.velocity.y = 0;
+			}
+			else if (enemy1Rigidbody.velocity.x > 0)
+			{
+				transform.position.x -= 10;
+				enemy1Rigidbody.velocity.y = -enemy1Rigidbody.velocity.x;
+				enemy1Rigidbody.velocity.x = 0;
+			}
+			else if (enemy1Rigidbody.velocity.x < 0)
+			{
+				transform.position.x += 10;
+				enemy1Rigidbody.velocity.y = enemy1Rigidbody.velocity.x;
+				enemy1Rigidbody.velocity.x = 0;
+			}
+		}
+	}
+
+	void OnPlayerHitsObstacleA( Entity obstacle, Entity player)
 	{
 		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
 		{
@@ -174,6 +206,55 @@ public:
 				{
 					playerTransform.collision = true;
 					playerRigidbody.velocity = glm::vec2(0,0);
+					playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
+					playerTransform.position.y = playerTransform.position.y;
+				}
+			}
+		}
+	}
+
+	void OnPlayerHitsObstacleB( Entity player, Entity obstacle)
+	{
+		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
+		{
+			if (obstacle.BelongsToGroup("colliders") && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
+			{
+				auto& playerTransform = player.GetComponent<TransformComponent>();
+				auto& playerCollider = player.GetComponent<BoxColliderComponent>();
+				auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
+
+				auto& obstacleTransform = obstacle.GetComponent<TransformComponent>();
+				auto& obstacleCollider = obstacle.GetComponent<BoxColliderComponent>();
+				//auto& obstacleRigidbody = obstacle.GetComponent<RigidBodyComponent>();
+
+				if (KeyboardControlSystem::dir == UP)
+				{
+					playerTransform.collision = true;
+					playerRigidbody.velocity.y = 0;
+					playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) + (obstacleCollider.height * obstacleTransform.scale.y);
+					playerTransform.position.x = playerTransform.position.x;
+				}
+
+				if (KeyboardControlSystem::dir == DOWN)
+				{
+					playerTransform.collision = true;
+					playerRigidbody.velocity.y = 0;
+					playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) - (playerCollider.height * playerTransform.scale.y);
+					playerTransform.position.x = playerTransform.position.x;
+				}
+
+				if (KeyboardControlSystem::dir == LEFT)
+				{
+					playerTransform.collision = true;
+					playerRigidbody.velocity.x = 0;
+					playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) + (obstacleCollider.width * obstacleTransform.scale.x);
+					playerTransform.position.y = playerTransform.position.y;
+				}
+
+				if (KeyboardControlSystem::dir == RIGHT)
+				{
+					playerTransform.collision = true;
+					playerRigidbody.velocity = glm::vec2(0, 0);
 					playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
 					playerTransform.position.y = playerTransform.position.y;
 				}

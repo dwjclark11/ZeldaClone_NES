@@ -157,14 +157,17 @@ bool GameState::OnEnter()
 	// Set timers back to default
 	enemyTimer.Stop();
 	playerTimer.Stop();
-	
+	LevelLoader loader;
 	// Open the lua libraries into the game
 	lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 	Game::isDebug = false;
-	
+	loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
+	loader.LoadHUDFromLuaTable(lua, "hud");
+	loader.LoadLevelFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
+
 	if (!firstEntered)
 	{
-		LevelLoader loader;
+		
 		
 		// Make adding a player into a function! --> Or From a Lua File!
 		
@@ -202,7 +205,7 @@ bool GameState::OnEnter()
 		shield.AddComponent<GameComponent>();
 		shield.Tag("the_shield");
 
-		Entity enemy = Registry::Instance()->CreateEntity();
+	/*	Entity enemy = Registry::Instance()->CreateEntity();
 		enemy.AddComponent<TransformComponent>(glm::vec2(7648, 5000), glm::vec2(4, 4), 0.0);
 		enemy.AddComponent<SpriteComponent>("enemies", 16, 16, 3, false, 0, 0, glm::vec2(64, 0));
 		enemy.AddComponent<BoxColliderComponent>(16, 16);
@@ -210,7 +213,7 @@ bool GameState::OnEnter()
 		enemy.AddComponent<RigidBodyComponent>(glm::vec2(0, 50));
 		enemy.AddComponent<GameComponent>();
 		enemy.AddComponent<AnimationComponent>(2, 10);
-		enemy.Group("enemies");
+		enemy.Group("enemies");*/
 
 		if (Game::Instance()->GetPlayerNum() == 1)
 		{
@@ -257,9 +260,7 @@ bool GameState::OnEnter()
 		if (!Registry::Instance()->HasSystem<GamePadSystem>()) 	Registry::Instance()->AddSystem<GamePadSystem>();
 		// =============================================================================================================================
 
-		loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
-		loader.LoadHUDFromLuaTable(lua, "hud");
-		loader.LoadLevelFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
+
 
 		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 

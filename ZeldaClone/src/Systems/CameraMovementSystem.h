@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include "../Game/Game.h"
 
+// Fix for linux
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -30,12 +31,8 @@ public:
 
 	CameraMovementSystem()
 	{
-		
-		// Declare the Components that are required in order to be updated by the 
-		// Camera System
 		RequiredComponent<CameraFollowComponent>();
 		RequiredComponent<TransformComponent>();
-		//RequiredComponent<SpriteComponent>();
 
 		// Initialize all the member variables
 		first = false;
@@ -55,11 +52,11 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
 			const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
+
 			// Check to see what the current state is and move the camera according to the required state
 			if (Game::Instance()->GetStateMachine()->GetCurrentState() == "EDITOR")
 			{
@@ -288,7 +285,6 @@ public:
 			camera.x = camera.x < 0 ? 0 : camera.x; // If the camera.x is < 0 make it 0
 			camera.y = camera.y < 0 ? 0 : camera.y;
 		}
-		
 	}
 
 	bool& GetScrollFinished()
