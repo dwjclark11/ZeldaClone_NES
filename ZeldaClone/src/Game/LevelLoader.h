@@ -40,9 +40,12 @@ public:
 	void SavePlayerDataToLuaTable(std::string saveNum, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void SavePlayerNameToLuaTable(std::string saveNum, std::string& name);
 	
+
+	void CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadLevelFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager);
+	void LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName);
+	void LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager);
 	void LoadHUDFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadAssetsFromLuaTable(sol::state& lua, std::string fileName);
 

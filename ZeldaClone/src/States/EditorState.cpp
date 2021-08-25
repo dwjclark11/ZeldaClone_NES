@@ -14,6 +14,7 @@ const std::string EditorState::editorID = "EDITOR";
 
 void EditorState::Update(const double& deltaTime)
 {
+
 	Game::Instance()->GetEventManager()->Reset();
 	Registry::Instance()->GetSystem<EditorKeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	

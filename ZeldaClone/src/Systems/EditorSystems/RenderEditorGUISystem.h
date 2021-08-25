@@ -9,7 +9,7 @@
 #include <imgui/imgui_stdlib.h>
 #include <fstream>
 #include "../Game/Game.h"
-#include <winsock.h>
+//#include <winsock.h>
 #include <fstream>
 #include <iostream>
 
@@ -275,7 +275,6 @@ public:
 					fileLoaded = true;
 
 				}
-				Logger::Log("Saved Level");
 			}
 
 			if (MouseControlSystem::createObstacles)
@@ -286,20 +285,16 @@ public:
 					fileLoaded = true;
 
 				}
-				Logger::Log("Saved Object");
 			}
 		}
 
 		if (ImGui::MenuItem("Save As.."))
 		{
-			//std::string saveAsFile = dialog.SaveFile();
-
 			if (MouseControlSystem::createTile)
 			{
 				std::string saveAsFile = dialog.SaveFile();
 				if (!saveAsFile.empty())
 				{
-					Logger::Err("Saved Level");
 					loader.SaveTilemap(saveAsFile, assetManager, renderer);
 				}
 			}
@@ -308,7 +303,6 @@ public:
 				std::string saveAsFile = dialog.SaveObjFile();
 				if (!saveAsFile.empty())
 				{
-					Logger::Err("SavedObject");
 					loader.SaveObjectMap(saveAsFile, assetManager, renderer);
 				}
 			}
@@ -317,8 +311,6 @@ public:
 				std::string saveAsFile = dialog.SaveBoxColliderFile();
 				if (!saveAsFile.empty())
 				{
-					Logger::Err("SavedCollider");
-					//loader.SaveBoxColliderMap(saveAsFile, assetManager, renderer);
 					loader.SaveBoxColliderMapToLuaFile(saveAsFile, assetManager, renderer);
 				}
 			}
@@ -327,8 +319,6 @@ public:
 				std::string saveAsFile = dialog.SaveBoxColliderFile();
 				if (!saveAsFile.empty())
 				{
-					Logger::Err("SavedCollider");
-					//loader.SaveBoxColliderMap(saveAsFile, assetManager, renderer);
 					loader.SaveEnemiesToLuaFile(saveAsFile);
 				}
 

@@ -1585,6 +1585,8 @@
     <None Include="Assets\LuaFiles\hud.lua" />
     <None Include="Assets\LuaFiles\game_state_assets.lua" />
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />
+    <None Include="Assets\LuaFiles\new_player_create.lua" />
+    <None Include="Assets\LuaFiles\menu_state_load.lua" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Backgrounds\hearts_rupees.png">

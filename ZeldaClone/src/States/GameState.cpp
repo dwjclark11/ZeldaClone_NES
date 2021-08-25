@@ -163,57 +163,12 @@ bool GameState::OnEnter()
 	Game::isDebug = false;
 	loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
 	loader.LoadHUDFromLuaTable(lua, "hud");
-	loader.LoadLevelFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
+	loader.LoadEnemiesFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
 
 	if (!firstEntered)
 	{
-		
-		
-		// Make adding a player into a function! --> Or From a Lua File!
-		
-		// Create the main player into the registry
-		Entity link = Registry::Instance()->CreateEntity();
-		link.AddComponent<TransformComponent>(glm::vec2(7600, 5152), glm::vec2(4, 4), 0.0);
-		link.AddComponent<SpriteComponent>("Link", 32, 32, 5, false, 0, 0);
-		link.AddComponent<RigidBodyComponent>(glm::vec2(0, 0));
-		link.AddComponent<AnimationComponent>(2, 10);
-		link.AddComponent<BoxColliderComponent>(10, 13, glm::vec2(45, 26));
-		link.AddComponent<KeyboardControlComponent>(glm::vec2(0, -200), glm::vec2(200, 0), glm::vec2(0, 200), glm::vec2(-200, 0));
-		link.AddComponent<HealthComponent>(6);
-		link.AddComponent<ProjectileEmitterComponent>(glm::vec2(300, 300), 0, 3000, 10, true);
-		link.AddComponent<CameraFollowComponent>();
-		link.AddComponent<GameComponent>();
-		link.Tag("player");
-
-		Entity sword = Registry::Instance()->CreateEntity();
-		sword.AddComponent<TransformComponent>(link.GetComponent<TransformComponent>().position, glm::vec2(1, 1), 0.0);
-		sword.AddComponent<RigidBodyComponent>(glm::vec2(0, 0));
-		sword.AddComponent<KeyboardControlComponent>(glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0));
-		sword.AddComponent<ProjectileEmitterComponent>(glm::vec2(300, 300), 0, 3000, 10, true);
-		sword.AddComponent<BoxColliderComponent>(4, 4, glm::vec2(64, -96));
-		sword.AddComponent<CameraFollowComponent>();
-		sword.AddComponent<GameComponent>();
-		sword.Tag("the_sword");
-
-		Entity shield = Registry::Instance()->CreateEntity();
-		shield.AddComponent<TransformComponent>(link.GetComponent<TransformComponent>().position, glm::vec2(1, 1), 0.0);
-		shield.AddComponent<RigidBodyComponent>(glm::vec2(0, 0));
-		shield.AddComponent<KeyboardControlComponent>(glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0));
-		shield.AddComponent<ProjectileEmitterComponent>(glm::vec2(300, 300), 0, 3000, 10, true);
-		shield.AddComponent<BoxColliderComponent>(4, 4, glm::vec2(64, -96));
-		shield.AddComponent<CameraFollowComponent>();
-		shield.AddComponent<GameComponent>();
-		shield.Tag("the_shield");
-
-	/*	Entity enemy = Registry::Instance()->CreateEntity();
-		enemy.AddComponent<TransformComponent>(glm::vec2(7648, 5000), glm::vec2(4, 4), 0.0);
-		enemy.AddComponent<SpriteComponent>("enemies", 16, 16, 3, false, 0, 0, glm::vec2(64, 0));
-		enemy.AddComponent<BoxColliderComponent>(16, 16);
-		enemy.AddComponent<HealthComponent>(2,1);
-		enemy.AddComponent<RigidBodyComponent>(glm::vec2(0, 50));
-		enemy.AddComponent<GameComponent>();
-		enemy.AddComponent<AnimationComponent>(2, 10);
-		enemy.Group("enemies");*/
+		// Player is now created from a Lua script instead of Hard Coded
+		loader.CreatePlayerEntityFromLuaTable(lua, "new_player_create");
 
 		if (Game::Instance()->GetPlayerNum() == 1)
 		{
@@ -259,8 +214,6 @@ bool GameState::OnEnter()
 		if (!Registry::Instance()->HasSystem<RenderTextSystem>()) Registry::Instance()->AddSystem<RenderTextSystem>();
 		if (!Registry::Instance()->HasSystem<GamePadSystem>()) 	Registry::Instance()->AddSystem<GamePadSystem>();
 		// =============================================================================================================================
-
-
 
 		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 
