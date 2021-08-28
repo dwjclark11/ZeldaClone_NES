@@ -71,15 +71,15 @@ public:
 			break;
 		// Change the type of trigger --> This will be removed when drop-down list is funcitonal
 		case SDLK_m:
-			if(MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
-				MouseControlSystem::triggerLevelNum++;
+		/*	if(MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
+				MouseControlSystem::triggerLevelNum++;*/
 			break;
 		// Same as above
 		case SDLK_n:
-			if (MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
+			/*if (MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
 				MouseControlSystem::triggerLevelNum--;
 			if (MouseControlSystem::triggerLevelNum-- < 0)
-				MouseControlSystem::triggerLevelNum = 0;
+				MouseControlSystem::triggerLevelNum = 0;*/
 			break;
 		// This will also be removed with the implementation of the drop-list stated above
 		case SDLK_SPACE:

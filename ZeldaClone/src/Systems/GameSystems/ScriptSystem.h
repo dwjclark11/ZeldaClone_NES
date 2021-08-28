@@ -39,6 +39,13 @@ std::tuple<double, double> GetEntityVelocity(Entity entity)
 	}
 }
 
+std::tuple<double, double> GetPlayerPosition()
+{
+	const auto& entity = Registry::Instance()->GetEntityByTag("player");
+	const auto& transform = entity.GetComponent<TransformComponent>();
+	return std::make_tuple(transform.position.x, transform.position.y);
+}
+
 void SetEntityPosition(Entity entity, double x, double y)
 {
 	if (entity.HasComponent<TransformComponent>())
@@ -97,6 +104,7 @@ void SetEntityAnimationFrame(Entity entity, int frame)
 	}
 }
 
+
 class ScriptSystem : public System
 {
 public:
@@ -123,6 +131,7 @@ public:
 		lua.set_function("set_position", SetEntityPosition);
 		lua.set_function("set_velocity", SetEntityVelocity);
 		lua.set_function("set_animation_frame", SetEntityAnimationFrame);
+		lua.set_function("get_player_pos", GetPlayerPosition);
 		// TODO:
 		// Add all the other Lua Bindings and c++ functions that may be needed
 	}

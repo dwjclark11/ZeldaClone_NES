@@ -2,6 +2,7 @@
 #include "State.h"
 #include <sol/sol.hpp>
 #include "../Utilities/Timer.h"
+#include <glm/glm.hpp>
 
 class GameState : public State
 {
@@ -15,6 +16,7 @@ public:
 	
 	// Constructor
 	GameState() {}
+	GameState(glm::vec2 cameraOffset) { this->cameraOffset = cameraOffset; }
 	
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -33,4 +35,5 @@ private:
 	sol::state lua;
 	Timer enemyTimer;
 	Timer playerTimer;
+	glm::vec2 cameraOffset;
 };

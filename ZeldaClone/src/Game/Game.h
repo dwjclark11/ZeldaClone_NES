@@ -52,6 +52,7 @@ struct GameItems
 	bool masterKey;
 	bool bluePotion;
 	bool redPotion;
+	bool candle;
 };
 
 class Game
@@ -98,6 +99,8 @@ public:
 	bool& IsRunning() { return mIsRunning; }
 	bool& GetCameraMoving(){ return cameraMoving;}
 	bool& GetGameRunning(){ return mIsRunning;}
+	bool& GetplayerCreated() { return playerCreated; }
+
 	GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } // Move Semantics?
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
@@ -116,6 +119,7 @@ private:
 	bool attack;
 	bool keydown;
 	bool cameraMoving;
+	bool playerCreated;
 	unsigned gamePlayerNum;
 	
 	SDL_Window* mWindow;

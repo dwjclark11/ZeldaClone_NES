@@ -188,8 +188,8 @@ enemies = {
         offset = { x = 0, y = 0}
       },
       health = {
-        health_percentage = 9,
-        max_hearts = 3
+        health_percentage = 2,
+        max_hearts = 1
       },
       rigidbody = {
         velocity = { x = 50, y = 0}
@@ -200,6 +200,24 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      },
+      on_update_script = 
+      {
+            [0] = 
+            function (entity, delta_time, elapsed_time)
+                -- Change the position
+                local player_x, player_y = get_player_pos()
+                local enemy_x, enemy_y = get_position(entity)
+                local enemy_vel_x, enemy_vel_y = get_velocity(entity)
+               
+                if enemy_x >= (player_x - 200) and enemy_x <= (player_x + 200) then
+                    if player_x > enemy_x then
+                        set_velocity(entity, 50, enemy_vel_y)      
+                    elseif player_x < enemy_x then
+                        set_velocity(entity, -50, enemy_vel_y)
+                    end
+                end
+            end
       }
     }
   }

@@ -169,16 +169,17 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		std::string group = "";
 		glm::vec2 offset = glm::vec2(0, 0);
 		glm::vec2 triggerOffset = glm::vec2(0, 0);
+		glm::vec2 triggerCamOffset = glm::vec2(0, 0);
 		bool collider = false;
 		bool trigger = false;
 		int type = 0;
-		int triggerLevel = 0;
+		std::string triggerLevel = "";
 		TriggerType triggerType = NO_TRIGGER;
 		
 		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
 
 		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
-		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerLevel;
+		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel;
 		
 		// Convert the trigger type to TriggerType enum
 		triggerType = ConvertToTriggerType(type);
@@ -347,7 +348,7 @@ void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::uniqu
 				collider = true;
 				trigger = true;
 				mapFile << collider << " " << trigger << " " << collision.width << " " << collision.height << " " << collision.offset.x << " " << collision.offset.y << " " <<
-					trig.triggerType << " " << trig.transportOffset.x << " " << trig.transportOffset.y << " " << trig.levelNum << " " << std::endl;
+					trig.triggerType << " " << trig.transportOffset.x << " " << trig.transportOffset.y << " " << trig.level << " " << std::endl;
 			}
 		}
 	}
@@ -470,7 +471,7 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 			m_writer.WriteKeyAndUnquotedValue("type", trig.triggerType, file);
 			m_writer.WriteKeyAndUnquotedValue("transport_offset_x", trig.transportOffset.x, file);
 			m_writer.WriteKeyAndUnquotedValue("transport_offset_y", trig.transportOffset.y, file);
-			m_writer.WriteKeyAndUnquotedValue("level", trig.levelNum, file);
+			m_writer.WriteKeyAndUnquotedValue("level", trig.level, file);
 			//m_writer.WriteEndTable(false, file);
 			m_writer.WriteEndTable(false, file);
 		

@@ -34,6 +34,14 @@
 
 const std::string DungeonState::dungeonID = "DUNGEON";
 
+DungeonState::DungeonState(std::string level)
+	: paused(false)
+	, level(level)
+	
+{
+
+}
+
 void DungeonState::Update(const double& deltaTime)
 {
 	Game::Instance()->GetEventManager()->Reset();
@@ -86,10 +94,10 @@ bool DungeonState::OnEnter()
 {
 	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
 
-
+	Logger::Log("Level:" + level);
 	LevelLoader loader;
 	loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "secret_dungeon_colliders.map");
-
+	//loader.CreatePlayerEntityFromLuaTable(lua, "new_player_create");
 	Game::Instance()->GetCamera().x = 0;
 	Game::Instance()->GetCamera().y = 0;
 	

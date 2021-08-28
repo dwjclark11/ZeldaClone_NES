@@ -21,7 +21,6 @@ struct RenderMainMenuSystem : public System
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
 	{
-
 		// Loop all entities that the system is interested in
 		for (auto entity : GetSystemEntities())
 		{

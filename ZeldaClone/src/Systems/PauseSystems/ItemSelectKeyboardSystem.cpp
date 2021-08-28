@@ -46,19 +46,19 @@ void ItemSelectKeyboardControlSystem::Update()
 
 			if (GamePadSystem::aPressed && !GamePadSystem::buttonDown)
 			{
-				if (transform.position.x == 386 && transform.position.y == 190)
+				if (transform.position.x == 386 && transform.position.y == 190 && Game::Instance()->GetGameItems().woodBoomerang)
 				{
 					itemType = BOOMERANG;
 				}
-				else if ((transform.position.x == 486 && transform.position.y == 190) && GameState::totalBombs > 0)
+				else if ((transform.position.x == 486 && transform.position.y == 190) && GameState::totalBombs > 0 && Game::Instance()->GetGameItems().bombs)
 				{
 					itemType = BOMB;
 				}
-				else if (transform.position.x == 586 && transform.position.y == 190)
+				else if (transform.position.x == 586 && transform.position.y == 190 && Game::Instance()->GetGameItems().bow)
 				{
 					itemType = WOOD_BOW;
 				}
-				else if (transform.position.x == 686 && transform.position.y == 190)
+				else if (transform.position.x == 686 && transform.position.y == 190 && Game::Instance()->GetGameItems().candle)
 				{
 					itemType = CANDLE;
 				}
@@ -66,15 +66,15 @@ void ItemSelectKeyboardControlSystem::Update()
 				{
 
 				}
-				else if (transform.position.x == 486 && transform.position.y == 260)
+				else if (transform.position.x == 486 && transform.position.y == 260 && Game::Instance()->GetGameItems().food)
 				{
 					itemType = FOOD;
 				}
-				else if (transform.position.x == 586 && transform.position.y == 260)
+				else if (transform.position.x == 586 && transform.position.y == 260 && Game::Instance()->GetGameItems().redPotion)
 				{
 					itemType = POTION_RED;
 				}
-				else if (transform.position.x == 686 && transform.position.y == 260)
+				else if (transform.position.x == 686 && transform.position.y == 260 && Game::Instance()->GetGameItems().magicRod)
 				{
 					itemType = MAGIC_ROD;
 				}

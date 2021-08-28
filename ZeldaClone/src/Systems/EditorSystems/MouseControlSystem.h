@@ -67,7 +67,7 @@ public:
 	static int layer;
 	static unsigned triggerNum;
 	static TriggerType triggerType;
-	static int triggerLevelNum;
+	static std::string triggerLevelNum;
 
 	static int CanvasWidth;
 	static int CanvasHeight;
@@ -494,7 +494,7 @@ public:
 				else if (isTrigger)
 				{
 					tile.AddComponent<BoxColliderComponent>(boxColliderWidth, boxColliderHeight, glm::vec2(boxColliderOffsetX, boxColliderOffsetY));
-					tile.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(0,0), triggerLevelNum);
+					tile.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(0,0), glm::vec2(0,0), triggerLevelNum);
 					tile.Group("trigger");
 					Logger::Log("Trigger Created");
 				}
@@ -539,7 +539,7 @@ public:
 		std::string collisionText = "Collision: " + std::to_string(isCollision);
 		std::string triggerText = "Trigger: " + std::to_string(isTrigger);
 		std::string trigType = "";
-		std::string trigLevelNum = "Level Num: " + std::to_string(triggerLevelNum);
+		std::string trigLevelNum = "Level Num: " + triggerLevelNum;
 		std::string layerText = "Layer: " + std::to_string(layer);
 		std::string tilePositionText = "X: " + std::to_string(static_cast<int>(mouseBox.x + camera.x) / gridSize)
 			+ ", Y: " + std::to_string(static_cast<int>(mouseBox.y + camera.y) / gridSize);
@@ -963,7 +963,7 @@ glm::vec2 MouseControlSystem::rigidBodyVelocity = glm::vec2(10, 10);
 std::string MouseControlSystem::imageID = "";
 TriggerType MouseControlSystem::triggerType = NO_TRIGGER;
 unsigned MouseControlSystem::triggerNum = 0;
-int MouseControlSystem::triggerLevelNum = 0;
+std::string MouseControlSystem::triggerLevelNum = "";
 
 int MouseControlSystem::CanvasWidth = 992;
 int MouseControlSystem::CanvasHeight = 992;

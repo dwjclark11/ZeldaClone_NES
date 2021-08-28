@@ -80,14 +80,80 @@ public:
 					the camera will scroll to the next panel at a speed of 24px per interval; The Game::Instance->GetCameraMoving() method
 					prevents the player from overstepping the camera.
 				*/
+				// Update the player position for the location map in the HUD!
+				if (entity.HasTag("player"))
+				{
+					for (int i = 0; i < 16; i++)
+					{
+						for (int j = 0; j < 8; j++)
+						{
+							if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i))
+							{
+								if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
+								{
+									if (west)
+									{
+										rigidBody.velocity.x = 0;
+										camera.x -= 24;
+										Sleep(1);
+									}
+
+									if (east)
+									{
+										rigidBody.velocity.x = 0;
+										camera.x += 24;
+										Sleep(1);
+									}
+
+									if (camera.x >= i * 1024 && east)
+									{
+										camera.x = i * 1024;
+										east = false;
+										Game::Instance()->GetCameraMoving() = false;
+									}
+
+									if (camera.x <= i * 1024 && west)
+									{
+										camera.x = i * 1024;
+										west = false;
+										Game::Instance()->GetCameraMoving() = false;
+									}
+
+									if (south)
+									{
+										rigidBody.velocity.y = 0;
+										camera.y += 24;
+										Sleep(1);
+									}
+
+									if (north)
+									{
+										rigidBody.velocity.y = 0;
+										camera.y -= 24;
+										Sleep(1);
+									}
+
+									if (camera.y >= (j * 672) - 288 && south)
+									{
+										camera.y = (j * 672) - 288;
+										south = false;
+										Game::Instance()->GetCameraMoving() = false;
+									}
+
+									if (camera.y <= (j * 672) - 288 && north)
+									{
+										camera.y = (j * 672) - 288;
+										north = false;
+										Game::Instance()->GetCameraMoving() = false;
+									}
+								}
+							}
+						}
+					}
+				}
+
 				if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
 				{
-					if (!first)
-					{
-						camera.x = 7168;
-						camera.y = 4704;
-						first = true;
-					}
 
 					if (camera.x > (transform.position.x + boxCollider.offset.x) && !west && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x < 0)
 					{
@@ -116,99 +182,13 @@ public:
 						Game::Instance()->GetCameraMoving() = true;
 						rigidBody.velocity.y = 0;
 					}
-
-					// Moving West
-					if (west)
-					{
-						rigidBody.velocity.x = 0;
-						camera.x -= 24;
-						Sleep(1);
-
-						if (camera.x < (transform.position.x + boxCollider.offset.x) - Game::Instance()->windowWidth + (boxCollider.width * transform.scale.x))
-						{
-							camera.x = (transform.position.x + boxCollider.offset.x) - Game::Instance()->windowWidth + (boxCollider.width * transform.scale.x); // transform.position.x + sprite.width * transform.scale.x;
-							west = false;
-							Game::Instance()->GetCameraMoving() = false;
-						}
-					}
-
-					// Moving East
-					if (east)
-					{
-						rigidBody.velocity.x = 0;
-						camera.x += 24;
-						Sleep(1);
-
-						if (camera.x + camera.w >= transform.position.x + Game::Instance()->windowWidth)
-						{
-							camera.x = (transform.position.x + boxCollider.offset.x) /*+ sprite.width * transform.scale.x*/;
-							east = false;
-							Game::Instance()->GetCameraMoving() = false;
-						}
-					}
-
-					// Moving North
-					if (north)
-					{
-						rigidBody.velocity.y = 0;
-						camera.y -= 24;
-						Sleep(1);
-
-						if (camera.y < (transform.position.y + boxCollider.offset.y) - (Game::Instance()->windowHeight - (sprite.width * transform.scale.y)))
-						{
-							//transform.position.y -= 64;
-							camera.y = (transform.position.y + boxCollider.offset.y) - Game::Instance()->windowHeight + (boxCollider.height * transform.scale.y);
-							north = false;
-							Game::Instance()->GetCameraMoving() = false;
-						}
-					}
-
-					// Moving South
-					if (south)
-					{
-						rigidBody.velocity.y = 0;
-						camera.y += 24;
-						Sleep(1);
-						if (camera.y + camera.h > (transform.position.y - boxCollider.offset.y) + (Game::Instance()->windowHeight - (Game::Instance()->windowHeight / 4 + (Game::Instance()->tilePixels * Game::Instance()->gameScale))))
-						{
-							camera.y = transform.position.y + boxCollider.offset.y - (Game::Instance()->windowHeight / 6 + (Game::Instance()->tilePixels * Game::Instance()->gameScale) + 64);
-							south = false;
-							Game::Instance()->GetCameraMoving() = false;
-						}
-					}
-
-					// Keep the camera rectange view inside the screen limits
-					camera.x = camera.x < 0 ? 0 : camera.x; // If the camera.x is < 0 make it 0
-					camera.y = camera.y < 0 ? 0 : camera.y;
-					camera.x = (camera.x + camera.w > 16384) ? 16384 - camera.w : camera.x; // if Camera.x is > than the width of the screen
-					camera.y = (camera.y + camera.h > 5376) ? 5376 - camera.h : camera.y;
 				}
-				else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "DUNGEON")
-				{
-					if (camera.x > transform.position.x)
-					{
-						camera.x -= 1024;
-					}
-					if ((camera.x + camera.w) < transform.position.x + sprite.width)
-					{
-						camera.x += 1024;
-					}
-					if (camera.y > transform.position.y - 300)
-					{
-						camera.y -= 1620;
-						transform.position.y -= 100;
-					}
-					if ((camera.y + camera.h) < transform.position.y + sprite.height)
-					{
-						camera.y += 960;
-					}
-
-					// Keep the camera rectange view inside the screen limits
-					camera.x = camera.x < 0 ? 0 : camera.x; // If the camera.x is < 0 make it 0
-					camera.y = camera.y < 0 ? 0 : camera.y;
-					camera.x = (camera.x + camera.w > 16384) ? 16384 - camera.w : camera.x; // if Camera.x is > than the width of the screen
-					camera.y = (camera.y + camera.h > 5376) ? 5376 - camera.h : camera.y;
-				}
+				
+				// Keep the camera rectange view inside the screen limits
+				camera.x = camera.x < -288 ? -288 : camera.x; // If the camera.x is < 0 make it 0
+				camera.y = camera.y < -288 ? -288 : camera.y;
+				camera.x = (camera.x + camera.w > 16384) ? 16384 - camera.w : camera.x; // if Camera.x is > than the width of the screen
+				camera.y = (camera.y + camera.h > 5376) ? 5376 - camera.h : camera.y;
 			}
 		}
 

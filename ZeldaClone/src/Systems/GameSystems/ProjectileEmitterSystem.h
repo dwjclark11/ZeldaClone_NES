@@ -490,12 +490,11 @@ public:
 			if (entity.BelongsToGroup("boomerang"))
 			{
 				auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
-				Logger::Log("Boomer Pos.y: " + std::to_string(entity.GetComponent<TransformComponent>().position.y) + "PlayerPos.y: " + std::to_string(playerPosition.y));
+				//Logger::Log("Boomer Pos.y: " + std::to_string(entity.GetComponent<TransformComponent>().position.y) + "PlayerPos.y: " + std::to_string(playerPosition.y));
 				if (KeyboardControlSystem::dir == UP)
 				{
 					if (entity.GetComponent<TransformComponent>().position.y < (playerPosition.y - 200) && !boomerangReturned)
 					{
-						Logger::Log("BOMER");
 						rigidbody.velocity *= -1;
 						boomerangReturned = true;
 					}

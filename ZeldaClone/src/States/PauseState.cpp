@@ -30,9 +30,8 @@ void PauseState::Update(const double& deltaTime)
 		bombItem.Group("pause");
 
 		bombs = true;
-
-		Logger::Err("Bomb Created");
 	}
+
 	if (GameState::totalBombs == 0 && bombs) bombs = false;
 	if (State::exitToMain) Game::Instance()->GetStateMachine()->PopState();
 }
@@ -57,8 +56,8 @@ bool PauseState::OnEnter()
 	if (!Registry::Instance()->HasSystem<ItemSelectKeyboardControlSystem>()) Registry::Instance()->AddSystem<ItemSelectKeyboardControlSystem>();
 	if (!Registry::Instance()->HasSystem<RenderPauseSystem>()) Registry::Instance()->AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
-	if (!firstEnter)
-	{
+	/*if (!firstEnter)
+	{*/
 		Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "pause_hud", "./Assets/Backgrounds/pauseHud.png");
 
 		Entity hudHolder = Registry::Instance()->CreateEntity();
@@ -81,13 +80,16 @@ bool PauseState::OnEnter()
 		triforce.Group("pause");
 
 		// Top Row Items
-		Entity boomerang = Registry::Instance()->CreateEntity();
-		boomerang.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 112);
-		boomerang.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
-		boomerang.AddComponent<PauseComponent>();
-		boomerang.Group("pause");
-
-		if (GameState::totalBombs > 0)
+		if (Game::Instance()->GetGameItems().woodBoomerang)
+		{
+			Entity boomerang = Registry::Instance()->CreateEntity();
+			boomerang.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 112);
+			boomerang.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
+			boomerang.AddComponent<PauseComponent>();
+			boomerang.Group("pause");
+		}
+		
+		if (GameState::totalBombs > 0 && Game::Instance()->GetGameItems().bombs)
 		{
 			Entity bombs = Registry::Instance()->CreateEntity();
 			bombs.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
@@ -98,42 +100,61 @@ bool PauseState::OnEnter()
 		}
 
 
-		Entity bow = Registry::Instance()->CreateEntity();
-		bow.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 0);
-		bow.AddComponent<TransformComponent>(glm::vec2(586, 190), glm::vec2(4, 4), 0.0);
-		bow.AddComponent<PauseComponent>();
-		bow.Group("pause");
+		if (Game::Instance()->GetGameItems().bow)
+		{
+			Entity bow = Registry::Instance()->CreateEntity();
+			bow.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 0);
+			bow.AddComponent<TransformComponent>(glm::vec2(586, 190), glm::vec2(4, 4), 0.0);
+			bow.AddComponent<PauseComponent>();
+			bow.Group("pause");
+		}
 
-		Entity candle = Registry::Instance()->CreateEntity();
-		candle.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 48);
-		candle.AddComponent<TransformComponent>(glm::vec2(686, 190), glm::vec2(4, 4), 0.0);
-		candle.AddComponent<PauseComponent>();
-		candle.Group("pause");
+		if (Game::Instance()->GetGameItems().candle)
+		{
+			Entity candle = Registry::Instance()->CreateEntity();
+			candle.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 48);
+			candle.AddComponent<TransformComponent>(glm::vec2(686, 190), glm::vec2(4, 4), 0.0);
+			candle.AddComponent<PauseComponent>();
+			candle.Group("pause");
+		}
 
 		// Bottom Row Items
-		Entity flute = Registry::Instance()->CreateEntity();
-		flute.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 16);
-		flute.AddComponent<TransformComponent>(glm::vec2(386, 260), glm::vec2(4, 4), 0.0);
-		flute.AddComponent<PauseComponent>();
-		flute.Group("pause");
+		if (Game::Instance()->GetGameItems().flute)
+		{
+			Entity flute = Registry::Instance()->CreateEntity();
+			flute.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 16);
+			flute.AddComponent<TransformComponent>(glm::vec2(386, 260), glm::vec2(4, 4), 0.0);
+			flute.AddComponent<PauseComponent>();
+			flute.Group("pause");
+		}
 
-		Entity meat = Registry::Instance()->CreateEntity();
-		meat.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 112, 16);
-		meat.AddComponent<TransformComponent>(glm::vec2(486, 260), glm::vec2(4, 4), 0.0);
-		meat.AddComponent<PauseComponent>();
-		meat.Group("pause");
+		if (Game::Instance()->GetGameItems().food)
+		{
+			Entity meat = Registry::Instance()->CreateEntity();
+			meat.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 112, 16);
+			meat.AddComponent<TransformComponent>(glm::vec2(486, 260), glm::vec2(4, 4), 0.0);
+			meat.AddComponent<PauseComponent>();
+			meat.Group("pause");
+		}
 
-		Entity potion = Registry::Instance()->CreateEntity();
-		potion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 32, 32);
-		potion.AddComponent<TransformComponent>(glm::vec2(586, 260), glm::vec2(4, 4), 0.0);
-		potion.AddComponent<PauseComponent>();
-		potion.Group("pause");
+		if (Game::Instance()->GetGameItems().redPotion)
+		{
+			Entity potion = Registry::Instance()->CreateEntity();
+			potion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 32, 32);
+			potion.AddComponent<TransformComponent>(glm::vec2(586, 260), glm::vec2(4, 4), 0.0);
+			potion.AddComponent<PauseComponent>();
+			potion.Group("pause");
+		}
 
-		Entity magicalRod = Registry::Instance()->CreateEntity();
-		magicalRod.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 80);
-		magicalRod.AddComponent<TransformComponent>(glm::vec2(686, 260), glm::vec2(4, 4), 0.0);
-		magicalRod.AddComponent<PauseComponent>();
-		magicalRod.Group("pause");
+		if (Game::Instance()->GetGameItems().magicRod)
+		{
+			Entity magicalRod = Registry::Instance()->CreateEntity();
+			magicalRod.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 80);
+			magicalRod.AddComponent<TransformComponent>(glm::vec2(686, 260), glm::vec2(4, 4), 0.0);
+			magicalRod.AddComponent<PauseComponent>();
+			magicalRod.Group("pause");
+		}
+
 
 		Entity pauseSelector = Registry::Instance()->CreateEntity();
 		pauseSelector.AddComponent<SpriteComponent>("box", 16, 16, 0, false, 16, 0);
@@ -141,23 +162,26 @@ bool PauseState::OnEnter()
 		pauseSelector.AddComponent<PauseComponent>();
 		pauseSelector.Tag("pauseSelector");
 		pauseSelector.Group("pause");
-		firstEnter = true;
+		
+		
+		if (!firstEnter)
+		{
+			Entity selectedItem = Registry::Instance()->CreateEntity();
+			selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
+			selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
+			selectedItem.AddComponent<PauseComponent>();
+			selectedItem.Tag("selectedItem");
+			selectedItem.Group("pause");
+			firstEnter = true;
+		}
+	//}
 
-		Entity selectedItem = Registry::Instance()->CreateEntity();
-		selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
-		selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
-		selectedItem.AddComponent<PauseComponent>();
-		selectedItem.Tag("selectedItem");
-		selectedItem.Group("pause");
-	}
-
-	//Logger::Log("Entering Pause State");
 	return true;
 }
 
 bool PauseState::OnExit()
 {
-	//Registry::Instance()->GetSystem<RenderPauseSystem>().OnExit();
+	Registry::Instance()->GetSystem<RenderPauseSystem>().OnExit();
 	//Logger::Err("Exiting Pause State");
 	return true;
 }

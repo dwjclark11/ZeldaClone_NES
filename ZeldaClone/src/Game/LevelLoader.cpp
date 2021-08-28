@@ -601,16 +601,17 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		std::string group = "";
 		glm::vec2 offset = glm::vec2(0, 0);
 		glm::vec2 triggerOffset = glm::vec2(0, 0);
+		glm::vec2 triggerCamOffset = glm::vec2(0, 0);
 		bool collider = false;
 		bool trigger = false;
 		int type = 0;
-		int triggerLevel = 0;
+		std::string triggerLevel = "";
 		TriggerType triggerType = NO_TRIGGER;
 
 		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
 
 		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
-		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerLevel;
+		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel;
 
 
 		triggerType = ConvertToTriggerType(type);
@@ -631,7 +632,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		if (collider && trigger)
 		{
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), triggerLevel);
+			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y), triggerLevel);
 			boxCollider.AddComponent<GameComponent>();
 		}
 	}
@@ -653,6 +654,7 @@ TriggerType LevelLoader::ConvertToTriggerType(int triggerType)
 	case 6: return TRAP; break;
 	case 7: return HIDDEN_SWITCH; break;
 	case 8: return HIDDEN_OBJECT; break;
+	case 9: return RETURN_WORLD; break;
 	}
 }
 
@@ -752,7 +754,7 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 						collider["triggerComponent"]["transport_offset_x"].get_or(0.0),
 						collider["triggerComponent"]["transport_offset_y"].get_or(0.0)
 					),
-					collider["triggerComponent"]["level"].get_or(0.0)
+					collider["triggerComponent"]["level"]
 				);
 			}
 			else
@@ -1261,11 +1263,9 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> inventory = player["inventory"];
 		if (inventory != sol::nullopt)
 		{
-			Logger::Err("Needs to be set up");
 			GameState::totalRupees = player["inventory"]["num_rupees"].get_or(0);
 			GameState::totalBombs = player["inventory"]["num_bombs"].get_or(0);
 			GameState::totalKeys = player["inventory"]["num_keys"].get_or(0);
-			//RenderHealthSystem::loadedHearts = player["inventory"]["num_hearts"].get_or(3);
 		}
 		i++;
 	}
@@ -1398,29 +1398,29 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 						entity["componets"]["box_collider"]["offset_y"].get_or(0)
 					));
 			}
-		//	// Projectile Emitter  
-		//	sol::optional<sol::table> projectile = entity["components"]["projectile_emitter"];
-		//	if (projectile != sol::nullopt)
-		//	{
-		//		newEntity.AddComponent<ProjectileEmitterComponent>(
-		//			glm::vec2(
-		//				entity["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
-		//				entity["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
-		//			),
-		//			entity["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
-		//			entity["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
-		//			entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
-		//			entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
-		//			);
-		//	}
+			// Projectile Emitter  
+			sol::optional<sol::table> projectile = entity["components"]["projectile_emitter"];
+			if (projectile != sol::nullopt)
+			{
+				newEntity.AddComponent<ProjectileEmitterComponent>(
+					glm::vec2(
+						entity["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
+						entity["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
+					),
+					entity["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
+					entity["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
+					entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
+					entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
+					);
+			}
 
 			// Script Component
-		/*	sol::optional<sol::table> script = entity["components"]["on_update_script"];
+			sol::optional<sol::table> script = entity["components"]["on_update_script"];
 			if (script != sol::nullopt)
 			{
 				sol::function func = entity["components"]["on_update_script"][0];
 				newEntity.AddComponent<ScriptComponent>(func);
-			}*/
+			}
 			newEntity.AddComponent<GameComponent>();
 		}
 		i++;

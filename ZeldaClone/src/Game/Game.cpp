@@ -25,6 +25,7 @@ Game::Game()
 	, keydown(false)
 	, deltaTime(0.0f)
 	, gamePlayerNum(0)
+	, playerCreated(false)
 	, cameraMoving(false)
 {
 	//Logger::Log("Game Constructor called");

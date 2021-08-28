@@ -35,37 +35,38 @@ public:
 		// Check to see if the player has activated a trigger
 		if (a.BelongsToGroup("trigger") && b.HasTag("player"))
 		{
-			OnPlayerTrigger(a, b);
+			OnPlayerTriggerA(a, b);
 		}
 		if (b.BelongsToGroup("trigger") && a.HasTag("player"))
 		{
-			OnPlayerTrigger(b, a);	
+			OnPlayerTriggerB(a, b);	
 		}
 	}
 
-	void OnPlayerTrigger( Entity trigger, Entity player)
+	void OnPlayerTriggerA( Entity trigger, Entity player)
 	{
 		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 		auto& transform = player.GetComponent<TransformComponent>();
 		auto& rigidbody = player.GetComponent<RigidBodyComponent>();
-	
+		Logger::Log("trig num: " + std::to_string(trig.triggerType));
+
 		switch (trig.triggerType)
 		{
 		case NO_TRIGGER:
+			Logger::Log("No Trig?");
 			break;
 
 		case SECRET_AREA:
-			if (trig.levelNum == 1)
-				Logger::Err("LevelNum: " + std::to_string(trig.levelNum));
+			Logger::Log("Secret");
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
-			transform.position.x = 480;
-			transform.position.y = 900;
+			transform.position.x = trig.transportOffset.x;
+			transform.position.y = trig.transportOffset.y;
 			Game::Instance()->GetStateMachine()->PopState();
-			Game::Instance()->GetStateMachine()->PushState(new DungeonState());
+			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
 			break;
 
 		case ENTER_DUNGEON:
-	
+			Logger::Log("Dungeon");
 			break;
 
 		case BURN_BUSHES:
@@ -79,8 +80,64 @@ public:
 		case CAMERA_RIGHT:
 
 			break;
+
+		case RETURN_WORLD:
+			Logger::Err("In The Trigger");
+			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			transform.position = trig.transportOffset;
+			Game::Instance()->GetStateMachine()->PopState();
+			Game::Instance()->GetStateMachine()->PushState(new GameState(trig.cameraOffset));
+			break;
 		default:
 			
+			break;
+		}
+	}
+	void OnPlayerTriggerB(Entity player, Entity trigger)
+	{
+		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
+		auto& transform = player.GetComponent<TransformComponent>();
+		auto& rigidbody = player.GetComponent<RigidBodyComponent>();
+		Logger::Log("trig num: " + std::to_string(trig.triggerType));
+		switch (trig.triggerType)
+		{
+		case NO_TRIGGER:
+			break;
+
+		case SECRET_AREA:
+
+			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			transform.position.x = trig.transportOffset.x;
+			transform.position.y = trig.transportOffset.y;
+			Game::Instance()->GetStateMachine()->PopState();
+			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
+			break;
+
+		case ENTER_DUNGEON:
+
+			break;
+
+		case BURN_BUSHES:
+
+			break;
+
+		case PUSH_ROCKS:
+
+			break;
+
+		case CAMERA_RIGHT:
+
+			break;
+
+		case RETURN_WORLD:
+			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			transform.position = trig.transportOffset;
+
+			Game::Instance()->GetStateMachine()->PopState();
+			Game::Instance()->GetStateMachine()->PushState(new GameState(trig.cameraOffset));
+			break;
+		default:
+
 			break;
 		}
 	}

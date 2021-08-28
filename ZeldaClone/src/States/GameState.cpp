@@ -18,6 +18,7 @@
 #include "../Systems/GameSystems/CollectItemSystem.h"
 #include "../Systems/GameSystems/ProjectileEmitterSystem.h"
 #include "../Systems/GameSystems/ProjectileLifeCycleSystem.h"
+#include "../Systems/GameSystems/ScriptSystem.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
@@ -113,6 +114,8 @@ void GameState::Update(const double& deltaTime)
 		Game::Instance()->GetStateMachine()->PushState(new GameOverState());
 	}
 
+	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
+
 	// Convert the total Rupees
 	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
 	ConvertNumberParser("rupee_tens", totalRupees, 1);
@@ -154,48 +157,55 @@ void GameState::Render()
 
 bool GameState::OnEnter()
 {
-	// Set timers back to default
-	enemyTimer.Stop();
-	playerTimer.Stop();
-	LevelLoader loader;
-	// Open the lua libraries into the game
-	lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
-	Game::isDebug = false;
-	loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
-	loader.LoadHUDFromLuaTable(lua, "hud");
-	loader.LoadEnemiesFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
-
 	if (!firstEntered)
 	{
+		// Set timers back to default
+		enemyTimer.Stop();
+		playerTimer.Stop();
+		LevelLoader loader;
+		// Open the lua libraries into the game
+		lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
+		Game::isDebug = false;
+		loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
+		loader.LoadHUDFromLuaTable(lua, "hud");
+		loader.LoadEnemiesFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
+		loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+
 		// Player is now created from a Lua script instead of Hard Coded
-		loader.CreatePlayerEntityFromLuaTable(lua, "new_player_create");
-
-		if (Game::Instance()->GetPlayerNum() == 1)
+		if (!Game::Instance()->GetplayerCreated())
 		{
-			loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
-			//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
-			loader.LoadPlayerDataFromLuaTable(lua, "save1");
-			loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
-			
-		}
-		else if (Game::Instance()->GetPlayerNum() == 2)
-		{
-			loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
-			//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
-			loader.LoadPlayerDataFromLuaTable(lua, "save2");
-			loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
-			//Logger::Log("Second Player Column");
-		}
-		else if (Game::Instance()->GetPlayerNum() == 3)
-		{
-			loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
-			//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
-			loader.LoadPlayerDataFromLuaTable(lua, "save3");
-			loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
-			//Logger::Log("Third Player Column");
-		}
+			loader.CreatePlayerEntityFromLuaTable(lua, "new_player_create");
+			Game::Instance()->GetplayerCreated() = true;
+			Logger::Log("Player Creating");
 
 
+
+			if (Game::Instance()->GetPlayerNum() == 1)
+			{
+				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
+				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
+				loader.LoadPlayerDataFromLuaTable(lua, "save1");
+				
+
+			}
+			else if (Game::Instance()->GetPlayerNum() == 2)
+			{
+				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
+				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
+				loader.LoadPlayerDataFromLuaTable(lua, "save2");
+				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+				//Logger::Log("Second Player Column");
+			}
+			else if (Game::Instance()->GetPlayerNum() == 3)
+			{
+				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
+				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
+				loader.LoadPlayerDataFromLuaTable(lua, "save3");
+				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+				//Logger::Log("Third Player Column");
+			}
+
+		}
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
 		// =============================================================================================================================
@@ -213,6 +223,7 @@ bool GameState::OnEnter()
 		if (!Registry::Instance()->HasSystem<KeyboardControlSystem>()) 	Registry::Instance()->AddSystem<KeyboardControlSystem>();
 		if (!Registry::Instance()->HasSystem<RenderTextSystem>()) Registry::Instance()->AddSystem<RenderTextSystem>();
 		if (!Registry::Instance()->HasSystem<GamePadSystem>()) 	Registry::Instance()->AddSystem<GamePadSystem>();
+		if (!Registry::Instance()->HasSystem<ScriptSystem>()) 	Registry::Instance()->AddSystem<ScriptSystem>();
 		// =============================================================================================================================
 
 		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
@@ -270,8 +281,13 @@ bool GameState::OnEnter()
 		bombItem.Group("items");
 
 		firstEntered = true;
+		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
+		//lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
+		Logger::Err("AGAIN");
 	}
 
+	Game::Instance()->GetCamera().x = cameraOffset.x;
+	Game::Instance()->GetCamera().y = cameraOffset.y;
 	return true;
 }
 

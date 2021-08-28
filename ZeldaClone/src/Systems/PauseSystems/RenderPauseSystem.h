@@ -29,8 +29,8 @@ struct RenderPauseSystem : public System
 			if (entity.HasTag("bombItem") && GameState::totalBombs == 0)
 			{
 				entity.Kill();
-				Logger::Log("Killed BOMB");
 			}
+			
 
 			if (entity.BelongsToGroup("pause") || entity.HasTag("pauseSelector"))
 			{
@@ -65,7 +65,10 @@ struct RenderPauseSystem : public System
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			entity.Kill();
+			if (!entity.HasTag("selectedItem"))
+			{
+				entity.Kill();
+			}	
 		}
 	}
 };
