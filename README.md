@@ -41,6 +41,6 @@ Some of the desired changes are:
 
 ## There are still a lot of bugs that must be fixed to have a properly working demo
 Some of the bugs are as follows:
-* SDL Window crashes when mouse goes outside of the zero boundaries -> Works fine otherwise
+* ~~SDL Window crashes when mouse goes outside of the zero boundaries -> Works fine otherwise~~
 * TODO: More to be listed
 
