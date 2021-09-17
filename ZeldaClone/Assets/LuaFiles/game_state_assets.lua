@@ -3,6 +3,7 @@ Assets =
 {
 	[0] = 
 	{type = "texture", id = "triforce", file = "./Assets/Backgrounds/triforcePieces.png"}, 
+	{type = "texture", id = "level_1", file = "./Assets/Backgrounds/Level1.png"}, 
 	{type = "texture", id = "items", file = "./Assets/Backgrounds/Items.png"}, 
 	{type = "texture", id = "hud_holder", file =  "./Assets/Backgrounds/hudHolder.png"}, 
 	{type = "texture", id = "hud_hearts", file =  "./Assets/Backgrounds/hearts.png"}, 

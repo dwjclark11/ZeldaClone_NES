@@ -100,7 +100,8 @@ public:
 	bool& GetCameraMoving(){ return cameraMoving;}
 	bool& GetGameRunning(){ return mIsRunning;}
 	bool& GetplayerCreated() { return playerCreated; }
-
+	int& GetLevelWidth() { return mLevelWidth; }
+	int& GetLevelHeight() { return mLevelHeight; }
 	GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } // Move Semantics?
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
@@ -137,6 +138,8 @@ private:
 
 	GameItems mGameItems;
 	glm::vec2 mPlayerPos;
+	int mLevelWidth;
+	int mLevelHeight;
 };
 
 

@@ -83,7 +83,7 @@ void DungeonState::Render()
 
 	Registry::Instance()->GetSystem<HealthSystem>().Update();
 	Game::Instance()->GetSystem<RenderHealthSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetCamera());
-
+	
 	if (Game::isDebug)
 	{
 		Game::Instance()->GetSystem<RenderCollisionSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetCamera());
@@ -96,26 +96,42 @@ bool DungeonState::OnEnter()
 
 	Logger::Log("Level:" + level);
 	LevelLoader loader;
-	loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "secret_dungeon_colliders.map");
+	if (level == "level1")
+	{
+		Game::Instance()->GetLevelWidth() = 6;
+		Game::Instance()->GetLevelHeight() = 7;
+		Logger::Log("In Eagle Level");
+		Entity secret = Registry::Instance()->CreateEntity();
+		secret.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
+		secret.AddComponent<SpriteComponent>("level_1", 1543, 1063, 1, false, 0, 0);
+		secret.AddComponent<TileComponent>();
+		secret.Group("map");
+	}
+	if (level == "secret")
+	{
+		loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "secret_dungeon_colliders.map");
+		Entity secret = Registry::Instance()->CreateEntity();
+		secret.AddComponent<TransformComponent>(glm::vec2(0, 256), glm::vec2(4, 4), 0.0);
+		secret.AddComponent<SpriteComponent>("secret_dungeon", 256, 176, 1, false, 0, 0);
+		secret.AddComponent<TileComponent>();
+		secret.Group("map");
+	}
+	
 	//loader.CreatePlayerEntityFromLuaTable(lua, "new_player_create");
 	Game::Instance()->GetCamera().x = 0;
 	Game::Instance()->GetCamera().y = 0;
 	
 
-	Entity secret = Registry::Instance()->CreateEntity();
-	secret.AddComponent<TransformComponent>(glm::vec2(0, 256), glm::vec2(4, 4), 0.0);
-	secret.AddComponent<SpriteComponent>("secret_dungeon", 256, 176, 1, false, 0, 0);
-	secret.AddComponent<TileComponent>();
-	secret.Group("map");
+	
 
-	Entity bombItem = Registry::Instance()->CreateEntity();
+	/*Entity bombItem = Registry::Instance()->CreateEntity();
 	bombItem.AddComponent<TransformComponent>(glm::vec2(150, 400), glm::vec2(4, 4), 0.0);
 	bombItem.AddComponent<SpriteComponent>("items", 16, 16, 5, false, 64, 112);
 	bombItem.AddComponent<RigidBodyComponent>(glm::vec2(0));
 	bombItem.AddComponent<ItemComponent>(BOMBS);
 	bombItem.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
 	bombItem.AddComponent<GameComponent>();
-	bombItem.Group("items");
+	bombItem.Group("items");*/
 
 	Logger::Log("Entering Dungeon State");
 	return false;

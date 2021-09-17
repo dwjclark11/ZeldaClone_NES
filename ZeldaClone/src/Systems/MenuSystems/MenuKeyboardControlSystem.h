@@ -63,7 +63,7 @@ public:
 							{
 								Game::Instance()->GetPlayerNum() = 1;
 								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								Game::Instance()->GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
 							}
 
 						}

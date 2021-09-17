@@ -127,12 +127,18 @@ void AssetManager::ClearAssets()
 	}
 	fonts.clear();
 	
-	// TODO: 
 	// Destroy/ Remove all Music
-	
-	
-	
-	// TODO: 
+	for (auto fx : soundFX)
+	{
+		Mix_FreeChunk(fx.second);
+	}
+	soundFX.clear();
+
 	// Destroy / Remove all SoundFX
-	
+	for (auto music : music)
+	{
+		Mix_FreeMusic(music.second);
+	}
+
+	music.clear();
 }

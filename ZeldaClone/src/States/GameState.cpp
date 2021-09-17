@@ -45,6 +45,13 @@ int GameState::totalBombs = 0;
 int GameState::totalKeys = 0;
 
 
+GameState::GameState(glm::vec2 cameraOffset)
+{
+	this->cameraOffset = cameraOffset; 
+	Game::Instance()->GetCamera().x = this->cameraOffset.x;
+	Game::Instance()->GetCamera().y = this->cameraOffset.y;
+}
+
 void GameState::Update(const double& deltaTime)
 {
 	// Check to see if level music has been paused
@@ -157,6 +164,7 @@ void GameState::Render()
 
 bool GameState::OnEnter()
 {
+	
 	if (!firstEntered)
 	{
 		// Set timers back to default
@@ -283,11 +291,9 @@ bool GameState::OnEnter()
 		firstEntered = true;
 		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
 		//lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
-		Logger::Err("AGAIN");
 	}
 
-	Game::Instance()->GetCamera().x = cameraOffset.x;
-	Game::Instance()->GetCamera().y = cameraOffset.y;
+
 	return true;
 }
 

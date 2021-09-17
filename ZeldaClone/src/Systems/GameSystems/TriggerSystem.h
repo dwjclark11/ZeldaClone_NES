@@ -67,6 +67,11 @@ public:
 
 		case ENTER_DUNGEON:
 			Logger::Log("Dungeon");
+			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			transform.position.x = trig.transportOffset.x;
+			transform.position.y = trig.transportOffset.y;
+			Game::Instance()->GetStateMachine()->PopState();
+			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
 			break;
 
 		case BURN_BUSHES:
@@ -85,6 +90,8 @@ public:
 			Logger::Err("In The Trigger");
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
 			transform.position = trig.transportOffset;
+			Game::Instance()->GetLevelWidth() = 16;
+			Game::Instance()->GetLevelHeight() = 8;
 			Game::Instance()->GetStateMachine()->PopState();
 			Game::Instance()->GetStateMachine()->PushState(new GameState(trig.cameraOffset));
 			break;

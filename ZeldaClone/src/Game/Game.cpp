@@ -27,6 +27,8 @@ Game::Game()
 	, gamePlayerNum(0)
 	, playerCreated(false)
 	, cameraMoving(false)
+	, mLevelWidth(16)
+	, mLevelHeight(8)
 {
 	//Logger::Log("Game Constructor called");
 	assetManager = std::make_unique<AssetManager>();

@@ -16,7 +16,7 @@ public:
 	
 	// Constructor
 	GameState() {}
-	GameState(glm::vec2 cameraOffset) { this->cameraOffset = cameraOffset; }
+	GameState(glm::vec2 cameraOffset);
 	
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
