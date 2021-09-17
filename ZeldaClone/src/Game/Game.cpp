@@ -172,9 +172,7 @@ void Game::ProcessEvents()
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		
 		//Logger::Err("X: " + std::to_string(io.MousePos.x) + ",Y: " + std::to_string(io.MousePos.y));
-		if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) mIsRunning = false;
 		gameStateMachine->ProcessEvents(sdlEvent);
-
 		// Handle Core SDL Events
 		switch (sdlEvent.type)
 		{
@@ -185,6 +183,8 @@ void Game::ProcessEvents()
 			case SDL_KEYDOWN:
 				
 				eventManager->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
+
+				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) mIsRunning = false;
 
 				if(sdlEvent.key.keysym.sym)
 					gameStateMachine->OnKeyDown(&sdlEvent);

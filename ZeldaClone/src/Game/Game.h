@@ -143,7 +143,6 @@ private:
 };
 
 
-
 template<typename TSystem>
 TSystem& Game::GetSystem()
 {
