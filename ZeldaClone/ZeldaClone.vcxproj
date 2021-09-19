@@ -169,7 +169,6 @@
     <ClCompile Include="src\Game\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\States\DungeonState.cpp" />
     <ClCompile Include="src\States\EditorState.cpp" />
     <ClCompile Include="src\States\GameOverState.cpp" />
     <ClCompile Include="src\States\GameState.cpp" />
@@ -486,7 +485,6 @@
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Game\LevelLoader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
-    <ClInclude Include="src\States\DungeonState.h" />
     <ClInclude Include="src\States\EditorState.h" />
     <ClInclude Include="src\States\GameOverState.h" />
     <ClInclude Include="src\States\GameState.h" />

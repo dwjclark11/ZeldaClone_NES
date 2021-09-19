@@ -96,9 +96,6 @@
     <ClCompile Include="src\Utilities\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\States\DungeonState.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Systems\GameSystems\HealthSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1122,9 +1119,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Components\CameraComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\States\DungeonState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Components\RupeeTypeComponent.h">

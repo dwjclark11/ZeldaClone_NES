@@ -172,17 +172,17 @@ bool GameState::OnEnter()
 		playerTimer.Stop();
 		LevelLoader loader;
 		// Open the lua libraries into the game
-		lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
+		Game::Instance()->GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 		Game::isDebug = false;
-		loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
-		loader.LoadHUDFromLuaTable(lua, "hud");
-		loader.LoadEnemiesFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
+		loader.LoadAssetsFromLuaTable(Game::Instance()->GetLuaState(), "game_state_assets");
+		loader.LoadHUDFromLuaTable(Game::Instance()->GetLuaState(), "hud");
+		loader.LoadEnemiesFromLuaTable(Game::Instance()->GetLuaState(), "enemies", Game::Instance()->GetAssetManager());
 		loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 
 		// Player is now created from a Lua script instead of Hard Coded
 		if (!Game::Instance()->GetplayerCreated())
 		{
-			loader.CreatePlayerEntityFromLuaTable(lua, "new_player_create");
+			loader.CreatePlayerEntityFromLuaTable(Game::Instance()->GetLuaState(), "new_player_create");
 			Game::Instance()->GetplayerCreated() = true;
 			Logger::Log("Player Creating");
 
@@ -192,7 +192,7 @@ bool GameState::OnEnter()
 			{
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
-				loader.LoadPlayerDataFromLuaTable(lua, "save1");
+				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save1");
 				
 
 			}
@@ -200,7 +200,7 @@ bool GameState::OnEnter()
 			{
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
-				loader.LoadPlayerDataFromLuaTable(lua, "save2");
+				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save2");
 				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 				//Logger::Log("Second Player Column");
 			}
@@ -208,7 +208,7 @@ bool GameState::OnEnter()
 			{
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
-				loader.LoadPlayerDataFromLuaTable(lua, "save3");
+				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save3");
 				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 				//Logger::Log("Third Player Column");
 			}
@@ -237,11 +237,13 @@ bool GameState::OnEnter()
 		//Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 
 		// TODO: Refactor all entities below to a lua table
-		Entity map = Registry::Instance()->CreateEntity();
+	/*	Entity map = Registry::Instance()->CreateEntity();
 		map.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
 		map.AddComponent<SpriteComponent>("map", 4096, 1344, 0, false, 0, 0);
 		map.AddComponent<TileComponent>();
-		map.Group("map");
+		map.Group("map");*/
+
+		loader.LoadMap(Game::Instance()->GetAssetManager(), "map", 4096, 1344);
 
 		Entity yellowRupee = Registry::Instance()->CreateEntity();
 		yellowRupee.AddComponent<TransformComponent>(glm::vec2(7648, 5050), glm::vec2(4, 4), 0.0);
@@ -289,7 +291,7 @@ bool GameState::OnEnter()
 		bombItem.Group("items");
 
 		firstEntered = true;
-		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
+		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(Game::Instance()->GetLuaState());
 	}
 
 

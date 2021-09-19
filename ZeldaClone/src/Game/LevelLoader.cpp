@@ -33,11 +33,11 @@ LevelLoader::~LevelLoader()
 }
 
 
-void LevelLoader::LoadMap(const std::unique_ptr<AssetManager>& assetManager, std::string mapName)
+void LevelLoader::LoadMap(const std::unique_ptr<AssetManager>& assetManager, std::string mapName, int image_width, int image_height)
 {
 	Entity secret = Registry::Instance()->CreateEntity();
 	secret.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
-	secret.AddComponent<SpriteComponent>(mapName, 256, 176, 1, false, 0, 0);
+	secret.AddComponent<SpriteComponent>(mapName, image_width, image_height, 1, false, 0, 0);
 	secret.AddComponent<TileComponent>();
 	secret.Group("map");
 }
@@ -690,13 +690,17 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		std::string triggerEnemyFile = "";
 		std::string triggerColliderFile = "";
 		std::string triggerTilemapFile = "";
+		std::string triggerTilemapImage = "";
+		int triggerImageHeight = 0;
+		int triggerImageWidth = 0;
 		TriggerType triggerType = NO_TRIGGER;
 
 		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
 
 		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
 		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> 
-			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >> triggerColliderFile >> triggerTilemapFile;
+			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >> 
+			triggerColliderFile >> triggerTilemapFile >> triggerTilemapImage >> triggerImageHeight >> triggerImageWidth;
 
 
 		triggerType = ConvertToTriggerType(type);
@@ -718,7 +722,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		{
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y), 
-				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile);
+				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerImageHeight, triggerImageWidth);
 			boxCollider.AddComponent<GameComponent>();
 		}
 	}
@@ -1360,7 +1364,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
-	
+	Logger::Log(fileName);
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -1504,6 +1508,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			sol::optional<sol::table> script = entity["components"]["on_update_script"];
 			if (script != sol::nullopt)
 			{
+				Logger::Log("HERE");
 				sol::function func = entity["components"]["on_update_script"][0];
 				newEntity.AddComponent<ScriptComponent>(func);
 			}

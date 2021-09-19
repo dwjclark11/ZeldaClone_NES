@@ -92,7 +92,7 @@ public:
 								if (east)
 								{
 									rigidBody.velocity.x = 0;
-									camera.x += 16;
+									camera.x += 4;
 									Sleep(1);
 								}
 
@@ -108,7 +108,7 @@ public:
 								if (west)
 								{
 									rigidBody.velocity.x = 0;
-									camera.x -= 16;
+									camera.x -= 4;
 									Sleep(1);
 								}
 
@@ -125,7 +125,7 @@ public:
 								if (north)
 								{
 									rigidBody.velocity.y = 0;
-									camera.y -= 16;
+									camera.y -= 4;
 									Sleep(1);
 								}
 
@@ -141,7 +141,7 @@ public:
 								if (south)
 								{
 									rigidBody.velocity.y = 0;
-									camera.y += 16;
+									camera.y += 4;
 									Sleep(1);
 								}
 								if (camera.y >= (j * 672) - 288 && south)
@@ -157,7 +157,7 @@ public:
 
 				if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
 				{
-					Logger::Log("x: " + std::to_string(static_cast<int>(transform.position.x)) + ", y: " + std::to_string(static_cast<int>(transform.position.y)));
+					//Logger::Log("x: " + std::to_string(static_cast<int>(transform.position.x)) + ", y: " + std::to_string(static_cast<int>(transform.position.y)));
 					if (camera.x > (transform.position.x + boxCollider.offset.x) && !west && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x < 0)
 					{
 						west = true;
@@ -202,126 +202,7 @@ public:
 					north = false;
 
 			}
-			else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "DUNGEON")
-			{
-			/*
-				Inside GameState the camera has a scrolling effect. Once the player is beyond the camera bounds,
-				the camera will scroll to the next panel at a speed of 24px per interval; The Game::Instance->GetCameraMoving() method
-				prevents the player from overstepping the camera.
-			*/
-			// Update the player position for the location map in the HUD!
-			if (entity.HasTag("player"))
-			{
-				for (int i = 0; i < Game::Instance()->GetLevelWidth(); i++)
-				{
-					for (int j = 0; j < Game::Instance()->GetLevelHeight(); j++)
-					{
-						if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i))
-						{
-							if (transform.position.y >= (704 * j) && transform.position.y <= 704 + (704 * j))
-							{
-								if (west)
-								{
-									rigidBody.velocity.x = 0;
-									camera.x -= 24;
-									Sleep(1);
-								}
-
-								if (east)
-								{
-									rigidBody.velocity.x = 0;
-									camera.x += 24;
-									Sleep(1);
-								}
-
-								if (camera.x >= i * 1024 && east)
-								{
-									camera.x = i * 1024;
-									east = false;
-									Game::Instance()->GetCameraMoving() = false;
-								}
-
-								if (camera.x <= i * 1024 && west)
-								{
-									camera.x = i * 1024;
-									west = false;
-									Game::Instance()->GetCameraMoving() = false;
-								}
-
-								if (south)
-								{
-									rigidBody.velocity.y = 0;
-									camera.y += 24;
-									Sleep(1);
-								}
-
-								if (north)
-								{
-									rigidBody.velocity.y = 0;
-									camera.y -= 24;
-									Sleep(1);
-								}
-
-								if (camera.y >= (j * 704) - 288 && south)
-								{
-									camera.y = (j * 704) - 288;
-									south = false;
-									Game::Instance()->GetCameraMoving() = false;
-								}
-
-								if (camera.y <= (j * 704) - 288 && north)
-								{
-									camera.y = (j * 704) - 288;
-									north = false;
-									Game::Instance()->GetCameraMoving() = false;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
-			{
-
-				if (camera.x > (transform.position.x + boxCollider.offset.x) && !west && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x < 0)
-				{
-					west = true;
-					Game::Instance()->GetCameraMoving() = true;
-					rigidBody.velocity.x = 0;
-				}
-
-				if ((camera.x + camera.w) < (transform.position.x - boxCollider.offset.x) + (sprite.width * transform.scale.x) && !east && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x > 0)
-				{
-					east = true;
-					Game::Instance()->GetCameraMoving() = true;
-					rigidBody.velocity.x = 0;
-				}
-
-				if (camera.y > (transform.position.y + boxCollider.offset.y) - (Game::Instance()->windowHeight / 6 + (Game::Instance()->tilePixels * Game::Instance()->gameScale) + 64) && !north && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.y < 0)
-				{
-					north = true;
-					Game::Instance()->GetCameraMoving() = true;
-					rigidBody.velocity.y = 0;
-				}
-
-				if ((camera.y + camera.h) < (transform.position.y) + ((sprite.height - boxCollider.height) * transform.scale.y) && !south && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.y > 0)
-				{
-					Logger::Err("GOING SOUTH");
-					south = true;
-					Game::Instance()->GetCameraMoving() = true;
-					rigidBody.velocity.y = 0;
-				}
-			}
-
-			// Keep the camera rectange view inside the screen limits
-			camera.x = camera.x < -288 ? -288 : camera.x; // If the camera.x is < 0 make it 0
-			camera.y = camera.y < -1080 ? -1080 : camera.y;
-			camera.x = (camera.x + camera.w > 16384) ? 16384 - camera.w : camera.x; // if Camera.x is > than the width of the screen
-			camera.y = (camera.y + camera.h > 5376) ? 5376 - camera.h : camera.y;
-			}
 		}
-
 		// If the current State is the Title State, Run this Camera 
 		if (Game::Instance()->GetStateMachine()->GetCurrentState() == "TITLESTATE")
 		{

@@ -348,7 +348,7 @@ void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::uniqu
 				collider = true;
 				trigger = true;
 				mapFile << collider << " " << trigger << " " << collision.width << " " << collision.height << " " << collision.offset.x << " " << collision.offset.y << " " <<
-					trig.triggerType << " " << trig.transportOffset.x << " " << trig.transportOffset.y << " " << trig.level << " " << std::endl;
+					trig.triggerType << " " << trig.transportOffset.x << " " << trig.transportOffset.y << " " << trig.levelMusic << " " << std::endl;
 			}
 		}
 	}
@@ -471,7 +471,7 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 			m_writer.WriteKeyAndUnquotedValue("type", trig.triggerType, file);
 			m_writer.WriteKeyAndUnquotedValue("transport_offset_x", trig.transportOffset.x, file);
 			m_writer.WriteKeyAndUnquotedValue("transport_offset_y", trig.transportOffset.y, file);
-			m_writer.WriteKeyAndUnquotedValue("level", trig.level, file);
+			m_writer.WriteKeyAndUnquotedValue("level", trig.levelMusic, file);
 			//m_writer.WriteEndTable(false, file);
 			m_writer.WriteEndTable(false, file);
 		

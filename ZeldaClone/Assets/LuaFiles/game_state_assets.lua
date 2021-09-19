@@ -3,6 +3,7 @@ Assets =
 {
 	[0] = 
 	{type = "texture", id = "triforce", file = "./Assets/Backgrounds/triforcePieces.png"}, 
+	{type = "texture", id = "map", file = "./Assets/Backgrounds/entire_worldmap_single_image.png"}, 
 	{type = "texture", id = "level_1", file = "./Assets/Backgrounds/Level1.png"}, 
 	{type = "texture", id = "items", file = "./Assets/Backgrounds/Items.png"}, 
 	{type = "texture", id = "hud_holder", file =  "./Assets/Backgrounds/hudHolder.png"}, 
@@ -26,5 +27,6 @@ Assets =
 	{type = "soundFX", id = "stairs", file =  "./Assets/sounds/Stairs.wav"}, 
 	{type = "soundFX", id = "enemy_hit", file =   "./Assets/sounds/Enemy_Hit.wav"}, 
 	{type = "soundFX", id = "enemy_die", file =   "./Assets/sounds/Enemy_Die.wav"}, 
+	{type = "music", id = "dungeon", file = "./Assets/Music/Dungeon_Theme.mp3"},
 	
 }

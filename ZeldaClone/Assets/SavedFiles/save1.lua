@@ -12,11 +12,11 @@ player_data = {
     },
     components = {
       transform = {
-        position = { x = 7550.0, y = 5009.4}}
+        position = { x = 7604, y = 4861.6}}
     },
     items = {
       boomerang = true,
-      sword = true,
+      sword = false,
       magic_rod = false,
       bombs = false,
       food = false,
@@ -31,7 +31,7 @@ player_data = {
       red_potion = false,
       master_key = false},
     inventory = {
-      num_rupees = 195,
+      num_rupees = 202,
       num_bombs = 20,
       num_arrows = 10,
       num_keys = 0

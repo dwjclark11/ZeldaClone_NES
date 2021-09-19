@@ -5,7 +5,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_sdl.h>
 #include <imgui/imgui_impl_sdl.h>
-
+#include <sol/sol.hpp>
 #include <iostream>
 #include "../ECS/ECS.h"
 #include "../Logger/Logger.h"
@@ -110,6 +110,8 @@ public:
 	unsigned& GetPlayerNum();
 	glm::vec2& GetPlayerPos() { return mPlayerPos; }
 	double& GetDeltaTime();
+	sol::state& GetLuaState() { return lua; }
+
 	template<typename TSystem> TSystem& GetSystem();
 
 	int milliSecondsPreviousFrame;
@@ -140,6 +142,8 @@ private:
 	glm::vec2 mPlayerPos;
 	int mLevelWidth;
 	int mLevelHeight;
+
+	sol::state lua;
 };
 
 

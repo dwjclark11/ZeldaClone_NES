@@ -30,9 +30,10 @@ public:
 	virtual void OnKeyUp(SDL_Event* event);
 
 	virtual std::string GetStateID() const { return gameID; }
+
 private:
 	static const std::string gameID;
-	sol::state lua;
+	//sol::state lua;
 	Timer enemyTimer;
 	Timer playerTimer;
 	glm::vec2 cameraOffset;

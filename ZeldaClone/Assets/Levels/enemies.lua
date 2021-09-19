@@ -201,7 +201,7 @@ enemies = {
         looped = true,
         frame_offset = 0
       },
-      on_update_script = 
+        on_update_script = 
       {
             [0] = 
             function (entity, delta_time, elapsed_time)
