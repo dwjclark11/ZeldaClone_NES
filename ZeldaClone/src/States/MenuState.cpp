@@ -54,7 +54,7 @@ bool MenuState::OnEnter()
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
 
-	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
+	//Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
 
 	loader.LoadMenuScreenFromLuaTable(lua, "save1");
 	loader.LoadMenuScreenFromLuaTable(lua, "save2");

@@ -21,12 +21,21 @@ struct TriggerBoxComponent
 	glm::vec2 transportOffset;
 	glm::vec2 cameraOffset;
 	std::string level;
+	std::string assetFile;
+	std::string enemyFile;
+	std::string colliderFile;
+	std::string tileMapName;
+	std::string tileImageName;
 
-	TriggerBoxComponent(TriggerType trigger = NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0), std::string level = "")
+	TriggerBoxComponent(TriggerType trigger = NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0), std::string level = "", std::string assetFile = "", std::string enemyFile = "", std::string colliderFile = "", std::string tileMapName = "")
 	{
 		this->triggerType = trigger;
 		this->transportOffset = offset;
 		this->cameraOffset = camera_offset;
 		this->level = level;
+		this->assetFile = assetFile;
+		this->enemyFile = enemyFile;
+		this->colliderFile = colliderFile;
+		this->tileMapName = tileMapName;
 	}
 };

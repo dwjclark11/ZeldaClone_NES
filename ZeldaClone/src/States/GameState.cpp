@@ -177,7 +177,7 @@ bool GameState::OnEnter()
 		loader.LoadAssetsFromLuaTable(lua, "game_state_assets");
 		loader.LoadHUDFromLuaTable(lua, "hud");
 		loader.LoadEnemiesFromLuaTable(lua, "enemies", Game::Instance()->GetAssetManager());
-		loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+		loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 
 		// Player is now created from a Lua script instead of Hard Coded
 		if (!Game::Instance()->GetplayerCreated())
@@ -201,7 +201,7 @@ bool GameState::OnEnter()
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(lua, "save2");
-				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 				//Logger::Log("Second Player Column");
 			}
 			else if (Game::Instance()->GetPlayerNum() == 3)
@@ -209,7 +209,7 @@ bool GameState::OnEnter()
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(lua, "save3");
-				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders.map");
+				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 				//Logger::Log("Third Player Column");
 			}
 
@@ -234,7 +234,7 @@ bool GameState::OnEnter()
 		if (!Registry::Instance()->HasSystem<ScriptSystem>()) 	Registry::Instance()->AddSystem<ScriptSystem>();
 		// =============================================================================================================================
 
-		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
+		//Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 
 		// TODO: Refactor all entities below to a lua table
 		Entity map = Registry::Instance()->CreateEntity();
@@ -290,7 +290,6 @@ bool GameState::OnEnter()
 
 		firstEntered = true;
 		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(lua);
-		//lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 	}
 
 

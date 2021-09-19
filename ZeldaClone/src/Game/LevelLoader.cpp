@@ -21,7 +21,7 @@
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include <string>
 #include <fstream>
-
+#include <SDL.h>
 LevelLoader::LevelLoader()
 {
 	Logger::Log("Level Loader Constructor run");
@@ -30,6 +30,86 @@ LevelLoader::LevelLoader()
 LevelLoader::~LevelLoader()
 {
 	Logger::Log("Level Loader Constructor run");
+}
+
+
+void LevelLoader::LoadMap(const std::unique_ptr<AssetManager>& assetManager, std::string mapName)
+{
+	Entity secret = Registry::Instance()->CreateEntity();
+	secret.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
+	secret.AddComponent<SpriteComponent>(mapName, 256, 176, 1, false, 0, 0);
+	secret.AddComponent<TileComponent>();
+	secret.Group("map");
+}
+
+void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string fileName, std::string imageName)
+{
+	// Adding Textures to the asset Manager
+	std::string assetID = imageName;
+	
+	// Remove the .png
+	for (int i = 0; i < 4; i++)
+		assetID.pop_back();
+
+	Logger::Log("AssetID: " + assetID);
+	assetManager->AddTextures(renderer, "Zelda_overworld", imageName);
+	Logger::Err(imageName);
+
+	// Load the tilemap
+	int tileSize = 16;
+
+	// Open and read the text file
+	std::fstream mapFile;
+	mapFile.open(fileName);
+
+	// Check to see if the file opened correctly
+	if (!mapFile.is_open())
+	{
+		Logger::Err("Unable to open [" + fileName + "]");
+	}
+
+	// Load the tilemap file 
+	while (true)
+	{
+		int srcRectX = 0;
+		int srcRectY = 0;
+		int tranX = 0;
+		int tranY = 0;
+		int colWidth = 0;
+		int colHeight = 0;
+		int tileScaleX = 0;
+		int tileScaleY = 0;
+		int zIndex = 0;
+		int tileWidth = 0;
+		int tileHeight = 0;
+		std::string group = "";
+		std::string assetID = "";
+		glm::vec2 offset = glm::vec2(0, 0);
+		bool collider = false;
+
+		// Read the contents of the file into the declared variables
+		mapFile >> group >> tileWidth >> tileHeight >> srcRectY >> srcRectX >> zIndex >> tranX >> tranY >> tileScaleX >> tileScaleY >> collider;
+
+		// Check to see if there is a collider and load data accordingly
+		if (collider) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
+
+		// If we are at the end of the File --> Leave the File!!
+		if (mapFile.eof()) break;
+
+		// Create a new entity for each tile
+		Entity tile = Registry::Instance()->CreateEntity();
+		tile.Group(group);
+		tile.AddComponent<SpriteComponent>("Zelda_overworld", tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
+		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
+		tile.AddComponent<TileComponent>();
+		// If the tile is a collider, add a boxColliderComponent
+		if (collider)
+		{
+			tile.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
+		}
+	}
+	// Close the file
+	mapFile.close();
 }
 
 void LevelLoader::LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const std::string& fileName)
@@ -583,7 +663,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 
 	// Open and read the text file
 	std::fstream mapFile;
-	mapFile.open("./Assets/Levels/" + filename);
+	mapFile.open("./Assets/Levels/" + filename + ".map");
 
 	if (!mapFile.is_open())
 	{
@@ -606,12 +686,17 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		bool trigger = false;
 		int type = 0;
 		std::string triggerLevel = "";
+		std::string triggerAssetFile = "";
+		std::string triggerEnemyFile = "";
+		std::string triggerColliderFile = "";
+		std::string triggerTilemapFile = "";
 		TriggerType triggerType = NO_TRIGGER;
 
 		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
 
 		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
-		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel;
+		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> 
+			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >> triggerColliderFile >> triggerTilemapFile;
 
 
 		triggerType = ConvertToTriggerType(type);
@@ -632,7 +717,8 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		if (collider && trigger)
 		{
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y), triggerLevel);
+			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y), 
+				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile);
 			boxCollider.AddComponent<GameComponent>();
 		}
 	}

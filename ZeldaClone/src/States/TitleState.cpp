@@ -42,6 +42,7 @@ void TitleState::Update(const double& deltaTime)
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
 		if (Registry::Instance()->GetSystem<CameraMovementSystem>().GetScrollFinished())
 		{
+			Logger::Log("HERE");
 			Registry::Instance()->GetSystem<CameraMovementSystem>().GetScrollFinished() = false;
 			Game::Instance()->GetStateMachine()->PopState();
 			Game::Instance()->GetStateMachine()->PushState(new TitleState());
@@ -73,7 +74,7 @@ bool TitleState::OnEnter()
 		Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "waterfall", "./Assets/Backgrounds/waterfall.png");
 	
 	// Start the Title Screen Music
-	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Title", -1);
+	//Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Title", -1);
 	
 	// Create the Title Screen Entity
 	Entity titleScreen = Registry::Instance()->CreateEntity();
@@ -98,7 +99,7 @@ bool TitleState::OnExit()
 	Game::Instance()->GetSystem<CameraMovementSystem>().OnExit();
 	
 	// Remove the Render Title System If we are not using it!
-	Registry::Instance()->RemoveSystem<RenderTitleSystem>();
+	//Registry::Instance()->RemoveSystem<RenderTitleSystem>();
 	return true;
 }
 

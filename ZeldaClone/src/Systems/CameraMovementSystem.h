@@ -87,65 +87,68 @@ public:
 					{
 						for (int j = 0; j < Game::Instance()->GetLevelHeight(); j++)
 						{
-							if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i))
+							if (transform.position.x + boxCollider.width * transform.scale.x + boxCollider.offset.x >= (1024 * i) && transform.position.x + boxCollider.width * transform.scale.x + boxCollider.offset.x <= 1024 + (1024 * i) && east)
 							{
-								if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
+								if (east)
 								{
-									if (west)
-									{
-										rigidBody.velocity.x = 0;
-										camera.x -= 24;
-										Sleep(1);
-									}
+									rigidBody.velocity.x = 0;
+									camera.x += 16;
+									Sleep(1);
+								}
 
-									if (east)
-									{
-										rigidBody.velocity.x = 0;
-										camera.x += 24;
-										Sleep(1);
-									}
+								if (camera.x >= i * 1024 && east)
+								{
+									camera.x = i * 1024;
+									east = false;
+									Game::Instance()->GetCameraMoving() = false;
+								}
+							}
+							else if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i) && west)
+							{
+								if (west)
+								{
+									rigidBody.velocity.x = 0;
+									camera.x -= 16;
+									Sleep(1);
+								}
 
-									if (camera.x >= i * 1024 && east)
-									{
-										camera.x = i * 1024;
-										east = false;
-										Game::Instance()->GetCameraMoving() = false;
-									}
+								if (camera.x <= i * 1024 && west)
+								{
+									camera.x = i * 1024;
+									west = false;
+									Game::Instance()->GetCameraMoving() = false;
+								}
+							}
 
-									if (camera.x <= i * 1024 && west)
-									{
-										camera.x = i * 1024;
-										west = false;
-										Game::Instance()->GetCameraMoving() = false;
-									}
+							if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j) && north)
+							{
+								if (north)
+								{
+									rigidBody.velocity.y = 0;
+									camera.y -= 16;
+									Sleep(1);
+								}
 
-									if (south)
-									{
-										rigidBody.velocity.y = 0;
-										camera.y += 24;
-										Sleep(1);
-									}
-
-									if (north)
-									{
-										rigidBody.velocity.y = 0;
-										camera.y -= 24;
-										Sleep(1);
-									}
-
-									if (camera.y >= (j * 672) - 288 && south)
-									{
-										camera.y = (j * 672) - 288;
-										south = false;
-										Game::Instance()->GetCameraMoving() = false;
-									}
-
-									if (camera.y <= (j * 672) - 288 && north)
-									{
-										camera.y = (j * 672) - 288;
-										north = false;
-										Game::Instance()->GetCameraMoving() = false;
-									}
+								if (camera.y <= (j * 672) - 288 && north)
+								{
+									camera.y = (j * 672) - 288;
+									north = false;
+									Game::Instance()->GetCameraMoving() = false;
+								}
+							}
+							else if (transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y >= (672 * j) && transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y <= 672 + (672 * j) && south)
+							{
+								if (south)
+								{
+									rigidBody.velocity.y = 0;
+									camera.y += 16;
+									Sleep(1);
+								}
+								if (camera.y >= (j * 672) - 288 && south)
+								{
+									camera.y = (j * 672) - 288;
+									south = false;
+									Game::Instance()->GetCameraMoving() = false;
 								}
 							}
 						}
@@ -154,7 +157,7 @@ public:
 
 				if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
 				{
-
+					Logger::Log("x: " + std::to_string(static_cast<int>(transform.position.x)) + ", y: " + std::to_string(static_cast<int>(transform.position.y)));
 					if (camera.x > (transform.position.x + boxCollider.offset.x) && !west && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x < 0)
 					{
 						west = true;
@@ -176,19 +179,28 @@ public:
 						rigidBody.velocity.y = 0;
 					}
 
-					if ((camera.y + camera.h) < (transform.position.y) + ((sprite.height - boxCollider.height) * transform.scale.y) && !south && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.y > 0)
+					if ((camera.y + camera.h) < transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y && !south && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.y > 0)
 					{
 						south = true;
 						Game::Instance()->GetCameraMoving() = true;
 						rigidBody.velocity.y = 0;
 					}
 				}
-				
+
 				// Keep the camera rectange view inside the screen limits
-				camera.x = camera.x < -288 ? -288 : camera.x; // If the camera.x is < 0 make it 0
+				camera.x = camera.x < 0 ? 0 : camera.x; // If the camera.x is < 0 make it 0
 				camera.y = camera.y < -288 ? -288 : camera.y;
 				camera.x = (camera.x + camera.w > 16384) ? 16384 - camera.w : camera.x; // if Camera.x is > than the width of the screen
 				camera.y = (camera.y + camera.h > 5376) ? 5376 - camera.h : camera.y;
+
+				if (camera.x == 0)
+				{
+					west = false;
+				}
+
+				if (camera.y == -288)
+					north = false;
+
 			}
 			else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "DUNGEON")
 			{
@@ -304,7 +316,7 @@ public:
 
 			// Keep the camera rectange view inside the screen limits
 			camera.x = camera.x < -288 ? -288 : camera.x; // If the camera.x is < 0 make it 0
-			camera.y = camera.y < -288 ? -288 : camera.y;
+			camera.y = camera.y < -1080 ? -1080 : camera.y;
 			camera.x = (camera.x + camera.w > 16384) ? 16384 - camera.w : camera.x; // if Camera.x is > than the width of the screen
 			camera.y = (camera.y + camera.h > 5376) ? 5376 - camera.h : camera.y;
 			}

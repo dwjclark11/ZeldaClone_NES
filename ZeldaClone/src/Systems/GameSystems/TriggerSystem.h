@@ -4,16 +4,22 @@
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/HealthComponent.h"
+#include "../Systems/GameSystems/RenderTileSystem.h"
 #include "../Events/CollisionEvent.h"
 #include "../Events/TriggerEvent.h"
 #include "../Events/EventManager.h"
 #include "../../Game/Game.h"
+#include "../../Game/LevelLoader.h"
 #include <cmath>
 #include "../../Utilities/Timer.h"
 #include "../../States/DungeonState.h"
 
 class TriggerSystem : public System
 {
+private: 
+sol::state lua;
+LevelLoader loader;
+
 public: 
 
 	TriggerSystem()
@@ -50,6 +56,9 @@ public:
 		auto& rigidbody = player.GetComponent<RigidBodyComponent>();
 		Logger::Log("trig num: " + std::to_string(trig.triggerType));
 
+		std::string mapFile = "Assets/Tilemaps/Maps/" + trig.assetFile + ".map";
+		std::string tileFile = "Assets/Tilemaps/Tiles/" + trig.tileMapName + ".png";
+
 		switch (trig.triggerType)
 		{
 		case NO_TRIGGER:
@@ -57,21 +66,47 @@ public:
 			break;
 
 		case SECRET_AREA:
-			Logger::Log("Secret");
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+	/*		Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
 			transform.position.x = trig.transportOffset.x;
 			transform.position.y = trig.transportOffset.y;
 			Game::Instance()->GetStateMachine()->PopState();
-			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
+			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));*/
+			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
+			Game::Instance()->GetSystem<RenderSystem>().OnExit();
+			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
+
+			transform.position.x = trig.transportOffset.x;
+			transform.position.y = trig.transportOffset.y;
+			Game::Instance()->GetCamera().x = trig.cameraOffset.x;
+			Game::Instance()->GetCamera().y = trig.cameraOffset.y;
+			rigidbody.velocity = glm::vec2(0);
+
+			if (trig.tileMapName != "no_file" && trig.assetFile != "no_file")loader.LoadTilemap(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), mapFile, tileFile);
+			else loader.LoadMap(Game::Instance()->GetAssetManager(), trig.tileMapName);
+			
+			//if (trig.assetFile != "no_file") loader.LoadAssetsFromLuaTable(lua, trig.assetFile);
+			if (trig.colliderFile != "no_file") loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), trig.colliderFile);
+			if (trig.enemyFile != "no_file") loader.LoadEnemiesFromLuaTable(lua, trig.enemyFile, Game::Instance()->GetAssetManager());
 			break;
 
 		case ENTER_DUNGEON:
-			Logger::Log("Dungeon");
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			/* Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
 			transform.position.x = trig.transportOffset.x;
 			transform.position.y = trig.transportOffset.y;
 			Game::Instance()->GetStateMachine()->PopState();
-			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
+			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level)); */
+			
+			// Test --> If this works --> Make it into a function in Game
+			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
+			Game::Instance()->GetSystem<RenderSystem>().OnExit();
+			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
+			
+			transform.position.x = trig.transportOffset.x;
+			transform.position.y = trig.transportOffset.y;
+			//loader.LoadAssetsFromLuaTable(lua, trig.assetFile);
+			//loader.LoadEnemiesFromLuaTable(lua, trig.enemyFile, Game::Instance()->GetAssetManager());
+			//loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), trig.colliderFile);
+			
 			break;
 
 		case BURN_BUSHES:
@@ -87,7 +122,6 @@ public:
 			break;
 
 		case RETURN_WORLD:
-			Logger::Err("In The Trigger");
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
 			transform.position = trig.transportOffset;
 			Game::Instance()->GetLevelWidth() = 16;
@@ -114,10 +148,19 @@ public:
 		case SECRET_AREA:
 
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			//transform.position.x = trig.transportOffset.x;
+			//transform.position.y = trig.transportOffset.y;
+			//Game::Instance()->GetStateMachine()->PopState();
+			//Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
+			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
+			Game::Instance()->GetSystem<RenderSystem>().OnExit();
+			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
+
 			transform.position.x = trig.transportOffset.x;
 			transform.position.y = trig.transportOffset.y;
-			Game::Instance()->GetStateMachine()->PopState();
-			Game::Instance()->GetStateMachine()->PushState(new DungeonState(trig.level));
+			//loader.LoadAssetsFromLuaTable(lua, trig.assetFile);
+			//loader.LoadEnemiesFromLuaTable(lua, trig.enemyFile, Game::Instance()->GetAssetManager());
+			//loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), trig.colliderFile);
 			break;
 
 		case ENTER_DUNGEON:
