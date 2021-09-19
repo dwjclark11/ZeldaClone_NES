@@ -28,7 +28,8 @@ This game/engine includes the following:
 
 ![Clone_Editor](https://user-images.githubusercontent.com/63356975/130303677-08d6fdc8-6f66-490b-ba8a-df98e0a7192a.png)
 
-![zelda_clone](https://user-images.githubusercontent.com/63356975/130304810-ad7e5efe-b8a2-4fd1-ab23-6c624646fd57.png)
+![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
+
 
 ## Desired Additions/Changes
 Some of the desired changes are:
