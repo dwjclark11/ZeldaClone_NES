@@ -20,7 +20,7 @@ void PauseState::Update(const double& deltaTime)
 	Registry::Instance()->Update();
 	Registry::Instance()->GetSystem<ItemSelectKeyboardControlSystem>().Update();
 
-	if (GameState::totalBombs > 0 && !bombs)
+	if (GameState::totalBombs > 0 && !Game::Instance()->GetGameItems().bombs)
 	{
 		Entity bombItem = Registry::Instance()->CreateEntity();
 		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
@@ -29,10 +29,10 @@ void PauseState::Update(const double& deltaTime)
 		bombItem.Tag("bombItem");
 		bombItem.Group("pause");
 
-		bombs = true;
+		Game::Instance()->GetGameItems().bombs = true;
 	}
 
-	if (GameState::totalBombs == 0 && bombs) bombs = false;
+	if (GameState::totalBombs == 0 && Game::Instance()->GetGameItems().bombs) Game::Instance()->GetGameItems().bombs = false;
 	if (State::exitToMain) Game::Instance()->GetStateMachine()->PopState();
 }
 
@@ -46,9 +46,8 @@ void PauseState::Render()
 
 bool PauseState::OnEnter()
 {
-	bombs = false;
-	// Play the Menu Theme on Entrance of the Pause Menu
-	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
+	// Turn music volume down while paused
+	Mix_VolumeMusic(3);
 
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
@@ -56,9 +55,28 @@ bool PauseState::OnEnter()
 	if (!Registry::Instance()->HasSystem<ItemSelectKeyboardControlSystem>()) Registry::Instance()->AddSystem<ItemSelectKeyboardControlSystem>();
 	if (!Registry::Instance()->HasSystem<RenderPauseSystem>()) Registry::Instance()->AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
-	/*if (!firstEnter)
-	{*/
+
+	if (!firstEnter)
+	{
+		Logger::Log("Entered!");
 		Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "pause_hud", "./Assets/Backgrounds/pauseHud.png");
+		firstEnter = true;
+
+		Entity pauseSelector = Registry::Instance()->CreateEntity();
+		pauseSelector.AddComponent<SpriteComponent>("box", 16, 16, 0, false, 16, 0);
+		pauseSelector.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
+		pauseSelector.AddComponent<PauseComponent>();
+		pauseSelector.Tag("pauseSelector");
+		pauseSelector.Group("pause");
+
+
+
+		Entity selectedItem = Registry::Instance()->CreateEntity();
+		selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
+		selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
+		selectedItem.AddComponent<PauseComponent>();
+		selectedItem.Tag("selectedItem");
+		selectedItem.Group("pause");
 
 		Entity hudHolder = Registry::Instance()->CreateEntity();
 		hudHolder.AddComponent<TransformComponent>(glm::vec2(325, 100), glm::vec2(5, 5), 0.0);
@@ -88,7 +106,7 @@ bool PauseState::OnEnter()
 			boomerang.AddComponent<PauseComponent>();
 			boomerang.Group("pause");
 		}
-		
+
 		if (GameState::totalBombs > 0 && Game::Instance()->GetGameItems().bombs)
 		{
 			Entity bombs = Registry::Instance()->CreateEntity();
@@ -154,34 +172,14 @@ bool PauseState::OnEnter()
 			magicalRod.AddComponent<PauseComponent>();
 			magicalRod.Group("pause");
 		}
-
-
-		Entity pauseSelector = Registry::Instance()->CreateEntity();
-		pauseSelector.AddComponent<SpriteComponent>("box", 16, 16, 0, false, 16, 0);
-		pauseSelector.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
-		pauseSelector.AddComponent<PauseComponent>();
-		pauseSelector.Tag("pauseSelector");
-		pauseSelector.Group("pause");
-		
-		
-		if (!firstEnter)
-		{
-			Entity selectedItem = Registry::Instance()->CreateEntity();
-			selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
-			selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
-			selectedItem.AddComponent<PauseComponent>();
-			selectedItem.Tag("selectedItem");
-			selectedItem.Group("pause");
-			firstEnter = true;
-		}
-	//}
-
-	return true;
+	}
+	
+	return false;
 }
 
 bool PauseState::OnExit()
 {
-	Registry::Instance()->GetSystem<RenderPauseSystem>().OnExit();
+	//Registry::Instance()->GetSystem<RenderPauseSystem>().OnExit();
 	//Logger::Err("Exiting Pause State");
 	return true;
 }

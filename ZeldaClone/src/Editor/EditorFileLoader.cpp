@@ -696,7 +696,7 @@ TriggerType EditorFileLoader::ConvertToTriggerType(int triggerType)
 	case 2: return ENTER_DUNGEON; break;
 	case 3: return BURN_BUSHES; break;
 	case 4: return PUSH_ROCKS; break;
-	case 5: return CAMERA_RIGHT; break;
+	case 5: return COLLECT_ITEM; break;
 	case 6: return TRAP; break;
 	case 7: return HIDDEN_SWITCH; break;
 	case 8: return HIDDEN_OBJECT; break;
@@ -712,7 +712,7 @@ std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 		case ENTER_DUNGEON: return "ENTER_DUNGEON"; break;
 		case BURN_BUSHES: return "BURN_BUSHES"; break;
 		case PUSH_ROCKS: return "PUSH_ROCKS"; break;
-		case CAMERA_RIGHT: return "CAMERA_RIGHT"; break;
+		case COLLECT_ITEM: return "CAMERA_RIGHT"; break;
 		case TRAP: return "TRAP"; break;
 		case HIDDEN_SWITCH: return "HIDDEN_SWITCH"; break;
 		case HIDDEN_OBJECT: return "HIDDEN_OBJECT"; break;

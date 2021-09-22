@@ -104,7 +104,7 @@ public:
 				MouseControlSystem::triggerType = PUSH_ROCKS;
 				break;
 			case 5:
-				MouseControlSystem::triggerType = CAMERA_RIGHT;
+				MouseControlSystem::triggerType = COLLECT_ITEM;
 				break;
 			case 6:
 				MouseControlSystem::triggerType = TRAP;

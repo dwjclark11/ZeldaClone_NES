@@ -74,7 +74,7 @@ bool TitleState::OnEnter()
 		Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "waterfall", "./Assets/Backgrounds/waterfall.png");
 	
 	// Start the Title Screen Music
-	//Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Title", -1);
+	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Title", -1);
 	
 	// Create the Title Screen Entity
 	Entity titleScreen = Registry::Instance()->CreateEntity();

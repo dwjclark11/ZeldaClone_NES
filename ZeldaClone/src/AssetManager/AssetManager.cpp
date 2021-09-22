@@ -16,21 +16,27 @@ AssetManager::~AssetManager()
 // Functions
 void AssetManager::AddTextures(SDL_Renderer* renderer, const std::string& assetID, const std::string& filePath)
 {
-	SDL_Surface* surface = IMG_Load(filePath.c_str());
-	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-	if (!texture)
+	if (!HasTexture(assetID))
 	{
-		Logger::Err("Unable to create texture [" + assetID + "] " + " at filepath: " + filePath);
+		SDL_Surface* surface = IMG_Load(filePath.c_str());
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+		
+		
+		if (!texture)
+		{
+			Logger::Err("Unable to create texture [" + assetID + "] " + " at filepath: " + filePath);
+		}
+
+		// Free the surface once the texture is created
+		SDL_FreeSurface(surface);
+
+		// Add the Textures to the map
+		textures.emplace(assetID, texture);
 	}
-
-	// Free the surface once the texture is created
-	SDL_FreeSurface(surface);
-
-	// Add the Textures to the map
-	textures.emplace(assetID, texture);
-
-	//Logger::Log("New texture add to the asset manager with ID " + assetID);
+	else
+	{
+		Logger::Log("New texture ID: " + assetID + " already exists");
+	}
 }
 
 SDL_Texture* AssetManager::GetTexture(const std::string& assetID)

@@ -540,9 +540,9 @@ public:
 				{
 					MouseControlSystem::triggerType = PUSH_ROCKS;
 				}
-				else if (current_item == "CAMERA_RIGHT")
+				else if (current_item == "COLLECT_ITEM")
 				{
-					MouseControlSystem::triggerType = CAMERA_RIGHT;
+					MouseControlSystem::triggerType = COLLECT_ITEM;
 				}
 				else if (current_item == "TRAP")
 				{

@@ -91,18 +91,17 @@ public:
 		Entity a = colEvent.a;
 		Entity b = colEvent.b;
 
-		if (a.BelongsToGroup("colliders") && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword"))) OnPlayerHitsObstacleA(a, b);
-		if (b.BelongsToGroup("colliders") && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword"))) OnPlayerHitsObstacleB(a, b);
-		if (b.BelongsToGroup("colliders") && a.BelongsToGroup("enemies")) OnEnemyHitsObstacleA(a, b);
-		if (b.BelongsToGroup("enemies") && a.BelongsToGroup("colliders")) OnEnemyHitsObstacleB(a, b);
-
+		if ((a.BelongsToGroup("colliders") || a.BelongsToGroup("tiles")) && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword"))) OnPlayerHitsObstacleA(a, b);
+		if ((b.BelongsToGroup("colliders") || b.BelongsToGroup("tiles")) && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword"))) OnPlayerHitsObstacleB(a, b);
+		if ((b.BelongsToGroup("colliders") || b.BelongsToGroup("tiles")) && a.BelongsToGroup("enemies")) OnEnemyHitsObstacleA(a, b);
+		if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("colliders") || a.BelongsToGroup("tiles"))) OnEnemyHitsObstacleB(a, b);
 	}
 
 	void OnEnemyHitsObstacleA(Entity enemy, Entity obstacle)
 	{
 		auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
 		auto& transform = enemy.GetComponent<TransformComponent>();
-		if (obstacle.BelongsToGroup("colliders") && enemy.BelongsToGroup("enemies"))
+		if ((obstacle.BelongsToGroup("colliders") || obstacle.BelongsToGroup("tiles")) && enemy.BelongsToGroup("enemies"))
 		{
 			if (enemy1Rigidbody.velocity.y > 0)
 			{
@@ -135,7 +134,7 @@ public:
 	{
 		auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
 		auto& transform = enemy.GetComponent<TransformComponent>();
-		if (obstacle.BelongsToGroup("colliders") && enemy.BelongsToGroup("enemies"))
+		if ((obstacle.BelongsToGroup("colliders") || obstacle.BelongsToGroup("tiles")) && enemy.BelongsToGroup("enemies"))
 		{
 			if (enemy1Rigidbody.velocity.y > 0)
 			{
@@ -168,7 +167,7 @@ public:
 	{
 		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
 		{
-			if (obstacle.BelongsToGroup("colliders") && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
+			if ((obstacle.BelongsToGroup("colliders") || obstacle.BelongsToGroup("tiles")) && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
 			{
 				auto& playerTransform = player.GetComponent<TransformComponent>();
 				auto& playerCollider = player.GetComponent<BoxColliderComponent>();
@@ -217,7 +216,7 @@ public:
 	{
 		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
 		{
-			if (obstacle.BelongsToGroup("colliders") && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
+			if ((obstacle.BelongsToGroup("colliders") || obstacle.BelongsToGroup("tiles")) && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
 			{
 				auto& playerTransform = player.GetComponent<TransformComponent>();
 				auto& playerCollider = player.GetComponent<BoxColliderComponent>();

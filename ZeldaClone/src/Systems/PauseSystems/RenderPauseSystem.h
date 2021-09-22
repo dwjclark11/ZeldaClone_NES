@@ -65,10 +65,10 @@ struct RenderPauseSystem : public System
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			if (!entity.HasTag("selectedItem"))
-			{
+			/*if (!entity.HasTag("selectedItem"))
+			{*/
 				entity.Kill();
-			}	
+			//}	
 		}
 	}
 };

@@ -1,6 +1,6 @@
 #include "GameState.h"
 #include "../Game/Game.h"
-#include "PauseState.h"
+//#include "PauseState.h"
 #include "GameOverState.h"
 #include "../Systems/GameSystems/CollisionSystem.h"
 #include "../AssetManager/AssetManager.h"
@@ -45,11 +45,17 @@ int GameState::totalBombs = 0;
 int GameState::totalKeys = 0;
 
 
+GameState::~GameState()
+{
+	
+}
+
 GameState::GameState(glm::vec2 cameraOffset)
 {
 	this->cameraOffset = cameraOffset; 
 	Game::Instance()->GetCamera().x = this->cameraOffset.x;
 	Game::Instance()->GetCamera().y = this->cameraOffset.y;
+
 }
 
 void GameState::Update(const double& deltaTime)
@@ -57,7 +63,8 @@ void GameState::Update(const double& deltaTime)
 	// Check to see if level music has been paused
 	if (GamePadSystem::paused)
 	{
-		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
+		// Turn music volume up
+		Mix_VolumeMusic(10);
 		GamePadSystem::paused = false;
 	}
 	if (State::exitToMain) 
@@ -91,9 +98,10 @@ void GameState::Update(const double& deltaTime)
 	
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<MovementSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	
 	Registry::Instance()->GetSystem<CollectItemSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
 	// Update the registry values
 	Registry::Instance()->Update();
@@ -122,6 +130,8 @@ void GameState::Update(const double& deltaTime)
 	}
 
 	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
+
+	psm.Update();
 
 	// Convert the total Rupees
 	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
@@ -164,7 +174,6 @@ void GameState::Render()
 
 bool GameState::OnEnter()
 {
-	
 	if (!firstEntered)
 	{
 		// Set timers back to default
@@ -234,7 +243,7 @@ bool GameState::OnEnter()
 		if (!Registry::Instance()->HasSystem<ScriptSystem>()) 	Registry::Instance()->AddSystem<ScriptSystem>();
 		// =============================================================================================================================
 
-		//Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
+		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 
 		// TODO: Refactor all entities below to a lua table
 	/*	Entity map = Registry::Instance()->CreateEntity();
@@ -288,7 +297,8 @@ bool GameState::OnEnter()
 		bombItem.AddComponent<ItemComponent>(BOMBS);
 		bombItem.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
 		bombItem.AddComponent<GameComponent>();
-		bombItem.Group("items");
+		bombItem.AddComponent<TriggerBoxComponent>(COLLECT_ITEM);
+		bombItem.Group("trigger");
 
 		firstEntered = true;
 		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(Game::Instance()->GetLuaState());

@@ -3,6 +3,9 @@
 #include <sol/sol.hpp>
 #include "../Utilities/Timer.h"
 #include <glm/glm.hpp>
+#include "PauseState.h"
+#include "../StateMachines/PlayerStateMachine.h"
+
 
 class GameState : public State
 {
@@ -16,6 +19,7 @@ public:
 	
 	// Constructor
 	GameState() {}
+	~GameState();
 	GameState(glm::vec2 cameraOffset);
 	
 	virtual void Update(const double& deltaTime);
@@ -33,8 +37,8 @@ public:
 
 private:
 	static const std::string gameID;
-	//sol::state lua;
 	Timer enemyTimer;
 	Timer playerTimer;
 	glm::vec2 cameraOffset;
+	PlayerStateMachine psm;
 };

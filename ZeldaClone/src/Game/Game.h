@@ -105,13 +105,13 @@ public:
 	GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } // Move Semantics?
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
-
+	
 	GameItems& GetGameItems() { return mGameItems; }
 	unsigned& GetPlayerNum();
 	glm::vec2& GetPlayerPos() { return mPlayerPos; }
 	double& GetDeltaTime();
 	sol::state& GetLuaState() { return lua; }
-
+	bool& GetPlayerItem() { return playerItem; }
 	template<typename TSystem> TSystem& GetSystem();
 
 	int milliSecondsPreviousFrame;
@@ -123,6 +123,7 @@ private:
 	bool keydown;
 	bool cameraMoving;
 	bool playerCreated;
+	bool playerItem = false;
 	unsigned gamePlayerNum;
 	
 	SDL_Window* mWindow;
@@ -137,7 +138,6 @@ private:
 
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
-
 	GameItems mGameItems;
 	glm::vec2 mPlayerPos;
 	int mLevelWidth;

@@ -50,7 +50,10 @@ public:
 	void LoadHUDFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadAssetsFromLuaTable(sol::state& lua, std::string fileName);
 
+
+	// Helper Functions
 	void ConvertName(std::string name, int x, int y);
 	TriggerType ConvertToTriggerType(int triggerType);
 	TriggerType ConvertToTriggerType(std::string triggerType);
+	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 };

@@ -8,7 +8,7 @@ enum TriggerType
 	ENTER_DUNGEON = 2,
 	BURN_BUSHES = 3,
 	PUSH_ROCKS = 4,
-	CAMERA_RIGHT = 5,
+	COLLECT_ITEM = 5,
 	TRAP = 6,
 	HIDDEN_SWITCH = 7,
 	HIDDEN_OBJECT = 8,
@@ -28,10 +28,11 @@ struct TriggerBoxComponent
 	std::string tileImageName;
 	int imageHeight;
 	int imageWidth;
+	bool active;
 
 	TriggerBoxComponent(TriggerType trigger = NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0), 
 		std::string levelMusic = "", std::string assetFile = "", std::string enemyFile = "", std::string colliderFile = "", 
-		std::string tileMapName = "", std::string tileImageName = "", int imageWidth = 0, int imageHeight = 0)
+		std::string tileMapName = "", std::string tileImageName = "", int imageWidth = 0, int imageHeight = 0, bool active = false)
 	{
 		this->triggerType = trigger;
 		this->transportOffset = offset;
@@ -44,5 +45,6 @@ struct TriggerBoxComponent
 		this->tileImageName = tileImageName;
 		this->imageHeight = imageHeight;
 		this->imageWidth = imageWidth;
+		this->active = active;
 	}
 };

@@ -126,6 +126,12 @@
     <ClCompile Include="src\Systems\GameSystems\DamageSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\StateMachines\PlayerStateMachine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\StateMachines\PlayerStates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\Game.h">
@@ -1173,6 +1179,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\EntityStates\EntityStates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StateMachines\TState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StateMachines\TStateMachine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StateMachines\PlayerStateMachine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\StateMachines\PlayerStates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

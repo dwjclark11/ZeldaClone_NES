@@ -566,7 +566,7 @@ public:
 			trigType = "PUSH_ROCKS";
 			break;
 
-		case CAMERA_RIGHT:
+		case COLLECT_ITEM:
 			trigType = "CAMERA_RIGHT";
 			break;
 

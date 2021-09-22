@@ -1,7 +1,7 @@
 #include "Timer.h"
 #include <SDL.h>
 #include <iostream>
-
+#include "../Logger/Logger.h"
 using namespace std::literals::chrono_literals; // Needed to get the 's' in 1s for seconds
 
 
@@ -17,6 +17,7 @@ Timer::Timer()
 // Various clock actions
 void Timer::Start()
 {
+	//Logger::Log("Timer Started");
 	// Start the timer
 	mStarted = true;
 	// Unpause if paused

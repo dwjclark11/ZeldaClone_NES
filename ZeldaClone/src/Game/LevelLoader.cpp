@@ -50,10 +50,16 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 	// Remove the .png
 	for (int i = 0; i < 4; i++)
 		assetID.pop_back();
+	Logger::Err("Before: " + imageName);
+	std::string tileMapImage = SetName(imageName);
+	Logger::Err("After: " + tileMapImage);
 
 	Logger::Log("AssetID: " + assetID);
-	assetManager->AddTextures(renderer, "Zelda_overworld", imageName);
-	Logger::Err(imageName);
+	assetManager->AddTextures(renderer, tileMapImage, imageName);
+
+	//Logger::Err("Before: " + imageName);
+	//std::string tileMapImage = SetName(imageName);
+	//Logger::Err("After: " + tileMapImage);
 
 	// Load the tilemap
 	int tileSize = 16;
@@ -99,12 +105,13 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 		// Create a new entity for each tile
 		Entity tile = Registry::Instance()->CreateEntity();
 		tile.Group(group);
-		tile.AddComponent<SpriteComponent>("Zelda_overworld", tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
+		tile.AddComponent<SpriteComponent>(tileMapImage, tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		tile.AddComponent<TileComponent>();
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{
+			Logger::Log("Collider");
 			tile.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 		}
 	}
@@ -740,7 +747,7 @@ TriggerType LevelLoader::ConvertToTriggerType(int triggerType)
 	case 2: return ENTER_DUNGEON; break;
 	case 3: return BURN_BUSHES; break;
 	case 4: return PUSH_ROCKS; break;
-	case 5: return CAMERA_RIGHT; break;
+	case 5: return COLLECT_ITEM; break;
 	case 6: return TRAP; break;
 	case 7: return HIDDEN_SWITCH; break;
 	case 8: return HIDDEN_OBJECT; break;
@@ -752,6 +759,19 @@ TriggerType LevelLoader::ConvertToTriggerType(std::string triggerType)
 {
 	if (triggerType == "NO_TRIGGER") return NO_TRIGGER;
 	else if (triggerType == "SECRET_AREA") return SECRET_AREA;
+}
+
+std::string LevelLoader::SetName(std::string filePath, bool wExtension, char separator)
+{
+	// Get the last '.' position
+	std::size_t sepPos = filePath.rfind(separator);
+	std::size_t found = filePath.find_last_of('.');
+	if (sepPos != std::string::npos)
+	{
+		std::string name = filePath = filePath.substr(0, found);
+		return name.substr(sepPos + 1);
+	}
+	return "";
 }
 
 void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, const std::string& fileName)

@@ -27,6 +27,7 @@ Assets =
 	{type = "soundFX", id = "stairs", file =  "./Assets/sounds/Stairs.wav"}, 
 	{type = "soundFX", id = "enemy_hit", file =   "./Assets/sounds/Enemy_Hit.wav"}, 
 	{type = "soundFX", id = "enemy_die", file =   "./Assets/sounds/Enemy_Die.wav"}, 
+	{type = "soundFX", id = "fanfare", file =   "./Assets/sounds/Fanfare.wav"}, 
 	{type = "music", id = "dungeon", file = "./Assets/Music/Dungeon_Theme.mp3"},
 	
 }

@@ -12,7 +12,7 @@
 #include "../../AssetManager/AssetManager.h"
 #include <string>
 #include <SDL.h>
-
+#include "../../Utilities/Timer.h"
 
 enum directionE {NONE = 0, UP, RIGHT, DOWN, LEFT, ATTACK};
 
@@ -44,128 +44,130 @@ public:
 	{
 		auto entities = GetSystemEntities();
 
-	// Loop all the entities that the system is interested in
-	for (auto i = entities.begin(); i != entities.end(); i++)
-	{
-		if (i->HasTag("player"))
+		// Loop all the entities that the system is interested in
+		for (auto i = entities.begin(); i != entities.end(); i++)
 		{
-			Entity a = *i;
-			auto& playerTransform = a.GetComponent<TransformComponent>();
-			auto& playerCollider = a.GetComponent<BoxColliderComponent>();
-			auto& playerRigidbody = a.GetComponent<RigidBodyComponent>();
-			auto& sprite = a.GetComponent<SpriteComponent>();
-			const auto keyboardControl = a.GetComponent<KeyboardControlComponent>();
-			// Loop all entities that still need to be checked 
-			for (auto j = i; j != entities.end(); j++)
+			if (!Game::Instance()->GetPlayerItem())
 			{
-				if (j->HasTag("the_sword") || j->HasTag("the_shield"))
+				if (i->HasTag("player"))
 				{
-					Entity b = *j;
-
-					// Bypass if we are testing the same entity
-					if (a == b)
-						continue;
-					
-					auto& bTransform = b.GetComponent<TransformComponent>();
-					auto& bCollider = b.GetComponent<BoxColliderComponent>();
-					auto& bRigidbody = b.GetComponent<RigidBodyComponent>();
-
-					bool shield = false;
-					bool sword = false;
-					if (b.HasTag("the_shield")) shield = true;
-					if (b.HasTag("the_sword")) sword = true;
-
-					playerRigidbody.velocity = glm::vec2(0);
-					bRigidbody.velocity = playerRigidbody.velocity;
-					switch (event.symbol)
+					Entity a = *i;
+					auto& playerTransform = a.GetComponent<TransformComponent>();
+					auto& playerCollider = a.GetComponent<BoxColliderComponent>();
+					auto& playerRigidbody = a.GetComponent<RigidBodyComponent>();
+					auto& sprite = a.GetComponent<SpriteComponent>();
+					const auto keyboardControl = a.GetComponent<KeyboardControlComponent>();
+					// Loop all entities that still need to be checked 
+					for (auto j = i; j != entities.end(); j++)
 					{
-						case SDLK_w:
-							bTransform.position = playerTransform.position;
-							playerRigidbody.velocity = keyboardControl.upVelocity;
-							bRigidbody = playerRigidbody;
-							sprite.srcRect.x = sprite.width * 2;
-							if (shield)
-							{
-								bCollider.height = 2;
-								bCollider.width = 24;
-								bCollider.offset = glm::vec2(48, 32);
-							}
-							else if (sword)
-							{
-								bCollider.height = 2;
-								bCollider.width = 2;
-								bCollider.offset = glm::vec2(64, 60);
-							}
-							dir = UP;
-							break;
+						if (j->HasTag("the_sword") || j->HasTag("the_shield"))
+						{
+							Entity b = *j;
 
-						case SDLK_d:
-							bTransform.position = playerTransform.position;
-							playerRigidbody.velocity = keyboardControl.rightVelocity;
-							bRigidbody = playerRigidbody;
-							sprite.srcRect.x = sprite.width * 3;
-							if (shield)
-							{
-								bCollider.height = 30;
-								bCollider.width = 2;
-								bCollider.offset = glm::vec2(90, 56);
-							}
-							else if (sword)
-							{
-								bCollider.height = 2;
-								bCollider.width = 2;
-								bCollider.offset = glm::vec2(64, 60);
-							}
-							dir = RIGHT;
-							break;
+							// Bypass if we are testing the same entity
+							if (a == b)
+								continue;
 
-						case SDLK_s:
-							bTransform.position = playerTransform.position;
-							playerRigidbody.velocity = keyboardControl.downVelocity;
-							bRigidbody = playerRigidbody;
-							sprite.srcRect.x = sprite.width * 0;
-							if (shield)
-							{
-								bCollider.height = 2;
-								bCollider.width = 24;
-								bCollider.offset = glm::vec2(40, 84);
-							}
-							else if (sword)
-							{
-								bCollider.height = 2;
-								bCollider.width = 2;
-								bCollider.offset = glm::vec2(64, 60);
-							}
-							dir = DOWN;
-							break;
+							auto& bTransform = b.GetComponent<TransformComponent>();
+							auto& bCollider = b.GetComponent<BoxColliderComponent>();
+							auto& bRigidbody = b.GetComponent<RigidBodyComponent>();
 
-						case SDLK_a:
-							bTransform.position = playerTransform.position;
-							playerRigidbody.velocity = keyboardControl.leftVelocity;
-							bRigidbody = playerRigidbody;
-							sprite.srcRect.x = sprite.width * 1;
-							if (shield)
-							{
-								bCollider.height = 30;
-								bCollider.width = 2;
-								bCollider.offset = glm::vec2(30, 50);
-							}
-							else if (sword)
-							{
-								bCollider.height = 2;
-								bCollider.width = 2;
-								bCollider.offset = glm::vec2(64, 60);
-							}
+							bool shield = false;
+							bool sword = false;
+							if (b.HasTag("the_shield")) shield = true;
+							if (b.HasTag("the_sword")) sword = true;
 
-							dir = LEFT;
-							break;
+							playerRigidbody.velocity = glm::vec2(0);
+							bRigidbody.velocity = playerRigidbody.velocity;
+							switch (event.symbol)
+							{
+							case SDLK_w:
+								bTransform.position = playerTransform.position;
+								playerRigidbody.velocity = keyboardControl.upVelocity;
+								bRigidbody = playerRigidbody;
+								sprite.srcRect.x = sprite.width * 2;
+								if (shield)
+								{
+									bCollider.height = 2;
+									bCollider.width = 24;
+									bCollider.offset = glm::vec2(48, 32);
+								}
+								else if (sword)
+								{
+									bCollider.height = 2;
+									bCollider.width = 2;
+									bCollider.offset = glm::vec2(64, 60);
+								}
+								dir = UP;
+								break;
+
+							case SDLK_d:
+								bTransform.position = playerTransform.position;
+								playerRigidbody.velocity = keyboardControl.rightVelocity;
+								bRigidbody = playerRigidbody;
+								sprite.srcRect.x = sprite.width * 3;
+								if (shield)
+								{
+									bCollider.height = 30;
+									bCollider.width = 2;
+									bCollider.offset = glm::vec2(90, 56);
+								}
+								else if (sword)
+								{
+									bCollider.height = 2;
+									bCollider.width = 2;
+									bCollider.offset = glm::vec2(64, 60);
+								}
+								dir = RIGHT;
+								break;
+
+							case SDLK_s:
+								bTransform.position = playerTransform.position;
+								playerRigidbody.velocity = keyboardControl.downVelocity;
+								bRigidbody = playerRigidbody;
+								sprite.srcRect.x = sprite.width * 0;
+								if (shield)
+								{
+									bCollider.height = 2;
+									bCollider.width = 24;
+									bCollider.offset = glm::vec2(40, 84);
+								}
+								else if (sword)
+								{
+									bCollider.height = 2;
+									bCollider.width = 2;
+									bCollider.offset = glm::vec2(64, 60);
+								}
+								dir = DOWN;
+								break;
+
+							case SDLK_a:
+								bTransform.position = playerTransform.position;
+								playerRigidbody.velocity = keyboardControl.leftVelocity;
+								bRigidbody = playerRigidbody;
+								sprite.srcRect.x = sprite.width * 1;
+								if (shield)
+								{
+									bCollider.height = 30;
+									bCollider.width = 2;
+									bCollider.offset = glm::vec2(30, 50);
+								}
+								else if (sword)
+								{
+									bCollider.height = 2;
+									bCollider.width = 2;
+									bCollider.offset = glm::vec2(64, 60);
+								}
+
+								dir = LEFT;
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
 	}
-
 	void UpdatePlayer();
 
 };

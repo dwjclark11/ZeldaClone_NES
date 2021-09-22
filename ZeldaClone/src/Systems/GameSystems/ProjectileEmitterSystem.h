@@ -53,7 +53,7 @@ private:
 		ItemAttrib(std::string group, std::string sprite_name, int width, int height, int src_rect_x, int src_rect_y, int num_frames, glm::vec2 scale, 
 			glm::vec2 trans_offset_up, glm::vec2 trans_offset_down, glm::vec2 trans_offset_right, glm::vec2 trans_offset_left, glm::vec2 box_size_up, 
 			glm::vec2 box_size_down, glm::vec2 box_size_left, glm::vec2 box_size_right, glm::vec2 box_up_offset, glm::vec2 box_down_offset, 
-			glm::vec2 box_right_offset, glm::vec2 box_left_offset, int duration, bool animation, bool vertical = false)
+			glm::vec2 box_right_offset, glm::vec2 box_left_offset, int duration = 3000, bool animation = false, bool vertical = false)
 		{
 			this->group = group;
 			this->sprite_name = sprite_name;
@@ -230,7 +230,7 @@ public:
 					projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
 					newItem.AddComponent<RigidBodyComponent>(projectileVelocity);
 					newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
-				}
+				}else Logger::Log("Bomber");
 				// Does the projectile have an animation component?
 				if (attrib.animation)
 				{
@@ -240,6 +240,7 @@ public:
 				projectileEmitter.isFriendly = true;
 				newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
 				newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0,attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
+				newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration);
 				newItem.AddComponent<GameComponent>();
 			}
 		}
@@ -392,6 +393,7 @@ public:
 				ItemAttrib bomb("bomber", "items", 16, 16, 64, 112, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
 					glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
 				UseItem(bomb);
+				GameState::totalBombs--;
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "bomb_drop", 0, 1);
 				KeyboardControlSystem::keyDown = true;
 			}
@@ -432,7 +434,7 @@ public:
 			{
 				// Create Sword beam projectile
 				ItemAttrib beam("projectile", "Sword", 16, 16, 0, 0, 4, glm::vec2(4, 4), glm::vec2(35, 45), glm::vec2(40, 25), glm::vec2(15, 30), glm::vec2(65, 30),
-					glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(25, 0), glm::vec2(25, 20), glm::vec2(15, 30), glm::vec2(10, 30), 3000, true, true);
+					glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(25, 0), glm::vec2(25, 20), glm::vec2(15, 30), glm::vec2(10, 30), 1000, true, true);
 
 				UseItem(beam);
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_shoot", 0, 1);
