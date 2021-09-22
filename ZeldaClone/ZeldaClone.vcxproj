@@ -555,6 +555,7 @@
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />
     <None Include="Assets\LuaFiles\menu_state_load.lua" />
     <None Include="Assets\LuaFiles\new_player_create.lua" />
+    <None Include="Assets\Levels\sword_dungeon.lua" />
     <None Include="Assets\SavedFiles\save1.lua" />
     <None Include="Assets\SavedFiles\save2.lua" />
     <None Include="Assets\SavedFiles\save3.lua" />
