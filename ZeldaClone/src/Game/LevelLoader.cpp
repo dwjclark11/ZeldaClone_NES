@@ -104,10 +104,21 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 
 		// Create a new entity for each tile
 		Entity tile = Registry::Instance()->CreateEntity();
-		tile.Group(group);
-		tile.AddComponent<SpriteComponent>(tileMapImage, tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
+		tile.AddComponent<SpriteComponent>(tileMapImage, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
-		tile.AddComponent<TileComponent>();
+		if (zIndex < 2)
+		{
+			tile.AddComponent<TileComponent>();
+			tile.Group(group);
+		}
+			
+		else
+		{
+			Logger::Log("Game Tile");
+			tile.AddComponent<GameComponent>();
+			tile.Group("layered");
+		}
+			
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{

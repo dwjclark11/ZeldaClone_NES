@@ -25,6 +25,7 @@ void EditorState::Update(const double& deltaTime)
 
 void EditorState::Render()
 {
+
 	Registry::Instance()->GetSystem<RenderEditorSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 
 	if (editor)
@@ -35,8 +36,23 @@ void EditorState::Render()
 			Game::Instance()->GetMouseBox(), Game::Instance()->GetEvent(), Game::Instance()->GetCamera());
 
 		Registry::Instance()->GetSystem<RenderCollisionSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetCamera());
+		
+		// Create the HUD rect --> black rectangle that all the HUD items are on
+		SDL_Rect hudRect = { 0, 0, 1920, 1080 / 4 };
+
+		// Render all HUD objects
+		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 70, 70, 70, 255);
+		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRect);
+		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRect);
+		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 0, 0, 0, 255);
+
+		// ---
 		Registry::Instance()->GetSystem<RenderEditorLabelSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	}
+
+
+
+
 }	
 
 bool EditorState::OnEnter()
@@ -50,6 +66,8 @@ bool EditorState::OnEnter()
 	// Set the Camera Position
 	Game::Instance()->GetCamera().x = 0;
 	Game::Instance()->GetCamera().y = 0;
+	Game::Instance()->GetCamera().w = 1920;
+	Game::Instance()->GetCamera().h = 1080;
 
 	// Initialize IMGUI context
 	ImGui::CreateContext();
@@ -75,7 +93,8 @@ bool EditorState::OnExit()
 {
 	// Delete the editor entities
 	Registry::Instance()->GetSystem<RenderEditorSystem>().OnExit();
-	
+	Game::Instance()->GetCamera().w = Game::Instance()->windowWidth;
+	Game::Instance()->GetCamera().y = Game::Instance()->windowHeight;
 	// Set the Window Size/Position to the desired Game Window Size and position
 	SDL_SetWindowSize(Game::Instance()->GetWindow(), 256 * 4, 240 * 4);
 	SDL_SetWindowPosition(Game::Instance()->GetWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);

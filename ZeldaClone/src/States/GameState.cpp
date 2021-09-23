@@ -147,8 +147,8 @@ void GameState::Render()
 {
 	// Create the HUD rect --> black rectangle that all the HUD items are on
 	SDL_Rect hudRect = { 0, 0, Game::Instance()->windowWidth, Game::Instance()->windowHeight / 6 + (Game::Instance()->tilePixels * Game::Instance()->gameScale) + 64};
+	
 	Game::Instance()->GetSystem<RenderTileSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
-
 	
 	// Update all other render systems
 	Game::Instance()->GetSystem<RenderSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
@@ -292,7 +292,7 @@ bool GameState::OnEnter()
 
 		Entity bombItem = Registry::Instance()->CreateEntity();
 		bombItem.AddComponent<TransformComponent>(glm::vec2(7648, 4750), glm::vec2(4, 4), 0.0);
-		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 5, false, 64, 112);
+		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
 		bombItem.AddComponent<RigidBodyComponent>(glm::vec2(0));
 		bombItem.AddComponent<ItemComponent>(BOMBS);
 		bombItem.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));

@@ -38,6 +38,7 @@ struct RenderSystem : public System
 		{
 			if (!entity.BelongsToGroup("pause") && !entity.BelongsToGroup("tiles") && !entity.BelongsToGroup("hud")) //Add the other groups
 			{
+				
 
 			RenderableEntity renderableEntity;
 			renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
@@ -74,7 +75,7 @@ struct RenderSystem : public System
 		// Loop all entities that the system is interested in
 		for (auto entity : renderableEntities)
 		{
-
+			Logger::Log("Layer: " + std::to_string(entity.spriteComponent.layer));
 			const auto transform = entity.transformComponent;
 			const auto sprite = entity.spriteComponent;
 
