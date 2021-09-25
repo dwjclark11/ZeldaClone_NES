@@ -37,16 +37,36 @@ void EditorState::Render()
 
 		Registry::Instance()->GetSystem<RenderCollisionSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetCamera());
 		
-		// Create the HUD rect --> black rectangle that all the HUD items are on
-		SDL_Rect hudRect = { 0, 0, 1920, 1080 / 4 };
+		// Create the HUD rect that each tilemap screen will be inside
+		SDL_Rect hudRectTop = { 0, 0, 1920, 288 };
+		
+		// Test to see if this works correctly
+		// ****************************************************************** //
+		SDL_Rect hudRectBottom = { 0, 960, 1920, 120};
+		SDL_Rect hudRectLeft = { 0, 0, 448, 1080};
+		SDL_Rect hudRectRight = { 1472, 0, 448, 1080};
+		// ****************************************************************** //
 
 		// Render all HUD objects
 		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 70, 70, 70, 255);
-		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRect);
-		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRect);
+
+		// ****************************************************************** //
+		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectTop);
+		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectTop);
+		
+		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectBottom);
+		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectBottom);
+		
+		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectLeft);
+		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectLeft);
+		
+		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectRight);
+		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectRight);
+		// ****************************************************************** //
+		
 		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 0, 0, 0, 255);
 
-		// ---
+		// --- Render the Labels on top of the surounding rects
 		Registry::Instance()->GetSystem<RenderEditorLabelSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	}
 
@@ -93,8 +113,10 @@ bool EditorState::OnExit()
 {
 	// Delete the editor entities
 	Registry::Instance()->GetSystem<RenderEditorSystem>().OnExit();
+	
 	Game::Instance()->GetCamera().w = Game::Instance()->windowWidth;
 	Game::Instance()->GetCamera().y = Game::Instance()->windowHeight;
+	
 	// Set the Window Size/Position to the desired Game Window Size and position
 	SDL_SetWindowSize(Game::Instance()->GetWindow(), 256 * 4, 240 * 4);
 	SDL_SetWindowPosition(Game::Instance()->GetWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
@@ -105,7 +127,10 @@ bool EditorState::OnExit()
 	Registry::Instance()->RemoveSystem<MouseControlSystem>();
 	Registry::Instance()->RemoveSystem<EditorKeyboardControlSystem>();
 	Registry::Instance()->RemoveSystem<RenderEditorLabelSystem>();
-
+	
+	// Turn on Debug if it has been turned off --> To allow access to the editor without having to reload
+	if (!Game::isDebug) Game::isDebug = true;
+	
 	return true;
 }
 
@@ -127,6 +152,7 @@ void EditorState::OnKeyDown(SDL_Event* event)
 		{
 			editor = !editor;
 		}
+		
 		keyDown = true;
 	}
 }

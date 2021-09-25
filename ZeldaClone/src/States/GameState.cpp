@@ -210,7 +210,7 @@ bool GameState::OnEnter()
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save2");
-				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
+				//loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 				//Logger::Log("Second Player Column");
 			}
 			else if (Game::Instance()->GetPlayerNum() == 3)
@@ -218,7 +218,7 @@ bool GameState::OnEnter()
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save3");
-				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
+				//loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 				//Logger::Log("Third Player Column");
 			}
 

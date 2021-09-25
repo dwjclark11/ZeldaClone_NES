@@ -9,13 +9,13 @@ Timer timer;
 // Player Idle State definitions
 void IdleState::OnEnter(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Enter Idle State");
+	//Logger::Log("Enter Idle State");
 	Game::Instance()->GetPlayerItem() = false;
 }
 
 void IdleState::OnExit(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Exit Idle State");
+	//Logger::Log("Exit Idle State");
 }
 
 void IdleState::Execute(PlayerStateMachine* pOwner)
@@ -31,12 +31,12 @@ void IdleState::Execute(PlayerStateMachine* pOwner)
 
 void AttackState::OnEnter(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Enter Attack State");
+	//Logger::Log("Enter Attack State");
 }
 
 void AttackState::OnExit(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Enter Exit State");
+	//Logger::Log("Enter Exit State");
 }
 
 void AttackState::Execute(PlayerStateMachine* pOwner)
@@ -46,12 +46,12 @@ void AttackState::Execute(PlayerStateMachine* pOwner)
 
 void MoveState::OnEnter(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Enter Move State");
+	//Logger::Log("Enter Move State");
 }
 
 void MoveState::OnExit(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Exit Move State");
+	//Logger::Log("Exit Move State");
 }
 
 void MoveState::Execute(PlayerStateMachine* pOwner)
@@ -60,11 +60,11 @@ void MoveState::Execute(PlayerStateMachine* pOwner)
 	auto player = Registry::Instance()->GetEntityByTag("player");
 	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
 	{
-		Logger::Log("Player Moving");
+		//Logger::Log("Player Moving");
 	}	
 	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
 	{
-		Logger::Log("Player Moving");
+		//Logger::Log("Player Moving");
 	}
 	else
 		pOwner->ChangeState(pOwner->idleState);
@@ -83,8 +83,8 @@ void CollectItemState::OnEnter(PlayerStateMachine* pOwner)
 
 void CollectItemState::OnExit(PlayerStateMachine* pOwner)
 {
-	Logger::Log("Exit Collect Item State");
-	trigItem = nullptr;
+	//Logger::Log("Exit Collect Item State");
+	//trigItem = nullptr;
 }
 
 void CollectItemState::Execute(PlayerStateMachine* pOwner)
@@ -93,7 +93,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner)
 	auto& playerSprite = Registry::Instance()->GetEntityByTag("player").GetComponent<SpriteComponent>();
 	auto& playerRigidBody = Registry::Instance()->GetEntityByTag("player").GetComponent<RigidBodyComponent>();
 	auto& playerTransform = Registry::Instance()->GetEntityByTag("player").GetComponent<TransformComponent>();
-
+	
 	// Stop player movement!
 	playerRigidBody = glm::vec2(0);
 
@@ -139,7 +139,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner)
 	// Wait for 1 second  then change back to idle State
 	if (timer.GetTicks() > 1000)
 	{
-		Logger::Log("Item Has Been Collected");
+		//Logger::Log("Item Has Been Collected");
 		itemCollected = false;
 		trigItem->Kill();
 		pOwner->ChangeState(pOwner->idleState);

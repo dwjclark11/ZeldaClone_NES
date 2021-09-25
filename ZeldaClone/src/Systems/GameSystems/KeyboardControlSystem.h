@@ -57,6 +57,7 @@ public:
 					auto& playerRigidbody = a.GetComponent<RigidBodyComponent>();
 					auto& sprite = a.GetComponent<SpriteComponent>();
 					const auto keyboardControl = a.GetComponent<KeyboardControlComponent>();
+					//Logger::Log("x: " + std::to_string(playerTransform.position.x) + ", y: " + std::to_string(playerTransform.position.y));
 					// Loop all entities that still need to be checked 
 					for (auto j = i; j != entities.end(); j++)
 					{

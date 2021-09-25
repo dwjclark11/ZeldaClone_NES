@@ -37,6 +37,21 @@ public:
 
 		std::string collisionText = "Collision: " + collision;
 		std::string layerText = "Layer: " + std::to_string(MouseControlSystem::layer);
+		std::string nesScreenSize = "Zelda Screen Size: (256 x 240) x GameScale";
+
+
+		// Not implemented yet
+		std::string intructions1 = "Move Screen: W = UP, S = DOWN, A = LEFT, D = RIGHT";
+		std::string intructions2 = "Add Tile: Mouse Left Click";
+		std::string intructions3 = "Remove Tile: Mouse Right Click";
+		std::string intructions4 = "To open a previously made tilemap: ";
+		std::string intructions5 = "- Load the tile/object image you want to use.";
+		std::string intructions6 = "- Load the same image to the mouse.";
+		std::string intructions7 = "- Open the correct tilemap file and proceed.";
+		std::string intructions8 = "Hit ENTER to open the Selection Screen!";
+		std::string intructions9 = "Set the game scale and the mouse box size";
+		std::string intructions10 = "Add a box collider if needed and set it's size and offset";
+
 
 	/*	std::string triggerText = "Trigger: " + std::to_string(isTrigger);
 		std::string trigType = "";
@@ -127,6 +142,11 @@ public:
 			layerText.c_str(),
 			white);
 
+		SDL_Surface* surface10 = TTF_RenderText_Blended(
+			assetManager->GetFont("charriot-font-30"),
+			nesScreenSize.c_str(),
+			white);
+
 		SDL_Texture* texture1 = SDL_CreateTextureFromSurface(renderer, surface1);
 		SDL_Texture* texture2 = SDL_CreateTextureFromSurface(renderer, surface2);
 		SDL_Texture* texture3 = SDL_CreateTextureFromSurface(renderer, surface3);
@@ -136,6 +156,7 @@ public:
 		SDL_Texture* texture7 = SDL_CreateTextureFromSurface(renderer, surface7);
 		SDL_Texture* texture8 = SDL_CreateTextureFromSurface(renderer, surface8);
 		SDL_Texture* texture9 = SDL_CreateTextureFromSurface(renderer, surface9);
+		SDL_Texture* texture10 = SDL_CreateTextureFromSurface(renderer, surface10);
 
 
 		// As soon as we create a texture we can free the surface
@@ -148,15 +169,22 @@ public:
 		SDL_FreeSurface(surface7);
 		SDL_FreeSurface(surface8);
 		SDL_FreeSurface(surface9);
+		SDL_FreeSurface(surface10);
 
 		int labelWidth = 0;
 		int labelHeight = 0;
+		
 		int mouseWidth = 0;
 		int mouseHeight = 0;
+		
 		int collisionWidth = 0;
 		int collisionHeight = 0;
+		
 		int layerWidth = 0;
 		int layerHeight = 0;
+
+		int nesSizeWidth = 0;
+		int nesSizeHeight = 0;
 
 		SDL_QueryTexture(texture1, NULL, NULL, &labelWidth, &labelHeight);
 		SDL_QueryTexture(texture2, NULL, NULL, &labelWidth, &labelHeight);
@@ -167,70 +195,78 @@ public:
 		SDL_QueryTexture(texture7, NULL, NULL, &mouseWidth, &mouseHeight);
 		SDL_QueryTexture(texture8, NULL, NULL, &collisionWidth, &collisionHeight);
 		SDL_QueryTexture(texture9, NULL, NULL, &layerWidth, &layerHeight);
+		SDL_QueryTexture(texture10, NULL, NULL, &nesSizeWidth, &nesSizeHeight);
 
 
 
 		SDL_Rect colliderWidthTextRect = {
-			100,
-			30,
+			20,
+			400 + 30,
 			labelWidth,
 			labelHeight
 		};
 
 		SDL_Rect colliderHeightTextRect = {
-			100,
-			60,
+			20,
+			400 + 70,
 			labelWidth,
 			labelHeight
 		};
 
 		SDL_Rect colliderOffsetXTextRect = {
-			100,
-			90,
+			20,
+			400 + 110,
 			labelWidth,
 			labelHeight
 		};
 
 		SDL_Rect colliderOffsetYTextRect = {
-			100,
-			120,
+			20,
+			400 + 150,
 			labelWidth,
 			labelHeight
 		};
 
 		SDL_Rect tileScaleXTextRect = {
-			100,
-			145,
+			20,
+			400 + 195,
 			labelWidth,
 			labelHeight
 		};
 
 		SDL_Rect tileScaleYTextRect = {
-			100,
-			175,
+			20,
+			400 + 235,
 			labelWidth,
 			labelHeight
 		};
 
 		SDL_Rect tilePositionTextRect = {
-			100,
-			205,
+			20,
+			400 + 275,
 			mouseWidth,
 			mouseHeight
 		};
 
 		SDL_Rect collisionTextRect = {
-			labelWidth + 250,
-			30,
+			20,
+			715,
 			collisionWidth,
 			collisionHeight
 		};
 
 		SDL_Rect layerTextRect = {
-			labelWidth + 250,
-			60,
+			20,
+			755,
 			labelWidth,
 			layerHeight
+		};
+
+		SDL_Rect nesSizeRect = {
+			labelWidth + 320,
+			1000,
+			nesSizeWidth,
+			nesSizeHeight
 		};
 
 		// ===================================================================================================================================
@@ -246,6 +282,7 @@ public:
 		SDL_RenderCopy(renderer, texture7, NULL, &tilePositionTextRect);
 		SDL_RenderCopy(renderer, texture8, NULL, &collisionTextRect);
 		SDL_RenderCopy(renderer, texture9, NULL, &layerTextRect);
+		SDL_RenderCopy(renderer, texture10, NULL, &nesSizeRect);
 
 		// Destroy the Textures to Free up Memory
 		SDL_DestroyTexture(texture1);
@@ -257,5 +294,6 @@ public:
 		SDL_DestroyTexture(texture7);
 		SDL_DestroyTexture(texture8);
 		SDL_DestroyTexture(texture9);
+		SDL_DestroyTexture(texture10);
 	}
 };

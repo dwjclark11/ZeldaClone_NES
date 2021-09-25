@@ -90,8 +90,10 @@ public:
 	SDL_Renderer* GetRenderer() const { return mRenderer; }
 	SDL_Window* GetWindow() { return mWindow;  }
 	SDL_Rect& GetCamera();
+	
 	void SetCameraY(int change);
 	void SetCameraX(int change);
+	
 	SDL_Rect& GetMouseBox();
 	SDL_Event& GetEvent();
 	
@@ -103,7 +105,8 @@ public:
 	int& GetLevelWidth() { return mLevelWidth; }
 	int& GetLevelHeight() { return mLevelHeight; }
 	GameStateMachine* GetStateMachine() { return gameStateMachine; }
-	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } // Move Semantics?
+	
+	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } 
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
 	
 	GameItems& GetGameItems() { return mGameItems; }
