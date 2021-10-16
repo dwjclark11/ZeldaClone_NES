@@ -26,12 +26,16 @@ void GameOverState::Render()
 
 bool GameOverState::OnEnter()
 {
-	if (!Registry::Instance()->HasSystem<RenderGameOverTextSystem>()) Registry::Instance()->AddSystem<RenderGameOverTextSystem>();
-	if (!Registry::Instance()->HasSystem<RenderGameOverSystem>()) Registry::Instance()->AddSystem<RenderGameOverSystem>();
-	if (!Registry::Instance()->HasSystem<GameOverKeyboardControlSystem>()) Registry::Instance()->AddSystem<GameOverKeyboardControlSystem>();
+	if (!Registry::Instance()->HasSystem<RenderGameOverTextSystem>()) 
+		Registry::Instance()->AddSystem<RenderGameOverTextSystem>();
+	if (!Registry::Instance()->HasSystem<RenderGameOverSystem>()) 
+		Registry::Instance()->AddSystem<RenderGameOverSystem>();
+	if (!Registry::Instance()->HasSystem<GameOverKeyboardControlSystem>()) 
+		Registry::Instance()->AddSystem<GameOverKeyboardControlSystem>();
 	
 	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
-	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "game_over_words", "./Assets/Backgrounds/game_over_words.png");
+	
+	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
 
 	Entity game_over_text = Registry::Instance()->CreateEntity();
 	game_over_text.AddComponent<TransformComponent>(glm::vec2(185, 50), glm::vec2(4, 4), 0.0);
@@ -59,7 +63,7 @@ bool GameOverState::OnEnter()
 	selector.Tag("gameOverSelector");
 	selector.Group("game_over");
 
-	Logger::Log("Entering Game Over State");
+	//Logger::Log("Entering Game Over State");
 	return true;
 }
 

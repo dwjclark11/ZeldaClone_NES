@@ -12,7 +12,10 @@ class GamePadSystem : public System
 public:
 	SDL_GameController* gameController;
 	const int JOYSTICK_DEAD_ZONE = 25000;
-
+	
+	/*
+		Should this be a struct?
+	*/
 	static bool xPressed;
 	static bool yPressed;
 	static bool aPressed;

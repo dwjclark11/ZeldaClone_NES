@@ -184,7 +184,6 @@
     <ClCompile Include="src\States\SaveGameState.cpp" />
     <ClCompile Include="src\States\State.cpp" />
     <ClCompile Include="src\States\TitleState.cpp" />
-    <ClCompile Include="src\Systems\GameSystems\DamageSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\GamePadSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\HealthSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\KeyboardControlSystem.cpp" />

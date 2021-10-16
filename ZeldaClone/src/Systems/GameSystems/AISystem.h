@@ -21,7 +21,7 @@ public:
 	
 	void Update()
 	{
-		int i = 0;
+		//int i = 0;
 		for (auto entity : GetSystemEntities())
 		{
 			auto& stateMachine = entity.GetComponent<AIComponent>();
@@ -30,18 +30,20 @@ public:
 				Game::Instance()->GetPlayerStateMachine().Update(entity);
 			else
 			{
+				// If the enemy is in the same screen panel as the player --> Update 
 				if (stateMachine.GetEnemyPos() == Game::Instance()->GetPlayerPos())
 				{
-					i++;
+					//i++;
 					//Logger::Err("The enemy and the player are in the same sceen -- " + std::to_string(i));
 					stateMachine.GetEnemyStateMachine()->Update(entity);
 				}
 				else
 				{
+					// Stop enemy movement
 					rigidBody.velocity = glm::vec2(0);
 				}
 			}
 		}
-		i = 0;
+		//i = 0;
 	}
 };

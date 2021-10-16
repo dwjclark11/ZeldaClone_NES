@@ -52,14 +52,16 @@ bool PauseState::OnEnter()
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
 	// =============================================================================================================================
-	if (!Registry::Instance()->HasSystem<ItemSelectKeyboardControlSystem>()) Registry::Instance()->AddSystem<ItemSelectKeyboardControlSystem>();
-	if (!Registry::Instance()->HasSystem<RenderPauseSystem>()) Registry::Instance()->AddSystem<RenderPauseSystem>();
+	if (!Registry::Instance()->HasSystem<ItemSelectKeyboardControlSystem>()) 
+		Registry::Instance()->AddSystem<ItemSelectKeyboardControlSystem>();
+	if (!Registry::Instance()->HasSystem<RenderPauseSystem>()) 
+		Registry::Instance()->AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
 
 	if (!firstEnter)
 	{
 		Logger::Log("Entered!");
-		Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "pause_hud", "./Assets/Backgrounds/pauseHud.png");
+		Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "pause_hud", "./Assets/HUDSprites/pauseHud.png");
 		firstEnter = true;
 
 		Entity pauseSelector = Registry::Instance()->CreateEntity();

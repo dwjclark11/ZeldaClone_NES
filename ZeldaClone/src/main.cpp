@@ -8,12 +8,16 @@
 
 int main()
 {
-	if (!Registry::Instance()->HasSystem<SoundFXSystem>()) Registry::Instance()->AddSystem<SoundFXSystem>();
-	if (!Registry::Instance()->HasSystem<MusicPlayerSystem>()) Registry::Instance()->AddSystem<MusicPlayerSystem>();
-	if (!Registry::Instance()->HasSystem<CameraMovementSystem>()) Registry::Instance()->AddSystem<CameraMovementSystem>();
+	if (!Registry::Instance()->HasSystem<SoundFXSystem>()) 
+		Registry::Instance()->AddSystem<SoundFXSystem>();
+	if (!Registry::Instance()->HasSystem<MusicPlayerSystem>()) 
+		Registry::Instance()->AddSystem<MusicPlayerSystem>();
+	if (!Registry::Instance()->HasSystem<CameraMovementSystem>()) 
+		Registry::Instance()->AddSystem<CameraMovementSystem>();
 	
 	// Is this needed here?
-	if (!Registry::Instance()->HasSystem<NameSelectKeyboardControlSystem>())Registry::Instance()->AddSystem<NameSelectKeyboardControlSystem>();
+	if (!Registry::Instance()->HasSystem<NameSelectKeyboardControlSystem>())
+		Registry::Instance()->AddSystem<NameSelectKeyboardControlSystem>();
 	
 	// Turn music volume down
 	Mix_VolumeMusic(10);

@@ -174,8 +174,10 @@ public:
 			break;
 
 		case SECRET_AREA:
-			// Remove all the prior assets/entities from the current scene
+			// Play stairs sound
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			
+			// Remove all the prior assets/entities from the current scene
 			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
 			Game::Instance()->GetSystem<RenderSystem>().OnExit();
 			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();

@@ -18,6 +18,7 @@ public:
 
 	void Update()
 	{
+		auto player = Registry::Instance()->GetEntityByTag("player");
 		for (auto entity : GetSystemEntities())
 		{
 			if (entity.HasTag("player"))

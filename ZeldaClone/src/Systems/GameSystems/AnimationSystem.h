@@ -32,15 +32,17 @@ public:
 
 			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000) % animation.numFrames;
 			
+			// If the animation is a vertical scroll use this
 			if (animation.vertical)
 			{
 				if (rigidbody.velocity != glm::vec2(0))
 				{
 					sprite.srcRect.y = animation.currentFrame * sprite.height;
 				}
-				else if (health.isHurt)
+				else if (health.isHurt) // If the enemy is hurt use this frame
 					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 			}
+			// If the animation is a horizontal scroll
 			else
 			{
 				sprite.srcRect.x = (animation.currentFrame * sprite.width) + animation.frameOffset;

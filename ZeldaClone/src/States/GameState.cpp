@@ -56,7 +56,6 @@ GameState::GameState(glm::vec2 cameraOffset)
 	this->cameraOffset = cameraOffset; 
 	Game::Instance()->GetCamera().x = this->cameraOffset.x;
 	Game::Instance()->GetCamera().y = this->cameraOffset.y;
-
 }
 
 void GameState::Update(const double& deltaTime)
@@ -79,24 +78,7 @@ void GameState::Update(const double& deltaTime)
 	
 
 	Registry::Instance()->GetSystem<DamageSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-	
-	//if (DamageSystem::hitEnemyTimerStarted && !enemyTimer.isStarted()) enemyTimer.Start();
-	//if (DamageSystem::hitPlayerTimerStarted && !playerTimer.isStarted()) playerTimer.Start();
 
-	//// If the enemy has been hit, wait
-	//if (enemyTimer.GetTicks() > 1000)
-	//{
-	//	DamageSystem::hitEnemyTimerStarted = false;
-	//	enemyTimer.Stop();
-	//}
-	//
-	//// If the player has been hit, wait
-	//if (playerTimer.GetTicks() > 1000)
-	//{
-	//	DamageSystem::hitPlayerTimerStarted = false;
-	//	playerTimer.Stop();
-	//}
-	
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<MovementSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
@@ -133,18 +115,18 @@ void GameState::Update(const double& deltaTime)
 
 	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	
-	/*auto player = Registry::Instance()->GetEntityByTag("player");
-	psm.Update(player);*/
 	Registry::Instance()->GetSystem<AISystem>().Update();
 	
-	// Convert the total Rupees
+	ConvertHUDNumbers();
+	
+/* 	// Convert the total Rupees
 	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
 	ConvertNumberParser("rupee_tens", totalRupees, 1);
 	ConvertNumberParser("rupee_ones", totalRupees, 0);
 	ConvertNumberParser("keys_tens", totalKeys, 1);
 	ConvertNumberParser("key_ones", totalKeys, 0);
 	ConvertNumberParser("bombs_tens", totalBombs, 1);
-	ConvertNumberParser("bombs_ones", totalBombs, 0);
+	ConvertNumberParser("bombs_ones", totalBombs, 0); */
 }
 
 void GameState::Render()

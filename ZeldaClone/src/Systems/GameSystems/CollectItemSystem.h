@@ -21,7 +21,13 @@ private:
 public:
 	bool yellowCollected;
 	bool blueCollected;
-
+	
+	/*
+		This is a system that is used to collect basic items in the field,
+		Such as rupees, bombs, etc. Those particular items do not require any
+		animation change while obtaining.
+	*/
+	
 	CollectItemSystem()
 	{
 		RequiredComponent<BoxColliderComponent>();
@@ -74,7 +80,6 @@ public:
 				item.Kill();
 			}
 		}
-
 	}
 
 	void Update()

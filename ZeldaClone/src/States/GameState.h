@@ -42,5 +42,4 @@ private:
 	Timer enemyTimer;
 	Timer playerTimer;
 	glm::vec2 cameraOffset;
-	PlayerStateMachine psm;
 };

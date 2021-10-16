@@ -187,6 +187,4 @@ public:
 			playerHealth.isHurt = true;
 		}
 	}
-
-	void Update();
 };

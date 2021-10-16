@@ -150,7 +150,6 @@ private:
 	int mLevelWidth;
 	int mLevelHeight;
 
-
 	EnemyStateMachine esm;
 	PlayerStateMachine psm;
 

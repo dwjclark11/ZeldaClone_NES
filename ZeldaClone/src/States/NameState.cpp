@@ -31,8 +31,8 @@ bool NameState::OnEnter()
 	Registry::Instance()->AddSystem<RenderNameStateTextSystem>();
 	Registry::Instance()->AddSystem<RenderNameSystem>();
 
-	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "name-letters", "./Assets/Backgrounds/Name_Letters.png");
-	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "box", "./Assets/Backgrounds/box.png");
+	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "name-letters", "./Assets/HUDSprites/Name_Letters.png");
+	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "box", "./Assets/HUDSprites/box.png");
 
 	Entity letters = Registry::Instance()->CreateEntity();
 	letters.AddComponent<SpriteComponent>("name-letters", 128, 112, 0, true);
@@ -60,7 +60,7 @@ bool NameState::OnExit()
 	//Game::Instance()->GetAssetManager()->ClearAssets();
 	Registry::Instance()->GetSystem<RenderNameStateTextSystem>().OnExit();
 	Registry::Instance()->GetSystem<RenderSystem>().OnExit();
-	Logger::Err("Exiting Name state");
+	//Logger::Err("Exiting Name state");
 	return true;
 }
 

@@ -39,7 +39,6 @@ public:
 			// Loop all entities that still need to be checked 
 			for (auto j = i; j != entities.end(); j++)
 			{
-
 				Entity b = *j;
 
 				// Bypass if we are testing the same entity
@@ -47,13 +46,11 @@ public:
 				{
 					continue;
 				}
-				//if (b.BelongsToGroup("enemies")) Logger::Err("Enemy Collide");
 
 				auto& bTransform = b.GetComponent<TransformComponent>();
 				auto& bCollider = b.GetComponent<BoxColliderComponent>();
 				auto& bRigidbody = b.GetComponent<RigidBodyComponent>();
-
-				//glm::vec2 delta = CalculateAABBDistance(a, b);
+				
 				// Perform the AABB collision check between entities a and b
 				
 				bool collisionHappened = CheckAABBCollision(
@@ -91,7 +88,8 @@ public:
 			aY + aHeight > bY
 			);
 	}
-
+	
+	// Calculate the distance before the entities collide? 
 	glm::vec2 CalculateAABBDistance(Entity a, Entity b)
 	{
 		auto& aPos = a.GetComponent<TransformComponent>();

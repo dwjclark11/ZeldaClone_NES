@@ -25,7 +25,11 @@ public:
 	{
 		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &AttackSystem::OnKeyPressed); // Callback Function
 	}
-
+	
+	
+	/*
+		IS THIS EVEN USED ANYWHERE????
+	*/
 	// Callback function
 	void OnKeyPressed(KeyPressedEvent& event)
 	{
