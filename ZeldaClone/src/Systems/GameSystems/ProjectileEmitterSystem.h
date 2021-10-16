@@ -249,34 +249,36 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
+			
 			// Change the sprite srcRect based on the direction facing
 			if (entity.HasTag("player"))
 			{
+				auto entity = Registry::Instance()->GetEntityByTag("player");
 				const auto health = entity.GetComponent<HealthComponent>();
 				auto& sprite = entity.GetComponent<SpriteComponent>();
 				auto& box = entity.GetComponent<BoxColliderComponent>();
 
 				if (KeyboardControlSystem::dir == UP)
 				{
-					sprite.srcRect.y = sprite.height * 2;
+					sprite.srcRect.y = sprite.height * 5;
 					box.offset.y = 60;
 				}
 
 				if (KeyboardControlSystem::dir == RIGHT)
 				{
-					sprite.srcRect.y = sprite.height * 2;
+					sprite.srcRect.y = sprite.height * 5;
 					box.offset.x = 30;
 				}
 
 				if (KeyboardControlSystem::dir == DOWN)
 				{
-					sprite.srcRect.y = sprite.height * 2;
+					sprite.srcRect.y = sprite.height * 5;
 					box.offset.y = 30;
 				}
 
 				if (KeyboardControlSystem::dir == LEFT)
 				{
-					sprite.srcRect.y = sprite.height * 2;
+					sprite.srcRect.y = sprite.height * 5;
 					box.offset.x = 60;
 				}
 
@@ -384,6 +386,7 @@ public:
 			{
 				ItemAttrib bow("projectile", "items", 16, 16, 0, 64, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
 					glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
+				
 				UseItem(bow);
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "boomerang_arrow", 0, 1);
 				KeyboardControlSystem::keyDown = true;
@@ -392,6 +395,7 @@ public:
 			{
 				ItemAttrib bomb("bomber", "items", 16, 16, 64, 112, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
 					glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
+				
 				UseItem(bomb);
 				GameState::totalBombs--;
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "bomb_drop", 0, 1);
@@ -401,6 +405,7 @@ public:
 			{
 				ItemAttrib candle("projectile", "items", 16, 16, 0, 96, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
 					glm::vec2(16, 16), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 500, false, false);
+				
 				UseItem(candle);
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "candle", 0, 1);
 				KeyboardControlSystem::keyDown = true;
@@ -411,6 +416,7 @@ public:
 				{
 					ItemAttrib boomerang("boomerang", "items", 16, 16, 0, 112, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(-40, -40),
 						glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(10, 10), glm::vec2(10, 10), glm::vec2(20, 20), glm::vec2(18, 18), 3000, true, false);
+					
 					UseItem(boomerang);
 					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "boomerang_arrow", 0, 1);
 					KeyboardControlSystem::keyDown = true;
@@ -420,6 +426,7 @@ public:
 			{
 				ItemAttrib beam("projectile", "items", 16, 16, 64, 96, 4, glm::vec2(4, 4), glm::vec2(0, 60), glm::vec2(30, 60), glm::vec2(30, 60), glm::vec2(30, 60),
 					glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 2000, false, false);
+				
 				UseMagicWand();
 				UseItem(beam);
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "magic_rod", 0, 1);
@@ -443,6 +450,7 @@ public:
 			{
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_slash", 0, 1);
 			}
+			
 			swordTimer.Start();
 			KeyboardControlSystem::keyDown = true;
 		}
@@ -483,9 +491,79 @@ public:
 			} 
 		}
 	}
-
+	
+	//void UpdateBoomerang()
+	//{
+	//	auto entity = Registry::Instance()->GetEntitiesByGroup("boomerang");
+	//	
+	//	// Make the boomerang come back to the player and destroy it when it returns
+	//	
+	///*	if (entity.BelongsToGroup("boomerang"))
+	//	{*/
+	//		auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
+	//		//Logger::Log("Boomer Pos.y: " + std::to_string(entity.GetComponent<TransformComponent>().position.y) + "PlayerPos.y: " + std::to_string(playerPosition.y));
+	//		if (KeyboardControlSystem::dir == UP)
+	//		{
+	//			if (entity.GetComponent<TransformComponent>().position.y < (playerPosition.y - 200) && !boomerangReturned)
+	//			{
+	//				rigidbody.velocity *= -1;
+	//				boomerangReturned = true;
+	//			}
+	//			else if (entity.GetComponent<TransformComponent>().position.y >= (playerPosition.y - 64) && boomerangReturned)
+	//			{
+	//				entity.Kill();
+	//				boomerangReturned = false;
+	//				playerSet = false;
+	//			}
+	//		}
+	//		else if (KeyboardControlSystem::dir == RIGHT)
+	//		{
+	//			if (entity.GetComponent<TransformComponent>().position.x > (playerPosition.x + 200) && !boomerangReturned)
+	//			{
+	//				rigidbody.velocity *= -1;
+	//				boomerangReturned = true;
+	//			}
+	//			else if (entity.GetComponent<TransformComponent>().position.x <= (playerPosition.x + 64) && boomerangReturned)
+	//			{
+	//				entity.Kill();
+	//				boomerangReturned = false;
+	//				playerSet = false;
+	//			}
+	//		}
+	//		else if (KeyboardControlSystem::dir == DOWN)
+	//		{
+	//			if (entity.GetComponent<TransformComponent>().position.y > (playerPosition.y + 200) && !boomerangReturned)
+	//			{
+	//				rigidbody.velocity *= -1;
+	//				boomerangReturned = true;
+	//			}
+	//			else if (entity.GetComponent<TransformComponent>().position.y <= (playerPosition.y + 64) && boomerangReturned)
+	//			{
+	//				entity.Kill();
+	//				boomerangReturned = false;
+	//				playerSet = false;
+	//			}
+	//		}
+	//		else if (KeyboardControlSystem::dir == LEFT)
+	//		{
+	//			if (entity.GetComponent<TransformComponent>().position.x < (playerPosition.x - 200) && !boomerangReturned)
+	//			{
+	//				rigidbody.velocity *= -1;
+	//				boomerangReturned = true;
+	//			}
+	//			else if (entity.GetComponent<TransformComponent>().position.x >= (playerPosition.x - 64) && boomerangReturned)
+	//			{
+	//				entity.Kill();
+	//				boomerangReturned = false;
+	//				playerSet = false;
+	//			}
+	//		}
+	//	//}
+	//}
+	
 	void Update(Registry* registry)
 	{
+		//UpdateBoomerang();
 		for (auto entity : GetSystemEntities())
 		{
 			// Make the boomerang come back to the player and destroy it when it returns
@@ -550,57 +628,78 @@ public:
 					}
 				}
 			}
-			if (swordTimer.GetTicks() > 500) swordTimer.Stop();
+			// This is the wait time for the player sword 
+			if (swordTimer.GetTicks() > 250) swordTimer.Stop();
 
-			//	auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-			//	const auto transform = entity.GetComponent<TransformComponent>(); 
-			//	// This is needed to keep the entity shooting
-			//	if (projectileEmitter.repeatFrequency == 0)
-			//	{
-			//		continue;
-			//	}
+			// Check the enemy projectile 
+			if (entity.BelongsToGroup("enemies"))
+			{
+				auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+				auto& projectileTransform = entity.GetComponent<TransformComponent>();
+				auto& rigid = entity.GetComponent<RigidBodyComponent>();
+				int offsetX = 0;
+				int offsetY = 0;
+				// Set the velocity and direction of the projectile based on when it 
+				// was triggered
+				if (projectileEmitter.shootUp)
+				{
+					projectileEmitter.projectileVelocity = glm::vec2(0, -200);
+					projectileEmitter.shootUp = false;
+					rigid.up = true;
+					offsetX = 20;
+					offsetY = 0;
+					
+				}
+				else if (projectileEmitter.shootRight)
+				{
+					projectileEmitter.projectileVelocity = glm::vec2(200, 0);
+					projectileEmitter.shootRight = false;
+					rigid.right = true;
+					offsetX = 0;
+					offsetY = 20;
+				}
+				else if (projectileEmitter.shootDown)
+				{
+					projectileEmitter.projectileVelocity = glm::vec2(0, 200);
+					projectileEmitter.shootDown = false;
+					rigid.down = true;
+					offsetX = 20;
+					offsetY = 0;
+				}
+				else if (projectileEmitter.shootLeft)
+				{
+					projectileEmitter.projectileVelocity = glm::vec2(-200, 0);
+					projectileEmitter.shootLeft = false;
+					rigid.left = true;
+					offsetX = 0;
+					offsetY = 20;
+				}
 
-			//	// Check if it is time to re emit a new projectile
-			//	if (SDL_GetTicks() - projectileEmitter.lastEmissionTime > projectileEmitter.repeatFrequency)
-			//	{
-			//		glm::vec2 projectilePosition = transform.position;
+				if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
+				{
+					// Create new projectile entity and add it to the world
+					Entity enemyProjectile = entity.registry->CreateEntity();
+					enemyProjectile.Group("projectile");
+					enemyProjectile.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x + offsetX, projectileTransform.position.y + offsetY), glm::vec2(2, 2), 0.0);
 
-			//		if (entity.HasComponent<SpriteComponent>())
-			//		{
-			//			const auto sprite = entity.GetComponent<SpriteComponent>();
-			//			projectilePosition.x += (transform.scale.x * sprite.width / 2);
-			//			projectilePosition.y += (transform.scale.y * sprite.height / 2);
-			//		}
+					enemyProjectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
+					enemyProjectile.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
-			//		int srcRectY = 64;
-			//		int srcRectX = 0;
-			//		const auto rigidBody = projectileEmitter.projectileVelocity;
+					/* 				// Does the projectile have an animation component?
+									if (attrib.animation)
+									{
+										// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
+										newItem.AddComponent<AnimationComponent>(attrib.numFrames, 20, attrib.vertical, true);
+									} */
+					projectileEmitter.isFriendly = false;
+					enemyProjectile.AddComponent<SpriteComponent>("items", 16, 16, 2, false, 48, 0);
+					enemyProjectile.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0, projectileEmitter.projectileDuration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
+					enemyProjectile.AddComponent<ProjectileComponent>(false, 10, projectileEmitter.projectileDuration);
+					enemyProjectile.AddComponent<GameComponent>();
 
-			//		if (rigidBody.y < 0)
-			//		{
-			//			srcRectX = 0;
-			//		}
-			//		if (rigidBody.x > 0)
-			//		{
-			//			srcRectX = 16;
-			//		}
-			//		if (rigidBody.y > 0)
-			//		{
-			//			srcRectX = 32;
-			//		}
-			//		if (rigidBody.x < 0)
-			//		{
-			//			srcRectX = 48;
-			//		}
-
-			//		Entity projectile = registry->CreateEntity();
-			//		projectile.Group("projectile");
-			//		projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(4, 4), 0.0);
-			//		projectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
-			//		projectile.AddComponent<SpriteComponent>("items", 16, 16, false, srcRectX, srcRectY);
-			//		projectile.AddComponent<BoxColliderComponent>(16, 16);
-			//		projectile.AddComponent<ProjectileComponent>(projectileEmitter.isFriendly, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
-			//	}
+					projectileEmitter.shotFired = true;
+				}	
+			}
 		}
 	}
 };

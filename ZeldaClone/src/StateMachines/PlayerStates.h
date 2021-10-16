@@ -7,35 +7,46 @@ class Entity;
 class IdleState : public TState<class PlayerStateMachine>
 {
 public:
-	void OnEnter(PlayerStateMachine* pOwner) override;
-	void OnExit(PlayerStateMachine* pOwner) override;
-	void Execute(PlayerStateMachine* pOwner) override;
+	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;
+	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
+	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
 };
 
 class AttackState : public TState<class PlayerStateMachine>
 {
 public:
-	void OnEnter(PlayerStateMachine* pOwner) override;
-	void OnExit(PlayerStateMachine* pOwner) override;
-	void Execute(PlayerStateMachine* pOwner) override;
+	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;
+	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
+	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
 };
 
 class MoveState : public TState<class PlayerStateMachine>
 {
 public:
-	void OnEnter(PlayerStateMachine* pOwner) override;
-	void OnExit(PlayerStateMachine* pOwner) override;
-	void Execute(PlayerStateMachine* pOwner) override;
+	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;
+	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
+	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
 };
 
 class CollectItemState : public TState<class PlayerStateMachine>
 {
 private:
 	bool itemCollected = false;
+	bool movedTrigItem = false;
 	Entity* trigItem;
 
 public:
-	void OnEnter(PlayerStateMachine* pOwner) override;
-	void OnExit(PlayerStateMachine* pOwner) override;
-	void Execute(PlayerStateMachine* pOwner) override;
+	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;
+	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
+	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
+};
+
+class PlayerHurtState : public TState<class PlayerStateMachine>
+{
+private:
+
+public:
+	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;
+	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
+	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
 };

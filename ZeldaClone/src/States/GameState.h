@@ -34,7 +34,9 @@ public:
 	virtual void OnKeyUp(SDL_Event* event);
 
 	virtual std::string GetStateID() const { return gameID; }
-
+	
+	void ConvertHUDNumbers();
+	
 private:
 	static const std::string gameID;
 	Timer enemyTimer;

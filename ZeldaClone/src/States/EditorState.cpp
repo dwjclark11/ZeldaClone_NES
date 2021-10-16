@@ -70,9 +70,6 @@ void EditorState::Render()
 		Registry::Instance()->GetSystem<RenderEditorLabelSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	}
 
-
-
-
 }	
 
 bool EditorState::OnEnter()

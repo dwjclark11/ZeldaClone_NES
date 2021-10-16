@@ -5,6 +5,7 @@
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/AIComponent.h"
 #include "../../Systems/SoundFXSystem.h"
 #include "../../Events/EventManager.h"
 #include "../../Events/CollisionEvent.h"
@@ -57,6 +58,39 @@ public:
 						}
 					}
 				}
+				
+				if (rigidBody.velocity.y > 0)
+				{
+					// Set the direction
+					rigidBody.down = true;
+					rigidBody.up = false;
+					rigidBody.left = false;
+					rigidBody.right = false;
+				}
+				if (rigidBody.velocity.y < 0)
+				{	
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = true;
+					rigidBody.left = false;
+					rigidBody.right = false;
+				}
+				if (rigidBody.velocity.x > 0)
+				{	
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = false;
+					rigidBody.left = false;
+					rigidBody.right = true;
+				}
+				if (rigidBody.velocity.x < 0)
+				{
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = false;
+					rigidBody.left = true;
+					rigidBody.right = false;
+				}
 			}
 
 			if (entity.BelongsToGroup("enemies"))
@@ -64,18 +98,62 @@ public:
 				if (rigidBody.velocity.y > 0)
 				{
 					sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
+					
+					// Set the direction
+					rigidBody.down = true;
+					rigidBody.up = false;
+					rigidBody.left = false;
+					rigidBody.right = false;
+					//Logger::Log("Down");
 				}
 				if (rigidBody.velocity.y < 0)
 				{
 					sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
+					
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = true;
+					rigidBody.left = false;
+					rigidBody.right = false;
+					//Logger::Log("Up");
 				}
 				if (rigidBody.velocity.x > 0)
 				{
 					sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
+					
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = false;
+					rigidBody.left = false;
+					rigidBody.right = true;
+					//Logger::Log("Right");
 				}
 				if (rigidBody.velocity.x < 0)
 				{
 					sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
+					
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = false;
+					rigidBody.left = true;
+					rigidBody.right = false;
+					//Logger::Log("Left");
+				}
+
+				auto& ai = entity.GetComponent<AIComponent>();
+				for (int i = 0; i < MAX_WORLD_WIDTH; i++)
+				{
+					for (int j = 0; j < MAX_WORLD_HEIGHT; j++)
+					{
+						if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i))
+						{
+							if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
+							{
+								ai.GetEnemyPos().x = i;
+								ai.GetEnemyPos().y = j;
+							}
+						}
+					}
 				}
 			}
 		}

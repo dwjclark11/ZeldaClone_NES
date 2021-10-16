@@ -161,6 +161,9 @@
     <ClCompile Include="libs\imgui\imgui_impl_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Components\AIComponent.cpp" />
+    <ClCompile Include="src\StateMachines\EnemyStateMachine.cpp" />
+    <ClCompile Include="src\StateMachines\EnemyStates.cpp" />
     <ClCompile Include="src\StateMachines\PlayerStateMachine.cpp" />
     <ClCompile Include="src\AssetManager\AssetManager.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
@@ -444,6 +447,9 @@
     <ClInclude Include="libs\imgui\imstb_rectpack.h" />
     <ClInclude Include="libs\imgui\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\Components\AIComponent.h" />
+    <ClInclude Include="src\StateMachines\EnemyStateMachine.h" />
+    <ClInclude Include="src\StateMachines\EnemyStates.h" />
     <ClInclude Include="src\StateMachines\PlayerStateMachine.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\AssetManager\AssetManager.h" />
@@ -508,6 +514,7 @@
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorGUISystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorLabelSystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorSystem.h" />
+    <ClInclude Include="src\Systems\GameSystems\AISystem.h" />
     <ClInclude Include="src\Systems\GameSystems\AnimationSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\AttackSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\CollectItemSystem.h" />

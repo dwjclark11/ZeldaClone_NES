@@ -18,14 +18,11 @@ private:
 	bool dead;
 
 public:
-	static bool hitEnemyTimerStarted;
-	static bool hitPlayerTimerStarted;
 	
 	DamageSystem()
 	{
 		dead = false;
 		RequiredComponent<BoxColliderComponent>();
-		//RequiredComponent<ProjectileEmitterComponent>(); // Not Every Enemy will have a ProjectileComponent!
 		RequiredComponent<HealthComponent>();
 	}
 
@@ -53,30 +50,37 @@ public:
 
 	void OnPlayerHitsProjectile(Entity projectile, Entity player)
 	{
-		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
+		// Should I put a check for this?
+		auto& playerHealth = player.GetComponent<HealthComponent>();
+		
+		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>() && !playerHealth.isHurt)
 		{
 			auto& playerTransform = player.GetComponent<TransformComponent>();
 			auto& playerCollider = player.GetComponent<BoxColliderComponent>();
 			auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
-			auto& playerHealth = player.GetComponent<HealthComponent>();
+			
 
 			auto& obstacleTransform = projectile.GetComponent<TransformComponent>();
 			auto& obstacleCollider = projectile.GetComponent<BoxColliderComponent>();
-			auto project = projectile.GetComponent<ProjectileEmitterComponent>();
+			const auto& project = projectile.GetComponent<ProjectileEmitterComponent>();
 
 			if (projectile.BelongsToGroup("projectile") && player.HasTag("player") && !project.isFriendly)
 			{
 				playerHealth.healthPercentage -= 1;
-				playerTransform.position.x += 15;
-				playerTransform.position.y += 15;
+				playerTransform.position.x += 5; 
+				playerTransform.position.y += 5; 
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_hurt", 0, 2);
+				playerHealth.isHurt = true;
+				
+				// Remove the projectile
+				projectile.Kill();
 			}
 		}
 	}
 
 	void OnPlayerProjectileHitsEnemy(Entity projectile, Entity enemy)
 	{
-		if ((projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")) && enemy.BelongsToGroup("enemies") && !hitEnemyTimerStarted)
+		if ((projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")) && enemy.BelongsToGroup("enemies"))
 		{
 			auto& enemyTransform = enemy.GetComponent<TransformComponent>();
 			auto& enemyCollider = enemy.GetComponent<BoxColliderComponent>();
@@ -84,7 +88,7 @@ public:
 			auto& enemyHealth = enemy.GetComponent<HealthComponent>();
 			const auto& proj = projectile.GetComponent<ProjectileEmitterComponent>();
 
-			if (proj.isFriendly)
+			if (proj.isFriendly && !enemyHealth.isHurt)
 			{
 				enemyHealth.healthPercentage -= 1;
 				projectile.Kill();
@@ -94,17 +98,16 @@ public:
 				if (enemyRigidbody.velocity.y > 0) enemyTransform.position.y -= 5;
 				if (enemyRigidbody.velocity.y < 0) enemyTransform.position.y += 5;
 
-				// Change the enemy animation to a hit animation --> Change the colors
-				// TODO:
-
-				Logger::Log("Enemy: " + std::to_string(enemyHealth.healthPercentage));
 				// Play the enemy hit sound FX
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "enemy_hit", 0, 2);
 
 				if (enemyHealth.healthPercentage <= 0)
 				{
-					enemy.Kill();
+					// Play the enemy die sound and kill the entity
+					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "enemy_die", 0, 2);
 				}
+
+				enemyHealth.isHurt = true;
 			}
 		}
 	}
@@ -126,31 +129,20 @@ public:
 
 	void OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 	{
-		//Logger::Log("IT FUCKING HIT");
-		
-	/*	auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
-		Logger::Log("IT FUCKING HIT");
-			if (enemy1Rigidbody.velocity.y > 0)
-				enemy1Rigidbody.velocity.y *= -1;*/
-			// Simple AI to have the enemy change direction if it collides with on Obstacle/Collider
-			//if ((enemy1Rigidbody.velocity.x > 0 || enemy1Rigidbody.velocity.x < 0) && enemy1Rigidbody.velocity.y == 0)
-			//	enemy1Rigidbody.velocity.x *= -1;
-			//if ((enemy1Rigidbody.velocity.y > 0 || enemy1Rigidbody.velocity.y < 0) && enemy1Rigidbody.velocity.x == 0)
-			//	enemy1Rigidbody.velocity.y *= -1;
 
 	}
 	
 	void OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 	{
-		if (enemy.BelongsToGroup("enemies") && !hitEnemyTimerStarted && (projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")))
+		if (enemy.BelongsToGroup("enemies") && (projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")))
 		{
 			auto& health = enemy.GetComponent<HealthComponent>();
 			auto& enemyTransform = enemy.GetComponent<TransformComponent>();
 			auto& animation = enemy.GetComponent<AnimationComponent>();
-			const auto rigidBody = enemy.GetComponent<RigidBodyComponent>();
+			const auto& rigidBody = enemy.GetComponent<RigidBodyComponent>();
 			auto& proj = projectile.GetComponent<ProjectileEmitterComponent>();
 			
-			if (proj.isFriendly)
+			if (proj.isFriendly && !health.isHurt)
 			{
 				health.healthPercentage -= 1;
 				
@@ -160,25 +152,19 @@ public:
 				if (rigidBody.velocity.y > 0) enemyTransform.position.y -= 5;
 				if (rigidBody.velocity.y < 0) enemyTransform.position.y += 5;
 				
-				// Change the enemy animation to a hit animation --> Change the colors
-				// TODO:
-				
-				Logger::Log("Enemy: " + std::to_string(health.healthPercentage));
-				
-				
 				if (health.healthPercentage <= 0)
 				{
 					// Play the enemy die sound and kill the entity
 					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "enemy_die", 0, 2);
-					enemy.Kill();
 				}
 				else
 				{
 					// Play the enemy hit sound FX
 					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "enemy_hit", 0, 2);
 				}
+
+				health.isHurt = true;
 			}
-			hitEnemyTimerStarted = true;
 		}
 	}
 
@@ -192,14 +178,14 @@ public:
 		const auto& obstacleTransform = enemy.GetComponent<TransformComponent>();
 		const auto& obstacleCollider = enemy.GetComponent<BoxColliderComponent>();
 
-		if (enemy.BelongsToGroup("enemies") && player.HasTag("player"))
+		if (enemy.BelongsToGroup("enemies") && player.HasTag("player") && !playerHealth.isHurt)
 		{
 			playerHealth.healthPercentage -= 1;
-			playerTransform.position.x += 15;
-			playerTransform.position.y += 15;
+			playerTransform.position.x += 5;
+			playerTransform.position.y += 5;
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_hurt", 0, 2);
+			playerHealth.isHurt = true;
 		}
-		
 	}
 
 	void Update();

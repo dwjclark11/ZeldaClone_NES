@@ -3,6 +3,7 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
+#include "../Components/AIComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TriggerBoxComponent.h"
@@ -1290,6 +1291,11 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					));
 			}
 
+
+			//entity.AddComponent<AIComponent>();
+			
+
+
 			entity.AddComponent<GameComponent>();
 			entity.AddComponent<CameraFollowComponent>();
 
@@ -1539,11 +1545,14 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			sol::optional<sol::table> script = entity["components"]["on_update_script"];
 			if (script != sol::nullopt)
 			{
-				Logger::Log("HERE");
+				//Logger::Log("HERE");
 				sol::function func = entity["components"]["on_update_script"][0];
 				newEntity.AddComponent<ScriptComponent>(func);
 			}
 			newEntity.AddComponent<GameComponent>();
+			newEntity.AddComponent<AIComponent>();
+			newEntity.AddComponent<ProjectileEmitterComponent>();
+			Logger::Log("HERE");
 		}
 		i++;
 	}

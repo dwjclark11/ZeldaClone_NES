@@ -3,7 +3,7 @@ Assets =
 {
 	[0] = 
 	{type = "texture", id = "hearts", file = "./Assets/Backgrounds/hearts_rupees.png"}, 
-	{type = "texture", id = "Link", file = "./Assets/Backgrounds/link_sprite.png"}, 
+	{type = "texture", id = "Link", file = "./Assets/PlayerSprites/link_sprite.png"}, 
 	{type = "texture", id = "Sword", file = "./Assets/Backgrounds/sword.png"}, 
 	{type = "texture", id = "name-letters", file =  "./Assets/Backgrounds/Name_Letters.png"}, 
 	{type = "texture", id = "box", file = "./Assets/Backgrounds/box.png"}, 

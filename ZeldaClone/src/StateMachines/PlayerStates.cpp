@@ -7,57 +7,60 @@
 Timer timer;
 
 // Player Idle State definitions
-void IdleState::OnEnter(PlayerStateMachine* pOwner)
+void IdleState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Enter Idle State");
 	Game::Instance()->GetPlayerItem() = false;
 }
 
-void IdleState::OnExit(PlayerStateMachine* pOwner)
+void IdleState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Exit Idle State");
 }
 
-void IdleState::Execute(PlayerStateMachine* pOwner)
+void IdleState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
 	glm::vec2 playerSpeed = glm::vec2(0);
-	auto player = Registry::Instance()->GetEntityByTag("player");
-	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
-		pOwner->ChangeState(pOwner->moveState);
-	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
-		pOwner->ChangeState(pOwner->moveState);
+	auto player = entity;
 	
+	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
+		pOwner->ChangeState(pOwner->moveState, entity);
+	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
+		pOwner->ChangeState(pOwner->moveState, entity);
 }
 
-void AttackState::OnEnter(PlayerStateMachine* pOwner)
+void AttackState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Enter Attack State");
 }
 
-void AttackState::OnExit(PlayerStateMachine* pOwner)
+void AttackState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Enter Exit State");
 }
 
-void AttackState::Execute(PlayerStateMachine* pOwner)
+void AttackState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
 
 }
 
-void MoveState::OnEnter(PlayerStateMachine* pOwner)
+void MoveState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Enter Move State");
 }
 
-void MoveState::OnExit(PlayerStateMachine* pOwner)
+void MoveState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Exit Move State");
 }
 
-void MoveState::Execute(PlayerStateMachine* pOwner)
+void MoveState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
 	glm::vec2 playerSpeed = glm::vec2(0);
-	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto player = entity;// Registry::Instance()->GetEntityByTag("player");
+	
+	auto& playerHealth = player.GetComponent<HealthComponent>();
+	
 	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
 	{
 		//Logger::Log("Player Moving");
@@ -67,27 +70,27 @@ void MoveState::Execute(PlayerStateMachine* pOwner)
 		//Logger::Log("Player Moving");
 	}
 	else
-		pOwner->ChangeState(pOwner->idleState);
+		pOwner->ChangeState(pOwner->idleState, entity);
 	
+	// If the player is collecting a special Item --> Move to the Collect Item State
 	if (Game::Instance()->GetPlayerItem())
 	{
-		pOwner->ChangeState(pOwner->collectItemState);
+		pOwner->ChangeState(pOwner->collectItemState, entity);
 	}
+	
+	// If the player is hurt --> Move to the HurtState
+	if (playerHealth.isHurt)
+		pOwner->ChangeState(pOwner->hurtState, entity);
+	
 }
 
-void CollectItemState::OnEnter(PlayerStateMachine* pOwner)
+void CollectItemState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	timer.Start();
 	trigItem = nullptr;
 }
 
-void CollectItemState::OnExit(PlayerStateMachine* pOwner)
-{
-	//Logger::Log("Exit Collect Item State");
-	//trigItem = nullptr;
-}
-
-void CollectItemState::Execute(PlayerStateMachine* pOwner)
+void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
 	// Get the player components that are needed
 	auto& playerSprite = Registry::Instance()->GetEntityByTag("player").GetComponent<SpriteComponent>();
@@ -102,17 +105,17 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner)
 	if (!Game::Instance()->GetGameItems().blueRing && !Game::Instance()->GetGameItems().redRing)
 	{
 		playerSprite.srcRect.x = playerSprite.width * 0;
-		playerSprite.srcRect.y = playerSprite.height * 5;
+		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
 	else if (Game::Instance()->GetGameItems().blueRing && !Game::Instance()->GetGameItems().redRing) // Blue Tunic
 	{
 		playerSprite.srcRect.x = playerSprite.width * 4;
-		playerSprite.srcRect.y = playerSprite.height * 5;
+		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
 	else if (Game::Instance()->GetGameItems().redRing) // Red Tunic
 	{
 		playerSprite.srcRect.x = playerSprite.width * 8;
-		playerSprite.srcRect.y = playerSprite.height * 0;
+		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
 
 	// Loop through the triggers and set the trigItem* to the active triggered item
@@ -130,18 +133,63 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner)
 	}
 
 	// Set the Triggered Item to the player position - the height of the player
-	if (trigItem)
+	if (trigItem && !movedTrigItem)
 	{
-		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x;
-		trigItem->GetComponent<TransformComponent>().position.y - playerSprite.height;
+		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x + 30;
+		trigItem->GetComponent<TransformComponent>().position.y = playerTransform.position.y - 30;
+		movedTrigItem = true;
 	}
 	
 	// Wait for 1 second  then change back to idle State
-	if (timer.GetTicks() > 1000)
+	if (timer.GetTicks() > 2000)
 	{
-		//Logger::Log("Item Has Been Collected");
+		Logger::Log("Item Has Been Collected");
 		itemCollected = false;
 		trigItem->Kill();
-		pOwner->ChangeState(pOwner->idleState);
+		pOwner->ChangeState(pOwner->idleState, entity);
 	}
+}
+
+void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
+{
+	movedTrigItem = false;
+}
+
+void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity) 
+{
+	auto player 			= entity;
+	auto& playerHealth 		= player.GetComponent<HealthComponent>();
+	auto& animation 		= player.GetComponent<AnimationComponent>();
+	auto& sprite 			= player.GetComponent<SpriteComponent>();
+	
+	// Start hurt Invincibility Timer
+	playerHealth.hurtTimer.Start();
+	// Change the animation sprite offset 
+	animation.numFrames = 3;
+	animation.frameOffset = 64;
+	
+}
+
+void PlayerHurtState::Execute(PlayerStateMachine* pOwner, Entity& entity) 
+{
+	auto player 			= entity;
+	auto& playerHealth 		= player.GetComponent<HealthComponent>();
+	auto& animation 		= player.GetComponent<AnimationComponent>();
+	auto& sprite 			= player.GetComponent<SpriteComponent>();
+	
+	// Check to see if the hurt timer is beyond the given setpoint
+	if (playerHealth.hurtTimer.GetTicks() > 1000) // This time may need to be changed --> Create a constant?
+	{
+		playerHealth.isHurt = false;
+		playerHealth.hurtTimer.Stop();
+		pOwner->ChangeState(pOwner->idleState, entity);
+	}
+}
+
+void PlayerHurtState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
+{
+	// Change animation back to current sprites
+	auto& animation = entity.GetComponent<AnimationComponent>();
+	animation.numFrames = 2;
+	animation.frameOffset = 0;
 }

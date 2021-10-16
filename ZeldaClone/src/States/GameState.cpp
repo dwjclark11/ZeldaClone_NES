@@ -18,6 +18,7 @@
 #include "../Systems/GameSystems/CollectItemSystem.h"
 #include "../Systems/GameSystems/ProjectileEmitterSystem.h"
 #include "../Systems/GameSystems/ProjectileLifeCycleSystem.h"
+#include "../Systems/GameSystems/AISystem.h"
 #include "../Systems/GameSystems/ScriptSystem.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
@@ -79,22 +80,22 @@ void GameState::Update(const double& deltaTime)
 
 	Registry::Instance()->GetSystem<DamageSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
-	if (DamageSystem::hitEnemyTimerStarted && !enemyTimer.isStarted()) enemyTimer.Start();
-	if (DamageSystem::hitPlayerTimerStarted && !playerTimer.isStarted()) playerTimer.Start();
+	//if (DamageSystem::hitEnemyTimerStarted && !enemyTimer.isStarted()) enemyTimer.Start();
+	//if (DamageSystem::hitPlayerTimerStarted && !playerTimer.isStarted()) playerTimer.Start();
 
-	// If the enemy has been hit, wait
-	if (enemyTimer.GetTicks() > 1000)
-	{
-		DamageSystem::hitEnemyTimerStarted = false;
-		enemyTimer.Stop();
-	}
-	
-	// If the player has been hit, wait
-	if (playerTimer.GetTicks() > 1000)
-	{
-		DamageSystem::hitPlayerTimerStarted = false;
-		playerTimer.Stop();
-	}
+	//// If the enemy has been hit, wait
+	//if (enemyTimer.GetTicks() > 1000)
+	//{
+	//	DamageSystem::hitEnemyTimerStarted = false;
+	//	enemyTimer.Stop();
+	//}
+	//
+	//// If the player has been hit, wait
+	//if (playerTimer.GetTicks() > 1000)
+	//{
+	//	DamageSystem::hitPlayerTimerStarted = false;
+	//	playerTimer.Stop();
+	//}
 	
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<MovementSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
@@ -119,6 +120,7 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance()->GetSystem<CameraMovementSystem>().Update(Game::Instance()->GetCamera());
 	Registry::Instance()->GetSystem<ProjectileLifeCycleSystem>().Update();
 	
+	
 	// If the player is dead, remove all entities and go to the game over state
 	if (playerDead)
 	{
@@ -130,9 +132,11 @@ void GameState::Update(const double& deltaTime)
 	}
 
 	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
-
-	psm.Update();
-
+	
+	/*auto player = Registry::Instance()->GetEntityByTag("player");
+	psm.Update(player);*/
+	Registry::Instance()->GetSystem<AISystem>().Update();
+	
 	// Convert the total Rupees
 	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
 	ConvertNumberParser("rupee_tens", totalRupees, 1);
@@ -202,6 +206,8 @@ bool GameState::OnEnter()
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
 				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save1");
+
+				Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
 				
 
 			}
@@ -241,6 +247,7 @@ bool GameState::OnEnter()
 		if (!Registry::Instance()->HasSystem<RenderTextSystem>()) Registry::Instance()->AddSystem<RenderTextSystem>();
 		if (!Registry::Instance()->HasSystem<GamePadSystem>()) 	Registry::Instance()->AddSystem<GamePadSystem>();
 		if (!Registry::Instance()->HasSystem<ScriptSystem>()) 	Registry::Instance()->AddSystem<ScriptSystem>();
+		if (!Registry::Instance()->HasSystem<AISystem>()) 	Registry::Instance()->AddSystem<AISystem>();
 		// =============================================================================================================================
 
 		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
@@ -302,6 +309,31 @@ bool GameState::OnEnter()
 
 		firstEntered = true;
 		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(Game::Instance()->GetLuaState());
+
+		Entity monster = Registry::Instance()->CreateEntity();
+		monster.Group("enemies");
+		monster.AddComponent<TransformComponent>(glm::vec2(7700, 5100), glm::vec2(4, 4), 0.0);
+		monster.AddComponent<SpriteComponent>("octorok", 16, 16, 1, false, 0, 0);
+		monster.AddComponent<RigidBodyComponent>(glm::vec2(0, 50));
+		monster.AddComponent<HealthComponent>(2);
+		monster.AddComponent<BoxColliderComponent>(16, 16);
+		monster.AddComponent<AnimationComponent>(2, 10);
+		monster.AddComponent<ProjectileEmitterComponent>();
+		monster.AddComponent<GameComponent>();
+		monster.AddComponent<AIComponent>();
+
+		Entity monster1 = Registry::Instance()->CreateEntity();
+		monster1.Group("enemies");
+		monster1.AddComponent<TransformComponent>(glm::vec2(7700, 5100), glm::vec2(4, 4), 0.0);
+		monster1.AddComponent<SpriteComponent>("octorok", 16, 16, 1, false, 0, 0);
+		monster1.AddComponent<RigidBodyComponent>(glm::vec2(0, -50));
+		monster1.AddComponent<HealthComponent>(2);
+		monster1.AddComponent<BoxColliderComponent>(16, 16);
+		monster1.AddComponent<AnimationComponent>(2, 10);
+		monster1.AddComponent<ProjectileEmitterComponent>();
+		monster1.AddComponent<GameComponent>();
+		monster1.AddComponent<AIComponent>();
+
 	}
 
 
@@ -343,6 +375,18 @@ void GameState::OnKeyUp(SDL_Event* event)
 	Registry::Instance()->GetSystem<KeyboardControlSystem>().UpdatePlayer();
 	Game::Instance()->GetEventManager()->Reset();
 	KeyboardControlSystem::keyDown = false;
+}
+
+void GameState::ConvertHUDNumbers()
+{
+	// Convert the total Rupees
+	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
+	ConvertNumberParser("rupee_tens", totalRupees, 1);
+	ConvertNumberParser("rupee_ones", totalRupees, 0);
+	ConvertNumberParser("keys_tens", totalKeys, 1);
+	ConvertNumberParser("key_ones", totalKeys, 0);
+	ConvertNumberParser("bombs_tens", totalBombs, 1);
+	ConvertNumberParser("bombs_ones", totalBombs, 0);
 }
 
 

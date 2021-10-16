@@ -36,7 +36,7 @@ public:
 			{
 				auto& sprite = entity.GetComponent<SpriteComponent>();
 
-				sprite.srcRect.y = sprite.height * 2;
+				sprite.srcRect.y = sprite.height * 5;
 			}
 		}
 	}

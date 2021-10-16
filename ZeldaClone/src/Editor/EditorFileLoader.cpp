@@ -75,9 +75,10 @@ void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetMan
 		// Create a new entity for each tile
 		Entity tile = Registry::Instance()->CreateEntity();
 		tile.Group(group);
-		tile.AddComponent<SpriteComponent>("image-Name", tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
+		tile.AddComponent<SpriteComponent>("image-Name", tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		tile.AddComponent<EditorComponent>();
+
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{

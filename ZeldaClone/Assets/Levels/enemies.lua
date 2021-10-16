@@ -18,7 +18,7 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "enemies",
+        asset_id = "octorok",
         width = 16,
         height = 16,
         z_index = 0,
@@ -58,7 +58,7 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "enemies",
+        asset_id = "octorok",
         width = 16,
         height = 16,
         z_index = 0,
@@ -98,7 +98,7 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "enemies",
+        asset_id = "octorok",
         width = 16,
         height = 16,
         z_index = 0,
@@ -138,7 +138,7 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "enemies",
+        asset_id = "octorok",
         width = 16,
         height = 16,
         z_index = 0,
@@ -178,7 +178,7 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "enemies",
+        asset_id = "octorok",
         width = 16,
         height = 16,
         z_index = 0,
@@ -209,14 +209,13 @@ enemies = {
                 local player_x, player_y = get_player_pos()
                 local enemy_x, enemy_y = get_position(entity)
                 local enemy_vel_x, enemy_vel_y = get_velocity(entity)
-               
-                if enemy_x >= (player_x - 200) and enemy_x <= (player_x + 200) then
-                    if player_x > enemy_x then
-                        set_velocity(entity, 50, enemy_vel_y)      
-                    elseif player_x < enemy_x then
-                        set_velocity(entity, -50, enemy_vel_y)
-                    end
-                end
+				local enemy_hurt, enemy_colliding = get_entity_collision(entity)
+				
+				if enemy_hurt then 
+					set_velocity(entity, 0, 0)
+				end
+				
+				
             end
       }
     }

@@ -12,6 +12,7 @@ Assets =
 	{type = "texture", id = "world_location", file =  "./Assets/Backgrounds/world_location.png"}, 
 	{type = "texture", id = "locator", file =  "./Assets/Backgrounds/location.png"}, 
 	{type = "texture", id = "enemies", file =  "./Assets/Backgrounds/sprites_enemies.png"}, 
+	{type = "texture", id = "octorok", file =  "./Assets/EnemySprites/octorok.png"}, 
 	{type = "texture", id = "numbers", file =  "./Assets/Fonts/numbers.png"}, 
 	{type = "soundFX", id = "magic_rod", file =  "./Assets/sounds/MagicalRod.wav"}, 
 	{type = "soundFX", id = "boomerang_arrow", file = "./Assets/sounds/Arrow_Boomerang.wav"}, 

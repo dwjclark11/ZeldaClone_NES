@@ -33,7 +33,7 @@ public:
 	
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
 	{
-		if (!Game::Instance()->GetCameraMoving())
+		if (!Game::Instance()->GetCameraMoving() && !Game::Instance()->GetPlayerItem())
 		{
 			eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardControlSystem::OnKeyPressed); // Callback Function
 		}

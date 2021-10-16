@@ -46,6 +46,52 @@ std::tuple<double, double> GetPlayerPosition()
 	return std::make_tuple(transform.position.x, transform.position.y);
 }
 
+std::tuple<bool, bool> GetEntityCollision(Entity entity)
+{
+	const auto& healthComponent = entity.GetComponent<HealthComponent>();
+	const auto& boxComponent = entity.GetComponent<BoxColliderComponent>();
+	
+	return std::make_tuple(boxComponent.colliding, healthComponent.isHurt);
+}
+
+// Get Animation Component
+//std::tuple <int, int, int, bool, bool, int, int, int> GetAnimationComponent(Entity entity)
+//{
+//	if (entity.HasComponent<AnimationComponent())
+//	{
+//		const auto& animation = entity.GetComponent<AnimationComponent>();
+//		return std::make_tuple(animation.numFrames, animation.currentFrame, animation.frameSpeedRate, 
+//		animation.vertical, animation.isLooped, animation.startTime, animation.frameOffset, animation.lastFrame);
+//	}
+//	else
+//	{
+//		Logger::Log("This entity Has No Animation");
+//		return NULL;
+//	}
+//}
+
+std::tuple <int, int> GetSpriteComponent(Entity entity)
+{
+	const auto& sprite = entity.GetComponent<SpriteComponent>();
+	return std::make_tuple(sprite.width, sprite.height);
+}
+
+void SetEntitySprite(Entity entity, int width, int height, int srcRectX, int srcRectY, int offsetX, int offsetY)
+{
+	if (entity.HasComponent<SpriteComponent>())
+	{
+		auto& sprite = entity.GetComponent<SpriteComponent>();
+		
+		// Change these values for the sprite. The other values do not need to be changed
+		sprite.width = width;
+		sprite.height = height;
+		sprite.srcRect.x = srcRectX;
+		sprite.srcRect.y = srcRectY;
+		sprite.offset.x = offsetX;
+		sprite.offset.y = offsetY;
+	}
+}
+
 void SetEntityPosition(Entity entity, double x, double y)
 {
 	if (entity.HasComponent<TransformComponent>())
@@ -104,7 +150,6 @@ void SetEntityAnimationFrame(Entity entity, int frame)
 	}
 }
 
-
 class ScriptSystem : public System
 {
 public:
@@ -115,7 +160,7 @@ public:
 
 	void CreateLuaBindings(sol::state& lua)
 	{
-		// Creat the entity usertype so Lua knows what an entity is:
+		// Create the entity usertype so Lua knows what an entity is:
 		lua.new_usertype<Entity>
 		(
 			"entity",
@@ -128,12 +173,15 @@ public:
 		// Create all the bindings between c++ and Lua Functions
 		lua.set_function("get_position", GetEntityPosition);
 		lua.set_function("get_velocity", GetEntityVelocity);
+		lua.set_function("get_player_pos", GetPlayerPosition);
+		//lua.set_function("get_animation_component", GetAnimationComponent);
+		lua.set_function("get_entity_collision", GetEntityCollision);
+		lua.set_function("get_sprite_component", GetSpriteComponent);
 		lua.set_function("set_position", SetEntityPosition);
 		lua.set_function("set_velocity", SetEntityVelocity);
 		lua.set_function("set_animation_frame", SetEntityAnimationFrame);
-		lua.set_function("get_player_pos", GetPlayerPosition);
-		// TODO:
-		// Add all the other Lua Bindings and c++ functions that may be needed
+		lua.set_function("set_entity_sprite", SetEntitySprite);
+		
 	}
 
 	void Update(double deltaTime, int elapsedTime)

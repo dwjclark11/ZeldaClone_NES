@@ -1,6 +1,7 @@
 #pragma once
 #include "TState.h"
 #include "../Logger/Logger.h"
+#include "../ECS/ECS.h"
 
 template <class T>
 class TStateMachine
@@ -22,13 +23,13 @@ public:
 	}
 
 	void Init(T* pOwner, TState<T>* pInitialState);
-	void Update();
-	void ChangeState(TState<T>* newState);
+	void Update(Entity& entity);
+	void ChangeState(TState<T>* newState, Entity& entity);
 };
 
 // Template funciton initialization
 template <class T>
-inline void TStateMachine<T>::Init(T* pOwner, TState<T>* pInitialState)
+void TStateMachine<T>::Init(T* pOwner, TState<T>* pInitialState)
 {
 	mCurrentState = pInitialState;
 	mPOwner = pOwner;
@@ -36,20 +37,20 @@ inline void TStateMachine<T>::Init(T* pOwner, TState<T>* pInitialState)
 }
 
 template <class T>
-inline void TStateMachine<T>::Update()
+void TStateMachine<T>::Update(Entity& entity)
 {
 	if (initialize)
 	{
 		initialize = false;
-		mCurrentState->OnEnter(mPOwner);
+		mCurrentState->OnEnter(mPOwner, entity);
 	}
-	mCurrentState->Execute(mPOwner);
+	mCurrentState->Execute(mPOwner, entity);
 }
 
 template <class T>
-inline void TStateMachine<T>::ChangeState(TState<T>* newState)
+void TStateMachine<T>::ChangeState(TState<T>* newState, Entity& entity)
 {
-	mCurrentState->OnExit(mPOwner);
+	mCurrentState->OnExit(mPOwner, entity);
 	mCurrentState = newState;
-	mCurrentState->OnEnter(mPOwner);
+	mCurrentState->OnEnter(mPOwner, entity);
 }

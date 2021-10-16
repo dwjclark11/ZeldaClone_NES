@@ -19,7 +19,8 @@
 #include "../Systems/GameSystems/AnimationSystem.h"
 #include "../Systems/RemoveEntitySystem.h"
 #include "../Systems/GameSystems/AttackSystem.h"
-
+#include "../StateMachines/EnemyStateMachine.h"
+#include "../StateMachines/PlayerStateMachine.h"
 
 // Forward Declarations
 class AssetManager;
@@ -119,6 +120,9 @@ public:
 
 	int milliSecondsPreviousFrame;
 
+	EnemyStateMachine& GetEnemyStateMachine() { return esm; }
+	PlayerStateMachine& GetPlayerStateMachine() { return psm; }
+
 private:
 	int milliSecondsPerFrame;
 	bool mIsRunning;
@@ -145,6 +149,10 @@ private:
 	glm::vec2 mPlayerPos;
 	int mLevelWidth;
 	int mLevelHeight;
+
+
+	EnemyStateMachine esm;
+	PlayerStateMachine psm;
 
 	sol::state lua;
 };

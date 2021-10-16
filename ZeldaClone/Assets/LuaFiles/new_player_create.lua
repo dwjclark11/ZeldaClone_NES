@@ -56,7 +56,7 @@ player =
         right_velocity = { x = 200, y = 0 },
         down_velocity = { x = 0, y = 200 },
         left_velocity = { x = -200, y = 0 }
-      }
+      },
     }
   },
   [2] = {

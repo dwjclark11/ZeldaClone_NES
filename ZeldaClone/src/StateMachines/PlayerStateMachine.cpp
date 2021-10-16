@@ -8,6 +8,7 @@ PlayerStateMachine::PlayerStateMachine()
 	moveState = new MoveState();
 	attackState = new AttackState();
 	collectItemState = new CollectItemState();
+	hurtState = new PlayerHurtState();
 	TStateMachine<PlayerStateMachine>::Init(this, idleState);
 }
 
@@ -18,9 +19,10 @@ PlayerStateMachine::~PlayerStateMachine()
 	delete moveState; 
 	delete attackState;
 	delete collectItemState;
+	delete hurtState;
 }
 
-void PlayerStateMachine::Update()
+void PlayerStateMachine::Update(Entity& entity)
 {
-	TStateMachine<PlayerStateMachine>::Update();
+	TStateMachine<PlayerStateMachine>::Update(entity);
 }
