@@ -2,9 +2,11 @@
 #include "../Game/Game.h"
 #include "../Utilities/Timer.h"
 #include "../Systems/SoundFXSystem.h"
+#include "../Systems/GameSystems/RenderHealthSystem.h"
+#include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/AIComponent.h"
-#include "../States/GameState.h" // Change this to the game singleton
+#include "../States/GameOverState.h" // Change this to the game singleton
 
 Timer timer;
 
@@ -227,12 +229,18 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	// TODO: Play Death animation and Kill the Entity/enemy
 	
 	auto& ai = entity.GetComponent<AIComponent>();
-	
+	Game::Instance()->GetPlayerDead() = true;
+
 	if (ai.deathTimer.GetTicks() > 3000)
 	{
 		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
-		Game::Instance()->GetPlayerDead() = true;
-		entity.Kill();
+		
+		Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
+		Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
+		//firstEntered = false;
+		Game::Instance()->GetStateMachine()->PopState();
+		Game::Instance()->GetStateMachine()->PushState(new GameOverState());
+		//entity.Kill();
 	}
 	
 }

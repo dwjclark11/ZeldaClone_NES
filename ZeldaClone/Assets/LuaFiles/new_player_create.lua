@@ -15,10 +15,10 @@ player =
         rotation = {0}
       },
       box_collider = {
-        width = 10,
-        height = 13,
+        width = 8,
+        height = 8,
         offset_x = 45,
-        offset_y = 26
+        offset_y = 45
       },
       sprite = {
         asset_id = "Link",

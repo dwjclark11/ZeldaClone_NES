@@ -23,18 +23,33 @@ public:
 		auto player = Registry::Instance()->GetEntityByTag("player");
 		for (auto entity : GetSystemEntities())
 		{
+			// If the Player is Dead --> Remove the Enemies from the screen
+			if (entity.BelongsToGroup("enemies") && Game::Instance()->GetPlayerDead())
+				entity.Kill();
+
+
 			if (entity.HasTag("player"))
 			{
-				const auto& health = entity.GetComponent<HealthComponent>();
+				auto& health = entity.GetComponent<HealthComponent>();
 				currentHealth = health.healthPercentage;
 				maxHearts = health.maxHearts;
 
-				if (currentHealth <= 2 && currentHealth > 0)
+				// Start Low health sound timer
+				if (currentHealth <= 2 && !lowHealth)
 				{
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "low_health", 1, -1);
+					health.lowHeathTimer.Start();
+					lowHealth = true;
+				}
+				// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
+				if (currentHealth <= 2 && currentHealth > 0 && health.lowHeathTimer.GetTicks() > 250)
+				{
+					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "low_health", 0, 5);
+					health.lowHeathTimer.Stop();
+					lowHealth = false;
 				}
 			}
 
+			// This is ugly? Better way?
 			if (entity.HasTag("heart1") && currentHealth == 1)
 			{
 				auto& sprite = entity.GetComponent<SpriteComponent>();

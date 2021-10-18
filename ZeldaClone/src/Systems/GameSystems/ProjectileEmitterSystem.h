@@ -440,8 +440,8 @@ public:
 			if (fullLife)
 			{
 				// Create Sword beam projectile
-				ItemAttrib beam("projectile", "Sword", 16, 16, 0, 0, 4, glm::vec2(4, 4), glm::vec2(35, 45), glm::vec2(40, 25), glm::vec2(15, 30), glm::vec2(65, 30),
-					glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(25, 0), glm::vec2(25, 20), glm::vec2(15, 30), glm::vec2(10, 30), 1000, true, true);
+				ItemAttrib beam("beam", "Sword", 32, 32, 0, 0, 4, glm::vec2(4, 4), glm::vec2(0, 45), glm::vec2(0, 25), glm::vec2(15, 20), glm::vec2(65, 20),
+					glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(56, 30), glm::vec2(56, 40), glm::vec2(30, 60), glm::vec2(10, 60), 1000, true, true);
 
 				UseItem(beam);
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_shoot", 0, 1);

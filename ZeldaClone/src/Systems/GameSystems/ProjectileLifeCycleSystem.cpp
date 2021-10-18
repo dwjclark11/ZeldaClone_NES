@@ -14,14 +14,13 @@ void ProjectileLifeCycleSystem::Update()
 	{
 		auto projectile = entity.GetComponent<ProjectileComponent>();
 
-		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && !entity.BelongsToGroup("bomber"))
+		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && !entity.BelongsToGroup("bomber") && !entity.BelongsToGroup("beam"))
 		{
 			entity.Kill();
 		}
 			
 		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && entity.BelongsToGroup("bomber"))
 		{
-			Logger::Log("What the Fart");
 			Entity explosion = entity.registry->CreateEntity();
 			explosion.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>().position, glm::vec2(4, 4), 0.0);
 			explosion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 112);
@@ -34,6 +33,20 @@ void ProjectileLifeCycleSystem::Update()
 			entity.Kill();
 
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "bomb_blow", 0, 1);
+		}
+		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && entity.BelongsToGroup("beam"))
+		{
+			auto& sprite = entity.GetComponent<SpriteComponent>();
+			auto& animation = entity.GetComponent<AnimationComponent>();
+			auto& projectile = entity.GetComponent<ProjectileComponent>();
+			auto& rigid = entity.GetComponent<RigidBodyComponent>();
+			
+			rigid.velocity = glm::vec2(0);
+			sprite.srcRect.y = 128;
+			animation.vertical = false;
+			animation.numFrames = 4;
+			if (SDL_GetTicks() - projectile.startTime > projectile.duration + 500)
+				entity.Kill();
 		}
 	}
 

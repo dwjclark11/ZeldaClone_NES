@@ -11,17 +11,15 @@
 #include "../../Events/CollisionEvent.h"
 #include "../../Game/Game.h"
 #include "../SoundFXSystem.h"
+#include "../GameSystems/KeyboardControlSystem.h"
 
 class DamageSystem : public System
 {
-private: 
-	bool dead;
 
 public:
 	
 	DamageSystem()
 	{
-		dead = false;
 		RequiredComponent<BoxColliderComponent>();
 		RequiredComponent<HealthComponent>();
 	}
@@ -36,16 +34,29 @@ public:
 		Entity a = event.a;
 		Entity b = event.b;
 
-		if (a.BelongsToGroup("projectile") && b.HasTag("player")) OnPlayerHitsProjectile(a, b);
-		if (b.BelongsToGroup("projectile") && a.HasTag("player")) OnPlayerHitsProjectile(b, a);
-		if (a.BelongsToGroup("enemies") && b.HasTag("player")) OnEnemyHitsPlayer(a, b);
-		if (b.BelongsToGroup("enemies") && a.HasTag("player")) OnEnemyHitsPlayer(b, a);
+		// Enemy projectile hits the player
+		if (a.BelongsToGroup("projectile") && b.HasTag("player")) 
+			OnPlayerHitsProjectile(a, b);
+		if (b.BelongsToGroup("projectile") && a.HasTag("player")) 
+			OnPlayerHitsProjectile(b, a);
 
+		// Player/Enemy run into each other
+		if (a.BelongsToGroup("enemies") && b.HasTag("player")) 
+			OnEnemyHitsPlayer(a, b);
+		if (b.BelongsToGroup("enemies") && a.HasTag("player")) 
+			OnEnemyHitsPlayer(b, a);
 
-		if (b.BelongsToGroup("projectile") && a.BelongsToGroup("enemies")) OnPlayerProjectileHitsEnemy(b, a);
-		if (b.BelongsToGroup("enemies") && a.BelongsToGroup("colliders")) OnEnemyHitsObstacle(b, a);
-		if (a.BelongsToGroup("enemies") && (b.BelongsToGroup("projectile") || b.HasTag("the_sword"))) OnEnemyHitsPlayerProjectile(a, b);
-		if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("projectile") || a.HasTag("the_sword"))) OnEnemyHitsPlayerProjectile(b, a);
+		// Player Sword Hits Enemy
+		if (b.HasTag("the_sword") && a.BelongsToGroup("enemies"))
+			OnPlayerSwordHitsEnemy(b, a);
+		if (a.HasTag("the_sword") && b.BelongsToGroup("enemies"))
+			OnPlayerSwordHitsEnemy(a, b);
+
+		// Player Sword beam or arrow hits enemy
+		if (a.BelongsToGroup("enemies") && (b.BelongsToGroup("beam") || b.BelongsToGroup("projectile")))
+			OnEnemyHitsPlayerProjectile(a, b);
+		if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("beam") || a.BelongsToGroup("projectile"))) 
+			OnEnemyHitsPlayerProjectile(b, a);
 	}
 
 	void OnPlayerHitsProjectile(Entity projectile, Entity player)
@@ -56,12 +67,6 @@ public:
 		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>() && !playerHealth.isHurt)
 		{
 			auto& playerTransform = player.GetComponent<TransformComponent>();
-			auto& playerCollider = player.GetComponent<BoxColliderComponent>();
-			auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
-			
-
-			auto& obstacleTransform = projectile.GetComponent<TransformComponent>();
-			auto& obstacleCollider = projectile.GetComponent<BoxColliderComponent>();
 			const auto& project = projectile.GetComponent<ProjectileEmitterComponent>();
 
 			if (projectile.BelongsToGroup("projectile") && player.HasTag("player") && !project.isFriendly)
@@ -78,20 +83,19 @@ public:
 		}
 	}
 
-	void OnPlayerProjectileHitsEnemy(Entity projectile, Entity enemy)
+	void OnPlayerSwordHitsEnemy(Entity sword, Entity enemy)
 	{
-		if ((projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")) && enemy.BelongsToGroup("enemies"))
-		{
+		if (sword.HasTag("the_sword")  && enemy.BelongsToGroup("enemies") && KeyboardControlSystem::keyDown)
+		{		
 			auto& enemyTransform = enemy.GetComponent<TransformComponent>();
-			auto& enemyCollider = enemy.GetComponent<BoxColliderComponent>();
 			auto& enemyRigidbody = enemy.GetComponent<RigidBodyComponent>();
 			auto& enemyHealth = enemy.GetComponent<HealthComponent>();
-			const auto& proj = projectile.GetComponent<ProjectileEmitterComponent>();
 
-			if (proj.isFriendly && !enemyHealth.isHurt)
+			if (!enemyHealth.isHurt)
 			{
-				enemyHealth.healthPercentage -= 1;
-				projectile.Kill();
+				// Subtract 1 HP from the enemy
+				enemyHealth.healthPercentage -= 1; // * SwordLevel!! TODO!!
+				
 				// Move the enemy slightly away in the opposite direction of movement
 				if (enemyRigidbody.velocity.x > 0) enemyTransform.position.x -= 5;
 				if (enemyRigidbody.velocity.x < 0) enemyTransform.position.x += 5;
@@ -106,41 +110,34 @@ public:
 					// Play the enemy die sound and kill the entity
 					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "enemy_die", 0, 2);
 				}
-
 				enemyHealth.isHurt = true;
 			}
 		}
 	}
 
-	void OnEnemyHitsEnemy(Entity enemy1, Entity enemy2)
-	{
-		// Simple AI to have the enemy change direction if it collides with another enemy
-		if (enemy1.BelongsToGroup("enemies") && enemy2.BelongsToGroup("enemies"))
-		{
-			auto& enemy1Rigidbody = enemy1.GetComponent<RigidBodyComponent>();
-			auto& enemy2Rigidbody = enemy2.GetComponent<RigidBodyComponent>();
+	//void OnEnemyHitsEnemy(Entity enemy1, Entity enemy2)
+	//{
+	//	// Simple AI to have the enemy change direction if it collides with another enemy
+	//	if (enemy1.BelongsToGroup("enemies") && enemy2.BelongsToGroup("enemies"))
+	//	{
+	//		auto& enemy1Rigidbody = enemy1.GetComponent<RigidBodyComponent>();
+	//		auto& enemy2Rigidbody = enemy2.GetComponent<RigidBodyComponent>();
 
-			if ((enemy1Rigidbody.velocity.x > 0 || enemy1Rigidbody.velocity.x < 0) && enemy1Rigidbody.velocity.y == 0)
-				enemy1Rigidbody.velocity.x *= -1;
-			if ((enemy1Rigidbody.velocity.y > 0 || enemy1Rigidbody.velocity.y < 0) && enemy1Rigidbody.velocity.x == 0)
-				enemy2Rigidbody.velocity.y *= -1;
-		}
-	}
-
-	void OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
-	{
-
-	}
+	//		if ((enemy1Rigidbody.velocity.x > 0 || enemy1Rigidbody.velocity.x < 0) && enemy1Rigidbody.velocity.y == 0)
+	//			enemy1Rigidbody.velocity.x *= -1;
+	//		if ((enemy1Rigidbody.velocity.y > 0 || enemy1Rigidbody.velocity.y < 0) && enemy1Rigidbody.velocity.x == 0)
+	//			enemy2Rigidbody.velocity.y *= -1;
+	//	}
+	//}
 	
 	void OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 	{
-		if (enemy.BelongsToGroup("enemies") && (projectile.HasTag("the_sword") || projectile.BelongsToGroup("projectile")))
+		if (enemy.BelongsToGroup("enemies") && (projectile.BelongsToGroup("projectile") || projectile.BelongsToGroup("beam")))
 		{
 			auto& health = enemy.GetComponent<HealthComponent>();
 			auto& enemyTransform = enemy.GetComponent<TransformComponent>();
-			auto& animation = enemy.GetComponent<AnimationComponent>();
 			const auto& rigidBody = enemy.GetComponent<RigidBodyComponent>();
-			auto& proj = projectile.GetComponent<ProjectileEmitterComponent>();
+			auto& proj = projectile.GetComponent<ProjectileComponent>();
 			
 			if (proj.isFriendly && !health.isHurt)
 			{
@@ -164,6 +161,8 @@ public:
 				}
 
 				health.isHurt = true;
+				// Kill the projectile --> start the projectile death
+				proj.startTime = proj.duration - 500;
 			}
 		}
 	}
@@ -171,18 +170,14 @@ public:
 	void OnEnemyHitsPlayer(Entity enemy, Entity player)
 	{
 		auto& playerTransform = player.GetComponent<TransformComponent>();
-		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
-		const auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 		auto& playerHealth = player.GetComponent<HealthComponent>();
-
-		const auto& obstacleTransform = enemy.GetComponent<TransformComponent>();
-		const auto& obstacleCollider = enemy.GetComponent<BoxColliderComponent>();
 
 		if (enemy.BelongsToGroup("enemies") && player.HasTag("player") && !playerHealth.isHurt)
 		{
 			playerHealth.healthPercentage -= 1;
 			playerTransform.position.x += 5;
 			playerTransform.position.y += 5;
+
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_hurt", 0, 2);
 			playerHealth.isHurt = true;
 		}

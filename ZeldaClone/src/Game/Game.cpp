@@ -56,7 +56,7 @@ void Game::Initialize()
 	}
 	
 	// Allocate channels and control the volume of the music
-	Mix_AllocateChannels(4);
+	Mix_AllocateChannels(16);
 	Mix_Volume(1, MIX_MAX_VOLUME / 4);
 
 	/* Use SDL to grab the displays Resolution */

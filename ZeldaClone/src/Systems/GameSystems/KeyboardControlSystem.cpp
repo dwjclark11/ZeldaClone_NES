@@ -25,7 +25,7 @@ void KeyboardControlSystem::UpdatePlayer()
 				
 			// Reset velocity and box collider
 			rigidBody = glm::vec2(0);
-			playerBox.offset = glm::vec2(45, 35);
+			playerBox.offset = glm::vec2(45, 45);
 
 			if (dir == UP)
 			{

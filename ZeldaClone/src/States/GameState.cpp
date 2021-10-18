@@ -103,14 +103,14 @@ void GameState::Update(const double& deltaTime)
 	
 	
 	// If the player is dead, remove all entities and go to the game over state
-	if (Game::Instance()->GetPlayerDead())
-	{
-		Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
-		Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
-		//firstEntered = false;
-		Game::Instance()->GetStateMachine()->PopState();
-		Game::Instance()->GetStateMachine()->PushState(new GameOverState());
-	}
+	//if (Game::Instance()->GetPlayerDead())
+	//{
+	//	Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
+	//	Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
+	//	//firstEntered = false;
+	//	Game::Instance()->GetStateMachine()->PopState();
+	//	Game::Instance()->GetStateMachine()->PushState(new GameOverState());
+	//}
 
 	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	

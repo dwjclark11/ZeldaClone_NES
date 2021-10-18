@@ -168,7 +168,6 @@
     <ClCompile Include="src\AssetManager\AssetManager.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\Editor\EditorFileLoader.cpp" />
-    <ClCompile Include="src\EntityStates\EntityStateMachine.cpp" />
     <ClCompile Include="src\Game\Game.cpp" />
     <ClCompile Include="src\Game\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
@@ -481,9 +480,6 @@
     <ClInclude Include="src\Components\TriggerBoxComponent.h" />
     <ClInclude Include="src\ECS\ECS.h" />
     <ClInclude Include="src\Editor\EditorFileLoader.h" />
-    <ClInclude Include="src\EntityStates\AttackState.h" />
-    <ClInclude Include="src\EntityStates\EntityStateMachine.h" />
-    <ClInclude Include="src\EntityStates\EntityStates.h" />
     <ClInclude Include="src\Events\CollisionEvent.h" />
     <ClInclude Include="src\Events\Event.h" />
     <ClInclude Include="src\Events\EventManager.h" />
@@ -506,7 +502,6 @@
     <ClInclude Include="src\States\SaveGameState.h" />
     <ClInclude Include="src\States\State.h" />
     <ClInclude Include="src\States\TitleState.h" />
-    <ClInclude Include="src\Systems\AttackSystem.h" />
     <ClInclude Include="src\Systems\CameraMovementSystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\EditorKeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\MouseControlSystem.h" />
