@@ -34,11 +34,22 @@ public:
 class HurtState : public TState<class EnemyStateMachine>
 {
 private:
-	bool itemCollected = false;
-	Entity* trigItem;
-
+	// Add private variables as needed
+	
 public:
 	virtual ~HurtState() {};
+	void OnEnter(EnemyStateMachine* pOwner, Entity& entity) override;
+	void OnExit(EnemyStateMachine* pOwner, Entity& entity) override;
+	void Execute(EnemyStateMachine* pOwner, Entity& entity) override;
+};
+
+class EnemyDeathState : public TState<class EnemyStateMachine>
+{
+private:
+	// Add private variables as needed
+
+public:
+	virtual ~EnemyDeathState() {};
 	void OnEnter(EnemyStateMachine* pOwner, Entity& entity) override;
 	void OnExit(EnemyStateMachine* pOwner, Entity& entity) override;
 	void Execute(EnemyStateMachine* pOwner, Entity& entity) override;

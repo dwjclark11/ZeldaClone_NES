@@ -10,6 +10,7 @@ private:
 	TState<EnemyStateMachine>* patrolState;
 	TState<EnemyStateMachine>* attackState;
 	TState<EnemyStateMachine>* hurtState;
+	TState<EnemyStateMachine>* deathState;
 	bool isRunning = true;
 	
 
@@ -24,4 +25,5 @@ public:
 	friend class PatrolState;
 	friend class EnemyAttackState;
 	friend class HurtState;
+	friend class EnemyDeathState;
 };

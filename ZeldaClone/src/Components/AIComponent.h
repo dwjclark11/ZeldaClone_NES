@@ -11,15 +11,11 @@ class AIComponent
 	glm::vec2 enemyPos;
 public: 
 	Timer aiTimer;
+	Timer deathTimer;
 
 	AIComponent(glm::vec2 enemyPos = glm::vec2(0, 0));
-	//virtual ~AIComponent()
-	//{
-	//	delete esm;
-	//}
 
 	EnemyStateMachine* GetEnemyStateMachine() { return esm; }
 	void GarbageCollect() { delete esm; }
 	glm::vec2& GetEnemyPos() { return enemyPos; }
-	//std::unique_ptr<EnemyStateMachine>& GetEnemyStateMachine() { return esm; }
 };

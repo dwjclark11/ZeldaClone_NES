@@ -200,23 +200,86 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      }
+    }
+  },
+  [6] = {
+    group = "enemies",
+    components = {
+      transform = {
+        position = { x = 7700, y = 5100},
+        scale = { x = 4, y = 4},
+        rotation = {0}
       },
-        on_update_script = 
-      {
-            [0] = 
-            function (entity, delta_time, elapsed_time)
-                -- Change the position
-                local player_x, player_y = get_player_pos()
-                local enemy_x, enemy_y = get_position(entity)
-                local enemy_vel_x, enemy_vel_y = get_velocity(entity)
-				local enemy_hurt, enemy_colliding = get_entity_collision(entity)
-				
-				if enemy_hurt then 
-					set_velocity(entity, 0, 0)
-				end
-				
-				
-            end
+      box_collider = {
+        width = 16,
+        height = 16,
+        offset_x = 0,
+        offset_y = 0
+      },
+      sprite = {
+        asset_id = "octorok",
+        width = 16,
+        height = 16,
+        z_index = 0,
+        is_fixed = false,
+        src_rect_x = 64,
+        src_rect_y = 0,
+        offset = { x = 0, y = 0}
+      },
+      health = {
+        health_percentage = 2,
+        max_hearts = 1
+      },
+      rigidbody = {
+        velocity = { x = 50, y = 0}
+      },
+      animation = {
+        num_frames = 2,
+        frame_rate = 10,
+        vertical = true,
+        looped = true,
+        frame_offset = 0
+      }
+    }
+  },
+  [7] = {
+    group = "enemies",
+    components = {
+      transform = {
+        position = { x = 7700, y = 5000},
+        scale = { x = 4, y = 4},
+        rotation = {0}
+      },
+      box_collider = {
+        width = 16,
+        height = 16,
+        offset_x = 0,
+        offset_y = 0
+      },
+      sprite = {
+        asset_id = "octorok",
+        width = 16,
+        height = 16,
+        z_index = 0,
+        is_fixed = false,
+        src_rect_x = 64,
+        src_rect_y = 0,
+        offset = { x = 0, y = 0}
+      },
+      health = {
+        health_percentage = 2,
+        max_hearts = 1
+      },
+      rigidbody = {
+        velocity = { x = 50, y = 0}
+      },
+      animation = {
+        num_frames = 2,
+        frame_rate = 10,
+        vertical = true,
+        looped = true,
+        frame_offset = 0
       }
     }
   }

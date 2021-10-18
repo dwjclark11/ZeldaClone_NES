@@ -39,7 +39,6 @@
 
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
-bool GameState::playerDead = false;
 bool GameState::firstEntered = false;
 int GameState::totalRupees = 0;
 int GameState::totalBombs = 0;
@@ -104,7 +103,7 @@ void GameState::Update(const double& deltaTime)
 	
 	
 	// If the player is dead, remove all entities and go to the game over state
-	if (playerDead)
+	if (Game::Instance()->GetPlayerDead())
 	{
 		Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
 		Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
@@ -118,15 +117,6 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance()->GetSystem<AISystem>().Update();
 	
 	ConvertHUDNumbers();
-	
-/* 	// Convert the total Rupees
-	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
-	ConvertNumberParser("rupee_tens", totalRupees, 1);
-	ConvertNumberParser("rupee_ones", totalRupees, 0);
-	ConvertNumberParser("keys_tens", totalKeys, 1);
-	ConvertNumberParser("key_ones", totalKeys, 0);
-	ConvertNumberParser("bombs_tens", totalBombs, 1);
-	ConvertNumberParser("bombs_ones", totalBombs, 0); */
 }
 
 void GameState::Render()
@@ -162,16 +152,14 @@ bool GameState::OnEnter()
 {
 	if (!firstEntered)
 	{
-		// Set timers back to default
-		enemyTimer.Stop();
-		playerTimer.Stop();
 		LevelLoader loader;
+
 		// Open the lua libraries into the game
 		Game::Instance()->GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 		Game::isDebug = false;
 		loader.LoadAssetsFromLuaTable(Game::Instance()->GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(Game::Instance()->GetLuaState(), "hud");
-		loader.LoadEnemiesFromLuaTable(Game::Instance()->GetLuaState(), "enemies", Game::Instance()->GetAssetManager());
+		loader.LoadEnemiesFromLuaTable(Game::Instance()->GetLuaState(), "overworld_enemies", Game::Instance()->GetAssetManager());
 		loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
 
 		// Player is now created from a Lua script instead of Hard Coded
@@ -179,37 +167,21 @@ bool GameState::OnEnter()
 		{
 			loader.CreatePlayerEntityFromLuaTable(Game::Instance()->GetLuaState(), "new_player_create");
 			Game::Instance()->GetplayerCreated() = true;
-			Logger::Log("Player Creating");
-
-
 
 			if (Game::Instance()->GetPlayerNum() == 1)
 			{
-				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
-				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save1");
-
 				Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
-				
-
 			}
 			else if (Game::Instance()->GetPlayerNum() == 2)
 			{
-				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
-				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save2");
-				//loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
-				//Logger::Log("Second Player Column");
 			}
 			else if (Game::Instance()->GetPlayerNum() == 3)
 			{
 				loader.LoadLevelAssets(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), "Level1.txt");
-				//loader.LoadCollidersFromLuaTable(lua, Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "luaTrigger");
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save3");
-				//loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), "colliders");
-				//Logger::Log("Third Player Column");
 			}
-
 		}
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
@@ -234,91 +206,20 @@ bool GameState::OnEnter()
 
 		Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Overworld", -1);
 
-		// TODO: Refactor all entities below to a lua table
-	/*	Entity map = Registry::Instance()->CreateEntity();
-		map.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
-		map.AddComponent<SpriteComponent>("map", 4096, 1344, 0, false, 0, 0);
-		map.AddComponent<TileComponent>();
-		map.Group("map");*/
-
 		loader.LoadMap(Game::Instance()->GetAssetManager(), "map", 4096, 1344);
-
-		Entity yellowRupee = Registry::Instance()->CreateEntity();
-		yellowRupee.AddComponent<TransformComponent>(glm::vec2(7648, 5050), glm::vec2(4, 4), 0.0);
-		yellowRupee.AddComponent<SpriteComponent>("hearts", 16, 16, 5, false, 48, 0);
-		yellowRupee.AddComponent<RigidBodyComponent>(glm::vec2(0));
-		yellowRupee.AddComponent<RupeeTypeComponent>(YELLOW);
-		yellowRupee.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
-		yellowRupee.AddComponent<GameComponent>();
-		yellowRupee.Group("money");
-
-		Entity yellowRupee1 = Registry::Instance()->CreateEntity();
-		yellowRupee1.AddComponent<TransformComponent>(glm::vec2(7648, 4950), glm::vec2(4, 4), 0.0);
-		yellowRupee1.AddComponent<SpriteComponent>("hearts", 16, 16, 5, false, 48, 0);
-		yellowRupee1.AddComponent<RigidBodyComponent>(glm::vec2(0));
-		yellowRupee1.AddComponent<RupeeTypeComponent>(YELLOW);
-		yellowRupee1.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
-		yellowRupee1.AddComponent<GameComponent>();
-		yellowRupee1.Group("money");
-
-		Entity blueRupee = Registry::Instance()->CreateEntity();
-		blueRupee.AddComponent<TransformComponent>(glm::vec2(7648, 4950), glm::vec2(4, 4), 0.0);
-		blueRupee.AddComponent<SpriteComponent>("hearts", 16, 16, 5, false, 64, 0);
-		blueRupee.AddComponent<RigidBodyComponent>(glm::vec2(0));
-		blueRupee.AddComponent<RupeeTypeComponent>(BLUE);
-		blueRupee.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
-		blueRupee.AddComponent<GameComponent>();
-		blueRupee.Group("money");
-
-		Entity blueRupee2 = Registry::Instance()->CreateEntity();
-		blueRupee2.AddComponent<TransformComponent>(glm::vec2(7648, 4850), glm::vec2(4, 4), 0.0);
-		blueRupee2.AddComponent<SpriteComponent>("hearts", 16, 16, 5, false, 64, 0);
-		blueRupee2.AddComponent<RigidBodyComponent>(glm::vec2(0));
-		blueRupee2.AddComponent<RupeeTypeComponent>(BLUE);
-		blueRupee2.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
-		blueRupee2.AddComponent<GameComponent>();
-		blueRupee2.Group("money");
-
-		Entity bombItem = Registry::Instance()->CreateEntity();
-		bombItem.AddComponent<TransformComponent>(glm::vec2(7648, 4750), glm::vec2(4, 4), 0.0);
-		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
-		bombItem.AddComponent<RigidBodyComponent>(glm::vec2(0));
-		bombItem.AddComponent<ItemComponent>(BOMBS);
-		bombItem.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
-		bombItem.AddComponent<GameComponent>();
-		bombItem.AddComponent<TriggerBoxComponent>(COLLECT_ITEM);
-		bombItem.Group("trigger");
+		//Entity bombItem = Registry::Instance()->CreateEntity();
+		//bombItem.AddComponent<TransformComponent>(glm::vec2(7648, 4750), glm::vec2(4, 4), 0.0);
+		//bombItem.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
+		//bombItem.AddComponent<RigidBodyComponent>(glm::vec2(0));
+		//bombItem.AddComponent<ItemComponent>(BOMBS);
+		//bombItem.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
+		//bombItem.AddComponent<GameComponent>();
+		//bombItem.AddComponent<TriggerBoxComponent>(COLLECT_ITEM);
+		//bombItem.Group("trigger");
 
 		firstEntered = true;
 		Registry::Instance()->GetSystem<ScriptSystem>().CreateLuaBindings(Game::Instance()->GetLuaState());
-
-		Entity monster = Registry::Instance()->CreateEntity();
-		monster.Group("enemies");
-		monster.AddComponent<TransformComponent>(glm::vec2(7700, 5100), glm::vec2(4, 4), 0.0);
-		monster.AddComponent<SpriteComponent>("octorok", 16, 16, 1, false, 0, 0);
-		monster.AddComponent<RigidBodyComponent>(glm::vec2(0, 50));
-		monster.AddComponent<HealthComponent>(2);
-		monster.AddComponent<BoxColliderComponent>(16, 16);
-		monster.AddComponent<AnimationComponent>(2, 10);
-		monster.AddComponent<ProjectileEmitterComponent>();
-		monster.AddComponent<GameComponent>();
-		monster.AddComponent<AIComponent>();
-
-		Entity monster1 = Registry::Instance()->CreateEntity();
-		monster1.Group("enemies");
-		monster1.AddComponent<TransformComponent>(glm::vec2(7700, 5100), glm::vec2(4, 4), 0.0);
-		monster1.AddComponent<SpriteComponent>("octorok", 16, 16, 1, false, 0, 0);
-		monster1.AddComponent<RigidBodyComponent>(glm::vec2(0, -50));
-		monster1.AddComponent<HealthComponent>(2);
-		monster1.AddComponent<BoxColliderComponent>(16, 16);
-		monster1.AddComponent<AnimationComponent>(2, 10);
-		monster1.AddComponent<ProjectileEmitterComponent>();
-		monster1.AddComponent<GameComponent>();
-		monster1.AddComponent<AIComponent>();
-
 	}
-
-
 	return true;
 }
 

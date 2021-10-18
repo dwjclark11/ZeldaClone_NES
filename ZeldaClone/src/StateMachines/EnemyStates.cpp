@@ -79,23 +79,23 @@ void EnemyAttackState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 
 void EnemyAttackState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
 {
-
+	//Logger::Err("Exiting Attack State");
 }
 
 // PatrolState
 void PatrolState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
-
 	ai.aiTimer.Start();
 }
 void PatrolState::OnExit(EnemyStateMachine* pOwner, Entity& entity) 
 {
-	
+	//Logger::Err("Exiting Patrol State");
 }
 
 void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 {
+	
 	auto player = Registry::Instance()->GetEntityByTag("player");
 	auto& transform = entity.GetComponent<TransformComponent>();
 	auto& playerTransform = player.GetComponent<TransformComponent>();
@@ -107,8 +107,10 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 	{
 		auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 		
-		if (!projectileEmitter.shootDown && rigid.down && playerTransform.position.x < transform.position.x + 32 && playerTransform.position.x > transform.position.x - 32
-			&& playerTransform.position.y < transform.position.y + 256 && playerTransform.position.y > transform.position.y + 64)
+		if (!projectileEmitter.shootDown && rigid.down && playerTransform.position.x < transform.position.x + 32 
+			&& playerTransform.position.x > transform.position.x - 32
+			&& playerTransform.position.y < transform.position.y + 256 
+			&& playerTransform.position.y > transform.position.y + 64)
 		{
 			//Logger::Err("Shoot Player Down");
 			rigid = glm::vec2(0,0);
@@ -116,8 +118,10 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 			projectileEmitter.shotTriggered = true;
 			
 		}
-		else if (!projectileEmitter.shootUp && rigid.up && playerTransform.position.x < transform.position.x + 32 && playerTransform.position.x > transform.position.x - 32
-			&& playerTransform.position.y < transform.position.y - 64 && playerTransform.position.y > transform.position.y  - 256)
+		else if (!projectileEmitter.shootUp && rigid.up && playerTransform.position.x < transform.position.x + 32 
+				&& playerTransform.position.x > transform.position.x - 32
+				&& playerTransform.position.y < transform.position.y - 64 
+				&& playerTransform.position.y > transform.position.y  - 256)
 		{
 			//Logger::Err("Shoot Player Up!");
 			
@@ -125,16 +129,20 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 			projectileEmitter.shootUp = true;
 			projectileEmitter.shotTriggered = true;
 		}
-		else if (!projectileEmitter.shootRight && rigid.right && playerTransform.position.x < transform.position.x + 256 && playerTransform.position.x > transform.position.x + 64
-			&& playerTransform.position.y < transform.position.y + 32 && playerTransform.position.y > transform.position.y  -32)
+		else if (!projectileEmitter.shootRight && rigid.right && playerTransform.position.x < transform.position.x + 256 
+				&& playerTransform.position.x > transform.position.x + 64
+				&& playerTransform.position.y < transform.position.y + 32 
+				&& playerTransform.position.y > transform.position.y  -32)
 		{
 			//Logger::Err("Shoot Player Right!");
 			rigid = glm::vec2(0,0);
 			projectileEmitter.shootRight = true;
 			projectileEmitter.shotTriggered = true;
 		}
-		else if (!projectileEmitter.shootLeft && rigid.left && playerTransform.position.x > transform.position.x - 256 && playerTransform.position.x < transform.position.x - 64
-			&& playerTransform.position.y < transform.position.y + 32 && playerTransform.position.y > transform.position.y - 32)
+		else if (!projectileEmitter.shootLeft && rigid.left && playerTransform.position.x > transform.position.x - 256 
+				&& playerTransform.position.x < transform.position.x - 64
+				&& playerTransform.position.y < transform.position.y + 32 
+				&& playerTransform.position.y > transform.position.y - 32)
 		{
 			//Logger::Err("Shoot Player Left!");
 			rigid = glm::vec2(0,0);
@@ -147,7 +155,6 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 			//Logger::Err("Enemy has fired a projectile now is idle");
 			pOwner->ChangeState(pOwner->idleState, entity);
 		}
-		
 		
 		if (ai.aiTimer.GetTicks() > 2000)
 		{
@@ -212,10 +219,14 @@ void HurtState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		enemyHealth.hurtTimer.Stop();
 		pOwner->ChangeState(pOwner->idleState, entity);
 	}
+	// If the enemy's heath is <= 0, call death state!
 	else if (enemyHealth.healthPercentage <= 0)
 	{
-		ai.GarbageCollect();
-		entity.Kill();
+		// TODO: Call the EnemyDeathState
+		// pOwner->ChangeState(pOwner->deathState, entity);
+		
+		ai.GarbageCollect(); // Move this to death state!!
+		entity.Kill(); 		 // Move this to death state!!
 	}
 }
 
@@ -225,4 +236,41 @@ void HurtState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
 	animation.numFrames = 2;
 	animation.frameOffset = 0;
 	//Logger::Err("Enemy Leaving HURT state");
+}
+
+
+// Death State
+void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+{
+	// TODO: Start Death timer to run the death animation! 
+	/*
+		auto& ai = entity.GetComponent<AIComponent>();
+		auto& animation = entity.GetComponent<AnimationComponent>();
+		
+		ai.deathTimer.Start();
+		animation.frameOffset = xyz; --> TBD
+		animation.numFrames = xyz; --> TBD
+		animation.frameSpeed = abc; --> TBD
+		animation.looped = false;
+	*/
+}
+void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+{
+	// TODO: Play Death animation and Kill the Entity/enemy
+	/*
+		Pseudo-code
+		
+		auto& ai = entity.GetComponent<AIComponent>();
+		
+		if (ai.deathTimer.GetTicks() > 2000)
+		{
+			ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
+			entity.Kill();
+		}
+	*/
+}
+
+void EnemyDeathState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+{
+	// Animation does not have to return to regular because the entity is destroyed!
 }

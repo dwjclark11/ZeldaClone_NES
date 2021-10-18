@@ -10,6 +10,8 @@
 #include "../../Components/KeyboardControlComponent.h"
 #include "../../Logger/Logger.h"
 #include "../../AssetManager/AssetManager.h"
+#include "../../States/GameState.h"
+
 #include <string>
 #include <SDL.h>
 #include "../../Utilities/Timer.h"
@@ -33,7 +35,7 @@ public:
 	
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
 	{
-		if (!Game::Instance()->GetCameraMoving() && !Game::Instance()->GetPlayerItem())
+		if (!Game::Instance()->GetCameraMoving() && !Game::Instance()->GetPlayerItem() && !Game::Instance()->GetPlayerDead())
 		{
 			eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardControlSystem::OnKeyPressed); // Callback Function
 		}

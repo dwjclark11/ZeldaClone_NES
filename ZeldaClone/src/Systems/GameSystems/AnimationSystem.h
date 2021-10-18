@@ -21,10 +21,9 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-
 			auto& animation = entity.GetComponent<AnimationComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();
-			const auto rigidbody = entity.GetComponent<RigidBodyComponent>();
+			const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
 			auto health = HealthComponent(); 
 
 			if (entity.HasComponent<HealthComponent>())

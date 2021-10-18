@@ -83,7 +83,7 @@ void Game::Initialize()
 	mRenderer = SDL_CreateRenderer(
 		mWindow,
 		-1,
-		0
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Added!!
 	);
 	// Check if the renderer was created correctly
 	if (!mRenderer)

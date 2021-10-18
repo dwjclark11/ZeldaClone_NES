@@ -3,6 +3,8 @@
 #include "../Utilities/Timer.h"
 #include "../Systems/SoundFXSystem.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/AIComponent.h"
+#include "../States/GameState.h" // Change this to the game singleton
 
 Timer timer;
 
@@ -164,9 +166,11 @@ void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 	
 	// Start hurt Invincibility Timer
 	playerHealth.hurtTimer.Start();
+
 	// Change the animation sprite offset 
 	animation.numFrames = 3;
 	animation.frameOffset = 64;
+	animation.frameSpeedRate = 20;
 	
 }
 
@@ -184,12 +188,57 @@ void PlayerHurtState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		playerHealth.hurtTimer.Stop();
 		pOwner->ChangeState(pOwner->idleState, entity);
 	}
+
+	if (playerHealth.healthPercentage <= 0)
+	{
+		pOwner->ChangeState(pOwner->deathState, entity);
+	}
 }
 
 void PlayerHurtState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	// Change animation back to current sprites
 	auto& animation = entity.GetComponent<AnimationComponent>();
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+
 	animation.numFrames = 2;
 	animation.frameOffset = 0;
+	animation.frameSpeedRate = 10;
+	sprite.srcRect.y = 0;
 }
+
+// Death State
+void PlayerDeathState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
+{
+	// TODO: Start Death timer to run the death animation! 
+	
+	auto& ai = entity.GetComponent<AIComponent>();
+	auto& animation = entity.GetComponent<AnimationComponent>();
+		
+	ai.deathTimer.Start();
+	Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_die", 0, -1);
+	animation.frameOffset = 0; 
+	animation.numFrames = 4; 
+	animation.frameSpeedRate = 10;
+	animation.vertical = false;
+}
+void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
+{
+	// TODO: Play Death animation and Kill the Entity/enemy
+	
+	auto& ai = entity.GetComponent<AIComponent>();
+	
+	if (ai.deathTimer.GetTicks() > 3000)
+	{
+		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
+		Game::Instance()->GetPlayerDead() = true;
+		entity.Kill();
+	}
+	
+}
+
+void PlayerDeathState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
+{
+	// Animation does not have to return to regular because the entity is destroyed!
+}
+

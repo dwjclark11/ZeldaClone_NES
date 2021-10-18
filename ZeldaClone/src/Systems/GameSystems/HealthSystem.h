@@ -3,13 +3,15 @@
 #include "../../Components/HealthComponent.h"
 #include "../../Components/SpriteComponent.h"
 #include "../../AssetManager/AssetManager.h"
+#include "../../Game/Game.h"
+#include "../../Systems/SoundFXSystem.h"
 
 class HealthSystem : public System
 {
 public:
 	static unsigned int currentHealth;
 	static unsigned int maxHearts;
-
+	bool lowHealth = false;
 	HealthSystem()
 	{
 		RequiredComponent<HealthComponent>();
@@ -26,6 +28,11 @@ public:
 				const auto& health = entity.GetComponent<HealthComponent>();
 				currentHealth = health.healthPercentage;
 				maxHearts = health.maxHearts;
+
+				if (currentHealth <= 2 && currentHealth > 0)
+				{
+					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "low_health", 1, -1);
+				}
 			}
 
 			if (entity.HasTag("heart1") && currentHealth == 1)

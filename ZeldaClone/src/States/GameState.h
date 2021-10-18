@@ -11,7 +11,6 @@ class GameState : public State
 {
 public:
 	// Statics 
-	static bool playerDead;
 	static int totalRupees;
 	static int totalBombs;
 	static int totalKeys;
@@ -39,7 +38,5 @@ public:
 	
 private:
 	static const std::string gameID;
-	Timer enemyTimer;
-	Timer playerTimer;
 	glm::vec2 cameraOffset;
 };

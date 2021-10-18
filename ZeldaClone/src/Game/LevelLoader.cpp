@@ -1157,8 +1157,8 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		sol::table player = data[i];
 
 		auto entity = Registry::Instance()->CreateEntity();
-		Logger::Err("Player Create");
-		Logger::Err(player["tag"]);
+		//Logger::Err("Player Create");
+		//Logger::Err(player["tag"]);
 		entity.Tag(player["tag"]);
 		
 		// Components

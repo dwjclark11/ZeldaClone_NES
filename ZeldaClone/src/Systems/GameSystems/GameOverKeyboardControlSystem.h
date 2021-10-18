@@ -117,7 +117,7 @@ public:
 				{
 					if (transform.position.y == 475)
 					{
-						GameState::playerDead = false;
+						Game::Instance()->GetPlayerDead() = false;
 						GameState::firstEntered = false;
 						Game::Instance()->GetStateMachine()->PopState();
 						Game::Instance()->GetStateMachine()->PushState(new GameState());

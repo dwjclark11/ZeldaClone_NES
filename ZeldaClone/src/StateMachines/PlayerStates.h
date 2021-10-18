@@ -50,3 +50,14 @@ public:
 	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
 	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
 };
+
+
+class PlayerDeathState: public TState<class PlayerStateMachine>
+{
+private:
+
+public:
+	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;
+	void OnExit(PlayerStateMachine* pOwner, Entity& entity) override;
+	void Execute(PlayerStateMachine* pOwner, Entity& entity) override;
+};

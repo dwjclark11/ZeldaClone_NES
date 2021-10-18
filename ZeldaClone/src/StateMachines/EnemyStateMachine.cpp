@@ -9,6 +9,7 @@ EnemyStateMachine::EnemyStateMachine()
 	patrolState = new PatrolState();
 	attackState = new EnemyAttackState();
 	hurtState = new HurtState();
+	deathState = new EnemyDeathState();
 	
 	TStateMachine<EnemyStateMachine>::Init(this, idleState);
 }
@@ -21,6 +22,7 @@ EnemyStateMachine::~EnemyStateMachine()
 	delete patrolState; 
 	delete attackState;
 	delete hurtState;
+	delete deathState;
 }
 
 void EnemyStateMachine::Update(Entity& entity)

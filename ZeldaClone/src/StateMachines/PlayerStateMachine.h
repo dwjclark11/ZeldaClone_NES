@@ -10,6 +10,7 @@ private:
 	TState<PlayerStateMachine>* attackState;
 	TState<PlayerStateMachine>* collectItemState;
 	TState<PlayerStateMachine>* hurtState;
+	TState<PlayerStateMachine>* deathState;
 	bool isRunning = true;
 
 public:
@@ -25,5 +26,6 @@ public:
 	friend class AttackState;
 	friend class CollectItemState;
 	friend class PlayerHurtState;
+	friend class PlayerDeathState;
 };
 

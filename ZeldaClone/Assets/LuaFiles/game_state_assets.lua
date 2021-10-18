@@ -25,6 +25,7 @@ Assets =
 	{type = "soundFX", id = "sword_shoot", 		file =   "./Assets/sounds/Sword_Shoot.wav"}, 
 	{type = "soundFX", id = "link_hurt", 		file =  "./Assets/sounds/Link_Hurt.wav"}, 
 	{type = "soundFX", id = "link_die", 		file =  "./Assets/sounds/Link_Die.wav"}, 
+	{type = "soundFX", id = "low_health", 		file =  "./Assets/sounds/LowHealth.wav"}, 
 	{type = "soundFX", id = "get_rupee", 		file =  "./Assets/sounds/Get_Rupee.wav"}, 
 	{type = "soundFX", id = "get_item", 		file =  "./Assets/sounds/Get_Item.wav"}, 
 	{type = "soundFX", id = "stairs", 			file =  "./Assets/sounds/Stairs.wav"}, 
@@ -32,5 +33,6 @@ Assets =
 	{type = "soundFX", id = "enemy_die", 		file =   "./Assets/sounds/Enemy_Die.wav"}, 
 	{type = "soundFX", id = "fanfare", 			file =   "./Assets/sounds/Fanfare.wav"}, 
 	{type = "music",   id = "dungeon", 			file = "./Assets/Music/Dungeon_Theme.mp3"},
+	{type = "music",   id = "Overworld", 			file = "./Assets/Music/Overworld_Theme.mp3"},
 	
 }

@@ -116,6 +116,8 @@ public:
 	double& GetDeltaTime();
 	sol::state& GetLuaState() { return lua; }
 	bool& GetPlayerItem() { return playerItem; }
+	bool& GetPlayerDead() { return playerDead; }
+
 	template<typename TSystem> TSystem& GetSystem();
 
 	int milliSecondsPreviousFrame;
@@ -131,6 +133,7 @@ private:
 	bool cameraMoving;
 	bool playerCreated;
 	bool playerItem = false;
+	bool playerDead = false;
 	unsigned gamePlayerNum;
 	
 	SDL_Window* mWindow;

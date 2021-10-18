@@ -73,7 +73,7 @@ bool GameOverState::OnExit()
 	Game::Instance()->GetSystem<RenderGameOverTextSystem>().OnExit();
 	Game::Instance()->GetSystem<RenderTextSystem>().OnExit();
 	Logger::Log("Exiting Game Over State");
-	GameState::playerDead = false;
+	Game::Instance()->GetPlayerDead() = false;
 	return true;
 }
 
