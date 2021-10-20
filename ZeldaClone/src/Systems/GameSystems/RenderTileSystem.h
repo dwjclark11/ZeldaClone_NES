@@ -35,7 +35,6 @@ struct RenderTileSystem : public System
 		{
 			if (entity.BelongsToGroup("tiles") || entity.BelongsToGroup("map")) //Add the other groups
 			{
-
 				RenderableEntity renderableEntity;
 				renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
 				renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
@@ -53,7 +52,6 @@ struct RenderTileSystem : public System
 				// Bypass Rendering entities, if we are outside the camera view and are not fixed sprites
 				if (isEntityOutsideCameraView && !renderableEntity.spriteComponent.isFixed)
 				{
-
 					continue;
 				}
 
@@ -83,6 +81,10 @@ struct RenderTileSystem : public System
 					static_cast<int>(sprite.width * transform.scale.x),
 					static_cast<int>(sprite.height * transform.scale.y)
 				};
+
+				// If the player is dead change the background tile color to red
+				if (Game::Instance()->GetPlayerDead())
+					SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 0, 0);
 
 				SDL_RenderCopyEx(
 					renderer,

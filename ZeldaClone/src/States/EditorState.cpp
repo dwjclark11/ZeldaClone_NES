@@ -48,7 +48,8 @@ void EditorState::Render()
 		// ****************************************************************** //
 
 		// Render all HUD objects
-		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 70, 70, 70, 255);
+		SDL_SetRenderDrawBlendMode(Game::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
+		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 70, 70, 70, 100);
 
 		// ****************************************************************** //
 		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectTop);
