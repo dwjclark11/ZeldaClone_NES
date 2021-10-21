@@ -181,7 +181,6 @@ bool GameState::OnEnter()
 			if (Game::Instance()->GetPlayerNum() == 1)
 			{
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save1");
-				Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
 			}
 			else if (Game::Instance()->GetPlayerNum() == 2)
 			{
