@@ -84,6 +84,10 @@ struct RenderTileSystem : public System
 					static_cast<int>(sprite.height * transform.scale.y)
 				};
 
+				// If the player is dead change the background tile color to red
+				if (Game::Instance()->GetPlayerDead())
+					SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 0, 0);
+
 				SDL_RenderCopyEx(
 					renderer,
 					assetManager->GetTexture(sprite.assetID),

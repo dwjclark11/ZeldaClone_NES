@@ -1552,7 +1552,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			newEntity.AddComponent<GameComponent>();
 			newEntity.AddComponent<AIComponent>();
 			newEntity.AddComponent<ProjectileEmitterComponent>();
-			Logger::Log("HERE");
 		}
 		i++;
 	}

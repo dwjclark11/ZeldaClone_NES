@@ -693,8 +693,7 @@ public:
 									} */
 					projectileEmitter.isFriendly = false;
 					enemyProjectile.AddComponent<SpriteComponent>("items", 16, 16, 2, false, 48, 0);
-					enemyProjectile.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0, projectileEmitter.projectileDuration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
-					enemyProjectile.AddComponent<ProjectileComponent>(false, 10, projectileEmitter.projectileDuration);
+					enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 					enemyProjectile.AddComponent<GameComponent>();
 
 					projectileEmitter.shotFired = true;

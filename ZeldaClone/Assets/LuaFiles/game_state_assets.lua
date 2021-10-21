@@ -32,6 +32,7 @@ Assets =
 	{type = "soundFX", id = "enemy_hit", 		file =   "./Assets/sounds/Enemy_Hit.wav"}, 
 	{type = "soundFX", id = "enemy_die", 		file =   "./Assets/sounds/Enemy_Die.wav"}, 
 	{type = "soundFX", id = "fanfare", 			file =   "./Assets/sounds/Fanfare.wav"}, 
+	{type = "soundFX", id = "shield", 			file =   "./Assets/sounds/Shield.wav"}, 
 	{type = "music",   id = "dungeon", 			file = "./Assets/Music/Dungeon_Theme.mp3"},
 	{type = "music",   id = "Overworld", 			file = "./Assets/Music/Overworld_Theme.mp3"},
 	

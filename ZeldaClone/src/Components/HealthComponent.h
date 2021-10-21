@@ -8,7 +8,7 @@ struct HealthComponent
 	bool isHurt;
 	Timer hurtTimer;
 	Timer lowHeathTimer;
-	
+	Timer deathTimer;
 	
 	HealthComponent(int healthPercentage = 9, int maxHearts = 3, bool isHurt = false)
 	{

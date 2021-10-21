@@ -1602,7 +1602,7 @@
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />
     <None Include="Assets\LuaFiles\new_player_create.lua" />
     <None Include="Assets\LuaFiles\menu_state_load.lua" />
-    <None Include="Assets\Levels\sword_dungeon.lua" />
+    <None Include="Assets\Levels\sword_cave.lua" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Backgrounds\hearts_rupees.png">

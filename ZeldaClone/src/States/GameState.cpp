@@ -115,7 +115,8 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	
 	Registry::Instance()->GetSystem<AISystem>().Update();
-	
+	auto player = Registry::Instance()->GetEntityByTag("player");
+	Game::Instance()->GetPlayerStateMachine().Update(player);
 	ConvertHUDNumbers();
 }
 
@@ -171,7 +172,7 @@ bool GameState::OnEnter()
 			if (Game::Instance()->GetPlayerNum() == 1)
 			{
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save1");
-				Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
+				//Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
 			}
 			else if (Game::Instance()->GetPlayerNum() == 2)
 			{

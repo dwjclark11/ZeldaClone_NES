@@ -6,7 +6,7 @@
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/AIComponent.h"
-#include "../States/GameOverState.h" // Change this to the game singleton
+#include "../States/GameOverState.h" 
 
 Timer timer;
 
@@ -214,10 +214,10 @@ void PlayerDeathState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	// TODO: Start Death timer to run the death animation! 
 	
-	auto& ai = entity.GetComponent<AIComponent>();
+	auto& health = entity.GetComponent <HealthComponent> ();
 	auto& animation = entity.GetComponent<AnimationComponent>();
 		
-	ai.deathTimer.Start();
+	health.deathTimer.Start();
 	Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_die", 0, -1);
 	animation.frameOffset = 0; 
 	animation.numFrames = 4; 
@@ -226,23 +226,17 @@ void PlayerDeathState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 }
 void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
-	// TODO: Play Death animation and Kill the Entity/enemy
-	
-	auto& ai = entity.GetComponent<AIComponent>();
+	auto& health = entity.GetComponent <HealthComponent>();
 	Game::Instance()->GetPlayerDead() = true;
 
-	if (ai.deathTimer.GetTicks() > 3000)
+	if (health.deathTimer.GetTicks() > 3000)
 	{
-		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
-		
 		Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
 		Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
-		//firstEntered = false;
 		Game::Instance()->GetStateMachine()->PopState();
 		Game::Instance()->GetStateMachine()->PushState(new GameOverState());
-		//entity.Kill();
+		entity.Kill();
 	}
-	
 }
 
 void PlayerDeathState::OnExit(PlayerStateMachine* pOwner, Entity& entity)

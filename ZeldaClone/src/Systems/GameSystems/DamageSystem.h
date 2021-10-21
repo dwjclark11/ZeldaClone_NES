@@ -35,9 +35,9 @@ public:
 		Entity b = event.b;
 
 		// Enemy projectile hits the player
-		if (a.BelongsToGroup("projectile") && b.HasTag("player")) 
+		if (a.BelongsToGroup("projectile") && (b.HasTag("player") || b.HasTag("the_shield")))
 			OnPlayerHitsProjectile(a, b);
-		if (b.BelongsToGroup("projectile") && a.HasTag("player")) 
+		if (b.BelongsToGroup("projectile") && (a.HasTag("player") || a.HasTag("the_shield")))
 			OnPlayerHitsProjectile(b, a);
 
 		// Player/Enemy run into each other
@@ -67,11 +67,13 @@ public:
 		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>() && !playerHealth.isHurt)
 		{
 			auto& playerTransform = player.GetComponent<TransformComponent>();
-			const auto& project = projectile.GetComponent<ProjectileEmitterComponent>();
+			auto& projectileRigid = projectile.GetComponent<RigidBodyComponent>();
+			auto& project = projectile.GetComponent<ProjectileComponent>();
 
+			// If the projectile hits the player, inflict damage
 			if (projectile.BelongsToGroup("projectile") && player.HasTag("player") && !project.isFriendly)
 			{
-				playerHealth.healthPercentage -= 1;
+				playerHealth.healthPercentage -= project.hitPercentDamage; // This will need to change based on the enemy attack power!
 				playerTransform.position.x += 5; 
 				playerTransform.position.y += 5; 
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_hurt", 0, 2);
@@ -79,6 +81,35 @@ public:
 				
 				// Remove the projectile
 				projectile.Kill();
+			}
+			// Have the projectile bounce off the shield and not hurt the player
+			else if (projectile.BelongsToGroup("projectile") && player.HasTag("the_shield") && !project.isFriendly)
+			{
+				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "shield", 0, 6);
+				
+				if (projectileRigid.velocity.y < 0)
+				{
+					projectileRigid.velocity.y = 100;
+					projectileRigid.velocity.x = (rand() % 2 - 1) * 50;
+				}
+				else if (projectileRigid.velocity.y > 0)
+				{
+					projectileRigid.velocity.y = -100;
+					projectileRigid.velocity.x = (rand() % 2 - 1) * 50;
+				}
+				else if (projectileRigid.velocity.x > 0)
+				{
+					projectileRigid.velocity.x = -100;
+					projectileRigid.velocity.y = (rand() % 2 - 1) * 50;
+				}
+				else if (projectileRigid.velocity.x < 0)
+				{
+					projectileRigid.velocity.x = 100;
+					projectileRigid.velocity.y = (rand() % 2 - 1) * 50;
+				}
+
+				// Start the projectile death
+				project.startTime = project.duration;
 			}
 		}
 	}
