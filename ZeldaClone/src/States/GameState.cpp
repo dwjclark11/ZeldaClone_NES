@@ -131,6 +131,7 @@ void GameState::Render()
 	Game::Instance()->GetSystem<RenderSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	
 	// Render all HUD objects
+	//SDL_SetRenderDrawBlendMode(Game::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 0, 0, 0, 255);
 	SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRect);
 	SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRect);
@@ -154,7 +155,15 @@ bool GameState::OnEnter()
 	if (!firstEntered)
 	{
 		LevelLoader loader;
-
+		
+		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
+		if (Game::Instance()->GetCamera().x != 7168 && Game::Instance()->GetCamera().x != 4416)
+		{
+			Game::Instance()->GetCamera().x = 7168;
+			Game::Instance()->GetCamera().y = 4416;
+		}
+		
+		
 		// Open the lua libraries into the game
 		Game::Instance()->GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 		Game::isDebug = false;
@@ -172,7 +181,7 @@ bool GameState::OnEnter()
 			if (Game::Instance()->GetPlayerNum() == 1)
 			{
 				loader.LoadPlayerDataFromLuaTable(Game::Instance()->GetLuaState(), "save1");
-				//Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
+				Registry::Instance()->GetEntityByTag("player").AddComponent<AIComponent>();
 			}
 			else if (Game::Instance()->GetPlayerNum() == 2)
 			{
