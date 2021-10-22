@@ -118,7 +118,7 @@ struct RenderSystem : public System
 
 			if (!entity.HasTag("player") && !entity.BelongsToGroup("enemies"))
 			{
-				entity.Kill();
+				Registry::Instance()->RemoveEntityFromSystems(*i);
 			}
 		}
 	}

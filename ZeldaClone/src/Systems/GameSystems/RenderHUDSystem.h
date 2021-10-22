@@ -32,6 +32,11 @@ struct RenderHUDSystem : public System
 		// Loop all entities that the system is interested in
 		for (auto entity : GetSystemEntities())
 		{
+			if (!Game::Instance()->GetGameItems().woodSword && entity.HasTag("hudSword"))
+			{
+				continue;
+			}
+
 			if (entity.BelongsToGroup("hud"))
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
@@ -152,9 +157,17 @@ struct RenderHUDSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		/*for (auto entity : GetSystemEntities())
 		{
 			 entity.Kill();
+		}*/
+		auto entities = GetSystemEntities();
+
+		for (auto i = entities.begin(); i != entities.end() - 1; i++)
+		{
+			Entity entity = *i;
+
+			Registry::Instance()->RemoveEntityFromSystems(*i);
 		}
 	}
 };

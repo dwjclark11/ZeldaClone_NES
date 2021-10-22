@@ -63,12 +63,22 @@ struct RenderPauseSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		//for (auto entity : GetSystemEntities())
+		//{
+		//	/*if (!entity.HasTag("selectedItem"))
+		//	{*/
+		//		entity.Kill();
+		//	//}	
+		//}
+
+		auto entities = GetSystemEntities();
+
+		for (auto i = entities.begin(); i != entities.end() - 1; i++)
 		{
-			/*if (!entity.HasTag("selectedItem"))
-			{*/
-				entity.Kill();
-			//}	
+			Entity entity = *i;
+
+			Registry::Instance()->RemoveEntityFromSystems(*i);
 		}
+
 	}
 };

@@ -14,6 +14,7 @@
 #include "../Components/ScriptComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/CameraFollowComponent.h"
+#include "../Components/ItemComponent.h"
 #include "../States/NameState.h"
 #include "../States/MenuState.h"
 #include "../States/GameState.h"
@@ -1730,7 +1731,33 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 		i++;
 	}
 }
-
+SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
+{
+	if (special == "none")
+		return SpecialItemType::NOT_SPECIAL;
+	else if (special == "wood_sword")
+		return SpecialItemType::WOOD_SWORD;
+	else if (special == "steel_sword")
+		return SpecialItemType::STEEL_SWORD;
+	else if (special == "magic_sword")
+		return SpecialItemType::MAGIC_SWORD;
+	else if (special == "full_heart")
+		return SpecialItemType::FULL_HEART;
+	else if (special == "raft")
+		return SpecialItemType::RAFT;
+	else if (special == "power_braclet")
+		return SpecialItemType::POWER_BRACLET;
+	else if (special == "red_candle")
+		return SpecialItemType::RED_CANDLE;
+	else if (special == "wood_boomerang")
+		return SpecialItemType::WOOD_BOOMERANG;
+	else if (special == "magic_boomerang")
+		return SpecialItemType::MAGIC_BOOMERANG;
+	else if (special == "ladder")
+		return SpecialItemType::LADDER;
+	else
+		return SpecialItemType::NOT_SPECIAL;
+}
 
 void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename)
 {
@@ -1828,12 +1855,55 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					);
 			}
 
+			// Box Collider width, height, glm::vec2 offset 
+			sol::optional<sol::table> box_collider = lvlData["components"]["box_collider"];
+			if (box_collider != sol::nullopt)
+			{
+				int val = lvlData["components"]["box_collider"]["offset"]["x"].get_or(0);
+				Logger::Err("Box_OFFSET: " + std::to_string(val));
+				newLvlObject.AddComponent<BoxColliderComponent>(
+					lvlData["components"]["box_collider"]["width"].get_or(16),
+					lvlData["components"]["box_collider"]["height"].get_or(16),
+					glm::vec2(
+						lvlData["components"]["box_collider"]["offset"]["x"].get_or(0),
+						lvlData["components"]["box_collider"]["offset"]["y"].get_or(0)
+					));
+			}
+
+			// Trigger Component
+			sol::optional<sol::table> trigger_comp = lvlData["components"]["trigger"];
+			if (trigger_comp != sol::nullopt)
+			{
+				Logger::Err("Has trigger Component");
+				auto type = ConvertToTriggerType(lvlData["components"]["trigger"]["trigger_type"].get_or(0));
+
+				newLvlObject.AddComponent<TriggerBoxComponent>(type);
+					
+			}
+
+			// Item Type Component
+			sol::optional<sol::table> item_comp = lvlData["components"]["item"];
+			if (item_comp != sol::nullopt)
+			{
+				std::string that = lvlData["components"]["item"]["special"];
+				auto type = ItemCollectType::DEFAULT;
+				auto special = ConvertLuaStringToSpecial(that);
+				Logger::Err("Special Num: " + that);
+				Logger::Err("Special Num: " + std::to_string(special));
+
+				newLvlObject.AddComponent<ItemComponent>(type, special);
+			}
+
+
 			newLvlObject.AddComponent<GameComponent>();
 		}
 		i++;
 	}
 	return;
 }
+
+
+
 
 // This is a letter parser to deal with the SDL_Text issues
 void LevelLoader::ConvertName(std::string name, int x, int y)

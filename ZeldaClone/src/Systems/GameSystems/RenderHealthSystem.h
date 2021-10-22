@@ -138,15 +138,6 @@ public:
 					health.healthPercentage = health.maxHearts * 2;
 				}
 
-				//if (entity.HasTag("player"))
-				//{
-				//	if (health.healthPercentage <= 0)
-				//	{
-				//		entity.Kill();
-				//		GameState::playerDead = true;
-				//	}
-				//}
-
 				const SDL_Rect srcRect = {
 					transform.position.x + collider.offset.x - camera.x,
 					transform.position.y + collider.offset.y - camera.y,

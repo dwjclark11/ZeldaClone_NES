@@ -52,9 +52,18 @@ struct RenderMainMenuSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		//for (auto entity : GetSystemEntities())
+		//{
+		//	entity.Kill();
+		//}
+
+		auto entities = GetSystemEntities();
+
+		for (auto i = entities.begin(); i != entities.end() - 1; i++)
 		{
-			entity.Kill();
+			Entity entity = *i;
+
+			Registry::Instance()->RemoveEntityFromSystems(*i);
 		}
 	}
 };

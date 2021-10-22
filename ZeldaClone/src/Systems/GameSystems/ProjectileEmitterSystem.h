@@ -435,24 +435,27 @@ public:
 		}
 		else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
 		{
-			UseSword();
-			// If the player life is full, allow sword beam projectile
-			if (fullLife)
+			if (Game::Instance()->GetGameItems().woodSword)
 			{
-				// Create Sword beam projectile
-				ItemAttrib beam("beam", "Sword", 32, 32, 0, 0, 4, glm::vec2(4, 4), glm::vec2(0, 45), glm::vec2(0, 25), glm::vec2(15, 20), glm::vec2(65, 20),
-					glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(56, 30), glm::vec2(56, 40), glm::vec2(30, 60), glm::vec2(10, 60), 1000, true, true);
+				UseSword();
+				// If the player life is full, allow sword beam projectile
+				if (fullLife)
+				{
+					// Create Sword beam projectile
+					ItemAttrib beam("beam", "Sword", 32, 32, 0, 0, 4, glm::vec2(4, 4), glm::vec2(0, 45), glm::vec2(0, 25), glm::vec2(15, 20), glm::vec2(65, 20), glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(56, 30), 
+						glm::vec2(56, 40), glm::vec2(30, 60), glm::vec2(10, 60), 1000, true, true);
 
-				UseItem(beam);
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_shoot", 0, 1);
+					UseItem(beam);
+					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_shoot", 0, 1);
+				}
+				else
+				{
+					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_slash", 0, 1);
+				}
+
+				swordTimer.Start();
+				KeyboardControlSystem::keyDown = true;
 			}
-			else
-			{
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_slash", 0, 1);
-			}
-			
-			swordTimer.Start();
-			KeyboardControlSystem::keyDown = true;
 		}
 	}
 	

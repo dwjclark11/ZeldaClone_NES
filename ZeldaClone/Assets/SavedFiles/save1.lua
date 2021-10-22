@@ -16,7 +16,7 @@ player_data = {
     },
     items = {
       boomerang = true,
-      sword = false,
+      wood_sword = false,
       magic_rod = false,
       bombs = false,
       food = false,

@@ -101,11 +101,19 @@ struct RenderTileSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		//for (auto entity : GetSystemEntities())
+		//{
+		//	 entity.Kill();
+		//	 if (entity.BelongsToGroup("map"))
+		//		Logger::Err("Deleted map" + std::to_string(entity.GetID()));
+		//}
+		auto entities = GetSystemEntities();
+
+		for (auto i = entities.begin(); i != entities.end() - 1; i++)
 		{
-			 entity.Kill();
-			 if (entity.BelongsToGroup("map"))
-				Logger::Err("Deleted map" + std::to_string(entity.GetID()));
+			Entity entity = *i;
+
+			Registry::Instance()->RemoveEntityFromSystems(*i);
 		}
 	}
 };

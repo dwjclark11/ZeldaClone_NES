@@ -27,8 +27,8 @@ public:
 		
 		for (auto entity : GetSystemEntities())
 		{
-			auto transform = entity.GetComponent<BackgroundImageComponent>();
-			auto sprite = entity.GetComponent<SpriteComponent>();
+			const auto& transform = entity.GetComponent<BackgroundImageComponent>();
+			const auto& sprite = entity.GetComponent<SpriteComponent>();
 			auto& animation = entity.GetComponent<AnimationComponent>();
 			// Set the src Rect of our original sprite texture
 	

@@ -10,6 +10,38 @@
 
 Timer timer;
 
+void SetSpecialItem(SpecialItemType special)
+{
+	switch (special)
+	{
+	case NOT_SPECIAL:
+		break;
+	case WOOD_SWORD:
+		Game::Instance()->GetGameItems().woodSword = true;
+		break;
+	case STEEL_SWORD:
+		break;
+	case MAGIC_SWORD:
+		break;
+	case FULL_HEART:
+		break;
+	case RAFT:
+		break;
+	case POWER_BRACLET:
+		break;
+	case RED_CANDLE:
+		break;
+	case WOOD_BOOMERANG:
+		break;
+	case MAGIC_BOOMERANG:
+		break;
+	case LADDER:
+		break;
+	default:
+		break;
+	}
+}
+
 // Player Idle State definitions
 void IdleState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
@@ -139,8 +171,14 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	// Set the Triggered Item to the player position - the height of the player
 	if (trigItem && !movedTrigItem)
 	{
+		auto& special = trigItem->GetComponent<ItemComponent>();
+		
+		SetSpecialItem(special.special);
+
+
 		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x + 30;
 		trigItem->GetComponent<TransformComponent>().position.y = playerTransform.position.y - 30;
+
 		movedTrigItem = true;
 	}
 	

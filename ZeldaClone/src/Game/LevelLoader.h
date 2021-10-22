@@ -2,9 +2,11 @@
 #include "../ECS/ECS.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/ItemComponent.h"
 #include <SDL.h>
 #include <memory>
 #include <sol/sol.hpp>
+
 
 enum AssetType
 {
@@ -25,6 +27,8 @@ public:
 	void LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager,  const std::string& fileName);
 	void LoadHud(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	AssetType ConvertToAssetType(std::string& type);
+
+	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
 
 	void LoadMenuScreen(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, unsigned int& slotNum);
 
