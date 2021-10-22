@@ -49,7 +49,7 @@ public:
 	void LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager);
 	void LoadHUDFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadAssetsFromLuaTable(sol::state& lua, std::string fileName);
-
+	void LoadEntitiesFromLuaTable(sol::state& lua, std::string filename);
 
 	// Helper Functions
 	void ConvertName(std::string name, int x, int y);

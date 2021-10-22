@@ -26,13 +26,16 @@ struct TriggerBoxComponent
 	std::string colliderFile;
 	std::string tileMapName;
 	std::string tileImageName;
+	std::string entityFileName;
+
+
 	int imageHeight;
 	int imageWidth;
 	bool active;
 
 	TriggerBoxComponent(TriggerType trigger = NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0), 
 		std::string levelMusic = "", std::string assetFile = "", std::string enemyFile = "", std::string colliderFile = "", 
-		std::string tileMapName = "", std::string tileImageName = "", int imageWidth = 0, int imageHeight = 0, bool active = false)
+		std::string tileMapName = "", std::string tileImageName = "", std::string entityFileName = "no_file", int imageWidth = 0, int imageHeight = 0, bool active = false)
 	{
 		this->triggerType = trigger;
 		this->transportOffset = offset;
@@ -43,6 +46,7 @@ struct TriggerBoxComponent
 		this->colliderFile = colliderFile;
 		this->tileMapName = tileMapName;
 		this->tileImageName = tileImageName;
+		this->entityFileName = entityFileName;
 		this->imageHeight = imageHeight;
 		this->imageWidth = imageWidth;
 		this->active = active;

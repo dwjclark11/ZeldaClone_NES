@@ -83,13 +83,16 @@ void GameState::Update(const double& deltaTime)
 	
 	Registry::Instance()->GetSystem<CollectItemSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	
 	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
 	// Update the registry values
 	Registry::Instance()->Update();
 	
 	// Update all Game systems
-	
+	auto player = Registry::Instance()->GetEntityByTag("player");
+	Game::Instance()->GetPlayerStateMachine().Update(player);
+	Registry::Instance()->GetSystem<AISystem>().Update();
 	Registry::Instance()->GetSystem<AnimationSystem>().Update();
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().UpdateGamePad();
@@ -112,11 +115,10 @@ void GameState::Update(const double& deltaTime)
 	//	Game::Instance()->GetStateMachine()->PushState(new GameOverState());
 	//}
 
-	Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
+	//Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	
-	Registry::Instance()->GetSystem<AISystem>().Update();
-	auto player = Registry::Instance()->GetEntityByTag("player");
-	Game::Instance()->GetPlayerStateMachine().Update(player);
+	
+	
 	ConvertHUDNumbers();
 }
 

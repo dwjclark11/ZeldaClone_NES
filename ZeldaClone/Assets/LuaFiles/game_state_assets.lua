@@ -11,6 +11,7 @@ Assets =
 	{type = "texture", id = "hud_words", 		file =  "./Assets/HUDSprites/HUD_words.png"}, 
 	{type = "texture", id = "world_location", 	file =  "./Assets/HUDSprites/world_location.png"}, 
 	{type = "texture", id = "locator", 			file =  "./Assets/HUDSprites/location.png"}, 
+	{type = "texture", id = "npcs", 			file =  "./Assets/NPCSprites/npcs.png"}, 
 	{type = "texture", id = "enemies", 			file =  "./Assets/EnemySprites/sprites_enemies.png"}, 
 	{type = "texture", id = "octorok", 			file =  "./Assets/EnemySprites/octorok.png"}, 
 	{type = "texture", id = "moblin", 			file =  "./Assets/EnemySprites/moblin.png"}, 

@@ -67,6 +67,7 @@ public:
 		std::string assetFile = trig.assetFile;
 		std::string mapFile = "Assets/Tilemaps/Maps/" + trig.tileMapName + ".map";
 		std::string tileFile = "Assets/Tilemaps/Tiles/" + trig.tileImageName + ".png";
+		std::string entityFile = trig.entityFileName;
 
 		switch (trig.triggerType)
 		{
@@ -75,12 +76,13 @@ public:
 
 		case SECRET_AREA:
 			// Play stairs sound
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
-
+			Game::Instance()->GetSystem<RenderSystem>().OnExit();
 			// Remove all the prior assets/entities from the current scene
 			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
-			Game::Instance()->GetSystem<RenderSystem>().OnExit();
 			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
+			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+
+
 
 			// Adjust the player position to the trigger transport position
 			transform.position.x = trig.transportOffset.x;
@@ -103,6 +105,7 @@ public:
 				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), trig.colliderFile);
 				Logger::Log("Load Collider File");
 			}
+
 			if (trig.enemyFile != "no_file")
 			{
 				loader.LoadEnemiesFromLuaTable(Game::Instance()->GetLuaState(), trig.enemyFile, Game::Instance()->GetAssetManager());
@@ -120,6 +123,12 @@ public:
 				Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), trig.levelMusic, -1);
 			else
 				Game::Instance()->GetSystem<MusicPlayerSystem>().StopMusic();
+
+			if (entityFile != "no_file")
+			{
+				loader.LoadEntitiesFromLuaTable(Game::Instance()->GetLuaState(), entityFile);
+				Logger::Log("Load Entity File");
+			}
 
 			break;
 

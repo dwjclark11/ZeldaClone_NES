@@ -710,6 +710,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		std::string triggerColliderFile = "";
 		std::string triggerTilemapFile = "";
 		std::string triggerTilemapImage = "";
+		std::string triggerEntityFile = "";
 		int triggerImageHeight = 0;
 		int triggerImageWidth = 0;
 		TriggerType triggerType = NO_TRIGGER;
@@ -719,7 +720,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
 		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> 
 			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >> 
-			triggerColliderFile >> triggerTilemapFile >> triggerTilemapImage >> triggerImageHeight >> triggerImageWidth;
+			triggerColliderFile >> triggerTilemapFile >> triggerTilemapImage  >> triggerEntityFile >> triggerImageHeight >> triggerImageWidth;
 
 
 		triggerType = ConvertToTriggerType(type);
@@ -741,7 +742,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		{
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y), 
-				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerImageHeight, triggerImageWidth);
+				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerEntityFile,triggerImageHeight, triggerImageWidth);
 			boxCollider.AddComponent<GameComponent>();
 		}
 	}
@@ -1541,20 +1542,22 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 					);
 			}
 
-			// Script Component
-			sol::optional<sol::table> script = entity["components"]["on_update_script"];
-			if (script != sol::nullopt)
-			{
-				//Logger::Log("HERE");
-				sol::function func = entity["components"]["on_update_script"][0];
-				newEntity.AddComponent<ScriptComponent>(func);
-			}
-			newEntity.AddComponent<GameComponent>();
+			//// Script Component
+			//sol::optional<sol::table> script = entity["components"]["on_update_script"];
+			//if (script != sol::nullopt)
+			//{
+			//	//Logger::Log("HERE");
+			//	sol::function func = entity["components"]["on_update_script"][0];
+			//	newEntity.AddComponent<ScriptComponent>(func);
+			//}
+			
 			newEntity.AddComponent<AIComponent>();
 			newEntity.AddComponent<ProjectileEmitterComponent>();
+			newEntity.AddComponent<GameComponent>();
 		}
 		i++;
 	}
+	return;
 }
 
 void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
@@ -1726,9 +1729,110 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 
 		i++;
 	}
-		
+}
 
 
+void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename)
+{
+	sol::load_result script = lua.load_file("./Assets/Levels/" + filename + ".lua");
+
+	// This checks the syntax of our script, but it does not execute the script
+	if (!script.valid())
+	{
+		sol::error err = script;
+		std::string errorMessage = err.what();
+
+		Logger::Err("Error loading the Lua Script: " + errorMessage);
+		return;
+	}
+
+	// Executes the script using the sol State
+	lua.script_file("./Assets/Levels/" + filename + ".lua");
+
+	sol::table data = lua["level"];
+
+	int i = 1;
+
+	while (true)
+	{
+		sol::optional<sol::table> hasData = data[i];
+		if (hasData == sol::nullopt)
+		{
+			Logger::Err("No Level Data");
+			break;
+		}
+
+		sol::table lvlData = data[i];
+
+		Entity newLvlObject = Registry::Instance()->CreateEntity();
+
+		// Add tag if there is one
+		sol::optional<std::string> tag = lvlData["tag"];
+		if (tag != sol::nullopt)
+		{
+			newLvlObject.Tag(lvlData["tag"]);
+		}
+
+		// Add Group if there is one
+		sol::optional<std::string> group = lvlData["group"];
+		if (group != sol::nullopt)
+		{
+			newLvlObject.Group(lvlData["group"]);
+		}
+
+		// Add Object/Entity Components
+		sol::optional<sol::table> hasComponents = lvlData["components"];
+		if (hasComponents != sol::nullopt)
+		{
+			// Transform Component
+			sol::optional<sol::table> transform = lvlData["components"]["transform"];
+			if (transform != sol::nullopt)
+			{
+				newLvlObject.AddComponent<TransformComponent>(
+					glm::vec2(
+						lvlData["components"]["transform"]["position"]["x"].get_or(0),
+						lvlData["components"]["transform"]["position"]["y"].get_or(0)
+					),
+					glm::vec2(
+						lvlData["components"]["transform"]["scale"]["x"].get_or(1.0),
+						lvlData["components"]["transform"]["scale"]["y"].get_or(1.0)
+					),
+					lvlData["components"]["transform"]["rotation"].get_or(0.0));
+			}
+
+			// Add Sprite Component
+			sol::optional<sol::table> sprite = lvlData["components"]["sprite"];
+			if (sprite != sol::nullopt)
+			{
+				newLvlObject.AddComponent<SpriteComponent>(
+					lvlData["components"]["sprite"]["assetID"],
+					lvlData["components"]["sprite"]["width"],
+					lvlData["components"]["sprite"]["height"],
+					lvlData["components"]["sprite"]["layer"],
+					lvlData["components"]["sprite"]["fixed"],
+					lvlData["components"]["sprite"]["src_rect_x"].get_or(0),
+					lvlData["components"]["sprite"]["src_rect_y"].get_or(0)
+					);
+			}
+
+			// Add Animation Component
+			sol::optional<sol::table> animation = lvlData["components"]["animation"];
+			if (animation != sol::nullopt)
+			{
+				newLvlObject.AddComponent<AnimationComponent>(
+					lvlData["components"]["animation"]["num_frames"].get_or(1),
+					lvlData["components"]["animation"]["frame_rate"].get_or(1),
+					lvlData["components"]["animation"]["vertical"].get_or(false),
+					lvlData["components"]["animation"]["looped"].get_or(false),
+					lvlData["components"]["animation"]["frame_offset"].get_or(0)
+					);
+			}
+
+			newLvlObject.AddComponent<GameComponent>();
+		}
+		i++;
+	}
+	return;
 }
 
 // This is a letter parser to deal with the SDL_Text issues

@@ -15,7 +15,7 @@ public:
 
 	AIComponent(glm::vec2 enemyPos = glm::vec2(0, 0));
 
-	EnemyStateMachine* GetEnemyStateMachine() { return esm; }
+	EnemyStateMachine& GetEnemyStateMachine() { return *esm; }
 	void GarbageCollect() { delete esm; }
 	glm::vec2& GetEnemyPos() { return enemyPos; }
 };

@@ -3,6 +3,7 @@
 #include "../../Components/TransformComponent.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/GameComponent.h"
+#include "../../Components/AIComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../ECS/ECS.h"
 #include <SDL.h>
@@ -104,12 +105,21 @@ struct RenderSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		auto entities = GetSystemEntities();
+		for (auto i = entities.begin(); i != entities.end() - 1; i++)
 		{
-			if (!entity.HasTag("player"))
+			Entity entity = *i;
+
+			if (entity.HasComponent<AIComponent>())
+				entity.GetComponent<AIComponent>().GarbageCollect();
+
+			if (entity.BelongsToGroup("enemies"))
+				Registry::Instance()->RemoveEntityFromSystems(*i);
+
+			if (!entity.HasTag("player") && !entity.BelongsToGroup("enemies"))
+			{
 				entity.Kill();
-			 
-			Logger::Err("Deleted: " + std::to_string(entity.GetID()));
+			}
 		}
 	}
 };

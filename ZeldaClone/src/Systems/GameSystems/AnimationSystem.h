@@ -32,7 +32,7 @@ public:
 			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000) % animation.numFrames;
 			
 			// If the animation is a vertical scroll use this
-			if (animation.vertical)
+			if (animation.vertical && (entity.HasTag("player") || entity.BelongsToGroup("enemies")))
 			{
 				if (rigidbody.velocity != glm::vec2(0))
 				{
@@ -41,8 +41,13 @@ public:
 				else if (health.isHurt) // If the enemy is hurt use this frame
 					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 			}
+			else if (animation.vertical && !(entity.HasTag("player") || entity.BelongsToGroup("enemies")))
+			{
+				sprite.srcRect.y = animation.currentFrame * sprite.height;
+			}
+
 			// If the animation is a horizontal scroll
-			else
+			if (!animation.vertical)
 			{
 				sprite.srcRect.x = (animation.currentFrame * sprite.width) + animation.frameOffset;
 			}
