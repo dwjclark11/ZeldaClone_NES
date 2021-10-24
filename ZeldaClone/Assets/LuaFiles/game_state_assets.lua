@@ -17,6 +17,7 @@ Assets =
 	{type = "texture", id = "moblin", 			file =  "./Assets/EnemySprites/moblin.png"}, 
 	{type = "texture", id = "darknut", 			file =  "./Assets/EnemySprites/darknut.png"}, 
 	{type = "texture", id = "numbers", 			file =  "./Assets/Fonts/numbers.png"}, 
+	{type = "texture", id = "full_heart", 		file =  "./Assets/ItemSprites/full_heart.png"}, 
 	{type = "soundFX", id = "magic_rod", 		file =  "./Assets/sounds/MagicalRod.wav"}, 
 	{type = "soundFX", id = "boomerang_arrow", 	file = "./Assets/sounds/Arrow_Boomerang.wav"}, 
 	{type = "soundFX", id = "candle", 			file =  "./Assets/sounds/Candle.wav"}, 

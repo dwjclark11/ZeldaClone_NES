@@ -54,3 +54,15 @@ public:
 	void OnExit(EnemyStateMachine* pOwner, Entity& entity) override;
 	void Execute(EnemyStateMachine* pOwner, Entity& entity) override;
 };
+
+class EnemyStunnedState : public TState<class EnemyStateMachine>
+{
+private:
+	// Add private variables as needed
+
+public:
+	virtual ~EnemyStunnedState() {};
+	void OnEnter(EnemyStateMachine* pOwner, Entity& entity) override;
+	void OnExit(EnemyStateMachine* pOwner, Entity& entity) override;
+	void Execute(EnemyStateMachine* pOwner, Entity& entity) override;
+};

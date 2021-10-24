@@ -36,6 +36,14 @@ public:
 				const auto& collider = entity.GetComponent<BoxColliderComponent>();
 				auto& health = entity.GetComponent<HealthComponent>();
 
+				if (health.addHeart)
+				{
+
+					loadedHearts += 1;
+					Logger::Log("Loader Hearts " + std::to_string(loadedHearts));
+					health.addHeart = false;
+				}
+
 				if (loadedHearts > 3)
 				{
 					numHearts++;

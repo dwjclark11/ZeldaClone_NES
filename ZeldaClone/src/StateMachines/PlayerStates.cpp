@@ -10,32 +10,49 @@
 
 Timer timer;
 
-void SetSpecialItem(SpecialItemType special)
+void SetSpecialItem(SpecialItemType special, Entity& player)
 {
+	auto& health = player.GetComponent<HealthComponent>();
+	
 	switch (special)
 	{
 	case NOT_SPECIAL:
 		break;
+
 	case WOOD_SWORD:
 		Game::Instance()->GetGameItems().woodSword = true;
 		break;
+
 	case STEEL_SWORD:
+		Game::Instance()->GetGameItems().steelSword = true;
 		break;
+
 	case MAGIC_SWORD:
+		Game::Instance()->GetGameItems().magicSword = true;
 		break;
+
 	case FULL_HEART:
+	{
+		health.addHeart = true;
 		break;
+	}
 	case RAFT:
+		Game::Instance()->GetGameItems().raft = true;
 		break;
 	case POWER_BRACLET:
+		Game::Instance()->GetGameItems().powerBraclet = true;
 		break;
 	case RED_CANDLE:
+		Game::Instance()->GetGameItems().candle = true;
 		break;
 	case WOOD_BOOMERANG:
+		Game::Instance()->GetGameItems().woodBoomerang = true;
 		break;
 	case MAGIC_BOOMERANG:
+		Game::Instance()->GetGameItems().magicBoomerang = true;
 		break;
 	case LADDER:
+		Game::Instance()->GetGameItems().ladder = true;
 		break;
 	default:
 		break;
@@ -173,7 +190,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	{
 		auto& special = trigItem->GetComponent<ItemComponent>();
 		
-		SetSpecialItem(special.special);
+		SetSpecialItem(special.special, entity);
 
 
 		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x + 30;

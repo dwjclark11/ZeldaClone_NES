@@ -435,7 +435,8 @@ public:
 		}
 		else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
 		{
-			if (Game::Instance()->GetGameItems().woodSword)
+			// Do not use the sword if we do not have a sword
+			if (Game::Instance()->GetGameItems().woodSword) 
 			{
 				UseSword();
 				// If the player life is full, allow sword beam projectile

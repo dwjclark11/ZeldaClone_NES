@@ -179,76 +179,6 @@ void LevelLoader::LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetM
 	}
 }
 
-void LevelLoader::LoadHud(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
-{
-	// Open and read the text file
-	std::fstream hudBox;
-	if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
-	{
-		hudBox.open("./Assets/LevelAssets/hudBox.txt");
-	}
-	else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE")
-	{
-		hudBox.open("./Assets/LevelAssets/hudBoxPause.txt");
-	}
-	
-	if (!hudBox.is_open())
-	{
-		Logger::Err("Unable to open file");
-	}
-
-	while (!hudBox.eof())
-	{
-		// Mapfile variables
-		int srcRectX = 0;
-		int srcRectY = 0;
-		int transformX = 0;
-		int transformY = 0;
-		int tileWidth = 0;
-		int tileHeight = 0;
-		int tileScaleX = 0;
-		int tileScaleY = 0;
-		int zIndex = 0;
-		size_t numLines = 0;
-		bool vertical = false;
-		bool horizontal = false;
-		int xTransform = 0;
-		int yTransform = 0;
-		std::string group = "";
-		glm::vec2 colliderOffset = glm::vec2(0);
-		bool collider = false;
-		std::string assetID = "";
-
-		// If we are at the end of the File --> Leave the file!
-		if (hudBox.eof()) break;
-		// Start parsing the text file
-		hudBox >> group >> assetID >> tileWidth >> tileHeight >> srcRectY >> srcRectX >> zIndex >> transformX >> transformY >> tileScaleX >> tileScaleY >> vertical >> horizontal >> numLines;
-
-		for (size_t i = 0; i < numLines; i++)
-		{
-			if (i > 0 && horizontal) xTransform += 32;
-			if (i > 0 && vertical) yTransform += 32;
-
-			// Create new tile Entity for each parsed tile
-			Entity tile = Registry::Instance()->CreateEntity();
-			tile.Group(group);
-			tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, true, srcRectX, srcRectY);
-			tile.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(tileScaleX, tileScaleY), 0.0);
-
-			if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
-			{
-				tile.Group("game");
-			}
-
-			else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE")
-			{
-				tile.Group("pause");
-			}
-		}
-	} hudBox.close();
-
-	std::fstream hudHearts;
-}
 
 AssetType LevelLoader::ConvertToAssetType(std::string& type)
 {
@@ -579,18 +509,6 @@ void LevelLoader::LoadPauseScreen( std::unique_ptr<AssetManager>& assetManager, 
 
 std::string LevelLoader::LoadSlotName(unsigned int& slotNum)
 {
-	// What to load?
-	/*
-		name           --> std::string 
-		candle	       --> bool
-		sword type     --> enum SwordType{NO_SWORD, IRON_SWORD, SILVER_SWORD, ULTRA_SWORD};
-		bow		       --> bool
-		arrows	       --> unsigned int --> variable container
-		boomerang	   --> bool
-		boomerang type --> enum BoomerangType{CLOSE_RANGE = 0, LONG_RANGE};
-		tunic type     --> enum TunicType{GREEN, BLUE, RED};
-			Tunic Damage will be based on the type!
-	*/
 
 	// open slot file
 	std::fstream slotFile;

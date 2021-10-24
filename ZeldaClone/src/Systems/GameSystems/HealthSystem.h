@@ -20,7 +20,7 @@ public:
 
 	void Update()
 	{
-		auto player = Registry::Instance()->GetEntityByTag("player");
+		//auto player = Registry::Instance()->GetEntityByTag("player");
 		for (auto entity : GetSystemEntities())
 		{
 			// If the Player is Dead --> Remove the Enemies from the screen

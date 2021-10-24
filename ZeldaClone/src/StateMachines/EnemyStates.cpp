@@ -189,6 +189,10 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 			pOwner->ChangeState(pOwner->hurtState, entity);
 		else if (rigid.velocity == glm::vec2(0))
 			pOwner->ChangeState(pOwner->idleState, entity);
+
+		if (ai.GetStunned())
+			pOwner->ChangeState(pOwner->stunState, entity);
+
 	}
 }
 
@@ -206,6 +210,7 @@ void HurtState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	rigid.velocity = glm::vec2(0);
 	animation.numFrames = 3;
 	animation.frameOffset = 32;
+	animation.frameSpeedRate = 20;
 }
 void HurtState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 {
@@ -217,7 +222,11 @@ void HurtState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 	{
 		enemyHealth.isHurt = false;
 		enemyHealth.hurtTimer.Stop();
-		pOwner->ChangeState(pOwner->idleState, entity);
+
+		if (!ai.stunTimer.isStarted())
+			pOwner->ChangeState(pOwner->idleState, entity);
+		else
+			pOwner->ChangeState(pOwner->stunState, entity);
 	}
 	// If the enemy's heath is <= 0, call death state!
 	else if (enemyHealth.healthPercentage <= 0)
@@ -235,6 +244,7 @@ void HurtState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	animation.numFrames = 2;
 	animation.frameOffset = 0;
+	animation.frameSpeedRate = 10;
 	//Logger::Err("Enemy Leaving HURT state");
 }
 
@@ -273,4 +283,32 @@ void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 void EnemyDeathState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
 {
 	// Animation does not have to return to regular because the entity is destroyed!
+}
+
+
+void EnemyStunnedState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+{
+	auto& ai = entity.GetComponent<AIComponent>();
+	ai.stunTimer.Start();
+}
+
+void EnemyStunnedState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+{
+	auto& ai = entity.GetComponent<AIComponent>();
+	ai.SetStunned(false);
+}
+
+void EnemyStunnedState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+{
+	auto& enemyHealth = entity.GetComponent<HealthComponent>();
+	auto& ai = entity.GetComponent<AIComponent>();
+
+	if (ai.stunTimer.GetTicks() > 3000)
+	{
+		ai.stunTimer.Stop();
+		pOwner->ChangeState(pOwner->idleState, entity);
+	}
+
+	if (enemyHealth.isHurt)
+		pOwner->ChangeState(pOwner->hurtState, entity);
 }

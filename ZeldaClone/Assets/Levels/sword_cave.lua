@@ -111,4 +111,38 @@ level = {
 			}
 		}
 	},
+		-- TEST HEART
+	[5] ={
+		group = "trigger",	
+		components = {
+			transform = {
+				position = { x = 300, y = 332},
+				scale = { x = 4, y = 4},
+				rotation = 0.0
+			},
+			sprite = {
+				assetID = "full_heart",
+				width = 16,
+				height = 16,
+				layer = 1,
+				fixed = false,
+				src_rect_x = 0, 
+				src_rect_y = 0 
+			},
+			box_collider = {
+				width = 16,
+				height = 16,
+				offset = {x = 0, y = 0}
+			},
+			trigger = {
+				trigger_type = 5, -- Collect Item -- Need to convert to enum 
+				offset = {0, 0},
+				camera_offset = {0, 0},
+			},
+			item = {
+				item_type = "default",
+				special = "full_heart"
+			}
+		}
+	},
 }

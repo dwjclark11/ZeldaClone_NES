@@ -57,6 +57,11 @@ public:
 			OnEnemyHitsPlayerProjectile(a, b);
 		if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("beam") || a.BelongsToGroup("projectile"))) 
 			OnEnemyHitsPlayerProjectile(b, a);
+
+		if (a.BelongsToGroup("enemies") && (/*b.BelongsToGroup("beam") ||*/ b.BelongsToGroup("boomerang")))
+			OnEnemyHitsBoomerang(a, b);
+		if (b.BelongsToGroup("enemies") && (/*a.BelongsToGroup("beam") ||*/ a.BelongsToGroup("boomerang")))
+			OnEnemyHitsBoomerang(b, a);
 	}
 
 	void OnPlayerHitsProjectile(Entity projectile, Entity player)
@@ -145,21 +150,6 @@ public:
 			}
 		}
 	}
-
-	//void OnEnemyHitsEnemy(Entity enemy1, Entity enemy2)
-	//{
-	//	// Simple AI to have the enemy change direction if it collides with another enemy
-	//	if (enemy1.BelongsToGroup("enemies") && enemy2.BelongsToGroup("enemies"))
-	//	{
-	//		auto& enemy1Rigidbody = enemy1.GetComponent<RigidBodyComponent>();
-	//		auto& enemy2Rigidbody = enemy2.GetComponent<RigidBodyComponent>();
-
-	//		if ((enemy1Rigidbody.velocity.x > 0 || enemy1Rigidbody.velocity.x < 0) && enemy1Rigidbody.velocity.y == 0)
-	//			enemy1Rigidbody.velocity.x *= -1;
-	//		if ((enemy1Rigidbody.velocity.y > 0 || enemy1Rigidbody.velocity.y < 0) && enemy1Rigidbody.velocity.x == 0)
-	//			enemy2Rigidbody.velocity.y *= -1;
-	//	}
-	//}
 	
 	void OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 	{
@@ -211,6 +201,26 @@ public:
 
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_hurt", 0, 2);
 			playerHealth.isHurt = true;
+		}
+	}
+
+	void OnEnemyHitsBoomerang(Entity enemy, Entity boomerang)
+	{
+		auto& enemyRigid = enemy.GetComponent<RigidBodyComponent>();
+		auto& enemyAI = enemy.GetComponent<AIComponent>();
+
+		if (boomerang.BelongsToGroup("boomerang"))
+		{
+			enemyRigid.velocity = glm::vec2(0);
+			
+
+			if (!enemyAI.GetStunned())
+			{
+				enemyAI.SetStunned(true);
+				// Play the enemy hit sound FX
+				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "enemy_hit", 0, 2);
+			}
+			
 		}
 	}
 };
