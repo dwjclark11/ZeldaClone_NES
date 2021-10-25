@@ -242,6 +242,13 @@ public:
 				newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0,attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
 				newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration);
 				newItem.AddComponent<GameComponent>();
+
+				if (attrib.group == "boomerang")
+				{
+					Logger::Log("BOOMERANG");
+					auto& boomerTimer = newItem.GetComponent<ProjectileComponent>();
+					boomerTimer.boomTimer.Start();
+				}
 			}
 		}
 	}
@@ -496,75 +503,6 @@ public:
 		}
 	}
 	
-	//void UpdateBoomerang()
-	//{
-	//	auto entity = Registry::Instance()->GetEntitiesByGroup("boomerang");
-	//	
-	//	// Make the boomerang come back to the player and destroy it when it returns
-	//	
-	///*	if (entity.BelongsToGroup("boomerang"))
-	//	{*/
-	//		auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
-	//		//Logger::Log("Boomer Pos.y: " + std::to_string(entity.GetComponent<TransformComponent>().position.y) + "PlayerPos.y: " + std::to_string(playerPosition.y));
-	//		if (KeyboardControlSystem::dir == UP)
-	//		{
-	//			if (entity.GetComponent<TransformComponent>().position.y < (playerPosition.y - 200) && !boomerangReturned)
-	//			{
-	//				rigidbody.velocity *= -1;
-	//				boomerangReturned = true;
-	//			}
-	//			else if (entity.GetComponent<TransformComponent>().position.y >= (playerPosition.y - 64) && boomerangReturned)
-	//			{
-	//				entity.Kill();
-	//				boomerangReturned = false;
-	//				playerSet = false;
-	//			}
-	//		}
-	//		else if (KeyboardControlSystem::dir == RIGHT)
-	//		{
-	//			if (entity.GetComponent<TransformComponent>().position.x > (playerPosition.x + 200) && !boomerangReturned)
-	//			{
-	//				rigidbody.velocity *= -1;
-	//				boomerangReturned = true;
-	//			}
-	//			else if (entity.GetComponent<TransformComponent>().position.x <= (playerPosition.x + 64) && boomerangReturned)
-	//			{
-	//				entity.Kill();
-	//				boomerangReturned = false;
-	//				playerSet = false;
-	//			}
-	//		}
-	//		else if (KeyboardControlSystem::dir == DOWN)
-	//		{
-	//			if (entity.GetComponent<TransformComponent>().position.y > (playerPosition.y + 200) && !boomerangReturned)
-	//			{
-	//				rigidbody.velocity *= -1;
-	//				boomerangReturned = true;
-	//			}
-	//			else if (entity.GetComponent<TransformComponent>().position.y <= (playerPosition.y + 64) && boomerangReturned)
-	//			{
-	//				entity.Kill();
-	//				boomerangReturned = false;
-	//				playerSet = false;
-	//			}
-	//		}
-	//		else if (KeyboardControlSystem::dir == LEFT)
-	//		{
-	//			if (entity.GetComponent<TransformComponent>().position.x < (playerPosition.x - 200) && !boomerangReturned)
-	//			{
-	//				rigidbody.velocity *= -1;
-	//				boomerangReturned = true;
-	//			}
-	//			else if (entity.GetComponent<TransformComponent>().position.x >= (playerPosition.x - 64) && boomerangReturned)
-	//			{
-	//				entity.Kill();
-	//				boomerangReturned = false;
-	//				playerSet = false;
-	//			}
-	//		}
-	//	//}
-	//}
-	
 	void Update(Registry* registry)
 	{
 		//UpdateBoomerang();
@@ -573,65 +511,56 @@ public:
 			// Make the boomerang come back to the player and destroy it when it returns
 			if (entity.BelongsToGroup("boomerang"))
 			{
+				auto player = Registry::Instance()->GetEntityByTag("player");
+				auto& playerPos = player.GetComponent<TransformComponent>();
 				auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
-				//Logger::Log("Boomer Pos.y: " + std::to_string(entity.GetComponent<TransformComponent>().position.y) + "PlayerPos.y: " + std::to_string(playerPosition.y));
-				if (KeyboardControlSystem::dir == UP)
+				auto& proj = entity.GetComponent<ProjectileComponent>();
+				auto& transform = entity.GetComponent<TransformComponent>();
+
+				glm::vec2 direction = glm::normalize(playerPos.position - transform.position);
+
+				if (proj.boomTimer.GetTicks() > 300)
 				{
-					if (entity.GetComponent<TransformComponent>().position.y < (playerPosition.y - 200) && !boomerangReturned)
-					{
-						rigidbody.velocity *= -1;
-						boomerangReturned = true;
-					}
-					else if (entity.GetComponent<TransformComponent>().position.y >= (playerPosition.y - 64) && boomerangReturned)
-					{
-						entity.Kill();
-						boomerangReturned = false;
-						playerSet = false;
-					}
+					rigidbody.velocity.x = direction.x * 200;
+					rigidbody.velocity.y = direction.y * 200;
+					boomerangReturned = true;
 				}
-				else if (KeyboardControlSystem::dir == RIGHT)
+				if (boomerangReturned)
 				{
-					if (entity.GetComponent<TransformComponent>().position.x > (playerPosition.x + 200) && !boomerangReturned)
-					{
-						rigidbody.velocity *= -1;
-						boomerangReturned = true;
-					}
-					else if (entity.GetComponent<TransformComponent>().position.x <= (playerPosition.x + 64) && boomerangReturned)
+					bool setKill = false;
+					
+					// If the boomerang position is within any of these given parameters --> Kill it
+					if (rigidbody.velocity.x > 0 && rigidbody.velocity.y > 0 && 
+						transform.position.x >= playerPos.position.x - 32 && transform.position.y >= playerPos.position.y - 32)
+						setKill = true;
+					else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y > 0 && 
+						transform.position.x <= playerPos.position.x + 32 && transform.position.y >= playerPos.position.y - 32)
+						setKill = true;
+					else if (rigidbody.velocity.x > 0 && rigidbody.velocity.y < 0 &&
+						transform.position.x >= playerPos.position.x - 32 && transform.position.y <= playerPos.position.y + 32)
+						setKill = true;
+					else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y < 0 &&
+						transform.position.x <= playerPos.position.x + 32 && transform.position.y <= playerPos.position.y + 32)
+						setKill = true;
+					else if (rigidbody.velocity.x > 0 && rigidbody.velocity.y == 0 && transform.position.x >= playerPos.position.x - 32)
+						setKill = true;
+					else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y == 0 && transform.position.x <= playerPos.position.x + 32)
+						setKill = true;
+					else if (rigidbody.velocity.x == 0 && rigidbody.velocity.y > 0 && transform.position.y >= playerPos.position.y - 32)
+						setKill = true;
+					else if (rigidbody.velocity.x == 0 && rigidbody.velocity.y < 0 && transform.position.y <= playerPos.position.y + 32)
+						setKill = true;
+
+					if (setKill)
 					{
 						entity.Kill();
 						boomerangReturned = false;
 						playerSet = false;
 					}
-				}
-				else if (KeyboardControlSystem::dir == DOWN)
-				{
-					if (entity.GetComponent<TransformComponent>().position.y > (playerPosition.y + 200) && !boomerangReturned)
-					{
-						rigidbody.velocity *= -1;
-						boomerangReturned = true;
-					}
-					else if (entity.GetComponent<TransformComponent>().position.y <= (playerPosition.y + 64) && boomerangReturned)
-					{
-						entity.Kill();
-						boomerangReturned = false;
-						playerSet = false;
-					}
-				}
-				else if (KeyboardControlSystem::dir == LEFT)
-				{
-					if (entity.GetComponent<TransformComponent>().position.x < (playerPosition.x - 200) && !boomerangReturned)
-					{
-						rigidbody.velocity *= -1;
-						boomerangReturned = true;
-					}
-					else if (entity.GetComponent<TransformComponent>().position.x >= (playerPosition.x - 64) && boomerangReturned)
-					{
-						entity.Kill();
-						boomerangReturned = false;
-						playerSet = false;
-					}
+					
 				}
 			}
+
 			// This is the wait time for the player sword 
 			if (swordTimer.GetTicks() > 250) swordTimer.Stop();
 

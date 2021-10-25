@@ -1,5 +1,6 @@
 #pragma once
 #include <SDL.h>
+#include "../Utilities/Timer.h"
 
 struct ProjectileComponent
 {
@@ -8,6 +9,7 @@ struct ProjectileComponent
 	int hitPercentDamage;
 	int duration;
 	int startTime;
+	Timer boomTimer;
 
 	ProjectileComponent(bool isFriendly = false, int hitPercentDamage = 0, int duration = 0)
 	{

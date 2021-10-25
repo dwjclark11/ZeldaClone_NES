@@ -295,6 +295,7 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		animation.frameOffset = 0;
 		animation.numFrames = 8;
 		animation.frameSpeedRate = 20;
+		animation.isLooped = false;
 		animation.vertical = false;
 
 		if (health.deathTimer.GetTicks() > 3500)
