@@ -6,6 +6,7 @@
 #include "../Components/HealthComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Components/BoxColliderComponent.h"
 
 // IdleState
 void EnemyIdleState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
@@ -167,7 +168,8 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 				sign = 1;
 			else
 				sign = -1;
-			
+			//Logger::Log("Sign: " + std::to_string(sign));
+
 			if (rigid.down)
 				rigid.velocity = glm::vec2(sign*50, 0);
 			else if (rigid.up)
@@ -231,11 +233,8 @@ void HurtState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 	// If the enemy's heath is <= 0, call death state!
 	else if (enemyHealth.healthPercentage <= 0)
 	{
-		// TODO: Call the EnemyDeathState
-		// pOwner->ChangeState(pOwner->deathState, entity);
-		
-		ai.GarbageCollect(); // Move this to death state!!
-		entity.Kill(); 		 // Move this to death state!!
+		// Call the EnemyDeathState
+		 pOwner->ChangeState(pOwner->deathState, entity);
 	}
 }
 
@@ -252,32 +251,37 @@ void HurtState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
 // Death State
 void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 {
-	// TODO: Start Death timer to run the death animation! 
-	/*
-		auto& ai = entity.GetComponent<AIComponent>();
-		auto& animation = entity.GetComponent<AnimationComponent>();
+	
+	auto& ai = entity.GetComponent<AIComponent>();
+	auto& animation = entity.GetComponent<AnimationComponent>();
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+	entity.RemoveComponent<BoxColliderComponent>();
+	sprite.assetID = "enemy_death";
+	sprite.height = 16;
+	sprite.width = 16;
+	sprite.srcRect.x = 0;
+	sprite.srcRect.y = 0;
 		
-		ai.deathTimer.Start();
-		animation.frameOffset = xyz; --> TBD
-		animation.numFrames = xyz; --> TBD
-		animation.frameSpeed = abc; --> TBD
-		animation.looped = false;
-	*/
+	ai.deathTimer.Start();
+	animation.frameOffset = 0; 
+	animation.numFrames = 8; 
+	animation.frameSpeedRate = 20; 
+	animation.isLooped = false;
+	animation.vertical = false;
+	
+	
 }
 void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 {
-	// TODO: Play Death animation and Kill the Entity/enemy
-	/*
-		Pseudo-code
+	
+	auto& ai = entity.GetComponent<AIComponent>();
 		
-		auto& ai = entity.GetComponent<AIComponent>();
-		
-		if (ai.deathTimer.GetTicks() > 2000)
-		{
-			ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
-			entity.Kill();
-		}
-	*/
+	if (ai.deathTimer.GetTicks() > 500)
+	{
+		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
+		entity.Kill();
+	}
+	
 }
 
 void EnemyDeathState::OnExit(EnemyStateMachine* pOwner, Entity& entity)

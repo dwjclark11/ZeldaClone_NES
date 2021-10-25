@@ -32,11 +32,13 @@ public:
 			// Set the color for the trigger boxes
 			if (entity.BelongsToGroup("trigger"))
 			{
-				SDL_SetRenderDrawColor(renderer, 0, 255, 0, 0);
+				SDL_SetRenderDrawColor(renderer, 0, 255, 0, 50);
+				SDL_RenderFillRect(renderer, &srcRect);
 			}
 			else // Set the color for physical collsions
 			{
 				SDL_SetRenderDrawColor(renderer, 255, 0, 0, 50);
+				SDL_RenderFillRect(renderer, &srcRect);
 			}
 			SDL_RenderDrawRect(renderer, &srcRect);
 		}

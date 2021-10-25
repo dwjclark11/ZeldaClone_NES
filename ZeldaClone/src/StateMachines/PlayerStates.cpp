@@ -282,15 +282,31 @@ void PlayerDeathState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
 	auto& health = entity.GetComponent <HealthComponent>();
+	auto& animation = entity.GetComponent<AnimationComponent>();
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+
 	Game::Instance()->GetPlayerDead() = true;
 
 	if (health.deathTimer.GetTicks() > 3000)
 	{
-		Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
-		Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
-		Game::Instance()->GetStateMachine()->PopState();
-		Game::Instance()->GetStateMachine()->PushState(new GameOverState());
-		entity.Kill();
+		sprite.assetID = "player_death";
+
+
+		animation.frameOffset = 0;
+		animation.numFrames = 8;
+		animation.frameSpeedRate = 20;
+		animation.vertical = false;
+
+		if (health.deathTimer.GetTicks() > 3500)
+		{
+			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, -1);
+			Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
+			Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
+			Game::Instance()->GetStateMachine()->PopState();
+			Game::Instance()->GetStateMachine()->PushState(new GameOverState());
+			entity.Kill();
+		}
+
 	}
 }
 

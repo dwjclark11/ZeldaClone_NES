@@ -91,7 +91,10 @@ void Game::Initialize()
 		Logger::Err("Failed to create renderer: " + *SDL_GetError());
 		return;
 	}
-
+	
+	// Enable Alpha Blending
+	SDL_SetRenderDrawBlendMode(Game::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
+	
 	// Initialize IMGUI context
 	ImGui::CreateContext();
 	ImGuiSDL::Initialize(mRenderer, windowWidth, windowHeight);

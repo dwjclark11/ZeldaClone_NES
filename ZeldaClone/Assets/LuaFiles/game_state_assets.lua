@@ -16,6 +16,8 @@ Assets =
 	{type = "texture", id = "octorok", 			file =  "./Assets/EnemySprites/octorok.png"}, 
 	{type = "texture", id = "moblin", 			file =  "./Assets/EnemySprites/moblin.png"}, 
 	{type = "texture", id = "darknut", 			file =  "./Assets/EnemySprites/darknut.png"}, 
+	{type = "texture", id = "enemy_death", 		file =  "./Assets/EnemySprites/EnemyDeath.png"}, 
+	{type = "texture", id = "player_death", 	file =  "./Assets/PlayerSprites/player_death.png"}, 
 	{type = "texture", id = "numbers", 			file =  "./Assets/Fonts/numbers.png"}, 
 	{type = "texture", id = "full_heart", 		file =  "./Assets/ItemSprites/full_heart.png"}, 
 	{type = "soundFX", id = "magic_rod", 		file =  "./Assets/sounds/MagicalRod.wav"}, 
@@ -36,6 +38,6 @@ Assets =
 	{type = "soundFX", id = "fanfare", 			file =   "./Assets/sounds/Fanfare.wav"}, 
 	{type = "soundFX", id = "shield", 			file =   "./Assets/sounds/Shield.wav"}, 
 	{type = "music",   id = "dungeon", 			file = "./Assets/Music/Dungeon_Theme.mp3"},
-	{type = "music",   id = "Overworld", 			file = "./Assets/Music/Overworld_Theme.mp3"},
+	{type = "music",   id = "Overworld", 		file = "./Assets/Music/Overworld_Theme.mp3"},
 	
 }

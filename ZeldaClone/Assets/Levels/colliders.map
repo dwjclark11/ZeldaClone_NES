@@ -1232,4 +1232,4 @@ colliders 9408 3552 4 4 1 0 16 16 0 0
 trigger 7424 4768 4 4 1 1 16 8 0 0 1 450 500 0 -288 stop no_file no_file secret_dungeon_colliders no_file secret_dungeon sword_cave 256 176 
 trigger 6592 4096 4 4 1 1 16 8 0 0 1 450 500 0 -288 dungeon no_file no_file no_file funTileMap Zelda_Overworld no_file 0 0
 trigger 6720 3136 4 4 1 1 16 16 0 0 1 450 500 0 -288 dungeon no_file no_file no_file funTileMap Zelda_Overworld no_file 0 0
-trigger 7616 2275 4 4 1 1 16 8 0 0 1 2300 4000 2048 3072 dungeon no_file no_file no_file level1_Eagle Dungeon_Tiles no_file 0 0
+trigger 7616 2275 4 4 1 1 16 8 0 0 1 2300 4000 2048 3072 dungeon no_file no_file no_file level1_Eagle_Test Dungeon_Tiles no_file 0 0

@@ -152,7 +152,7 @@ public:
 					//Logger::Log("Left");
 				}
 
-				/*auto& ai = entity.GetComponent<AIComponent>();
+				auto& ai = entity.GetComponent<AIComponent>();
 
 				for (int i = 0; i < MAX_WORLD_WIDTH; i++)
 				{
@@ -167,7 +167,7 @@ public:
 							}
 						}
 					}
-				}*/
+				}
 			}
 		}
 	}
