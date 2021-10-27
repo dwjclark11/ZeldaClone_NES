@@ -14,12 +14,12 @@ private:
 public:
 	TStateMachine()
 	{
-		Logger::Log("Created State Machine");
+		//Logger::Log("Created State Machine");
 	}
 
 	~TStateMachine()
 	{
-		Logger::Log("State Machine Destroyed");
+		//Logger::Log("State Machine Destroyed");
 	}
 
 	void Init(T* pOwner, TState<T>* pInitialState);
@@ -33,7 +33,7 @@ void TStateMachine<T>::Init(T* pOwner, TState<T>* pInitialState)
 {
 	mCurrentState = pInitialState;
 	mPOwner = pOwner;
-	Logger::Log("State machine is ready");
+	//Logger::Log("State machine is ready");
 }
 
 template <class T>

@@ -85,9 +85,7 @@ private:
 	bool fullLife;
 public:
 
-	glm::vec2 playerPosition;
 	bool boomerangReturned;
-	bool playerSet;
 	GamePadSystem controller;
 
 	ProjectileEmitterSystem()
@@ -95,9 +93,7 @@ public:
 		RequiredComponent<ProjectileEmitterComponent>();
 		RequiredComponent<TransformComponent>();
 
-		playerPosition = glm::vec2(0);
 		boomerangReturned = false;
-		playerSet = false;
 		magicBeam = false;
 		fullLife = false;
 		swordTimer.Stop();
@@ -106,7 +102,6 @@ public:
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
 	{
 		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &ProjectileEmitterSystem::OnKeyPressed);
-		//eventManager->SubscribeToEvent<GamePadButtonPressedEvent>(this, &ProjectileEmitterSystem::OnButtonPressed);
 	}
 
 	void UseItem(ItemAttrib& attrib)
@@ -115,13 +110,6 @@ public:
 		{
 			if (entity.HasTag("player"))
 			{
-				// The playerSet is setting the position of the player for the boomerang to come back to in the update function
-				if (!playerSet && attrib.group == "boomerang")
-				{
-					playerPosition = entity.GetComponent<TransformComponent>().position;
-					playerSet = true;
-				}
-
 				auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 				const auto& transform = entity.GetComponent<TransformComponent>();
 				const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
@@ -245,7 +233,6 @@ public:
 
 				if (attrib.group == "boomerang")
 				{
-					Logger::Log("BOOMERANG");
 					auto& boomerTimer = newItem.GetComponent<ProjectileComponent>();
 					boomerTimer.boomTimer.Start();
 				}
@@ -256,11 +243,9 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			
 			// Change the sprite srcRect based on the direction facing
 			if (entity.HasTag("player"))
 			{
-				auto entity = Registry::Instance()->GetEntityByTag("player");
 				const auto health = entity.GetComponent<HealthComponent>();
 				auto& sprite = entity.GetComponent<SpriteComponent>();
 				auto& box = entity.GetComponent<BoxColliderComponent>();
@@ -419,7 +404,7 @@ public:
 			}
 			else if (ItemSelectKeyboardControlSystem::itemType == BOOMERANG)
 			{
-				if (!boomerangReturned && !playerSet)
+				if (!boomerangReturned/* && !playerSet*/)
 				{
 					ItemAttrib boomerang("boomerang", "items", 16, 16, 0, 112, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(-40, -40),
 						glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(10, 10), glm::vec2(10, 10), glm::vec2(20, 20), glm::vec2(18, 18), 3000, true, false);
@@ -467,62 +452,29 @@ public:
 		}
 	}
 	
-	void UpdateGamePad()
-	{
-		if (GamePadSystem::xPressed && !GamePadSystem::buttonDown)
-		{
-			if (ItemSelectKeyboardControlSystem::itemType == WOOD_BOW || ItemSelectKeyboardControlSystem::itemType == MAGIC_BOW)
-			{
-				/*ItemAttrib bow("projectile", "items", 16, 16, 0, 64, 4, 4, 4, 64, 64, 0, 0, 0, 0, 0);
-				UseItem(bow);
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "boomerang_arrow", 0, 1);
-				GamePadSystem::buttonDown = true;*/
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == CANDLE)
-			{
-				/*ItemAttrib bomb("bomber", "items", 16, 16, 64, 112, 1, 4, 4, 0, 0, 0, 0, 0, 0, 0);
-				UseItem(bomb);
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "bomb_drop", 0, 1);
-				GamePadSystem::buttonDown = true;*/
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == BOOMERANG)
-			{
-				/*ItemAttrib candle("projectile", "items", 16, 16, 0, 96, 1, 4, 4, 0, 0, 500, 14, 14, 5, 5);
-				UseItem(candle);
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "candle", 0, 1);
-				GamePadSystem::buttonDown = true;*/
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == MAGIC_ROD)
-			{
-				/*ItemAttrib beam("projectile", "items", 16, 16, 64, 96, 4, 4, 4, 0, 0, 2000, 16, 16, 0, 0);
-				UseMagicWand();
-				UseItem(beam);
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "magic_rod", 0, 1);
-				GamePadSystem::buttonDown = true;*/
-			} 
-		}
-	}
-	
 	void Update(Registry* registry)
 	{
-		//UpdateBoomerang();
 		for (auto entity : GetSystemEntities())
 		{
 			// Make the boomerang come back to the player and destroy it when it returns
 			if (entity.BelongsToGroup("boomerang"))
 			{
+				// Player variables
 				auto player = Registry::Instance()->GetEntityByTag("player");
 				auto& playerPos = player.GetComponent<TransformComponent>();
+
+				// Boomerang variables
 				auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
 				auto& proj = entity.GetComponent<ProjectileComponent>();
 				auto& transform = entity.GetComponent<TransformComponent>();
 
+				// Have the boomerang change direction based on the player position
 				glm::vec2 direction = glm::normalize(playerPos.position - transform.position);
 
-				if (proj.boomTimer.GetTicks() > 300)
+				if (proj.boomTimer.GetTicks() > 300) // TODO: Change the time based on type of boomerang-->wood/magic
 				{
-					rigidbody.velocity.x = direction.x * 200;
-					rigidbody.velocity.y = direction.y * 200;
+					rigidbody.velocity.x = direction.x * 300;
+					rigidbody.velocity.y = direction.y * 300;
 					boomerangReturned = true;
 				}
 				if (boomerangReturned)
@@ -555,14 +507,14 @@ public:
 					{
 						entity.Kill();
 						boomerangReturned = false;
-						playerSet = false;
+						//playerSet = false;
 					}
-					
 				}
 			}
 
 			// This is the wait time for the player sword 
-			if (swordTimer.GetTicks() > 250) swordTimer.Stop();
+			if (swordTimer.GetTicks() > 250) 
+				swordTimer.Stop();
 
 			// Check the enemy projectile 
 			if (entity.BelongsToGroup("enemies"))

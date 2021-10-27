@@ -9,6 +9,7 @@ class AIComponent
 {
 	EnemyStateMachine* esm;
 	glm::vec2 enemyPos;
+	bool created;
 	bool stunned;
 
 public: 
@@ -23,4 +24,6 @@ public:
 	glm::vec2& GetEnemyPos() { return enemyPos; }
 	void SetStunned(bool stun) { stunned = stun; }
 	bool GetStunned() { return stunned; }
+	bool StateMachineCreated();
+	void CreateStateMachine();
 };

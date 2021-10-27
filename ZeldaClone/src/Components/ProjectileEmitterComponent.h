@@ -18,7 +18,9 @@ struct ProjectileEmitterComponent
 	bool shootLeft;
 	bool shotTriggered;
 	bool shotFired;
+
 	Timer timer;
+
 
 	ProjectileEmitterComponent(glm::vec2 projectileVelocity = glm::vec2(0), int repeatFrequency = 0,
 		int projectileDuration = 10000, int hitPercentDamage = 1, bool isFriendly = false, bool shootUp = false,

@@ -82,8 +82,6 @@ public:
 			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
 
-
-
 			// Adjust the player position to the trigger transport position
 			transform.position.x = trig.transportOffset.x;
 			transform.position.y = trig.transportOffset.y;

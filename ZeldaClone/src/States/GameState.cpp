@@ -92,33 +92,17 @@ void GameState::Update(const double& deltaTime)
 	// Update all Game systems
 	auto player = Registry::Instance()->GetEntityByTag("player");
 	Game::Instance()->GetPlayerStateMachine().Update(player);
-	Registry::Instance()->GetSystem<AISystem>().Update();
+
 	Registry::Instance()->GetSystem<AnimationSystem>().Update();
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
-	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().UpdateGamePad();
-	// Check to see if there are any events in the queue and execute them
-	//Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 
 	Registry::Instance()->GetSystem<CollisionSystem>().Update(Game::Instance()->GetEventManager(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	Registry::Instance()->GetSystem<MovementSystem>().Update(deltaTime);
 	Registry::Instance()->GetSystem<CameraMovementSystem>().Update(Game::Instance()->GetCamera());
 	Registry::Instance()->GetSystem<ProjectileLifeCycleSystem>().Update();
 	
-	
-	// If the player is dead, remove all entities and go to the game over state
-	//if (Game::Instance()->GetPlayerDead())
-	//{
-	//	Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
-	//	Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
-	//	//firstEntered = false;
-	//	Game::Instance()->GetStateMachine()->PopState();
-	//	Game::Instance()->GetStateMachine()->PushState(new GameOverState());
-	//}
-
 	//Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
-	
-	
-	
+	Registry::Instance()->GetSystem<AISystem>().Update();
 	ConvertHUDNumbers();
 }
 

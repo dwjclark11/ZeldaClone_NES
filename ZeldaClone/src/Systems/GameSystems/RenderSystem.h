@@ -106,7 +106,7 @@ struct RenderSystem : public System
 	void OnExit()
 	{
 		auto entities = GetSystemEntities();
-		for (auto i = entities.begin(); i != entities.end() - 1; i++)
+		for (auto i = entities.begin(); i != entities.end(); i++)
 		{
 			Entity entity = *i;
 

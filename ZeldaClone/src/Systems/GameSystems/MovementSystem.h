@@ -263,7 +263,7 @@ public:
 				if (KeyboardControlSystem::dir == RIGHT)
 				{
 					playerTransform.collision = true;
-					playerRigidbody.velocity = glm::vec2(0, 0);
+					playerRigidbody.velocity.x = 0;
 					playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
 					playerTransform.position.y = playerTransform.position.y;
 				}

@@ -92,7 +92,7 @@ public:
 								if (east)
 								{
 									rigidBody.velocity.x = 0;
-									camera.x += 4;
+									camera.x += 8;
 									Sleep(1);
 								}
 
@@ -108,7 +108,7 @@ public:
 								if (west)
 								{
 									rigidBody.velocity.x = 0;
-									camera.x -= 4;
+									camera.x -= 8;
 									Sleep(1);
 								}
 
@@ -157,7 +157,6 @@ public:
 
 				if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
 				{
-					//Logger::Log("x: " + std::to_string(static_cast<int>(transform.position.x)) + ", y: " + std::to_string(static_cast<int>(transform.position.y)));
 					if (camera.x > (transform.position.x + boxCollider.offset.x) && !west && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x < 0)
 					{
 						west = true;
@@ -165,7 +164,8 @@ public:
 						rigidBody.velocity.x = 0;
 					}
 
-					if ((camera.x + camera.w) < (transform.position.x - boxCollider.offset.x) + (sprite.width * transform.scale.x) && !east && !Game::Instance()->GetCameraMoving() && rigidBody.velocity.x > 0)
+					if ((camera.x + camera.w) < transform.position.x + sprite.width / 4  && !east && !Game::Instance()->GetCameraMoving() 
+						&& rigidBody.velocity.x > 0)
 					{
 						east = true;
 						Game::Instance()->GetCameraMoving() = true;

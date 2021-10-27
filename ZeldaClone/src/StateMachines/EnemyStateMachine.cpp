@@ -11,6 +11,7 @@ EnemyStateMachine::EnemyStateMachine()
 	hurtState = new HurtState;
 	deathState = new EnemyDeathState;
 	stunState = new EnemyStunnedState;
+
 	TStateMachine<EnemyStateMachine>::Init(this, idleState);
 }
 

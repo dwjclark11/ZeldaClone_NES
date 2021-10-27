@@ -25,19 +25,28 @@ public:
 		{
 			auto& stateMachine = entity.GetComponent<AIComponent>();
 			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
-			// If the enemy is in the same screen panel as the player --> Update 
-			//if (stateMachine.GetEnemyPos() == Game::Instance()->GetPlayerPos())
-			//{
-			//	//Logger::Err("The enemy and the player are in the same sceen -- " + std::to_string(i));
-			//	stateMachine.GetEnemyStateMachine().Update(entity);
-			//}
-			//else
-			//{
-			//	// Stop enemy movement
-			//	rigidBody.velocity = glm::vec2(0);
-			//}
 
-			stateMachine.GetEnemyStateMachine().Update(entity);
+			// If the AI state machine is nullptr, create one!
+			if (!stateMachine.StateMachineCreated())
+				stateMachine.CreateStateMachine();
+
+			// If the AI state machine has been created, update the entity AI
+			if (stateMachine.StateMachineCreated())
+			{
+				// If the enemy is in the same screen panel as the player --> Update 
+				if (stateMachine.GetEnemyPos() == Game::Instance()->GetPlayerPos())
+				{
+					stateMachine.GetEnemyStateMachine().Update(entity);
+				}
+				else
+				{
+					// Stop enemy movement
+					rigidBody.velocity = glm::vec2(0);
+				}
+			}
+
+
+			//stateMachine.GetEnemyStateMachine().Update(entity);
 		}
 	}
 };
