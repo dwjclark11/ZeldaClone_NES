@@ -107,9 +107,12 @@ public:
 
 			if (entity.BelongsToGroup("enemies"))
 			{
+				auto& ai = entity.GetComponent<AIComponent>();
+			
 				if (rigidBody.velocity.y > 0)
 				{
-					sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
 
 					// Set the direction
 					rigidBody.down = true;
@@ -120,7 +123,8 @@ public:
 				}
 				if (rigidBody.velocity.y < 0)
 				{
-					sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
 
 					// Set the direction
 					rigidBody.down = false;
@@ -131,7 +135,8 @@ public:
 				}
 				if (rigidBody.velocity.x > 0)
 				{
-					sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
 
 					// Set the direction
 					rigidBody.down = false;
@@ -142,7 +147,8 @@ public:
 				}
 				if (rigidBody.velocity.x < 0)
 				{
-					sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
 
 					// Set the direction
 					rigidBody.down = false;
@@ -151,8 +157,7 @@ public:
 					rigidBody.right = false;
 					//Logger::Log("Left");
 				}
-
-				auto& ai = entity.GetComponent<AIComponent>();
+				
 
 				for (int i = 0; i < MAX_WORLD_WIDTH; i++)
 				{

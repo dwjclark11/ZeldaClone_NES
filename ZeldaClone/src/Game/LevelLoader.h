@@ -3,9 +3,11 @@
 #include "../AssetManager/AssetManager.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/ItemComponent.h"
+#include "../Components/AIComponent.h"
 #include <SDL.h>
 #include <memory>
 #include <sol/sol.hpp>
+
 
 
 enum AssetType
@@ -25,7 +27,6 @@ public:
 	void LoadMap(const std::unique_ptr<AssetManager>& assetManager, std::string mapName, int image_width, int image_height);
 	void LoadTilemap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string fileName, std::string imageName);
 	void LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager,  const std::string& fileName);
-	void LoadHud(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	AssetType ConvertToAssetType(std::string& type);
 
 	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
@@ -59,5 +60,6 @@ public:
 	void ConvertName(std::string name, int x, int y);
 	TriggerType ConvertToTriggerType(int triggerType);
 	TriggerType ConvertToTriggerType(std::string triggerType);
+	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 };

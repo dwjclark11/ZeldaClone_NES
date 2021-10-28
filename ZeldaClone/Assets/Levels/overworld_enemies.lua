@@ -40,6 +40,13 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      }, 
+      projectile_emitter = {
+
+      },
+      ai_component = {
+            enemy_pos = { x = 0,  y = 0},
+            enemy_type = "octorok",
       }
     }
   },
@@ -80,6 +87,13 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      }, 
+      projectile_emitter = {
+
+      },
+      ai_component = {
+            enemy_pos = { x = 0,  y = 0},
+            enemy_type = "octorok",
       }
     }
   },
@@ -120,6 +134,13 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      }, 
+      projectile_emitter = {
+
+      },
+      ai_component = {
+            enemy_pos = { x = 0,  y = 0},
+            enemy_type = "octorok",
       }
     }
   },
@@ -160,6 +181,13 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      }, 
+      projectile_emitter = {
+
+      },
+      ai_component = {
+            enemy_pos = { x = 0,  y = 0},
+            enemy_type = "octorok",
       }
     }
   },
@@ -200,6 +228,13 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      },
+      projectile_emitter = {
+
+      },
+      ai_component = {
+        enemy_pos = { x = 0,  y = 0},
+        enemy_type = "octorok",
       }
     }
   },
@@ -218,12 +253,12 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "octorok",
+        asset_id = "leever",
         width = 16,
         height = 16,
         z_index = 0,
         is_fixed = false,
-        src_rect_x = 64,
+        src_rect_x = 0,
         src_rect_y = 0,
         offset = { x = 0, y = 0}
       },
@@ -235,11 +270,18 @@ enemies = {
         velocity = { x = 50, y = 0}
       },
       animation = {
-        num_frames = 2,
-        frame_rate = 10,
+        num_frames = 1,
+        frame_rate = 0,
         vertical = true,
         looped = true,
         frame_offset = 0
+      }, 
+    --  projectile_emitter = {
+
+  --    },
+      ai_component = {
+            enemy_pos = { x = 0,  y = 0},
+            enemy_type = "leever",
       }
     }
   },
@@ -258,12 +300,12 @@ enemies = {
         offset_y = 0
       },
       sprite = {
-        asset_id = "octorok",
+        asset_id = "moblin",
         width = 16,
         height = 16,
         z_index = 0,
         is_fixed = false,
-        src_rect_x = 64,
+        src_rect_x = 0,
         src_rect_y = 0,
         offset = { x = 0, y = 0}
       },
@@ -280,6 +322,13 @@ enemies = {
         vertical = true,
         looped = true,
         frame_offset = 0
+      },
+      projectile_emitter = {
+
+      },
+      ai_component = {
+            enemy_pos = { x = 0,  y = 0},
+            enemy_type = "moblin",
       }
     }
   }

@@ -98,6 +98,13 @@ public:
 	SDL_Rect& GetMouseBox();
 	SDL_Event& GetEvent();
 	
+	const bool HasSword() 
+	{ 
+		if (mGameItems.woodSword || mGameItems.steelSword || mGameItems.magicSword)
+			return true;
+		
+		return false;
+	}
 	bool& GetAttack();
 	bool& IsRunning() { return mIsRunning; }
 	bool& GetCameraMoving(){ return cameraMoving;}
@@ -149,6 +156,7 @@ private:
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
 	GameItems mGameItems;
+	
 	glm::vec2 mPlayerPos;
 	int mLevelWidth;
 	int mLevelHeight;

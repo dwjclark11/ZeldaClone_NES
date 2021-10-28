@@ -117,7 +117,6 @@ void GameState::Render()
 	Game::Instance()->GetSystem<RenderSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
 	
 	// Render all HUD objects
-	//SDL_SetRenderDrawBlendMode(Game::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
 	SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 0, 0, 0, 255);
 	SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRect);
 	SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRect);

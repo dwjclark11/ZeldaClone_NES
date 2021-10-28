@@ -116,7 +116,7 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 			
 		else
 		{
-			Logger::Log("Game Tile");
+			//Logger::Log("Game Tile");
 			tile.AddComponent<GameComponent>();
 			tile.Group("layered");
 		}
@@ -124,7 +124,7 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{
-			Logger::Log("Collider");
+			//Logger::Log("Collider");
 			tile.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 		}
 	}
@@ -693,6 +693,32 @@ TriggerType LevelLoader::ConvertToTriggerType(std::string triggerType)
 	else if (triggerType == "SECRET_AREA") return SECRET_AREA;
 }
 
+AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
+{
+	if (enemyType == "octorok")
+		return AIComponent::EnemyType::OCTOROK;
+	else if (enemyType == "moblin")
+		return AIComponent::EnemyType::MOBLIN;
+	else if (enemyType == "darknut")
+		return AIComponent::EnemyType::DARKNUT;
+	else if (enemyType == "leever")
+		return AIComponent::EnemyType::LEEVER;
+	else if (enemyType == "tektite")
+		return AIComponent::EnemyType::TEKTITE;
+	else if (enemyType == "peahat")
+		return AIComponent::EnemyType::PEAHAT;
+	else if (enemyType == "armos")
+		return AIComponent::EnemyType::ARMOS;
+	else if (enemyType == "ghini")
+		return AIComponent::EnemyType::GHINI;
+	else if (enemyType == "lynel")
+		return AIComponent::EnemyType::LYNEL;
+	else if (enemyType == "zora")
+		return AIComponent::EnemyType::ZORA;
+	else
+		return AIComponent::EnemyType::OCTOROK;
+}
+
 std::string LevelLoader::SetName(std::string filePath, bool wExtension, char separator)
 {
 	// Get the last '.' position
@@ -1211,16 +1237,9 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					));
 			}
 
-
-			//entity.AddComponent<AIComponent>();
-			
-
-
 			entity.AddComponent<GameComponent>();
 			entity.AddComponent<CameraFollowComponent>();
-
 		}
-
 		i++;
 	}
 }
@@ -1456,7 +1475,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 					),
 					entity["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
 					entity["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
-					entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
+					entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(1),
 					entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
 					);
 			}
@@ -1469,9 +1488,23 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			//	sol::function func = entity["components"]["on_update_script"][0];
 			//	newEntity.AddComponent<ScriptComponent>(func);
 			//}
-			
-			newEntity.AddComponent<AIComponent>();
-			newEntity.AddComponent<ProjectileEmitterComponent>();
+			// 
+			// AI Component
+			sol::optional<sol::table> ai = entity["components"]["ai_component"];
+			if (ai != sol::nullopt)
+			{
+				AIComponent::EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"]);
+
+				Logger::Log("Type: " + std::to_string(type));
+				
+				newEntity.AddComponent<AIComponent>(
+					glm::vec2(
+						entity["components"]["ai_component"]["enemy_pos"]["x"].get_or(0),
+						entity["components"]["ai_component"]["enemy_pos"]["y"].get_or(0)),
+					type
+					);
+			}
+			//newEntity.AddComponent<ProjectileEmitterComponent>();
 			newEntity.AddComponent<GameComponent>();
 		}
 		i++;

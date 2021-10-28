@@ -1,13 +1,13 @@
 #include "AIComponent.h"
 
-AIComponent::AIComponent(glm::vec2 enemyPos)
+AIComponent::AIComponent(glm::vec2 enemyPos, EnemyType enemyType)
 {
-	//esm = new EnemyStateMachine;
 	esm = nullptr;
 	this->enemyPos = enemyPos;
+	this->enemyType = enemyType;
 }
 
-bool AIComponent::StateMachineCreated()
+const bool AIComponent::StateMachineCreated() 
 {
 	return esm;
 }

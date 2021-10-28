@@ -428,7 +428,7 @@ public:
 		else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
 		{
 			// Do not use the sword if we do not have a sword
-			if (Game::Instance()->GetGameItems().woodSword) 
+			if (Game::Instance()->HasSword()) 
 			{
 				UseSword();
 				// If the player life is full, allow sword beam projectile
@@ -442,9 +442,7 @@ public:
 					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_shoot", 0, 1);
 				}
 				else
-				{
 					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "sword_slash", 0, 1);
-				}
 
 				swordTimer.Start();
 				KeyboardControlSystem::keyDown = true;
@@ -507,7 +505,6 @@ public:
 					{
 						entity.Kill();
 						boomerangReturned = false;
-						//playerSet = false;
 					}
 				}
 			}
@@ -522,62 +519,92 @@ public:
 				auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 				auto& projectileTransform = entity.GetComponent<TransformComponent>();
 				auto& rigid = entity.GetComponent<RigidBodyComponent>();
-				int offsetX = 0;
-				int offsetY = 0;
-				// Set the velocity and direction of the projectile based on when it 
-				// was triggered
-				if (projectileEmitter.shootUp)
-				{
-					projectileEmitter.projectileVelocity = glm::vec2(0, -200);
-					projectileEmitter.shootUp = false;
-					rigid.up = true;
-					offsetX = 20;
-					offsetY = 0;
-					
-				}
-				else if (projectileEmitter.shootRight)
-				{
-					projectileEmitter.projectileVelocity = glm::vec2(200, 0);
-					projectileEmitter.shootRight = false;
-					rigid.right = true;
-					offsetX = 0;
-					offsetY = 20;
-				}
-				else if (projectileEmitter.shootDown)
-				{
-					projectileEmitter.projectileVelocity = glm::vec2(0, 200);
-					projectileEmitter.shootDown = false;
-					rigid.down = true;
-					offsetX = 20;
-					offsetY = 0;
-				}
-				else if (projectileEmitter.shootLeft)
-				{
-					projectileEmitter.projectileVelocity = glm::vec2(-200, 0);
-					projectileEmitter.shootLeft = false;
-					rigid.left = true;
-					offsetX = 0;
-					offsetY = 20;
-				}
-
+				const auto& ai = entity.GetComponent<AIComponent>();
+				
 				if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
 				{
-					// Create new projectile entity and add it to the world
 					Entity enemyProjectile = entity.registry->CreateEntity();
 					enemyProjectile.Group("projectile");
-					enemyProjectile.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x + offsetX, projectileTransform.position.y + offsetY), glm::vec2(2, 2), 0.0);
+					// Variables that can change based on the type of enemy
+					int offsetX = 0;
+					int offsetY = 0;
+					int srcRectX = 0;
+					int srcRectY = 0;
+					int scale = 0;
+				
+					switch (ai.GetEnemyType())
+					{
+						case AIComponent::EnemyType::OCTOROK:
+							srcRectX = 48;
+							srcRectY = 0;
+							scale = 2;
+							break;
+						
+						case AIComponent::EnemyType::MOBLIN:
+							// Set the srcRect for the projectile sprite
+							srcRectY = 4 * 16;
+							scale = 4;
+							if (projectileEmitter.shootUp)
+								srcRectX = 0 * 16;
+							else if (projectileEmitter.shootRight)
+								srcRectX = 1 * 16;
+							else if (projectileEmitter.shootDown)
+								srcRectX = 2 * 16;
+							else if (projectileEmitter.shootLeft)
+								srcRectX = 3 * 16;
+							break;
+
+						case AIComponent::EnemyType::ZORA:
+							// TODO: Create a sprite sheet of enemy projectiles
+							// enemyProjectile.AddComponent<AnimationComponent>(4, 20, false);
+							break;
+						default:
+							break;
+					}
+				
+					// Set the velocity and direction of the projectile based on when it 
+					// was triggered
+					if (projectileEmitter.shootUp)
+					{
+						projectileEmitter.projectileVelocity = glm::vec2(0, -200);
+						projectileEmitter.shootUp = false;
+						rigid.up = true;
+						offsetX = 20;
+						offsetY = 0;
+					
+					}
+					else if (projectileEmitter.shootRight)
+					{
+						projectileEmitter.projectileVelocity = glm::vec2(200, 0);
+						projectileEmitter.shootRight = false;
+						rigid.right = true;
+						offsetX = 0;
+						offsetY = 20;
+					}
+					else if (projectileEmitter.shootDown)
+					{
+						projectileEmitter.projectileVelocity = glm::vec2(0, 200);
+						projectileEmitter.shootDown = false;
+						rigid.down = true;
+						offsetX = 20;
+						offsetY = 0;
+					}
+					else if (projectileEmitter.shootLeft)
+					{
+						projectileEmitter.projectileVelocity = glm::vec2(-200, 0);
+						projectileEmitter.shootLeft = false;
+						rigid.left = true;
+						offsetX = 0;
+						offsetY = 20;
+					}
+
+					enemyProjectile.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x + offsetX, projectileTransform.position.y + offsetY), glm::vec2(scale, scale), 0.0);
 
 					enemyProjectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
 					enemyProjectile.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
-					/* 				// Does the projectile have an animation component?
-									if (attrib.animation)
-									{
-										// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
-										newItem.AddComponent<AnimationComponent>(attrib.numFrames, 20, attrib.vertical, true);
-									} */
 					projectileEmitter.isFriendly = false;
-					enemyProjectile.AddComponent<SpriteComponent>("items", 16, 16, 2, false, 48, 0);
+					enemyProjectile.AddComponent<SpriteComponent>("items", 16, 16, 2, false, srcRectX, srcRectY);
 					enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 					enemyProjectile.AddComponent<GameComponent>();
 
