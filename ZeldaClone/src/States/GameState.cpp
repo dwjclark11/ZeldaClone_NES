@@ -75,15 +75,11 @@ void GameState::Update(const double& deltaTime)
 	// Reset the event manager queue
 	Game::Instance()->GetEventManager()->Reset();
 	
-
+	Registry::Instance()->GetSystem<CollectItemSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<DamageSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<MovementSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-	
-	Registry::Instance()->GetSystem<CollectItemSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-	
 	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
 	// Update the registry values
@@ -103,6 +99,8 @@ void GameState::Update(const double& deltaTime)
 	
 	//Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	Registry::Instance()->GetSystem<AISystem>().Update();
+
+
 	ConvertHUDNumbers();
 }
 

@@ -7,6 +7,63 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
+#include "../Components/ItemComponent.h"
+#include "../Components/RupeeTypeComponent.h"
+#include "../Components/GameComponent.h"
+
+void ItemDrop(Entity& enemy)
+{
+	int chance = rand();
+	const auto& enemyTransform = enemy.GetComponent<TransformComponent>();
+	glm::vec2 pos = enemyTransform.position;
+	
+	Logger::Log("Chance: " + std::to_string(chance));
+	if (chance % 7 == 0)
+	{
+		Entity item = Registry::Instance()->CreateEntity();
+		item.Group("bombs");
+		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
+		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 48, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+	else if (chance % 5 == 0)
+	{
+		Entity item = Registry::Instance()->CreateEntity();
+		item.Group("money");
+		//item.AddComponent<ItemComponent>();
+		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
+		item.AddComponent<RupeeTypeComponent>(RupeeType::BLUE);
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+	else if (chance % 3 == 0)
+	{
+		Entity item = Registry::Instance()->CreateEntity();
+		item.Group("items");
+		item.AddComponent<ItemComponent>(ItemCollectType::HEARTS);
+		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<AnimationComponent>(2, 10, false, true, 0);
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+	else if (chance % 2 == 0)
+	{
+		Entity item = Registry::Instance()->CreateEntity();
+		item.Group("money");
+		//item.AddComponent<ItemComponent>();
+		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
+		item.AddComponent<RupeeTypeComponent>(RupeeType::YELLOW);
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+}
 
 // IdleState
 void EnemyIdleState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
@@ -88,7 +145,7 @@ void EnemyIdleState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		{
 			sprite.srcRect.y = 64;
 			animation.numFrames = 2;
-			animation.frameSpeedRate = 50;
+			animation.frameSpeedRate = 12;
 			animation.frameOffset = 64;
 			rigid.velocity = glm::vec2(50, 0);
 			pOwner->ChangeState(pOwner->patrolState, entity);
@@ -138,6 +195,7 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 	auto& enemyHealth		= entity.GetComponent<HealthComponent>();
 	auto& sprite			= entity.GetComponent<SpriteComponent>();
 	auto& animation			= entity.GetComponent<AnimationComponent>();
+	int sign = 1;
 
 	if (entity.HasComponent<ProjectileEmitterComponent>())
 	{
@@ -191,7 +249,7 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 	{
 		srand(time(NULL));
 		int num = rand() % 2 + 1;
-		int sign = 1;
+		
 
 		// Set the direction of the enemy randomly
 		if (num > 1)
@@ -199,14 +257,31 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		else
 			sign = -1;
 
-		if (rigid.down)
-			rigid.velocity = glm::vec2(sign*50, 0);
-		else if (rigid.up)
-			rigid.velocity = glm::vec2(sign*50, 0);
-		else if (rigid.left)
-			rigid.velocity = glm::vec2(0, sign*50);
-		else if (rigid.right)
-			rigid.velocity = glm::vec2(0, sign*50);
+		if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+		{
+			if (rigid.down)
+				rigid.velocity = glm::vec2(sign * 50, 0);
+			else if (rigid.up)
+				rigid.velocity = glm::vec2(sign * 50, 0);
+			else if (rigid.left)
+				rigid.velocity = glm::vec2(0, sign * 50);
+			else if (rigid.right)
+				rigid.velocity = glm::vec2(0, sign * 50);
+		}
+		else
+		{
+			if (ai.leeverTimer.GetTicks() > 3000 && ai.leeverTimer.GetTicks() < 10000)
+			{
+				if (rigid.down)
+					rigid.velocity = glm::vec2(sign * 50, 0);
+				else if (rigid.up)
+					rigid.velocity = glm::vec2(sign * 50, 0);
+				else if (rigid.left)
+					rigid.velocity = glm::vec2(0, sign * 50);
+				else if (rigid.right)
+					rigid.velocity = glm::vec2(0, sign * 50);
+			}
+		}
 
 		ai.aiTimer.Stop();
 	}
@@ -227,6 +302,8 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 
 	if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
 	{
+		/*Logger::Log("Animation Rate: " + std::to_string(animation.frameSpeedRate));
+		Logger::Log("Animation NUM: " + std::to_string(animation.numFrames));*/
 
 		if (ai.leeverTimer.GetTicks() > 10000 && ai.leeverTimer.GetTicks() < 10100)
 		{
@@ -321,6 +398,19 @@ void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	animation.frameSpeedRate = 20; 
 	animation.isLooped = false;
 	animation.vertical = false;
+	Timer time;
+	time.Start();
+	srand(SDL_GetTicks());
+
+	int chance = rand();
+	Logger::Log("Chance: " + std::to_string(chance));
+	if (chance % 2 == 0)
+	{
+		ItemDrop(entity);
+	}
+	else
+		Logger::Log("Not Created");
+
 }
 void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 {

@@ -25,7 +25,7 @@ public:
 			auto& animation = entity.GetComponent<AnimationComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 			const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
-			auto health = HealthComponent(); 
+			auto health = HealthComponent();
 			auto ai = AIComponent();
 
 			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000) % animation.numFrames;
@@ -66,11 +66,7 @@ public:
 					sprite.srcRect.x = (animation.currentFrame * sprite.width) + animation.frameOffset;
 				}
 			}
-			}
-				
 
-			
-			
-			
+		}	
 	}
 };

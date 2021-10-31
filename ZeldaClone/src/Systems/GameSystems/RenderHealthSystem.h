@@ -30,15 +30,12 @@ public:
 		{
 			if (entity.HasTag("player"))
 			{
-
-
 				const auto& transform = entity.GetComponent<TransformComponent>();
 				const auto& collider = entity.GetComponent<BoxColliderComponent>();
 				auto& health = entity.GetComponent<HealthComponent>();
 
 				if (health.addHeart)
 				{
-
 					loadedHearts += 1;
 					Logger::Log("Loader Hearts " + std::to_string(loadedHearts));
 					health.addHeart = false;
@@ -52,88 +49,26 @@ public:
 
 				if (health.maxHearts != numHearts && numHearts <= 16)
 				{
-					int xPos = 0;
+					int xPos = 0; 
 					int yPos = 0;
 					std::string tag = "heart";
-					if (numHearts == 4)
-					{
-						xPos = 756;
+	
+					if (numHearts <= 8)
+					{	
+						xPos = 724 + (numHearts - 3) * 32;
 						yPos = 95;
-						tag += std::to_string(numHearts);
 					}
-					else if (numHearts == 5)
-					{
-						xPos = 788;
-						yPos = 95;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 6)
-					{
-						xPos = 820;
-						yPos = 95;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 7)
-					{
-						xPos = 852;
-						yPos = 95;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 8)
-					{
-						xPos = 884;
-						yPos = 95;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 9)
-					{
-						xPos = 660;
+					else if (numHearts > 8 && numHearts <= 16)
+					{	
+						xPos = 628 + (numHearts - 8) * 32;
 						yPos = 128;
-						tag += std::to_string(numHearts);
+						Logger::Log(std::to_string(health.maxHearts));
 					}
-					else if (numHearts == 10)
-					{
-						xPos = 692;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 11)
-					{
-						xPos = 724;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 12)
-					{
-						xPos = 756;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 13)
-					{
-						xPos = 788;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 14)
-					{
-						xPos = 820;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 15)
-					{
-						xPos = 852;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
-					else if (numHearts == 16)
-					{
-						xPos = 884;
-						yPos = 128;
-						tag += std::to_string(numHearts);
-					}
+					
+					// Set the tag to the next heart!
+					tag += std::to_string(numHearts);
 
+					// Create a new player Heart
 					Entity newHeart = Registry::Instance()->CreateEntity();
 					newHeart.AddComponent<SpriteComponent>("hud_hearts", 16, 16, 5, true, 0, 0);
 					newHeart.AddComponent<TransformComponent>(glm::vec2(xPos, yPos), glm::vec2(4, 4), 0.0);
@@ -144,15 +79,15 @@ public:
 
 					health.maxHearts += 1;
 					health.healthPercentage = health.maxHearts * 2;
-				}
 
+				}
+				// Draw All Hearts
 				const SDL_Rect srcRect = {
 					transform.position.x + collider.offset.x - camera.x,
 					transform.position.y + collider.offset.y - camera.y,
 					collider.width * transform.scale.x,
 					collider.height * transform.scale.y
 				};
-
 			}
 		}
 	}

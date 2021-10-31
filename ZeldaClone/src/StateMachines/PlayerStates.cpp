@@ -192,9 +192,8 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		
 		SetSpecialItem(special.special, entity);
 
-
-		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x + 30;
-		trigItem->GetComponent<TransformComponent>().position.y = playerTransform.position.y - 30;
+		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x;
+		trigItem->GetComponent<TransformComponent>().position.y = playerTransform.position.y - 64;
 
 		movedTrigItem = true;
 	}
@@ -205,6 +204,8 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		Logger::Log("Item Has Been Collected");
 		itemCollected = false;
 		trigItem->Kill();
+		//Registry::Instance()->RemoveEntityFromSystems(*trigItem);
+		
 		pOwner->ChangeState(pOwner->idleState, entity);
 	}
 }
@@ -228,7 +229,6 @@ void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 	animation.numFrames = 3;
 	animation.frameOffset = 64;
 	animation.frameSpeedRate = 20;
-	
 }
 
 void PlayerHurtState::Execute(PlayerStateMachine* pOwner, Entity& entity) 
@@ -291,7 +291,6 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	{
 		sprite.assetID = "player_death";
 
-
 		animation.frameOffset = 0;
 		animation.numFrames = 8;
 		animation.frameSpeedRate = 20;
@@ -307,7 +306,6 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 			Game::Instance()->GetStateMachine()->PushState(new GameOverState());
 			entity.Kill();
 		}
-
 	}
 }
 

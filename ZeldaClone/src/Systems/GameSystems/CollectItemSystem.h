@@ -31,6 +31,7 @@ public:
 	CollectItemSystem()
 	{
 		RequiredComponent<BoxColliderComponent>();
+		//RequiredComponent<ItemComponent>();
 		yellowCollected = false;
 		blueCollected = false;
 	}
@@ -51,7 +52,7 @@ public:
 
 	void OnPlayerGetsItem(Entity& item, Entity& player)
 	{
-		if (item.BelongsToGroup("money") )
+		if (item.BelongsToGroup("money") && player.HasTag("player"))
 		{
 			auto& type = item.GetComponent<RupeeTypeComponent>();
 
@@ -59,13 +60,13 @@ public:
 			{
 				GameState::totalRupees += 1;
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_rupee", 0, 1);
-				item.Kill();
+				Registry::Instance()->RemoveEntityFromSystems(item);
 			}
 			if (type.type == BLUE)
 			{
 				GameState::totalRupees += 5;
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_rupee", 0, 1);
-				item.Kill();
+				Registry::Instance()->RemoveEntityFromSystems(item);
 			}
 		}
 		else if (item.BelongsToGroup("items"))
@@ -78,6 +79,13 @@ public:
 				GameState::totalBombs += 3;
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_item", 0, 1);
 				item.Kill();
+			}
+			else if (type.type == HEARTS)
+			{
+				auto& health = player.GetComponent<HealthComponent>();
+				health.healthPercentage += 2;
+				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_item", 0, 1);
+				Registry::Instance()->RemoveEntityFromSystems(item);
 			}
 		}
 	}

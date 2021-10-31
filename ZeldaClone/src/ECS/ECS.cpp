@@ -158,7 +158,6 @@ void Registry::Update()
 			if (pool) // If the pool is not null
 			{
 				pool->RemoveEntityFromPool(entity.GetID());
-
 			}
 
 		}
