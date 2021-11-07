@@ -12,7 +12,7 @@ struct ProjectileComponent
 
 	Timer boomTimer;
 
-	ProjectileComponent(bool isFriendly = false, int hitPercentDamage = 0, int duration = 0)
+	ProjectileComponent(bool isFriendly = false, int hitPercentDamage = 1, int duration = 0)
 	{
 		this->isFriendly 			= isFriendly;
 		this->hitPercentDamage 		= hitPercentDamage;

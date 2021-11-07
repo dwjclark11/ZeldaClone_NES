@@ -324,7 +324,10 @@ enemies = {
         frame_offset = 0
       },
       projectile_emitter = {
-
+            repeat_frequency = 0,
+            projectile_duration = 6000,
+            hit_percent_damage = 2,
+            is_friendly = false
       },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},

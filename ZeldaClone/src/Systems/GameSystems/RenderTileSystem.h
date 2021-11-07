@@ -107,13 +107,13 @@ struct RenderTileSystem : public System
 			 if (entity.BelongsToGroup("map"))
 				Logger::Err("Deleted map" + std::to_string(entity.GetID()));
 		}
-		auto entities = GetSystemEntities();
+		//auto entities = GetSystemEntities();
 
-		for (auto i = entities.begin(); i != entities.end(); i++)
-		{
-			Entity entity = *i;
+		//for (auto i = entities.begin(); i != entities.end(); i++)
+		//{
+		//	Entity entity = *i;
 
-			Registry::Instance()->RemoveEntityFromSystems(*i);
-		}
+		//	Registry::Instance()->RemoveEntityFromSystems(*i);
+		//}
 	}
 };

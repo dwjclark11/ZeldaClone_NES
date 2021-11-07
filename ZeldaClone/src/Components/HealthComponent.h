@@ -12,7 +12,7 @@ struct HealthComponent
 	Timer lowHeathTimer;
 	Timer deathTimer;
 	
-	HealthComponent(int healthPercentage = 9, int maxHearts = 3, bool addHeart = false, bool isHurt = false)
+	HealthComponent(int healthPercentage = 6, int maxHearts = 3, bool addHeart = false, bool isHurt = false)
 	{
 		this->healthPercentage = healthPercentage;
 		this->maxHearts = maxHearts;

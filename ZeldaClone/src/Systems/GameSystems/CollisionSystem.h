@@ -47,6 +47,9 @@ public:
 					continue;
 				}
 
+				//if (a.BelongsToGroup("colliders") && b.BelongsToGroup("colliders"))
+				//	continue;
+
 				auto& bTransform = b.GetComponent<TransformComponent>();
 				auto& bCollider = b.GetComponent<BoxColliderComponent>();
 				auto& bRigidbody = b.GetComponent<RigidBodyComponent>();

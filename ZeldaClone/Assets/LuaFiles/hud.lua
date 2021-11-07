@@ -289,7 +289,7 @@ hud = {
 		group = "hud",
 		components = {
 			transform = {
-				position = { x = 388, y = 55 },
+				position = { x = 380, y = 55 },
 				scale = { x = 3, y = 3 },
 				rotation = 0.0
 			},

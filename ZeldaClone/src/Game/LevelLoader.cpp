@@ -73,7 +73,7 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 	// Check to see if the file opened correctly
 	if (!mapFile.is_open())
 	{
-		Logger::Err("Unable to open [" + fileName + "]");
+		Logger::Err("Unable to open [" + fileName + "] This");
 	}
 
 	// Load the tilemap file 
@@ -1827,7 +1827,6 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			{
 				Logger::Err("Has trigger Component");
 				auto type = ConvertToTriggerType(lvlData["components"]["trigger"]["trigger_type"].get_or(0));
-
 				newLvlObject.AddComponent<TriggerBoxComponent>(type);
 					
 			}

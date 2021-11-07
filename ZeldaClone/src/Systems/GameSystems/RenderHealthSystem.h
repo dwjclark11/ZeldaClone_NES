@@ -37,7 +37,6 @@ public:
 				if (health.addHeart)
 				{
 					loadedHearts += 1;
-					Logger::Log("Loader Hearts " + std::to_string(loadedHearts));
 					health.addHeart = false;
 				}
 
@@ -62,7 +61,6 @@ public:
 					{	
 						xPos = 628 + (numHearts - 8) * 32;
 						yPos = 128;
-						Logger::Log(std::to_string(health.maxHearts));
 					}
 					
 					// Set the tag to the next heart!
@@ -102,8 +100,7 @@ public:
 			{
 				//GameState::playerDead = false;
 				//entity.GetComponent<HealthComponent>().healthPercentage = 6;
-			}
-				
+			}	
 		}
 	}
 

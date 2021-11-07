@@ -46,19 +46,19 @@ public:
 
 	void OnExit()
 	{
-		auto entities = GetSystemEntities();
-		for (auto i = entities.begin(); i != entities.end() - 1; i++)
+		for (auto entity : GetSystemEntities())
 		{
-			Entity entity = *i;
-			if (entity.BelongsToGroup("colliders"))
-				Registry::Instance()->RemoveEntityFromSystems(*i);
-		}
+			//Logger::Log("Colliders: " + std::to_string(Registry::Instance()->GetEntitiesByGroup("colliders").size()));
 
-		for (auto i = entities.begin(); i != entities.end() - 1; i++)
-		{
-			Entity entity = *i;
-			if (entity.BelongsToGroup("trigger"))
-				Registry::Instance()->RemoveEntityFromSystems(*i);
+			if (entity.BelongsToGroup("colliders") /*|| entity.BelongsToGroup("trigger")*/)
+			{
+				Registry::Instance()->RemoveEntityFromSystems(entity);	
+				//Registry::Instance()->RemoveEntityFromPool(entity);
+				Registry::Instance()->RemoveEntityGroup(entity);	
+				Registry::Instance()->RemoveEntityTag(entity);	
+
+				//entity.Kill();
+			}
 		}
 	}
 };

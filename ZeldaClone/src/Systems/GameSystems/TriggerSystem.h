@@ -75,11 +75,13 @@ public:
 			break;
 
 		case SECRET_AREA:
-			// Play stairs sound
-			Game::Instance()->GetSystem<RenderSystem>().OnExit();
+			
 			// Remove all the prior assets/entities from the current scene
+			Game::Instance()->GetSystem<RenderSystem>().OnExit();
 			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
 			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
+
+			// Play stairs sound
 			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
 
 			// Adjust the player position to the trigger transport position
@@ -96,6 +98,7 @@ public:
 			// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
 			if (assetFile != "no_file")
 			{
+				Logger::Log("Asset File");
 				loader.LoadAssetsFromLuaTable(Game::Instance()->GetLuaState(), assetFile);
 			}
 			if (trig.colliderFile != "no_file")
@@ -110,7 +113,9 @@ public:
 			}
 
 			if (trig.tileMapName != "no_file" && trig.tileImageName != "no_file")
+			{
 				loader.LoadTilemap(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), mapFile, tileFile);
+			}
 			else
 			{
 				loader.LoadMap(Game::Instance()->GetAssetManager(), trig.tileImageName, trig.imageWidth, trig.imageHeight);

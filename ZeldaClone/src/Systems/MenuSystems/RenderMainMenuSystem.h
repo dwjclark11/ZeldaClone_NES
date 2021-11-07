@@ -45,25 +45,16 @@ struct RenderMainMenuSystem : public System
 				&dstRect,
 				transform.rotation,
 				NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
-				sprite.flip				// This is if we want to flup a sprite
+				sprite.flip				// This is if we want to flip a sprite
 			);
 		}
 	}
 
 	void OnExit()
 	{
-		//for (auto entity : GetSystemEntities())
-		//{
-		//	entity.Kill();
-		//}
-
-		auto entities = GetSystemEntities();
-
-		for (auto i = entities.begin(); i != entities.end() - 1; i++)
+		for (auto entity : GetSystemEntities())
 		{
-			Entity entity = *i;
-
-			Registry::Instance()->RemoveEntityFromSystems(*i);
+			entity.Kill();
 		}
 	}
 };

@@ -21,9 +21,9 @@ void ItemDrop(Entity& enemy)
 	if (chance % 7 == 0)
 	{
 		Entity item = Registry::Instance()->CreateEntity();
-		item.Group("bombs");
+		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
-		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 48, 0);
+		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
 		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<BoxColliderComponent>(16, 16);
 		item.AddComponent<GameComponent>();

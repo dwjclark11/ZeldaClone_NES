@@ -6,7 +6,7 @@ player_data = {
   [1] = {
     menu_shared_values = {
       name = "DUSTIN",
-      num_hearts = 10,
+      num_hearts = 3,
       blue_ring = false,
       red_ring = false
     },
@@ -31,9 +31,9 @@ player_data = {
       red_potion = false,
       master_key = false},
     inventory = {
-      num_rupees = 202,
-      num_bombs = 20,
-      num_arrows = 10,
+      num_rupees = 0,
+      num_bombs = 0,
+      num_arrows = 0,
       num_keys = 0
     }
   }

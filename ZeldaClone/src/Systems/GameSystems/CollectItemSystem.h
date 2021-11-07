@@ -78,14 +78,21 @@ public:
 			{
 				GameState::totalBombs += 3;
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_item", 0, 1);
-				item.Kill();
+				Registry::Instance()->RemoveEntityFromSystems(item);
+				//item.Kill();
 			}
 			else if (type.type == HEARTS)
 			{
 				auto& health = player.GetComponent<HealthComponent>();
 				health.healthPercentage += 2;
+
+				// Clamp health to the maxHealth --> Create Variable?
+				if (health.healthPercentage >= health.maxHearts * 2)
+					health.healthPercentage = health.maxHearts * 2;
+				
 				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_item", 0, 1);
 				Registry::Instance()->RemoveEntityFromSystems(item);
+				//item.Kill();
 			}
 		}
 	}

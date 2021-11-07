@@ -74,14 +74,15 @@ void GameState::Update(const double& deltaTime)
 	}
 	// Reset the event manager queue
 	Game::Instance()->GetEventManager()->Reset();
+
 	
 	Registry::Instance()->GetSystem<CollectItemSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<DamageSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<MovementSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	Registry::Instance()->GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	
+	Registry::Instance()->GetSystem<TriggerSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
 	// Update the registry values
 	Registry::Instance()->Update();
 	
@@ -92,13 +93,16 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance()->GetSystem<AnimationSystem>().Update();
 	Registry::Instance()->GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 
-	Registry::Instance()->GetSystem<CollisionSystem>().Update(Game::Instance()->GetEventManager(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
+
 	Registry::Instance()->GetSystem<MovementSystem>().Update(deltaTime);
 	Registry::Instance()->GetSystem<CameraMovementSystem>().Update(Game::Instance()->GetCamera());
 	Registry::Instance()->GetSystem<ProjectileLifeCycleSystem>().Update();
-	
+	Registry::Instance()->GetSystem<CollisionSystem>().Update(Game::Instance()->GetEventManager(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
+
 	//Registry::Instance()->GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	Registry::Instance()->GetSystem<AISystem>().Update();
+	// Update the registry values
+	//Registry::Instance()->Update();
 
 
 	ConvertHUDNumbers();
@@ -121,7 +125,7 @@ void GameState::Render()
 	SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 0, 0, 0, 255);
 	
 	Game::Instance()->GetSystem<RenderHUDSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager());
-	Game::Instance()->GetSystem<RenderTextSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
+/*	Game::Instance()->GetSystem<RenderTextSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera())*/;
 
 	Registry::Instance()->GetSystem<HealthSystem>().Update();
 	Game::Instance()->GetSystem<RenderHealthSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetCamera());
@@ -220,7 +224,7 @@ bool GameState::OnExit()
 	Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
 	Game::Instance()->GetSystem<RenderSystem>().OnExit();
 	Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
-	Game::Instance()->GetSystem<RenderTextSystem>().OnExit();
+	//Game::Instance()->GetSystem<RenderTextSystem>().OnExit();
 	firstEntered = false;
 	return true;
 }
@@ -248,7 +252,7 @@ void GameState::OnKeyDown(SDL_Event* event)
 void GameState::OnKeyUp(SDL_Event* event)
 {
 	Registry::Instance()->GetSystem<KeyboardControlSystem>().UpdatePlayer();
-	Game::Instance()->GetEventManager()->Reset();
+	//Game::Instance()->GetEventManager()->Reset();
 	KeyboardControlSystem::keyDown = false;
 }
 

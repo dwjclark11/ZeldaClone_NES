@@ -45,7 +45,6 @@ void System::RemoveEntityFromSystem(Entity entity)
 {
 	// This uses the functions of the vector class. It contains a Lambda function that looks for a 
 	// match amd then removes it
-
 	entities.erase(std::remove_if(entities.begin(), entities.end(), [&entity](Entity otherEntity)
 		{
 			return entity == otherEntity;
@@ -99,7 +98,7 @@ Entity Registry::CreateEntity()
 void Registry::KillEntity(Entity entity)
 {
 	entitiesToBeKilled.insert(entity);
-	//Logger::Log("Entity " + std::to_string(entity.GetID()) + " was killed");
+	Logger::Log("Entity " + std::to_string(entity.GetID()) + " was killed");
 }
 
 void Registry::AddEntityToSystem(Entity entity)
@@ -172,7 +171,28 @@ void Registry::Update()
 	
 	entitiesToBeKilled.clear();
 }
+void Registry::RemoveEntityFromPool(Entity entity)
+{
+	entityComponentSignatures[entity.GetID()].reset(); // Reset the component signatures from the removed entity
 
+	// Remove the entity from the component pools
+	for (auto pool : componentPools)
+	{
+		if (pool) // If the pool is not null
+		{
+			pool->RemoveEntityFromPool(entity.GetID());
+		}
+
+	}
+
+	// Make the Entity ID available to be used
+	freeIDs.push_back(entity.GetID()); // Push back the ID that was just removed
+
+	// Remove any traces of that entity from the  tag/groups maps
+	//RemoveEntityTag(entity);
+	//RemoveEntityGroup(entity);
+	//RemoveEntityFromSystems(entity);
+}
 void Registry::TagEntity(Entity entity, const std::string& tag)
 {
 	entityPerTag.emplace(tag, entity);

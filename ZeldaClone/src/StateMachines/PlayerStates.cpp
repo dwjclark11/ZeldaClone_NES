@@ -203,9 +203,11 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	{
 		Logger::Log("Item Has Been Collected");
 		itemCollected = false;
+		//trigItem->GetComponent<TriggerBoxComponent>().active = false;
 		trigItem->Kill();
-		//Registry::Instance()->RemoveEntityFromSystems(*trigItem);
 		
+		//Registry::Instance()->RemoveEntityFromSystems(*trigItem);
+		//Registry::Instance()->RemoveEntityGroup(*trigItem);
 		pOwner->ChangeState(pOwner->idleState, entity);
 	}
 }
@@ -213,6 +215,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	movedTrigItem = false;
+	trigItem = nullptr;
 }
 
 void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity) 

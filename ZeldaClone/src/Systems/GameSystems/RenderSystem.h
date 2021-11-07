@@ -105,20 +105,20 @@ struct RenderSystem : public System
 
 	void OnExit()
 	{
-		auto entities = GetSystemEntities();
-		for (auto i = entities.begin(); i != entities.end(); i++)
+		for (auto entity : GetSystemEntities())
 		{
-			Entity entity = *i;
-
-			if (entity.HasComponent<AIComponent>())
-				entity.GetComponent<AIComponent>().GarbageCollect();
-
 			if (entity.BelongsToGroup("enemies"))
-				Registry::Instance()->RemoveEntityFromSystems(*i);
+			{
+				Registry::Instance()->RemoveEntityFromSystems(entity);
+
+				if (entity.HasComponent<AIComponent>())
+					entity.GetComponent<AIComponent>().GarbageCollect();
+			}
+
 
 			if (!entity.HasTag("player") && !entity.BelongsToGroup("enemies"))
 			{
-				Registry::Instance()->RemoveEntityFromSystems(*i);
+				Registry::Instance()->RemoveEntityFromSystems(entity);
 			}
 		}
 	}

@@ -31,7 +31,7 @@ player =
         offset = { x = 0, y = 0}
       },
       health = {
-        health_percentage = 9,
+        health_percentage = 6,
         max_hearts = 3
       },
       rigidbody = {

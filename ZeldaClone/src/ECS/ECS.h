@@ -185,27 +185,30 @@ public:
 
 	void Remove(int entityID)
 	{
-		//Logger::Log(std::to_string(size));
-		// Copy the last element to the deleted position to keep the array packed
-		int indexOfRemoved = entityIDToIndex[entityID];
-		int indexOfLast = size - 1;
-		data[indexOfRemoved] = data[indexOfLast];
+		if (size > 0)
+		{
+			// Copy the last element to the deleted position to keep the array packed
+			int indexOfRemoved = entityIDToIndex[entityID];
+			int indexOfLast = size - 1;
+			data[indexOfRemoved] = data[indexOfLast];
 
-		// Update the index-entity maps to point to the correct elements
-		int entityIDOfLastElement = indexToEntityID[indexOfLast];
-		entityIDToIndex[entityIDOfLastElement] = indexOfRemoved;
-		indexToEntityID[indexOfRemoved] = entityIDOfLastElement;
+			// Update the index-entity maps to point to the correct elements
+			int entityIDOfLastElement = indexToEntityID[indexOfLast];
+			entityIDToIndex[entityIDOfLastElement] = indexOfRemoved;
+			indexToEntityID[indexOfRemoved] = entityIDOfLastElement;
 
-		entityIDToIndex.erase(entityID);
-		indexToEntityID.erase(indexOfLast);
+			entityIDToIndex.erase(entityID);
+			indexToEntityID.erase(indexOfLast);
 
-		size--;
+			size--;
+		}
 	}
 
 	void RemoveEntityFromPool(int entityID) override
 	{
 		if (entityIDToIndex.find(entityID) != entityIDToIndex.end())
 		{
+			//Logger::Log("HERE");
 			Remove(entityID);
 		}
 	}
@@ -285,7 +288,7 @@ public:
 	void RemoveEntityFromSystems(Entity entity);
 
 	void Update();
-
+	void RemoveEntityFromPool(Entity entity);
 	// Tag Management 
 	void TagEntity(Entity entity, const std::string& tag);
 	bool EntityHasTag(Entity entity, const std::string& tag) const;
