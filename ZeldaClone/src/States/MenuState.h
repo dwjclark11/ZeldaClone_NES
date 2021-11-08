@@ -12,7 +12,8 @@ public:
 
 	static bool slotsFull;
 
-	MenuState() : full(false), slot1(1), slot2(2), slot3(3) {}
+	MenuState();
+	~MenuState() {};
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -32,5 +33,8 @@ private:
 	unsigned int slot2;
 	unsigned int slot3;
 	sol::state lua;
+
+	class Game& game;
+	class Registry& reg;
 
 };

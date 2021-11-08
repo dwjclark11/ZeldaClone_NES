@@ -17,7 +17,7 @@ void ItemDrop(Entity& enemy)
 	const auto& enemyTransform = enemy.GetComponent<TransformComponent>();
 	glm::vec2 pos = enemyTransform.position;
 	
-	Logger::Log("Chance: " + std::to_string(chance));
+	//Logger::Log("Chance: " + std::to_string(chance));
 	if (chance % 7 == 0)
 	{
 		Entity item = Registry::Instance()->CreateEntity();
@@ -403,13 +403,13 @@ void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	srand(SDL_GetTicks());
 
 	int chance = rand();
-	Logger::Log("Chance: " + std::to_string(chance));
+	//Logger::Log("Chance: " + std::to_string(chance));
 	if (chance % 2 == 0)
 	{
 		ItemDrop(entity);
 	}
-	else
-		Logger::Log("Not Created");
+	/*else
+		Logger::Log("Not Created");*/
 
 }
 void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)

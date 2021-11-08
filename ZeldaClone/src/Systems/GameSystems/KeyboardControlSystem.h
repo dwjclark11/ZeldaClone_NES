@@ -20,13 +20,15 @@ enum directionE {NONE = 0, UP, RIGHT, DOWN, LEFT, ATTACK};
 
 class KeyboardControlSystem : public System
 {
-
+private:
+	class Game& game;
 public:
 	static directionE dir;
 	static bool keyDown;
 	bool attack;
 	
 	KeyboardControlSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<RigidBodyComponent>();
 		RequiredComponent<KeyboardControlComponent>();
@@ -35,7 +37,7 @@ public:
 	
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
 	{
-		if (!Game::Instance()->GetCameraMoving() && !Game::Instance()->GetPlayerItem() && !Game::Instance()->GetPlayerDead())
+		if (!game.GetCameraMoving() && !game.GetPlayerItem() && !game.GetPlayerDead())
 		{
 			eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardControlSystem::OnKeyPressed); // Callback Function
 		}
@@ -49,7 +51,7 @@ public:
 		// Loop all the entities that the system is interested in
 		for (auto i = entities.begin(); i != entities.end(); i++)
 		{
-			if (!Game::Instance()->GetPlayerItem())
+			if (!game.GetPlayerItem())
 			{
 				if (i->HasTag("player"))
 				{
@@ -58,7 +60,7 @@ public:
 					auto& playerCollider = a.GetComponent<BoxColliderComponent>();
 					auto& playerRigidbody = a.GetComponent<RigidBodyComponent>();
 					auto& sprite = a.GetComponent<SpriteComponent>();
-					const auto keyboardControl = a.GetComponent<KeyboardControlComponent>();
+					const auto& keyboardControl = a.GetComponent<KeyboardControlComponent>();
 					//Logger::Log("x: " + std::to_string(playerTransform.position.x) + ", y: " + std::to_string(playerTransform.position.y));
 					// Loop all entities that still need to be checked 
 					for (auto j = i; j != entities.end(); j++)

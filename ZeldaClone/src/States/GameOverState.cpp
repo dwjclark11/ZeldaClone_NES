@@ -10,18 +10,23 @@
 
 const std::string GameOverState::gameOverID = "GAMEOVER";
 
+GameOverState::GameOverState()
+	: game(*Game::Instance())
+{
+}
+
 void GameOverState::Update(const double& deltaTime)
 {
-	Game::Instance()->GetEventManager()->Reset();
-	Registry::Instance()->GetSystem<GameOverKeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	game.GetEventManager()->Reset();
+	Registry::Instance()->GetSystem<GameOverKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance()->Update();
 	Registry::Instance()->GetSystem<GameOverKeyboardControlSystem>().Update();
 }
 
 void GameOverState::Render()
 {
-	Game::Instance()->GetSystem<RenderGameOverTextSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
-	Game::Instance()->GetSystem<RenderGameOverSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager());
+	game.GetSystem<RenderGameOverTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	game.GetSystem<RenderGameOverSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool GameOverState::OnEnter()
@@ -33,9 +38,9 @@ bool GameOverState::OnEnter()
 	if (!Registry::Instance()->HasSystem<GameOverKeyboardControlSystem>()) 
 		Registry::Instance()->AddSystem<GameOverKeyboardControlSystem>();
 	
-	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
+	game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 	
-	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
+	game.GetAssetManager()->AddTextures(game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
 
 	Entity game_over_text = Registry::Instance()->CreateEntity();
 	game_over_text.AddComponent<TransformComponent>(glm::vec2(185, 50), glm::vec2(4, 4), 0.0);
@@ -69,17 +74,17 @@ bool GameOverState::OnEnter()
 
 bool GameOverState::OnExit()
 {
-	Game::Instance()->GetSystem<RenderGameOverSystem>().OnExit();
-	Game::Instance()->GetSystem<RenderGameOverTextSystem>().OnExit();
-	Game::Instance()->GetSystem<RenderTextSystem>().OnExit();
+	game.GetSystem<RenderGameOverSystem>().OnExit();
+	game.GetSystem<RenderGameOverTextSystem>().OnExit();
+	game.GetSystem<RenderTextSystem>().OnExit();
 	Logger::Log("Exiting Game Over State");
-	Game::Instance()->GetPlayerDead() = false;
+	game.GetPlayerDead() = false;
 	return true;
 }
 
 void GameOverState::ProcessEvents(SDL_Event& event)
 {
-	Game::Instance()->GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	game.GetSystem<GamePadSystem>().UpdateOtherStates(event);
 }
 
 void GameOverState::OnKeyDown(SDL_Event* event)

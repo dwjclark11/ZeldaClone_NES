@@ -17,7 +17,7 @@ public:
 	static bool firstEntered;
 	
 	// Constructor
-	GameState() {}
+	GameState();
 	~GameState();
 	GameState(glm::vec2 cameraOffset);
 	
@@ -39,4 +39,6 @@ public:
 private:
 	static const std::string gameID;
 	glm::vec2 cameraOffset;
+	class Game& game;
+	class Registry& reg;
 };

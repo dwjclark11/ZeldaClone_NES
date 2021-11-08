@@ -4,11 +4,11 @@
 
 class ProjectileLifeCycleSystem : public System
 {
+private:
+	class Game& game;
 public:
-	ProjectileLifeCycleSystem()
-	{
-		RequiredComponent<ProjectileComponent>();
-	}
+	ProjectileLifeCycleSystem();
+
 
 	void Update();
 

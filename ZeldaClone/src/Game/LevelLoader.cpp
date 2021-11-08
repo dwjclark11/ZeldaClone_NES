@@ -25,19 +25,20 @@
 #include <fstream>
 #include <SDL.h>
 LevelLoader::LevelLoader()
+	: game(*Game::Instance()), reg(*Registry::Instance())
 {
-	Logger::Log("Level Loader Constructor run");
+	//Logger::Log("Level Loader Constructor run");
 }
 
 LevelLoader::~LevelLoader()
 {
-	Logger::Log("Level Loader Constructor run");
+	//Logger::Log("Level Loader Constructor run");
 }
 
 
 void LevelLoader::LoadMap(const std::unique_ptr<AssetManager>& assetManager, std::string mapName, int image_width, int image_height)
 {
-	Entity secret = Registry::Instance()->CreateEntity();
+	Entity secret = reg.CreateEntity();
 	secret.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
 	secret.AddComponent<SpriteComponent>(mapName, image_width, image_height, 1, false, 0, 0);
 	secret.AddComponent<TileComponent>();
@@ -52,11 +53,11 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 	// Remove the .png
 	for (int i = 0; i < 4; i++)
 		assetID.pop_back();
-	Logger::Err("Before: " + imageName);
+	//Logger::Err("Before: " + imageName);
 	std::string tileMapImage = SetName(imageName);
-	Logger::Err("After: " + tileMapImage);
+	//Logger::Err("After: " + tileMapImage);
 
-	Logger::Log("AssetID: " + assetID);
+	//Logger::Log("AssetID: " + assetID);
 	assetManager->AddTextures(renderer, tileMapImage, imageName);
 
 	//Logger::Err("Before: " + imageName);
@@ -105,7 +106,7 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity tile = Registry::Instance()->CreateEntity();
+		Entity tile = reg.CreateEntity();
 		tile.AddComponent<SpriteComponent>(tileMapImage, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		if (zIndex < 2)
@@ -154,13 +155,13 @@ void LevelLoader::LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetM
 
 		assetType = ConvertToAssetType(type);
 
-		//Entity newEntity = Registry::instance()->CreateEntity();
-		Logger::Log(assetPath);
+		//Entity newEntity = reg.CreateEntity();
+		//Logger::Log(assetPath);
 		switch (assetType)
 		{
 		case TEXTURE:
 			assetManager->AddTextures(renderer, assetID, (path + assetPath));
-			Logger::Log("Texture Added with ID " + assetID);
+			//Logger::Log("Texture Added with ID " + assetID);
 			break;
 
 		case MUSIC:
@@ -239,7 +240,7 @@ void LevelLoader::LoadMenuScreen(std::unique_ptr<AssetManager>& assetManager, SD
 			}
 
 			// Create new tile Entity for each parsed tile
-			Entity tile = Registry::Instance()->CreateEntity();
+			Entity tile = reg.CreateEntity();
 			tile.Group(group);
 			tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 			tile.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(tileScaleX, tileScaleY), 0.0);
@@ -291,7 +292,7 @@ void LevelLoader::LoadMenuScreen(std::unique_ptr<AssetManager>& assetManager, SD
 			if (i > 0 && vertical) yTransform += 32;
 	
 			// Create new tile Entity for each parsed tile
-			Entity tile = Registry::Instance()->CreateEntity();
+			Entity tile = reg.CreateEntity();
 			tile.Group(group);
 			tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 			tile.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(tileScaleX, tileScaleY), 0.0);
@@ -387,14 +388,14 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 				}
 
 				// Create new heart Entity for each parsed tile
-				Entity heart = Registry::Instance()->CreateEntity();
+				Entity heart = reg.CreateEntity();
 				heart.Group("hearts");
 				heart.AddComponent<SpriteComponent>("hearts", 16, 16, 0, false, 0, 0);
 				heart.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(4, 4), 0.0);
 				heart.AddComponent<MenuComponent>();
 			}
 			
-			auto entity = Registry::Instance()->GetEntityByTag(entityTag);
+			auto entity = reg.GetEntityByTag(entityTag);
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 			
 			blueRing = player["menu_shared_values"]["blue_ring"];
@@ -439,11 +440,11 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 
 		if (hasData == sol::nullopt)
 		{
-			Logger::Err("Menu File Read!");
+			//Logger::Err("Menu File Read!");
 			break;
 		}
 		sol::table ui = data[i];
-		auto entity = Registry::Instance()->CreateEntity();
+		auto entity = reg.CreateEntity();
 
 
 		sol::optional tag = ui["tag"];
@@ -543,7 +544,7 @@ void LevelLoader::SaveSlotData(unsigned int& slotNum)
 	std::string name = NameState::name;
 	slotFile << name;
 
-	Logger::Log("Slot number " + std::to_string(slotNum) + " is open");
+	//Logger::Log("Slot number " + std::to_string(slotNum) + " is open");
 	slotFile.close();
 }
 
@@ -583,7 +584,7 @@ void LevelLoader::LoadLevel(std::unique_ptr<AssetManager>& assetManager, SDL_Ren
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity tile = Registry::Instance()->CreateEntity();
+		Entity tile = reg.CreateEntity();
 		tile.Group(group);
 		tile.AddComponent<SpriteComponent>("tiles", tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
@@ -648,7 +649,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity boxCollider = Registry::Instance()->CreateEntity();
+		Entity boxCollider = reg.CreateEntity();
 		boxCollider.Group(group);
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
 		boxCollider.AddComponent<GameComponent>();
@@ -768,7 +769,7 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 		
 		sol::table collider = colliders[i];
 
-		Entity newCollider = Registry::Instance()->CreateEntity();
+		Entity newCollider = reg.CreateEntity();
 
 		// Group
 		sol::optional<std::string> group = collider["group"];
@@ -825,10 +826,10 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 					collider["triggerComponent"]["level"]
 				);
 			}
-			else
-			{
-				Logger::Err("No Trigger");
-			}
+			//else
+			//{
+			//	Logger::Err("No Trigger");
+			//}
 		}
 		i++;
 	}
@@ -836,7 +837,7 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 
 void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 {
-	Logger::Err("In Save Player to Lua Table Function");
+	//Logger::Err("In Save Player to Lua Table Function");
 	LuaTableWriter m_writer;
 	std::fstream file;
 	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
@@ -851,33 +852,33 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::uniqu
 	m_writer.WriteDeclareTable("player_data", file);
 	
 		
-	auto entity = Registry::Instance()->GetEntityByTag("player");
+	auto entity = reg.GetEntityByTag("player");
 		
 		
 	const auto& transform = entity.GetComponent<TransformComponent>();
 	
 	// Local variables that are based on the game Items
-	bool hasBoomerang = Game::Instance()->GetGameItems().woodBoomerang;
-	bool hasMagicBoomerang = Game::Instance()->GetGameItems().magicBoomerang;
-	bool hasSword = Game::Instance()->GetGameItems().woodSword;
-	bool hasMagicSword = Game::Instance()->GetGameItems().magicSword;
-	bool hasMagicRod = Game::Instance()->GetGameItems().magicRod;
-	bool hasBombs = Game::Instance()->GetGameItems().bombs;
-	bool hasFood = Game::Instance()->GetGameItems().food;
-	bool hasFlute = Game::Instance()->GetGameItems().flute;
-	bool hasRaft = Game::Instance()->GetGameItems().raft;
-	bool hasLadder = Game::Instance()->GetGameItems().ladder;
-	bool hasBlueRing = Game::Instance()->GetGameItems().blueRing;
-	bool hasRedRing = Game::Instance()->GetGameItems().redRing;
-	bool hasBow = Game::Instance()->GetGameItems().bow;
-	bool hasMagicBow = Game::Instance()->GetGameItems().magicBow;
-	bool hasShield = Game::Instance()->GetGameItems().shield;
-	bool hasMagicShield = Game::Instance()->GetGameItems().magicShield;
-	bool hasPowerBraclet = Game::Instance()->GetGameItems().powerBraclet;
-	bool hasMap = Game::Instance()->GetGameItems().map;
-	bool hasBluePotion = Game::Instance()->GetGameItems().bluePotion;
-	bool hasRedPotion = Game::Instance()->GetGameItems().redPotion;
-	bool hasMasterKey = Game::Instance()->GetGameItems().masterKey;
+	bool hasBoomerang = game.GetGameItems().woodBoomerang;
+	bool hasMagicBoomerang = game.GetGameItems().magicBoomerang;
+	bool hasSword = game.GetGameItems().woodSword;
+	bool hasMagicSword = game.GetGameItems().magicSword;
+	bool hasMagicRod = game.GetGameItems().magicRod;
+	bool hasBombs = game.GetGameItems().bombs;
+	bool hasFood = game.GetGameItems().food;
+	bool hasFlute = game.GetGameItems().flute;
+	bool hasRaft = game.GetGameItems().raft;
+	bool hasLadder = game.GetGameItems().ladder;
+	bool hasBlueRing = game.GetGameItems().blueRing;
+	bool hasRedRing = game.GetGameItems().redRing;
+	bool hasBow = game.GetGameItems().bow;
+	bool hasMagicBow = game.GetGameItems().magicBow;
+	bool hasShield = game.GetGameItems().shield;
+	bool hasMagicShield = game.GetGameItems().magicShield;
+	bool hasPowerBraclet = game.GetGameItems().powerBraclet;
+	bool hasMap = game.GetGameItems().map;
+	bool hasBluePotion = game.GetGameItems().bluePotion;
+	bool hasRedPotion = game.GetGameItems().redPotion;
+	bool hasMasterKey = game.GetGameItems().masterKey;
 	int numRupees = GameState::totalRupees;
 	int numBombs = GameState::totalBombs;
 	int numArrows = 10;
@@ -961,7 +962,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::uniqu
 // This is for a new player -->Default values for items
 void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& newName)
 {
-	Logger::Err("In Save Player to Lua Table Function");
+	//Logger::Err("In Save Player to Lua Table Function");
 	LuaTableWriter m_writer;
 	std::fstream file;
 	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
@@ -1102,7 +1103,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		}
 		sol::table player = data[i];
 
-		auto entity = Registry::Instance()->CreateEntity();
+		auto entity = reg.CreateEntity();
 		//Logger::Err("Player Create");
 		//Logger::Err(player["tag"]);
 		entity.Tag(player["tag"]);
@@ -1111,7 +1112,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		sol::optional<sol::table> hasComponents = player["components"];
 		if (hasComponents != sol::nullopt)
 		{
-			Logger::Err("HAS COMPONENTS");
+			//Logger::Err("HAS COMPONENTS");
 			// Transform Component
 			sol::optional<sol::table> transformComp = player["components"]["transform"];
 			if (transformComp != sol::nullopt)
@@ -1267,7 +1268,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 
 	while (true)
 	{
-		auto entity = Registry::Instance()->GetEntityByTag("player");
+		auto entity = reg.GetEntityByTag("player");
 
 		auto& transform = entity.GetComponent<TransformComponent>();
 
@@ -1304,25 +1305,25 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> hasItems = player["items"];
 		if (hasItems != sol::nullopt)
 		{ 
-			Game::Instance()->GetGameItems().woodBoomerang = player["items"]["boomerang"].get_or(false);
-			Game::Instance()->GetGameItems().magicBoomerang = player["items"]["magic_boomerang"].get_or(false);
-			Game::Instance()->GetGameItems().woodSword = player["items"]["wood_sword"].get_or(false);
-			Game::Instance()->GetGameItems().steelSword = player["items"]["steel_sword"].get_or(false);
-			Game::Instance()->GetGameItems().magicSword = player["items"]["magic_sword"].get_or(false);
-			Game::Instance()->GetGameItems().bombs = player["items"]["bombs"].get_or(false);
-			Game::Instance()->GetGameItems().food = player["items"]["food"].get_or(false);
-			Game::Instance()->GetGameItems().flute = player["items"]["flute"].get_or(false);
-			Game::Instance()->GetGameItems().raft = player["items"]["raft"].get_or(false);
-			Game::Instance()->GetGameItems().ladder = player["items"]["ladder"].get_or(false);
-			Game::Instance()->GetGameItems().bow = player["items"]["bow_wood"].get_or(false);
-			Game::Instance()->GetGameItems().magicBow = player["items"]["bow_magic"].get_or(false);
-			Game::Instance()->GetGameItems().shield = player["items"]["shield"].get_or(false);
-			Game::Instance()->GetGameItems().magicShield = player["items"]["magic_shield"].get_or(false);
-			Game::Instance()->GetGameItems().powerBraclet = player["items"]["power_braclet"].get_or(false);
-			Game::Instance()->GetGameItems().map = player["items"]["map"].get_or(false);
-			Game::Instance()->GetGameItems().bluePotion = player["items"]["blue_potion"].get_or(false);
-			Game::Instance()->GetGameItems().redPotion = player["items"]["red_potion"].get_or(false);
-			Game::Instance()->GetGameItems().masterKey = player["items"]["master_key"].get_or(false);
+			game.GetGameItems().woodBoomerang = player["items"]["boomerang"].get_or(false);
+			game.GetGameItems().magicBoomerang = player["items"]["magic_boomerang"].get_or(false);
+			game.GetGameItems().woodSword = player["items"]["wood_sword"].get_or(false);
+			game.GetGameItems().steelSword = player["items"]["steel_sword"].get_or(false);
+			game.GetGameItems().magicSword = player["items"]["magic_sword"].get_or(false);
+			game.GetGameItems().bombs = player["items"]["bombs"].get_or(false);
+			game.GetGameItems().food = player["items"]["food"].get_or(false);
+			game.GetGameItems().flute = player["items"]["flute"].get_or(false);
+			game.GetGameItems().raft = player["items"]["raft"].get_or(false);
+			game.GetGameItems().ladder = player["items"]["ladder"].get_or(false);
+			game.GetGameItems().bow = player["items"]["bow_wood"].get_or(false);
+			game.GetGameItems().magicBow = player["items"]["bow_magic"].get_or(false);
+			game.GetGameItems().shield = player["items"]["shield"].get_or(false);
+			game.GetGameItems().magicShield = player["items"]["magic_shield"].get_or(false);
+			game.GetGameItems().powerBraclet = player["items"]["power_braclet"].get_or(false);
+			game.GetGameItems().map = player["items"]["map"].get_or(false);
+			game.GetGameItems().bluePotion = player["items"]["blue_potion"].get_or(false);
+			game.GetGameItems().redPotion = player["items"]["red_potion"].get_or(false);
+			game.GetGameItems().masterKey = player["items"]["master_key"].get_or(false);
 		}
 
 		// Inventory
@@ -1340,7 +1341,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
-	Logger::Log(fileName);
+	//Logger::Log(fileName);
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -1370,7 +1371,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 		
 		sol::table entity = entities[i];
 		
-		Entity newEntity = Registry::Instance()->CreateEntity();
+		Entity newEntity = reg.CreateEntity();
 
 		// Group 
 		newEntity.Group(entity["group"]);
@@ -1455,7 +1456,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			sol::optional<sol::table> box_collider = entity["components"]["box_collider"];
 			if (box_collider != sol::nullopt)
 			{
-				Logger::Err("Has Box Collider Component");
+				//Logger::Err("Has Box Collider Component");
 				newEntity.AddComponent<BoxColliderComponent>(
 					entity["components"]["box_collider"]["width"].get_or(16),
 					entity["components"]["box_collider"]["height"].get_or(16),
@@ -1495,7 +1496,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			{
 				AIComponent::EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"]);
 
-				Logger::Log("Type: " + std::to_string(type));
+				//Logger::Log("Type: " + std::to_string(type));
 				
 				newEntity.AddComponent<AIComponent>(
 					glm::vec2(
@@ -1538,13 +1539,13 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 		sol::optional<sol::table> hasData = data[i];
 		if (hasData == sol::nullopt)
 		{
-			Logger::Err("No HUD Data");
+			//Logger::Err("No HUD Data");
 			break;
 		}
 
 		sol::table hudData = data[i];
 
-		Entity newHUDObject = Registry::Instance()->CreateEntity();
+		Entity newHUDObject = reg.CreateEntity();
 		
 		// Add tag if there is one
 		sol::optional<std::string> tag = hudData["tag"];
@@ -1634,7 +1635,7 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 		sol::optional<sol::table> hasAssets = assets[i];
 		if (hasAssets == sol::nullopt)
 		{
-			Logger::Err("No Assets Data");
+			//Logger::Err("No Assets Data");
 			break;
 		}
 
@@ -1644,38 +1645,38 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 
 		if (assetType == "texture")
 		{
-			if (!Game::Instance()->GetAssetManager()->HasTexture(assetID))
+			if (!game.GetAssetManager()->HasTexture(assetID))
 			{
-				Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), assetID, asset["file"]);
-				Logger::Log("New Texture asset loaded to the asset store, id: " + assetID);
+				game.GetAssetManager()->AddTextures(game.GetRenderer(), assetID, asset["file"]);
+				//Logger::Log("New Texture asset loaded to the asset store, id: " + assetID);
 			}
 
 		}
 
 		if (assetType == "font")
 		{
-			if (!Game::Instance()->GetAssetManager()->HasFont(assetID))
+			if (!game.GetAssetManager()->HasFont(assetID))
 			{
-				Game::Instance()->GetAssetManager()->AddFonts(assetID, asset["file"], asset["font_size"]);
-				Logger::Log("New Font asset loaded to the asset store, id: " + assetID);
+				game.GetAssetManager()->AddFonts(assetID, asset["file"], asset["font_size"]);
+				//Logger::Log("New Font asset loaded to the asset store, id: " + assetID);
 			}
 		}
 
 		if (assetType == "soundFX")
 		{
-			if (!Game::Instance()->GetAssetManager()->HasSoundFX(assetID))
+			if (!game.GetAssetManager()->HasSoundFX(assetID))
 			{
-				Game::Instance()->GetAssetManager()->AddSoundFX(assetID, asset["file"]);
-				Logger::Log("New SoundFX asset loaded to the asset store, id: " + assetID);
+				game.GetAssetManager()->AddSoundFX(assetID, asset["file"]);
+				//Logger::Log("New SoundFX asset loaded to the asset store, id: " + assetID);
 			}
 		}
 
 		if (assetType == "music")
 		{
-			if (!Game::Instance()->GetAssetManager()->HasMusic(assetID))
+			if (!game.GetAssetManager()->HasMusic(assetID))
 			{
-				Game::Instance()->GetAssetManager()->AddMusic(assetID, asset["file"]);
-				Logger::Log("New Music asset loaded to the asset store, id: " + assetID);
+				game.GetAssetManager()->AddMusic(assetID, asset["file"]);
+				//Logger::Log("New Music asset loaded to the asset store, id: " + assetID);
 			}
 		}
 
@@ -1736,13 +1737,13 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		sol::optional<sol::table> hasData = data[i];
 		if (hasData == sol::nullopt)
 		{
-			Logger::Err("No Level Data");
+			//Logger::Err("No Level Data");
 			break;
 		}
 
 		sol::table lvlData = data[i];
 
-		Entity newLvlObject = Registry::Instance()->CreateEntity();
+		Entity newLvlObject = reg.CreateEntity();
 
 		// Add tag if there is one
 		sol::optional<std::string> tag = lvlData["tag"];
@@ -1811,7 +1812,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			if (box_collider != sol::nullopt)
 			{
 				int val = lvlData["components"]["box_collider"]["offset"]["x"].get_or(0);
-				Logger::Err("Box_OFFSET: " + std::to_string(val));
+				//Logger::Err("Box_OFFSET: " + std::to_string(val));
 				newLvlObject.AddComponent<BoxColliderComponent>(
 					lvlData["components"]["box_collider"]["width"].get_or(16),
 					lvlData["components"]["box_collider"]["height"].get_or(16),
@@ -1825,7 +1826,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			sol::optional<sol::table> trigger_comp = lvlData["components"]["trigger"];
 			if (trigger_comp != sol::nullopt)
 			{
-				Logger::Err("Has trigger Component");
+				//Logger::Err("Has trigger Component");
 				auto type = ConvertToTriggerType(lvlData["components"]["trigger"]["trigger_type"].get_or(0));
 				newLvlObject.AddComponent<TriggerBoxComponent>(type);
 					
@@ -1838,8 +1839,8 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 				std::string that = lvlData["components"]["item"]["special"];
 				auto type = ItemCollectType::DEFAULT;
 				auto special = ConvertLuaStringToSpecial(that);
-				Logger::Err("Special Num: " + that);
-				Logger::Err("Special Num: " + std::to_string(special));
+				//Logger::Err("Special Num: " + that);
+				//Logger::Err("Special Num: " + std::to_string(special));
 
 				newLvlObject.AddComponent<ItemComponent>(type, special);
 			}
@@ -1874,7 +1875,7 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 	{
 		char letter = std::toupper(name[i]);
 
-		Entity name = Registry::Instance()->CreateEntity();
+		Entity name = reg.CreateEntity();
 
 		name.AddComponent<SpriteComponent>("name-letters", 16, 16, 0, true, 0, 0);
 		name.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);

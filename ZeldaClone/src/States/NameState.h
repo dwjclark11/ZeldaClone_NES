@@ -7,7 +7,8 @@ class NameState : public State
 public:
 	static std::string name;
 
-	NameState() : editor(false), keyDown(false) {}
+	NameState();
+	~NameState() {}
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -25,5 +26,8 @@ private:
 	bool editor;
 	bool keyDown;
 	static const std::string nameID;
+
+	class Game& game;
+	class Registry& reg;
 	
 };

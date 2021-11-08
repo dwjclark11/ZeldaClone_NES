@@ -34,13 +34,15 @@ enum ItemType
 
 class ItemSelectKeyboardControlSystem : public System
 {
-
+private:
+	class Game& game;
 public:
 
 	unsigned int slot;
 	static ItemType itemType;
 
 	ItemSelectKeyboardControlSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -67,44 +69,44 @@ public:
 				{
 				case SDLK_UP:
 					transform.position.y -= ((sprite.height * transform.scale.y) + 6);
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 190) transform.position.y = 260;
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += ((sprite.height * transform.scale.y) + 6);
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 260) transform.position.y = 190;
 					break;
 
 				case SDLK_RIGHT:
 					transform.position.x += 100;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.x > 686) transform.position.x = 386;
 					break;
 
 				case SDLK_LEFT:
 					transform.position.x -= 100;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.x < 386) transform.position.x = 686;
 
 					break;
 
 				case SDLK_SPACE:
 
-					if (transform.position.x == 386 && transform.position.y == 190 && Game::Instance()->GetGameItems().woodBoomerang)
+					if (transform.position.x == 386 && transform.position.y == 190 && game.GetGameItems().woodBoomerang)
 					{
 						itemType = BOOMERANG;
 					}
-					else if ((transform.position.x == 486 && transform.position.y == 190) && GameState::totalBombs > 0 && Game::Instance()->GetGameItems().bombs)
+					else if ((transform.position.x == 486 && transform.position.y == 190) && GameState::totalBombs > 0 && game.GetGameItems().bombs)
 					{
 						itemType = BOMB;
 					}
-					else if (transform.position.x == 586 && transform.position.y == 190 && Game::Instance()->GetGameItems().bow)
+					else if (transform.position.x == 586 && transform.position.y == 190 && game.GetGameItems().bow)
 					{
 						itemType = WOOD_BOW;
 					}
-					else if (transform.position.x == 686 && transform.position.y == 190 && Game::Instance()->GetGameItems().candle)
+					else if (transform.position.x == 686 && transform.position.y == 190 && game.GetGameItems().candle)
 					{
 						itemType = CANDLE;
 					}
@@ -112,15 +114,15 @@ public:
 					{
 						
 					}
-					else if (transform.position.x == 486 && transform.position.y == 260 && Game::Instance()->GetGameItems().food)
+					else if (transform.position.x == 486 && transform.position.y == 260 && game.GetGameItems().food)
 					{
 						itemType = FOOD;
 					}
-					else if (transform.position.x == 586 && transform.position.y == 260 && Game::Instance()->GetGameItems().redPotion)
+					else if (transform.position.x == 586 && transform.position.y == 260 && game.GetGameItems().redPotion)
 					{
 						itemType = POTION_RED;
 					}
-					else if (transform.position.x == 686 && transform.position.y == 260 && Game::Instance()->GetGameItems().magicRod)
+					else if (transform.position.x == 686 && transform.position.y == 260 && game.GetGameItems().magicRod)
 					{
 						itemType = MAGIC_ROD;
 					}

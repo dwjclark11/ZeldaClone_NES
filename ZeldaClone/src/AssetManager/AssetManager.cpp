@@ -4,13 +4,13 @@
 // Constructor  
 AssetManager::AssetManager()
 {
-	Logger::Log("AssetManager constructor called");
+	//Logger::Log("AssetManager constructor called");
 }
 
 // Destructor
 AssetManager::~AssetManager()
 {
-	Logger::Log("AssetManager destructor called");
+	//Logger::Log("AssetManager destructor called");
 }
 
 // Functions
@@ -33,10 +33,10 @@ void AssetManager::AddTextures(SDL_Renderer* renderer, const std::string& assetI
 		// Add the Textures to the map
 		textures.emplace(assetID, texture);
 	}
-	else
-	{
-		Logger::Log("New texture ID: " + assetID + " already exists");
-	}
+	//else
+	//{
+	//	Logger::Log("New texture ID: " + assetID + " already exists");
+	//}
 }
 
 SDL_Texture* AssetManager::GetTexture(const std::string& assetID)

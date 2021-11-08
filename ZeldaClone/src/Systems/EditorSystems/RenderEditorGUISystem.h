@@ -23,7 +23,7 @@ private:
 	EditorFileLoader loader;
 	MouseControlSystem choices;
 	static unsigned int imageWidth, imageHeight;
-
+	class Game& game;
 public:
 	struct Funcs
 	{
@@ -48,6 +48,7 @@ public:
 	};
 	// Setup the IMGUI Style in the Constructor --> Change to it's own style function?
 	RenderEditorGUISystem()
+		: game(*Game::Instance())
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.TabRounding = 0.0f;
@@ -400,8 +401,8 @@ public:
 
 		if (ImGui::Button("Quit Editor"))
 		{
-			Game::Instance()->GetStateMachine()->PopState();
-			Game::Instance()->GetStateMachine()->PushState(new MenuState());
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new MenuState());
 		}
 
 		ImGui::Spacing();

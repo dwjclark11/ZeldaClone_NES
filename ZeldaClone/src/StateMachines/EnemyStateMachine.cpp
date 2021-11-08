@@ -4,7 +4,7 @@
 
 EnemyStateMachine::EnemyStateMachine()
 {
-	Logger::Log("Enemy State Machine Created");
+	//Logger::Log("Enemy State Machine Created");
 	idleState = new EnemyIdleState;
 	patrolState = new PatrolState;
 	attackState = new EnemyAttackState;
@@ -18,7 +18,7 @@ EnemyStateMachine::EnemyStateMachine()
 EnemyStateMachine::~EnemyStateMachine()
 {
 	// Delete all of the active states
-	Logger::Log("Enemy State Machine Destroyed");
+	//Logger::Log("Enemy State Machine Destroyed");
 	delete idleState;
 	delete patrolState; 
 	delete attackState;

@@ -8,6 +8,12 @@
 #include "../../Game/Game.h"
 #include "../SoundFXSystem.h"
 
+ProjectileLifeCycleSystem::ProjectileLifeCycleSystem()
+	: game(*Game::Instance())
+{
+	RequiredComponent<ProjectileComponent>();
+}
+
 void ProjectileLifeCycleSystem::Update()
 {
 	for (auto entity : GetSystemEntities())
@@ -32,7 +38,7 @@ void ProjectileLifeCycleSystem::Update()
 			explosion.Group("projectile");
 			entity.Kill();
 
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "bomb_blow", 0, 1);
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_blow", 0, 1);
 		}
 		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && entity.BelongsToGroup("beam"))
 		{

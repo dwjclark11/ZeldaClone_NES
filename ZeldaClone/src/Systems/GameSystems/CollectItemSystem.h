@@ -17,6 +17,8 @@
 class CollectItemSystem : public System
 {
 private:
+	class Game& game;
+	class Registry& reg;
 
 public:
 	bool yellowCollected;
@@ -29,6 +31,7 @@ public:
 	*/
 	
 	CollectItemSystem()
+		: game(*Game::Instance()), reg(*Registry::Instance())
 	{
 		RequiredComponent<BoxColliderComponent>();
 		//RequiredComponent<ItemComponent>();
@@ -59,14 +62,14 @@ public:
 			if (type.type == YELLOW)
 			{
 				GameState::totalRupees += 1;
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_rupee", 0, 1);
-				Registry::Instance()->RemoveEntityFromSystems(item);
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
+				reg.RemoveEntityFromSystems(item);
 			}
 			if (type.type == BLUE)
 			{
 				GameState::totalRupees += 5;
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_rupee", 0, 1);
-				Registry::Instance()->RemoveEntityFromSystems(item);
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
+				reg.RemoveEntityFromSystems(item);
 			}
 		}
 		else if (item.BelongsToGroup("items"))
@@ -77,8 +80,8 @@ public:
 			if (type.type == BOMBS)
 			{
 				GameState::totalBombs += 3;
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_item", 0, 1);
-				Registry::Instance()->RemoveEntityFromSystems(item);
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+				reg.RemoveEntityFromSystems(item);
 				//item.Kill();
 			}
 			else if (type.type == HEARTS)
@@ -90,8 +93,8 @@ public:
 				if (health.healthPercentage >= health.maxHearts * 2)
 					health.healthPercentage = health.maxHearts * 2;
 				
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "get_item", 0, 1);
-				Registry::Instance()->RemoveEntityFromSystems(item);
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+				reg.RemoveEntityFromSystems(item);
 				//item.Kill();
 			}
 		}

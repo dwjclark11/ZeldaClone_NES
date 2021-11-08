@@ -8,11 +8,15 @@
 
 class HealthSystem : public System
 {
+private:
+	class Game& game;
+	class Registry& reg;
 public:
 	static unsigned int currentHealth;
 	static unsigned int maxHearts;
 	bool lowHealth = false;
 	HealthSystem()
+		: game(*Game::Instance()), reg(*Registry::Instance())
 	{
 		RequiredComponent<HealthComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -23,7 +27,7 @@ public:
 		for (auto entity : GetSystemEntities())
 		{
 			// If the Player is Dead --> Remove the Enemies from the screen
-			if (entity.BelongsToGroup("enemies") && Game::Instance()->GetPlayerDead())
+			if (entity.BelongsToGroup("enemies") && game.GetPlayerDead())
 				entity.Kill();
 
 			if (entity.HasTag("player"))
@@ -41,7 +45,7 @@ public:
 				// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
 				if (currentHealth <= 2 && currentHealth > 0 && health.lowHeathTimer.GetTicks() > 250)
 				{
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "low_health", 0, 5);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "low_health", 0, 5);
 					health.lowHeathTimer.Stop();
 					lowHealth = false;
 				}
@@ -50,7 +54,7 @@ public:
 			for (int i = 1; i <= maxHearts; i++)
 			{
 				std::string tag = "heart" + std::to_string(i);
-				auto currentHeart = Registry::Instance()->GetEntityByTag(tag);
+				auto currentHeart = reg.GetEntityByTag(tag);
 				auto& sprite = currentHeart.GetComponent<SpriteComponent>();
 				
 				// Compare current Health

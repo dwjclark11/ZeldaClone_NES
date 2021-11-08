@@ -22,10 +22,11 @@ class TriggerSystem : public System
 private:
 	sol::state lua;
 	LevelLoader loader;
-
+	class Game& game;
 public:
 
 	TriggerSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<BoxColliderComponent>();
@@ -77,20 +78,20 @@ public:
 		case SECRET_AREA:
 			
 			// Remove all the prior assets/entities from the current scene
-			Game::Instance()->GetSystem<RenderSystem>().OnExit();
-			Game::Instance()->GetSystem<RenderCollisionSystem>().OnExit();
-			Game::Instance()->GetSystem<RenderTileSystem>().OnExit();
+			game.GetSystem<RenderSystem>().OnExit();
+			game.GetSystem<RenderCollisionSystem>().OnExit();
+			game.GetSystem<RenderTileSystem>().OnExit();
 
 			// Play stairs sound
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, 1);
 
 			// Adjust the player position to the trigger transport position
 			transform.position.x = trig.transportOffset.x;
 			transform.position.y = trig.transportOffset.y;
 
 			// Adjust the camera location to the trigger offset
-			Game::Instance()->GetCamera().x = trig.cameraOffset.x;
-			Game::Instance()->GetCamera().y = trig.cameraOffset.y;
+			game.GetCamera().x = trig.cameraOffset.x;
+			game.GetCamera().y = trig.cameraOffset.y;
 
 			// Stop the player movement during the scene transition
 			rigidbody.velocity = glm::vec2(0);
@@ -99,37 +100,37 @@ public:
 			if (assetFile != "no_file")
 			{
 				Logger::Log("Asset File");
-				loader.LoadAssetsFromLuaTable(Game::Instance()->GetLuaState(), assetFile);
+				loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
 			}
 			if (trig.colliderFile != "no_file")
 			{
-				loader.LoadColliders(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), trig.colliderFile);
+				loader.LoadColliders(game.GetAssetManager(), game.GetRenderer(), trig.colliderFile);
 				Logger::Log("Load Collider File");
 			}
 
 			if (trig.enemyFile != "no_file")
 			{
-				loader.LoadEnemiesFromLuaTable(Game::Instance()->GetLuaState(), trig.enemyFile, Game::Instance()->GetAssetManager());
+				loader.LoadEnemiesFromLuaTable(game.GetLuaState(), trig.enemyFile, game.GetAssetManager());
 			}
 
 			if (trig.tileMapName != "no_file" && trig.tileImageName != "no_file")
 			{
-				loader.LoadTilemap(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(), mapFile, tileFile);
+				loader.LoadTilemap(game.GetAssetManager(), game.GetRenderer(), mapFile, tileFile);
 			}
 			else
 			{
-				loader.LoadMap(Game::Instance()->GetAssetManager(), trig.tileImageName, trig.imageWidth, trig.imageHeight);
+				loader.LoadMap(game.GetAssetManager(), trig.tileImageName, trig.imageWidth, trig.imageHeight);
 			}
 
 			// Start the new scene's music || stop the music
 			if (trig.levelMusic != "stop")
-				Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), trig.levelMusic, -1);
+				game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), trig.levelMusic, -1);
 			else
-				Game::Instance()->GetSystem<MusicPlayerSystem>().StopMusic();
+				game.GetSystem<MusicPlayerSystem>().StopMusic();
 
 			if (entityFile != "no_file")
 			{
-				loader.LoadEntitiesFromLuaTable(Game::Instance()->GetLuaState(), entityFile);
+				loader.LoadEntitiesFromLuaTable(game.GetLuaState(), entityFile);
 				Logger::Log("Load Entity File");
 			}
 
@@ -153,19 +154,19 @@ public:
 			if (!trig.active)
 			{
 				Logger::Log("Trigger B");
-				Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "fanfare", 0, 1);
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, 1);
 				trig.active = true;
-				Game::Instance()->GetPlayerItem() = true;
+				game.GetPlayerItem() = true;
 			}
 
 			break;
 
 		case RETURN_WORLD:
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "stairs", 0, 1);
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, 1);
 			transform.position = trig.transportOffset;
 
-			//Game::Instance()->GetStateMachine()->PopState();
-			//Game::Instance()->GetStateMachine()->PushState(new GameState(trig.cameraOffset));
+			//game.GetStateMachine()->PopState();
+			//game.GetStateMachine()->PushState(new GameState(trig.cameraOffset));
 			break;
 		default:
 

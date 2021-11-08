@@ -9,9 +9,14 @@
 #include <algorithm>
 #include <vector>
 
-struct RenderTileSystem : public System
+class RenderTileSystem : public System
 {
+private:
+	class Game& game;
+
+public:
 	RenderTileSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -83,7 +88,7 @@ struct RenderTileSystem : public System
 				};
 
 				// If the player is dead change the background tile color to red
-				if (Game::Instance()->GetPlayerDead())
+				if (game.GetPlayerDead())
 					SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 0, 0);
 
 				SDL_RenderCopyEx(

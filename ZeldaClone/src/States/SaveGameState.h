@@ -3,8 +3,9 @@
 
 class SaveGameState : public State
 {
-	public:
-	SaveGameState(){}
+public:
+	SaveGameState();
+	~SaveGameState() {}
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -21,5 +22,6 @@ class SaveGameState : public State
 private:
 
 	static const std::string saveID;
-	
+	class Game& game;
+	class Registry& reg;
 };

@@ -20,6 +20,9 @@ enum AssetType
 
 class LevelLoader
 {
+private:
+	class Game& game;
+	class Registry& reg;
 public:
 	LevelLoader();
 	~LevelLoader();

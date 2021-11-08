@@ -13,8 +13,11 @@
 
 class AISystem : public System
 {
+private:
+	Game& game;
 public:
 	AISystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<AIComponent>();
 	}
@@ -34,7 +37,7 @@ public:
 			if (stateMachine.StateMachineCreated())
 			{
 				// If the enemy is in the same screen panel as the player --> Update 
-				if (stateMachine.GetEnemyPos() == Game::Instance()->GetPlayerPos())
+				if (stateMachine.GetEnemyPos() == game.GetPlayerPos())
 				{
 					stateMachine.GetEnemyStateMachine().Update(entity);
 				}

@@ -12,11 +12,15 @@
 
 const int OFFSET = 720;
 
-struct RenderHUDSystem : public System
+class RenderHUDSystem : public System
 {
+private:
+	class Game& game;
+public:
 	bool pause;
-	bool game;
+	bool gamePlay;
 	RenderHUDSystem()
+		: game(*Game::Instance())
 	{
 		// All Systems need a required component to help separate what entities need to 
 		// use that system
@@ -24,7 +28,7 @@ struct RenderHUDSystem : public System
 		RequiredComponent<SpriteComponent>();
 		RequiredComponent<HUDComponenet>();
 		pause = false;
-		game = false;
+		gamePlay = false;
 	}
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
@@ -32,7 +36,7 @@ struct RenderHUDSystem : public System
 		// Loop all entities that the system is interested in
 		for (auto entity : GetSystemEntities())
 		{
-			if (!Game::Instance()->GetGameItems().woodSword && entity.HasTag("hudSword"))
+			if (!game.GetGameItems().woodSword && entity.HasTag("hudSword"))
 			{
 				continue;
 			}
@@ -45,12 +49,12 @@ struct RenderHUDSystem : public System
 				// Set the src Rect of our original sprite texture
 				SDL_Rect srcRect = sprite.srcRect;
 
-				if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE" && !pause)
+				if (game.GetStateMachine()->GetCurrentState() == "PAUSE" && !pause)
 				{
-					game = false;
+					gamePlay = false;
 					transform.position.y += OFFSET;
 				}
-				else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE" || Game::Instance()->GetStateMachine()->GetCurrentState() == "DUNGEON" && !game)
+				else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON" && !gamePlay)
 				{
 					// If we were previously in the pause state, subract the offset from all HUD entities
 					if (pause)
@@ -117,8 +121,8 @@ struct RenderHUDSystem : public System
 				// See MovementSystem --> Update()
 				if (entity.HasTag("locator"))
 				{
-					transform.position.x = 10 + (Game::Instance()->GetPlayerPos().x * 16);
-					transform.position.y = 40 + (Game::Instance()->GetPlayerPos().y * 16);
+					transform.position.x = 10 + (game.GetPlayerPos().x * 16);
+					transform.position.y = 40 + (game.GetPlayerPos().y * 16);
 				}
 
 				// Set the destination rect with the x, y position to be rendered
@@ -141,15 +145,15 @@ struct RenderHUDSystem : public System
 			}
 		}
 		// Reset the HUD states
-		if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE")
+		if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
 		{
 			pause = true;
-			game = false;
+			gamePlay = false;
 		}
 
-		if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE" || Game::Instance()->GetStateMachine()->GetCurrentState() == "DUNGEON")
+		if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON")
 		{
-			game = true;
+			gamePlay = true;
 			pause = false;
 		}
 

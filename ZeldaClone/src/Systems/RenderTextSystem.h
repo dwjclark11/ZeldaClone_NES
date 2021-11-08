@@ -9,8 +9,11 @@
 
 class RenderTextSystem : public System
 {
+private:
+	class Game& game;
 public: 
 	RenderTextSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TextLabelComponent>();
 	}
@@ -35,14 +38,14 @@ public:
 				textLabel.text = std::to_string(GameState::totalBombs);
 			}
 
-			if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE")
+			if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
 			{
 				if (entity.HasTag("rupees")) textLabel.position.y = 800;
 				if (entity.HasTag("keys")) textLabel.position.y = 832;
 				if (entity.HasTag("bombs")) textLabel.position.y = 864;
 				if (entity.HasTag("lifeText")) textLabel.position.y = 810;
 			}
-			else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE" || Game::Instance()->GetStateMachine()->GetCurrentState() == "DUNGEON")
+			else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON")
 			{
 				if (entity.HasTag("rupees")) textLabel.position.y = 40;
 				if (entity.HasTag("keys")) textLabel.position.y = 72;

@@ -7,6 +7,7 @@
 
 class RenderCollisionSystem : public System
 {
+
 public:
 	RenderCollisionSystem()
 	{

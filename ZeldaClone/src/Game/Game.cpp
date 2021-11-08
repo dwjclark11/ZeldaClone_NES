@@ -93,7 +93,7 @@ void Game::Initialize()
 	}
 	
 	// Enable Alpha Blending
-	SDL_SetRenderDrawBlendMode(Game::Instance()->GetRenderer(), SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawBlendMode(GetRenderer(), SDL_BLENDMODE_BLEND);
 	
 	// Initialize IMGUI context
 	ImGui::CreateContext();

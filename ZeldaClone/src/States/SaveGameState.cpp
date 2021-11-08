@@ -8,19 +8,24 @@
 
 const std::string SaveGameState::saveID = "SAVE";
 
+SaveGameState::SaveGameState()
+	: game(*Game::Instance()), reg(*Registry::Instance())
+{
+}
+
 void SaveGameState::Update(const double& deltaTime)
 {
-	Game::Instance()->GetEventManager()->Reset();
-	Registry::Instance()->GetSystem<SaveSelectKeyboardSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
-	Registry::Instance()->Update();
-	Registry::Instance()->GetSystem<AnimationSystem>().Update();
+	game.GetEventManager()->Reset();
+	reg.GetSystem<SaveSelectKeyboardSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.Update();
+	reg.GetSystem<AnimationSystem>().Update();
 
-	if (State::exitToMain) Game::Instance()->GetStateMachine()->PopState();
+	if (State::exitToMain) game.GetStateMachine()->PopState();
 }
 
 void SaveGameState::Render()
 {
-	Game::Instance()->GetSystem<RenderSaveStateSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager());
+	game.GetSystem<RenderSaveStateSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool SaveGameState::OnEnter()
@@ -37,27 +42,27 @@ bool SaveGameState::OnEnter()
 			
 	*/
 	
-	Registry::Instance()->AddSystem<RenderSaveStateSystem>();
-	Registry::Instance()->AddSystem<SaveSelectKeyboardSystem>();
-	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "save_gui", "./Assets/Backgrounds/save_state_GUI.png");
+	reg.AddSystem<RenderSaveStateSystem>();
+	reg.AddSystem<SaveSelectKeyboardSystem>();
+	game.GetAssetManager()->AddTextures(game.GetRenderer(), "save_gui", "./Assets/Backgrounds/save_state_GUI.png");
 
 
-	Entity saveText = Registry::Instance()->CreateEntity();
+	Entity saveText = reg.CreateEntity();
 	saveText.AddComponent<TransformComponent>(glm::vec2(200, 200), glm::vec2(4, 4), 0.0);
 	saveText.AddComponent<SpriteComponent>("save_gui", 144, 16, 0, true, 0,0);
 	saveText.AddComponent<SaveComponent>();
 	
-	Entity exitText = Registry::Instance()->CreateEntity();
+	Entity exitText = reg.CreateEntity();
 	exitText.AddComponent<TransformComponent>(glm::vec2(200, 400), glm::vec2(4, 4), 0.0);
 	exitText.AddComponent<SpriteComponent>("save_gui", 192, 16, 0, true, 0, 16);
 	exitText.AddComponent<SaveComponent>();
 
-	Entity quitText = Registry::Instance()->CreateEntity();
+	Entity quitText = reg.CreateEntity();
 	quitText.AddComponent<TransformComponent>(glm::vec2(200, 600), glm::vec2(4, 4), 0.0);
 	quitText.AddComponent<SpriteComponent>("save_gui", 144, 16, 0, true, 0, 32);
 	quitText.AddComponent<SaveComponent>();
 
-	Entity selector = Registry::Instance()->CreateEntity();
+	Entity selector = reg.CreateEntity();
 	selector.AddComponent<SpriteComponent>("hud_hearts", 16, 16, 5, true, 0, 0);
 	selector.AddComponent<TransformComponent>(glm::vec2(100, 185), glm::vec2(6, 6), 0.0);
 	selector.AddComponent<SaveComponent>();
@@ -81,7 +86,7 @@ void SaveGameState::OnKeyDown(SDL_Event* event)
 {
 	if (event->key.keysym.sym == SDLK_x)
 	{
-		Game::Instance()->GetStateMachine()->PopState();
+		game.GetStateMachine()->PopState();
 	}
 }
 void SaveGameState::OnKeyUp(SDL_Event* event)

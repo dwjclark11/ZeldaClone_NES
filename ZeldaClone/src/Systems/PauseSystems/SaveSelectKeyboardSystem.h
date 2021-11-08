@@ -11,9 +11,12 @@
 
 class SaveSelectKeyboardSystem : public System
 {
+private:
+	class Game& game;
 public:
 	
 	SaveSelectKeyboardSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<SpriteComponent>();
 		RequiredComponent<TransformComponent>();
@@ -51,17 +54,17 @@ public:
 					{
 						LevelLoader loader;
 
-						if (Game::Instance()->GetPlayerNum() == 1)
+						if (game.GetPlayerNum() == 1)
 						{
-							loader.SavePlayerDataToLuaTable("1", Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer());
+							loader.SavePlayerDataToLuaTable("1", game.GetAssetManager(), game.GetRenderer());
 						}
-						else if (Game::Instance()->GetPlayerNum() == 2)
+						else if (game.GetPlayerNum() == 2)
 						{
-							loader.SavePlayerDataToLuaTable("2", Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer());
+							loader.SavePlayerDataToLuaTable("2", game.GetAssetManager(), game.GetRenderer());
 						}
-						else if (Game::Instance()->GetPlayerNum() == 3)
+						else if (game.GetPlayerNum() == 3)
 						{
-							loader.SavePlayerDataToLuaTable("3", Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer());
+							loader.SavePlayerDataToLuaTable("3", game.GetAssetManager(), game.GetRenderer());
 						}
 
 						//Entity saving = Registry::Instance()->CreateEntity();
@@ -70,17 +73,17 @@ public:
 						//saving.AddComponent<AnimationComponent>(2, 5);
 						//saving.AddComponent<SaveComponent>();
 						Sleep(1000);
-						Game::Instance()->GetStateMachine()->PopState();
+						game.GetStateMachine()->PopState();
 					}
 					else if (transform.position.y == 385)
 					{
 						State::exitToMain = true;
-						//Game::Instance()->GetStateMachine()->ClearStates();
-						//Game::Instance()->GetStateMachine()->PushState(new MenuState());
+						//game.GetStateMachine()->ClearStates();
+						//game.GetStateMachine()->PushState(new MenuState());
 					}
 					else if (transform.position.y == 585)
 					{
-						Game::Instance()->GetGameRunning() = false;
+						game.GetGameRunning() = false;
 					}
 					break;
 				}

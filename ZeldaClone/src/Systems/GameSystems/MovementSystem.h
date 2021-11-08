@@ -18,8 +18,11 @@ const int MAX_WORLD_HEIGHT = 8;
 
 class MovementSystem : public System
 {
+private:
+	class Game& game;
 public:
 	MovementSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<RigidBodyComponent>();
@@ -52,8 +55,8 @@ public:
 						{
 							if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
 							{
-								Game::Instance()->GetPlayerPos().x = i;
-								Game::Instance()->GetPlayerPos().y = j;
+								game.GetPlayerPos().x = i;
+								game.GetPlayerPos().y = j;
 							}
 						}
 					}

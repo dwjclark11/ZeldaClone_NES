@@ -5,7 +5,8 @@ class PauseState : public State
 {
 public:
 
-	PauseState() {}
+	PauseState();
+	~PauseState() {}
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -23,4 +24,7 @@ private:
 
 	bool static firstEnter;
 	static const std::string pauseID;
+
+	class Game& game;
+	class Registry& reg;
 };

@@ -16,8 +16,10 @@ class EditorKeyboardControlSystem : public System
 private:
 	int levelWidth;
 	int levelHeight;
+	class Game& game;
 public:
 	EditorKeyboardControlSystem()
+		: game(*Game::Instance())
 	{
 		// These are magic numbers That should not be used!
 		levelWidth = MouseControlSystem::CanvasWidth;
@@ -35,19 +37,19 @@ public:
 		{
 		// Move the camera UP
 		case SDLK_w:
-			Game::Instance()->SetCameraY(-16); // Why 16? Should be based on the sprite_size*scale
+			game.SetCameraY(-16); // Why 16? Should be based on the sprite_size*scale
 			break;
 		// Move the camera RIGHT
 		case SDLK_d:
-			Game::Instance()->SetCameraX(16);
+			game.SetCameraX(16);
 			break;
 		// Move the camera DOWN
 		case SDLK_s:
-			Game::Instance()->SetCameraY(16);
+			game.SetCameraY(16);
 			break;
 		// Move the camera LEFT
 		case SDLK_a:
-			Game::Instance()->SetCameraX(-16);
+			game.SetCameraX(-16);
 			break;
 		// Toggle the Collision
 		case SDLK_c:
@@ -126,10 +128,10 @@ public:
 
 
 		// Clamps for Game Camera and Image Src Rec!! --> This needs to be investigated further
-		if (Game::Instance()->GetCamera().x < -1000) Game::Instance()->GetCamera().x = -1000;
-		if (Game::Instance()->GetCamera().y < -1000) Game::Instance()->GetCamera().y = -1000;
-		if (Game::Instance()->GetCamera().x > (levelWidth - Game::Instance()->GetCamera().w ) + 1000) Game::Instance()->GetCamera().x = (levelWidth - Game::Instance()->GetCamera().w) + 1000;
-		if (Game::Instance()->GetCamera().y > (levelHeight - Game::Instance()->GetCamera().h) + 1000) Game::Instance()->GetCamera().y = (levelHeight - Game::Instance()->GetCamera().h) + 1000;
+		if (game.GetCamera().x < -1000) game.GetCamera().x = -1000;
+		if (game.GetCamera().y < -1000) game.GetCamera().y = -1000;
+		if (game.GetCamera().x > (levelWidth - game.GetCamera().w ) + 1000) game.GetCamera().x = (levelWidth - game.GetCamera().w) + 1000;
+		if (game.GetCamera().y > (levelHeight - game.GetCamera().h) + 1000) game.GetCamera().y = (levelHeight - game.GetCamera().h) + 1000;
 
 		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
 		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;

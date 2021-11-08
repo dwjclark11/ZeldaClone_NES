@@ -12,30 +12,35 @@
 
 const std::string EditorState::editorID = "EDITOR";
 
-void EditorState::Update(const double& deltaTime)
+EditorState::EditorState()
+	: editor(false), keyDown(false), game(*Game::Instance()), reg(*Registry::Instance())
 {
 
-	Game::Instance()->GetEventManager()->Reset();
-	Registry::Instance()->GetSystem<EditorKeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+}
+
+void EditorState::Update(const double& deltaTime)
+{
+	game.GetEventManager()->Reset();
+	reg.GetSystem<EditorKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	
-	Registry::Instance()->Update();
-	Registry::Instance()->GetSystem<CameraMovementSystem>().Update(Game::Instance()->GetCamera());
-	//Registry::Instance()->GetSystem<AnimationSystem>().Update();
+	reg.Update();
+	reg.GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+	//reg.GetSystem<AnimationSystem>().Update();
 }
 
 void EditorState::Render()
 {
 
-	Registry::Instance()->GetSystem<RenderEditorSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
+	reg.GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 
 	if (editor)
-		Registry::Instance()->GetSystem<RenderEditorGUISystem>().Update(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer());
+		reg.GetSystem<RenderEditorGUISystem>().Update(game.GetAssetManager(), game.GetRenderer());
 	else
 	{
-		Registry::Instance()->GetSystem<MouseControlSystem>().Update(Game::Instance()->GetAssetManager(), Game::Instance()->GetRenderer(),
-			Game::Instance()->GetMouseBox(), Game::Instance()->GetEvent(), Game::Instance()->GetCamera());
+		reg.GetSystem<MouseControlSystem>().Update(game.GetAssetManager(), game.GetRenderer(),
+			game.GetMouseBox(), game.GetEvent(), game.GetCamera());
 
-		Registry::Instance()->GetSystem<RenderCollisionSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetCamera());
+		reg.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
 		
 		// Create the HUD rect that each tilemap screen will be inside
 		SDL_Rect hudRectTop = { 0, 0, 1920, 288 };
@@ -48,26 +53,26 @@ void EditorState::Render()
 		// ****************************************************************** //
 
 		// Render all HUD objects
-		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 70, 70, 70, 100);
+		SDL_SetRenderDrawColor(game.GetRenderer(), 70, 70, 70, 100);
 
 		// ****************************************************************** //
-		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectTop);
-		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectTop);
+		SDL_RenderFillRect(game.GetRenderer(), &hudRectTop);
+		SDL_RenderDrawRect(game.GetRenderer(), &hudRectTop);
 		
-		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectBottom);
-		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectBottom);
+		SDL_RenderFillRect(game.GetRenderer(), &hudRectBottom);
+		SDL_RenderDrawRect(game.GetRenderer(), &hudRectBottom);
 		
-		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectLeft);
-		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectLeft);
+		SDL_RenderFillRect(game.GetRenderer(), &hudRectLeft);
+		SDL_RenderDrawRect(game.GetRenderer(), &hudRectLeft);
 		
-		SDL_RenderFillRect(Game::Instance()->GetRenderer(), &hudRectRight);
-		SDL_RenderDrawRect(Game::Instance()->GetRenderer(), &hudRectRight);
+		SDL_RenderFillRect(game.GetRenderer(), &hudRectRight);
+		SDL_RenderDrawRect(game.GetRenderer(), &hudRectRight);
 		// ****************************************************************** //
 		
-		SDL_SetRenderDrawColor(Game::Instance()->GetRenderer(), 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 
 		// --- Render the Labels on top of the surounding rects
-		Registry::Instance()->GetSystem<RenderEditorLabelSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
+		reg.GetSystem<RenderEditorLabelSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 	}
 
 }	
@@ -77,27 +82,27 @@ bool EditorState::OnEnter()
 	// Stop any music that my be playing
 	Mix_HaltMusic();
 	// Set the desired window size/position for the editor
-	SDL_SetWindowSize(Game::Instance()->GetWindow(), 1920, 1080);
-	SDL_SetWindowPosition(Game::Instance()->GetWindow(), 0, 0);
+	SDL_SetWindowSize(game.GetWindow(), 1920, 1080);
+	SDL_SetWindowPosition(game.GetWindow(), 0, 0);
 	
 	// Set the Camera Position
-	Game::Instance()->GetCamera().x = 0;
-	Game::Instance()->GetCamera().y = 0;
-	Game::Instance()->GetCamera().w = 1920;
-	Game::Instance()->GetCamera().h = 1080;
+	game.GetCamera().x = 0;
+	game.GetCamera().y = 0;
+	game.GetCamera().w = 1920;
+	game.GetCamera().h = 1080;
 
 	// Initialize IMGUI context
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(Game::Instance()->GetRenderer(), 1920, 1080);
+	ImGuiSDL::Initialize(game.GetRenderer(), 1920, 1080);
 	
 	// If the needed systems are not already in the regstry, Add them
-	if(!Registry::Instance()->HasSystem<RenderCollisionSystem>()) Registry::Instance()->AddSystem<RenderCollisionSystem>();
-	if(!Registry::Instance()->HasSystem<RenderEditorGUISystem>()) Registry::Instance()->AddSystem<RenderEditorGUISystem>();
-	if(!Registry::Instance()->HasSystem<RenderEditorSystem>()) 	Registry::Instance()->AddSystem<RenderEditorSystem>();
-	if(!Registry::Instance()->HasSystem<MouseControlSystem>()) 	Registry::Instance()->AddSystem<MouseControlSystem>();
-	if(!Registry::Instance()->HasSystem<EditorKeyboardControlSystem>()) Registry::Instance()->AddSystem<EditorKeyboardControlSystem>();
-	if(!Registry::Instance()->HasSystem<RenderEditorLabelSystem>()) Registry::Instance()->AddSystem<RenderEditorLabelSystem>();
-	//Registry::Instance()->AddSystem<AnimationSystem>();
+	if(!reg.HasSystem<RenderCollisionSystem>()) reg.AddSystem<RenderCollisionSystem>();
+	if(!reg.HasSystem<RenderEditorGUISystem>()) reg.AddSystem<RenderEditorGUISystem>();
+	if(!reg.HasSystem<RenderEditorSystem>()) 	reg.AddSystem<RenderEditorSystem>();
+	if(!reg.HasSystem<MouseControlSystem>()) 	reg.AddSystem<MouseControlSystem>();
+	if(!reg.HasSystem<EditorKeyboardControlSystem>()) reg.AddSystem<EditorKeyboardControlSystem>();
+	if(!reg.HasSystem<RenderEditorLabelSystem>()) reg.AddSystem<RenderEditorLabelSystem>();
+	//reg.AddSystem<AnimationSystem>();
 	
 	// Assign values to varialbes
 	editor = false;
@@ -109,21 +114,21 @@ bool EditorState::OnEnter()
 bool EditorState::OnExit()
 {
 	// Delete the editor entities
-	Registry::Instance()->GetSystem<RenderEditorSystem>().OnExit();
+	reg.GetSystem<RenderEditorSystem>().OnExit();
 	
-	Game::Instance()->GetCamera().w = Game::Instance()->windowWidth;
-	Game::Instance()->GetCamera().y = Game::Instance()->windowHeight;
+	game.GetCamera().w = game.windowWidth;
+	game.GetCamera().y = game.windowHeight;
 	
 	// Set the Window Size/Position to the desired Game Window Size and position
-	SDL_SetWindowSize(Game::Instance()->GetWindow(), 256 * 4, 240 * 4);
-	SDL_SetWindowPosition(Game::Instance()->GetWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+	SDL_SetWindowSize(game.GetWindow(), 256 * 4, 240 * 4);
+	SDL_SetWindowPosition(game.GetWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
 	// Remove any sytems that are only used inside the editor
-	Registry::Instance()->RemoveSystem<RenderEditorGUISystem>();
-	Registry::Instance()->RemoveSystem<RenderEditorSystem>();
-	Registry::Instance()->RemoveSystem<MouseControlSystem>();
-	Registry::Instance()->RemoveSystem<EditorKeyboardControlSystem>();
-	Registry::Instance()->RemoveSystem<RenderEditorLabelSystem>();
+	reg.RemoveSystem<RenderEditorGUISystem>();
+	reg.RemoveSystem<RenderEditorSystem>();
+	reg.RemoveSystem<MouseControlSystem>();
+	reg.RemoveSystem<EditorKeyboardControlSystem>();
+	reg.RemoveSystem<RenderEditorLabelSystem>();
 	
 	// Turn on Debug if it has been turned off --> To allow access to the editor without having to reload
 	if (!Game::isDebug) Game::isDebug = true;
@@ -143,7 +148,7 @@ void EditorState::ProcessEvents(SDL_Event& event)
 
 void EditorState::OnKeyDown(SDL_Event* event)
 {
-	if (Game::Instance()->GetEvent().type == SDL_KEYDOWN && !keyDown)
+	if (game.GetEvent().type == SDL_KEYDOWN && !keyDown)
 	{
 		if (event->key.keysym.sym == SDLK_RETURN)
 		{

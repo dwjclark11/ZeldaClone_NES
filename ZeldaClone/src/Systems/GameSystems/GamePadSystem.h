@@ -9,6 +9,8 @@
 
 class GamePadSystem : public System
 {
+private:
+	class Game& game;
 public:
 	SDL_GameController* gameController;
 	const int JOYSTICK_DEAD_ZONE = 25000;
@@ -28,7 +30,7 @@ public:
 	static bool buttonDirDown;
 	static bool paused;
 
-	GamePadSystem() : gameController(nullptr)
+	GamePadSystem() : gameController(nullptr), game(*Game::Instance())
 	{
 		RequiredComponent<KeyboardControlComponent>();
 	}
@@ -62,7 +64,7 @@ public:
 			//rigidbody.velocity = glm::vec2(0);
 			if (entity.HasTag("player"))
 			{
-				if (!Game::Instance()->GetCameraMoving())
+				if (!game.GetCameraMoving())
 				{
 					if (event.type == SDL_JOYAXISMOTION)
 					{
@@ -133,7 +135,7 @@ public:
 
 						if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_UP) == 1)
 						{
-							if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
+							if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
 							{
 								rigidbody.velocity = keyboardControl.upVelocity;
 								sprite.srcRect.x = sprite.width * 2;
@@ -146,7 +148,7 @@ public:
 						}
 						else if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_DOWN) == 1)
 						{
-							if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
+							if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
 							{
 								rigidbody.velocity = keyboardControl.downVelocity;
 								sprite.srcRect.x = sprite.width * 0;
@@ -159,7 +161,7 @@ public:
 						}
 						else if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_LEFT) == 1)
 						{
-							if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
+							if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
 							{
 								rigidbody.velocity = keyboardControl.leftVelocity;
 								sprite.srcRect.x = sprite.width * 1;
@@ -172,7 +174,7 @@ public:
 						}
 						else if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) == 1)
 						{
-							if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
+							if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
 							{
 								rigidbody.velocity = keyboardControl.rightVelocity;
 								sprite.srcRect.x = sprite.width * 3;
@@ -185,14 +187,14 @@ public:
 						}
 						else if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_START) == 1)
 						{
-							if (Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMESTATE")
+							if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
 							{
 								paused = true;
-								Game::Instance()->GetStateMachine()->PushState(new PauseState());
+								game.GetStateMachine()->PushState(new PauseState());
 							}
-							else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE")
+							else if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
 							{
-								Game::Instance()->GetStateMachine()->PopState();
+								game.GetStateMachine()->PopState();
 							}
 						}
 					}
@@ -224,7 +226,7 @@ public:
 							{
 								rigidbody.velocity = glm::vec2(0);
 
-								if (Game::Instance()->GetStateMachine()->GetCurrentState() == "PAUSE" || Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMEOVER")
+								if (game.GetStateMachine()->GetCurrentState() == "PAUSE" || game.GetStateMachine()->GetCurrentState() == "GAMEOVER")
 								{
 									upPressed = false;
 									downPressed = false;
@@ -247,14 +249,14 @@ public:
 
 	void UpdateOtherStates(SDL_Event& event)
 	{
-		if (Game::Instance()->GetStateMachine()->GetCurrentState() == "TITLESTATE")
+		if (game.GetStateMachine()->GetCurrentState() == "TITLESTATE")
 		{
 			if (event.type == SDL_CONTROLLERBUTTONDOWN)
 			{
 				if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_START) == 1)
 				{
-					Game::Instance()->GetStateMachine()->PopState();
-					Game::Instance()->GetStateMachine()->PushState(new MenuState());
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new MenuState());
 					buttonDown = true;
 				}
 			}
@@ -265,7 +267,7 @@ public:
 				buttonDown = false;
 			}
 		}
-		else if (Game::Instance()->GetStateMachine()->GetCurrentState() == "MENU" || Game::Instance()->GetStateMachine()->GetCurrentState() == "GAMEOVER")
+		else if (game.GetStateMachine()->GetCurrentState() == "MENU" || game.GetStateMachine()->GetCurrentState() == "GAMEOVER")
 		{
 			if (event.type == SDL_CONTROLLERBUTTONDOWN)
 			{
@@ -292,8 +294,8 @@ public:
 				}
 				if (SDL_GameControllerGetButton(gameController, SDL_CONTROLLER_BUTTON_START) == 1)
 				{
-					//Game::Instance()->GetStateMachine()->PopState();
-					//Game::Instance()->GetStateMachine()->PushState(new MenuState());
+					//game.GetStateMachine()->PopState();
+					//game.GetStateMachine()->PushState(new MenuState());
 					//buttonDown = true;
 				}
 			}

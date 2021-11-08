@@ -9,6 +9,7 @@
 #include "../States/GameOverState.h" 
 
 Timer timer;
+Game& game = *Game::Instance();
 
 void SetSpecialItem(SpecialItemType special, Entity& player)
 {
@@ -20,15 +21,15 @@ void SetSpecialItem(SpecialItemType special, Entity& player)
 		break;
 
 	case WOOD_SWORD:
-		Game::Instance()->GetGameItems().woodSword = true;
+		game.GetGameItems().woodSword = true;
 		break;
 
 	case STEEL_SWORD:
-		Game::Instance()->GetGameItems().steelSword = true;
+		game.GetGameItems().steelSword = true;
 		break;
 
 	case MAGIC_SWORD:
-		Game::Instance()->GetGameItems().magicSword = true;
+		game.GetGameItems().magicSword = true;
 		break;
 
 	case FULL_HEART:
@@ -37,22 +38,22 @@ void SetSpecialItem(SpecialItemType special, Entity& player)
 		break;
 	}
 	case RAFT:
-		Game::Instance()->GetGameItems().raft = true;
+		game.GetGameItems().raft = true;
 		break;
 	case POWER_BRACLET:
-		Game::Instance()->GetGameItems().powerBraclet = true;
+		game.GetGameItems().powerBraclet = true;
 		break;
 	case RED_CANDLE:
-		Game::Instance()->GetGameItems().candle = true;
+		game.GetGameItems().candle = true;
 		break;
 	case WOOD_BOOMERANG:
-		Game::Instance()->GetGameItems().woodBoomerang = true;
+		game.GetGameItems().woodBoomerang = true;
 		break;
 	case MAGIC_BOOMERANG:
-		Game::Instance()->GetGameItems().magicBoomerang = true;
+		game.GetGameItems().magicBoomerang = true;
 		break;
 	case LADDER:
-		Game::Instance()->GetGameItems().ladder = true;
+		game.GetGameItems().ladder = true;
 		break;
 	default:
 		break;
@@ -63,7 +64,7 @@ void SetSpecialItem(SpecialItemType special, Entity& player)
 void IdleState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	//Logger::Log("Enter Idle State");
-	Game::Instance()->GetPlayerItem() = false;
+	game.GetPlayerItem() = false;
 }
 
 void IdleState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
@@ -126,7 +127,7 @@ void MoveState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		pOwner->ChangeState(pOwner->idleState, entity);
 	
 	// If the player is collecting a special Item --> Move to the Collect Item State
-	if (Game::Instance()->GetPlayerItem())
+	if (game.GetPlayerItem())
 	{
 		pOwner->ChangeState(pOwner->collectItemState, entity);
 	}
@@ -155,17 +156,17 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 
 	// Set the sprite to the proper position based on the item collected
 	// If the green tunic
-	if (!Game::Instance()->GetGameItems().blueRing && !Game::Instance()->GetGameItems().redRing)
+	if (!game.GetGameItems().blueRing && !game.GetGameItems().redRing)
 	{
 		playerSprite.srcRect.x = playerSprite.width * 0;
 		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
-	else if (Game::Instance()->GetGameItems().blueRing && !Game::Instance()->GetGameItems().redRing) // Blue Tunic
+	else if (game.GetGameItems().blueRing && !game.GetGameItems().redRing) // Blue Tunic
 	{
 		playerSprite.srcRect.x = playerSprite.width * 4;
 		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
-	else if (Game::Instance()->GetGameItems().redRing) // Red Tunic
+	else if (game.GetGameItems().redRing) // Red Tunic
 	{
 		playerSprite.srcRect.x = playerSprite.width * 8;
 		playerSprite.srcRect.y = playerSprite.height * 8;
@@ -201,7 +202,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	// Wait for 1 second  then change back to idle State
 	if (timer.GetTicks() > 2000)
 	{
-		Logger::Log("Item Has Been Collected");
+		//Logger::Log("Item Has Been Collected");
 		itemCollected = false;
 		//trigItem->GetComponent<TriggerBoxComponent>().active = false;
 		trigItem->Kill();
@@ -276,7 +277,7 @@ void PlayerDeathState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 		
 	health.deathTimer.Start();
-	Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "link_die", 0, -1);
+	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_die", 0, -1);
 	animation.frameOffset = 0; 
 	animation.numFrames = 4; 
 	animation.frameSpeedRate = 10;
@@ -288,7 +289,7 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 
-	Game::Instance()->GetPlayerDead() = true;
+	game.GetPlayerDead() = true;
 
 	if (health.deathTimer.GetTicks() > 3000)
 	{
@@ -302,11 +303,11 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 
 		if (health.deathTimer.GetTicks() > 3500)
 		{
-			Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, -1);
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, -1);
 			Registry::Instance()->GetSystem<RenderHUDSystem>().OnExit();
 			Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
-			Game::Instance()->GetStateMachine()->PopState();
-			Game::Instance()->GetStateMachine()->PushState(new GameOverState());
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new GameOverState());
 			entity.Kill();
 		}
 	}

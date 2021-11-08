@@ -4,7 +4,8 @@
 class TitleState : public State
 {
 public:
-	TitleState() {}
+	TitleState();
+	~TitleState() {};
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -24,4 +25,7 @@ private:
 	int timer;
 	bool scroll;
 	static const std::string titleID;
+
+	class Game& game;
+	class Registry& reg;
 };

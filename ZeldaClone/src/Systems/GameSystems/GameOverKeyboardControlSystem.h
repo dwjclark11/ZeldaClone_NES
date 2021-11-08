@@ -20,10 +20,12 @@
 
 class GameOverKeyboardControlSystem : public System
 {
-
+private:
+	Game& game;
 public:
 
 	GameOverKeyboardControlSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -48,13 +50,13 @@ public:
 				{
 				case SDLK_UP:
 					transform.position.y -= 100;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 475) transform.position.y = 675;
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += 100;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 675) transform.position.y = 475;
 					break;
 
@@ -62,21 +64,21 @@ public:
 				{
 					if (transform.position.y == 475)
 					{
-						Game::Instance()->GetPlayerNum() = 1;
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new GameState());
+						game.GetPlayerNum() = 1;
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new GameState());
 					}
 					else if (transform.position.y == 575)
 					{
-						Game::Instance()->GetPlayerNum();
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new GameState());
+						game.GetPlayerNum();
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new GameState());
 					}
 					else if (transform.position.y == 675)
 					{
 						
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new MenuState());
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new MenuState());
 					}
 					break;
 				}
@@ -100,7 +102,7 @@ public:
 				if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
 				{
 					transform.position.y -= 100;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 475) transform.position.y = 675;
 					GamePadSystem::buttonDirDown = true;
 				}
@@ -108,7 +110,7 @@ public:
 				if (GamePadSystem::downPressed && !GamePadSystem::buttonDirDown)
 				{
 					transform.position.y += 100;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 675) transform.position.y = 475;
 					GamePadSystem::buttonDirDown = true;
 				}
@@ -117,22 +119,22 @@ public:
 				{
 					if (transform.position.y == 475)
 					{
-						Game::Instance()->GetPlayerDead() = false;
+						game.GetPlayerDead() = false;
 						GameState::firstEntered = false;
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new GameState());
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new GameState());
 					
 					}
 					else if (transform.position.y == 575)
 					{
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new GameState());
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new GameState());
 					}
 					else if (transform.position.y == 675)
 					{
 
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new MenuState());
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new MenuState());
 					}
 					GamePadSystem::buttonDown = true;
 				}

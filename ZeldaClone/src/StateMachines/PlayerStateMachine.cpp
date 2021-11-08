@@ -1,9 +1,10 @@
 #include "PlayerStateMachine.h"
+#include "../Game/Game.h"
 
 
 PlayerStateMachine::PlayerStateMachine()
 {
-	Logger::Log("Player State Machine Created");
+	//Logger::Log("Player State Machine Created");
 	idleState 			= new IdleState();
 	moveState 			= new MoveState();
 	attackState 		= new AttackState();

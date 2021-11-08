@@ -20,12 +20,14 @@
 
 class NameSelectKeyboardControlSystem : public System
 {
-
+private:
+	class Game& game;
 public:
 
 	unsigned int slot;
 
 	NameSelectKeyboardControlSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -52,25 +54,25 @@ public:
 				{
 				case SDLK_UP:
 					transform.position.y -= sprite.height * transform.scale.y * 2;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 200) transform.position.y = 584;
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += sprite.height * transform.scale.y * 2;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 584) transform.position.y = 200;
 					break;
 
 				case SDLK_RIGHT:
 					transform.position.x += sprite.width * transform.scale.x;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.x > 708) transform.position.x = 260;
 					break;
 
 				case SDLK_LEFT:
 					transform.position.x -= sprite.width * transform.scale.x;
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.x < 260) transform.position.x = 708;
 
 					break;
@@ -227,8 +229,8 @@ public:
 						NameState::name = text.text.c_str();
 						//loader.SaveSlotData(slot);
 						loader.SavePlayerNameToLuaTable(std::to_string(slot), NameState::name);
-						Game::Instance()->GetStateMachine()->PopState();
-						Game::Instance()->GetStateMachine()->PushState(new MenuState());
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new MenuState());
 					}
 
 					break;

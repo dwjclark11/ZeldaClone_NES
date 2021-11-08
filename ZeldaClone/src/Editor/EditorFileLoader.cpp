@@ -14,6 +14,7 @@
 #include <fstream>
 
 EditorFileLoader::EditorFileLoader()
+	: reg(*Registry::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
@@ -73,7 +74,7 @@ void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetMan
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity tile = Registry::Instance()->CreateEntity();
+		Entity tile = reg.CreateEntity();
 		tile.Group(group);
 		tile.AddComponent<SpriteComponent>("image-Name", tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
@@ -130,7 +131,7 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity object = Registry::Instance()->CreateEntity();
+		Entity object = reg.CreateEntity();
 		object.Group(group);
 		object.AddComponent<SpriteComponent>(assetID, tileSize, tileSize, zIndex, false, srcRectX, srcRectY);
 		object.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
@@ -189,7 +190,7 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity boxCollider = Registry::Instance()->CreateEntity();
+		Entity boxCollider = reg.CreateEntity();
 		boxCollider.Group(group);
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
 		
@@ -217,9 +218,9 @@ void EditorFileLoader::SaveTilemap(std::string filepath, const std::unique_ptr<A
 	// Log the path where we saved the file!!
 	Logger::Err(filepath);
 
-	if (!Registry::Instance()->GetEntitiesByGroup("tiles").empty())
+	if (!reg.GetEntitiesByGroup("tiles").empty())
 	{
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("tiles"))
+		for (auto entity : reg.GetEntitiesByGroup("tiles"))
 		{
 			if (entity.BelongsToGroup("tiles"))
 			{
@@ -268,9 +269,9 @@ void EditorFileLoader::SaveObjectMap(std::string filepath, const std::unique_ptr
 	// Log the path where we saved the file!!
 	Logger::Err(filepath);
 
-	if (!Registry::Instance()->GetEntitiesByGroup("obstacles").empty())
+	if (!reg.GetEntitiesByGroup("obstacles").empty())
 	{
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("obstacles"))
+		for (auto entity : reg.GetEntitiesByGroup("obstacles"))
 		{
 			if (entity.BelongsToGroup("obstacles"))
 			{
@@ -309,9 +310,9 @@ void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::uniqu
 	// Log the path where we saved the file!!
 	Logger::Err(filepath);
 
-	if (!Registry::Instance()->GetEntitiesByGroup("colliders").empty())
+	if (!reg.GetEntitiesByGroup("colliders").empty())
 	{
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("colliders"))
+		for (auto entity : reg.GetEntitiesByGroup("colliders"))
 		{
 			bool collider = false;
 			bool trigger = false;
@@ -331,9 +332,9 @@ void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::uniqu
 		}
 	}
 
-	if (!Registry::Instance()->GetEntitiesByGroup("trigger").empty())
+	if (!reg.GetEntitiesByGroup("trigger").empty())
 	{
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("trigger"))
+		for (auto entity : reg.GetEntitiesByGroup("trigger"))
 		{
 			bool collider = false;
 			bool trigger = false;
@@ -378,9 +379,9 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 	m_writer.WriteDeclareTable("colliders", file);
 	
 	// If there are colliders in the registry, save them to a lua file, using the LuaTableWriter
-	if (!Registry::Instance()->GetEntitiesByGroup("colliders").empty())
+	if (!reg.GetEntitiesByGroup("colliders").empty())
 	{
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("colliders"))
+		for (auto entity : reg.GetEntitiesByGroup("colliders"))
 		{
 			Logger::Log("In the collider");
 			bool collider = false;
@@ -424,13 +425,13 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 	// Currently there is a glitch with the save --> There must be at least one trigger 
 	
 	// If there are triggers in the registry, save them to a lua file, using the LuaTableWriter
-	if (!Registry::Instance()->GetEntitiesByGroup("trigger").empty())
+	if (!reg.GetEntitiesByGroup("trigger").empty())
 	{
 		// reset i to 1
 		i = 1;
 		m_writer.WriteDeclareTable("triggers", file);
 		// Loop through all Triggers
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("trigger"))
+		for (auto entity : reg.GetEntitiesByGroup("trigger"))
 		{
 			Logger::Log("In the trigger");
 			bool collider = false;
@@ -513,9 +514,9 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	m_writer.WriteDeclareTable("enemies", file);
 
 	// If there are colliders in the registry, save them to a lua file, using the LuaTableWriter
-	if (!Registry::Instance()->GetEntitiesByGroup("enemies").empty())
+	if (!reg.GetEntitiesByGroup("enemies").empty())
 	{
-		for (auto entity : Registry::Instance()->GetEntitiesByGroup("enemies"))
+		for (auto entity : reg.GetEntitiesByGroup("enemies"))
 		{
 			bool animation = false;
 			bool projectile = false;

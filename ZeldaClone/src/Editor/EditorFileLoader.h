@@ -38,4 +38,5 @@ private:
 	// Declaration of variables
 	std::string fileName;
 	std::string imageName;
+	class Registry& reg;
 };

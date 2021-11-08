@@ -11,8 +11,11 @@
 
 class RenderEditorLabelSystem : public System
 {
+private:
+	Game& game;
 public:
 	RenderEditorLabelSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<SpriteComponent>();
 		RequiredComponent<TransformComponent>();
@@ -32,8 +35,8 @@ public:
 		std::string colliderOffsetY = "Collider Offset Y:  " + std::to_string(MouseControlSystem::boxColliderOffsetY);
 		std::string tileScaleX = "Tile Scale X:       " + std::to_string(MouseControlSystem::tileScaleX);
 		std::string tileScaleY = "Tile Scale Y:       " + std::to_string(MouseControlSystem::tileScaleY);
-		std::string tilePositionText = "Mouse X: " + std::to_string(static_cast<int>(Game::Instance()->GetMouseBox().x + camera.x) / MouseControlSystem::gridSize)
-			+ ", Mouse Y: " + std::to_string(static_cast<int>(Game::Instance()->GetMouseBox().y + camera.y) / MouseControlSystem::gridSize);
+		std::string tilePositionText = "Mouse X: " + std::to_string(static_cast<int>(game.GetMouseBox().x + camera.x) / MouseControlSystem::gridSize)
+			+ ", Mouse Y: " + std::to_string(static_cast<int>(game.GetMouseBox().y + camera.y) / MouseControlSystem::gridSize);
 
 		std::string collisionText = "Collision: " + collision;
 		std::string layerText = "Layer: " + std::to_string(MouseControlSystem::layer);

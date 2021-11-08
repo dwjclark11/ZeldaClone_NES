@@ -4,9 +4,12 @@
 
 class GameOverState : public State
 {
+private:
+	class Game& game;
 public:
 
-	GameOverState() {}
+	GameOverState();
+	~GameOverState() {}
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();

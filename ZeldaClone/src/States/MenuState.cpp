@@ -19,18 +19,23 @@ std::string MenuState::player3Name = "";
 
 bool MenuState::slotsFull = false;
 
+MenuState::MenuState()
+	: full(false), slot1(1), slot2(2), slot3(3), game(*Game::Instance()), reg(*Registry::Instance())
+{
+}
+
 void MenuState::Update(const double& deltaTime)
 {
-	Game::Instance()->GetEventManager()->Reset();
-	Registry::Instance()->GetSystem<MenuKeyboardControlSystem>().SubscribeToEvents(Game::Instance()->GetEventManager());
+	game.GetEventManager()->Reset();
+	reg.GetSystem<MenuKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	
 
-	Registry::Instance()->Update();
-	Registry::Instance()->GetSystem<MenuKeyboardControlSystem>().Update();
+	reg.Update();
+	reg.GetSystem<MenuKeyboardControlSystem>().Update();
 
 	if (slotsFull && !full)
 	{
-		Entity slotsFull = Registry::Instance()->CreateEntity();
+		Entity slotsFull = reg.CreateEntity();
 		slotsFull.AddComponent<TextLabelComponent>(glm::vec2(300, 900), " REGISTERS ARE FULL! ", "charriot-font-40", SDL_Color{ 255,0,0,0 }, true);
 		full = true;
 	}
@@ -38,8 +43,8 @@ void MenuState::Update(const double& deltaTime)
 
 void MenuState::Render()
 {
-	Registry::Instance()->GetSystem<RenderTextSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager(), Game::Instance()->GetCamera());
-	Registry::Instance()->GetSystem<RenderMainMenuSystem>().Update(Game::Instance()->GetRenderer(), Game::Instance()->GetAssetManager());
+	reg.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	reg.GetSystem<RenderMainMenuSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool MenuState::OnEnter()
@@ -47,14 +52,14 @@ bool MenuState::OnEnter()
 	LevelLoader loader;
 	full = false;
 
-	if (!Registry::Instance()->HasSystem<MenuKeyboardControlSystem>()) Registry::Instance()->AddSystem<MenuKeyboardControlSystem>();
-	if (!Registry::Instance()->HasSystem<RenderTextSystem>()) Registry::Instance()->AddSystem<RenderTextSystem>();
-	if (!Registry::Instance()->HasSystem<RenderMainMenuSystem>()) Registry::Instance()->AddSystem<RenderMainMenuSystem>();
+	if (!reg.HasSystem<MenuKeyboardControlSystem>()) reg.AddSystem<MenuKeyboardControlSystem>();
+	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
+	if (!reg.HasSystem<RenderMainMenuSystem>()) reg.AddSystem<RenderMainMenuSystem>();
 
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
 
-	Game::Instance()->GetSystem<MusicPlayerSystem>().PlayMusic(Game::Instance()->GetAssetManager(), "Main_Menu", -1);
+	game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 
 	loader.LoadMenuScreenFromLuaTable(lua, "save1");
 	loader.LoadMenuScreenFromLuaTable(lua, "save2");
@@ -65,17 +70,17 @@ bool MenuState::OnEnter()
 
 bool MenuState::OnExit()
 {
-	Registry::Instance()->GetSystem<RenderMainMenuSystem>().OnExit();
-	Registry::Instance()->GetSystem<RenderTextSystem>().OnExit();
+	reg.GetSystem<RenderMainMenuSystem>().OnExit();
+	reg.GetSystem<RenderTextSystem>().OnExit();
 
-	Registry::Instance()->RemoveSystem<RenderMainMenuSystem>();
-	Registry::Instance()->RemoveSystem<MenuKeyboardControlSystem>();
+	reg.RemoveSystem<RenderMainMenuSystem>();
+	reg.RemoveSystem<MenuKeyboardControlSystem>();
 	return true;
 }
 
 void MenuState::ProcessEvents(SDL_Event& event)
 {
-	Registry::Instance()->GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	reg.GetSystem<GamePadSystem>().UpdateOtherStates(event);
 }
 
 void MenuState::OnKeyDown(SDL_Event* event)

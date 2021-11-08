@@ -4,7 +4,7 @@
 class EditorState : public State
 {
 public:
-	EditorState() : editor(false), keyDown(false) {}
+	EditorState();
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
@@ -23,4 +23,6 @@ private:
 	bool keyDown;
 	bool bombs;
 	static const std::string editorID;
+	class Game& game;
+	class Registry& reg;
 };

@@ -17,8 +17,11 @@
 
 class MenuKeyboardControlSystem : public System
 {
+private:
+	class Game& game;
 public:
 	MenuKeyboardControlSystem()
+		: game(*Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -45,13 +48,13 @@ public:
 					{
 					case SDLK_UP:
 						transform.position.y -= sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y < 200) transform.position.y = 584;
 						break;
 
 					case SDLK_DOWN:
 						transform.position.y += sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y > 584) transform.position.y = 200;
 						break;
 
@@ -61,9 +64,9 @@ public:
 						{
 							if (MenuState::player1Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 1;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
+								game.GetPlayerNum() = 1;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
 							}
 
 						}
@@ -71,9 +74,9 @@ public:
 						{
 							if (MenuState::player2Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 2;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 2;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 
 						}
@@ -81,9 +84,9 @@ public:
 						{
 							if (MenuState::player3Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 3;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 3;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 						}
 						else if (transform.position.y == 488)
@@ -93,8 +96,8 @@ public:
 								MenuState::slotsFull = true;
 								break;
 							}
-							Game::Instance()->GetStateMachine()->PopState();
-							Game::Instance()->GetStateMachine()->PushState(new NameState());
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new NameState());
 						}
 						else if (transform.position.y == 584)
 						{
@@ -112,13 +115,13 @@ public:
 					{
 					case SDLK_UP:
 						transform.position.y -= sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y < 200) transform.position.y = 680;
 						break;
 
 					case SDLK_DOWN:
 						transform.position.y += sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y > 680) transform.position.y = 200;
 						break;
 
@@ -128,18 +131,18 @@ public:
 						{
 							if (MenuState::player1Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 1;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 1;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 						}
 						else if (transform.position.y == 296)
 						{
 							if (MenuState::player2Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 2;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 2;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 
 						}
@@ -147,9 +150,9 @@ public:
 						{
 							if (MenuState::player3Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 3;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 3;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 						}
 						else if (transform.position.y == 488)
@@ -159,8 +162,8 @@ public:
 								MenuState::slotsFull = true;
 								break;
 							}
-							Game::Instance()->GetStateMachine()->PopState();
-							Game::Instance()->GetStateMachine()->PushState(new NameState());
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new NameState());
 						}
 						else if (transform.position.y == 584)
 						{
@@ -168,8 +171,8 @@ public:
 						}
 						else if (transform.position.y == 680)
 						{
-							Game::Instance()->GetStateMachine()->PopState();
-							Game::Instance()->GetStateMachine()->PushState(new EditorState());
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new EditorState());
 						}
 						break;
 					}
@@ -195,7 +198,7 @@ public:
 					if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
 					{
 						transform.position.y -= sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y < 200) transform.position.y = 584;
 						GamePadSystem::buttonDirDown = true;
 					}
@@ -203,7 +206,7 @@ public:
 					if (GamePadSystem::downPressed && !GamePadSystem::buttonDirDown)
 					{
 						transform.position.y += sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y > 584) transform.position.y = 200;
 						GamePadSystem::buttonDirDown = true;
 					}
@@ -214,9 +217,9 @@ public:
 						{
 							if (MenuState::player1Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 1;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 1;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 
 						}
@@ -224,9 +227,9 @@ public:
 						{
 							if (MenuState::player2Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 2;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 2;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 
 						}
@@ -234,9 +237,9 @@ public:
 						{
 							if (MenuState::player1Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 3;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 3;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 						}
 						else if (transform.position.y == 488)
@@ -246,8 +249,8 @@ public:
 								MenuState::slotsFull = true;
 								break;
 							}
-							Game::Instance()->GetStateMachine()->PopState();
-							Game::Instance()->GetStateMachine()->PushState(new NameState());
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new NameState());
 						}
 						else if (transform.position.y == 584)
 						{
@@ -261,7 +264,7 @@ public:
 					if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
 					{
 						transform.position.y -= sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y < 200) transform.position.y = 680;
 						GamePadSystem::buttonDirDown = true;
 					}
@@ -269,7 +272,7 @@ public:
 					if (GamePadSystem::downPressed && !GamePadSystem::buttonDirDown)
 					{
 						transform.position.y += sprite.height * 6;
-						Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 0, 1);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						if (transform.position.y > 680) transform.position.y = 200;
 						GamePadSystem::buttonDirDown = true;
 					}
@@ -280,18 +283,18 @@ public:
 						{
 							if (MenuState::player1Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 1;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 1;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 						}
 						else if (transform.position.y == 296)
 						{
 							if (MenuState::player2Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 2;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 2;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 
 						}
@@ -299,9 +302,9 @@ public:
 						{
 							if (MenuState::player1Name.size() != 0)
 							{
-								Game::Instance()->GetPlayerNum() = 3;
-								Game::Instance()->GetStateMachine()->PopState();
-								Game::Instance()->GetStateMachine()->PushState(new GameState());
+								game.GetPlayerNum() = 3;
+								game.GetStateMachine()->PopState();
+								game.GetStateMachine()->PushState(new GameState());
 							}
 						}
 						else if (transform.position.y == 488)
@@ -311,8 +314,8 @@ public:
 								MenuState::slotsFull = true;
 								break;
 							}
-							Game::Instance()->GetStateMachine()->PopState();
-							Game::Instance()->GetStateMachine()->PushState(new NameState());
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new NameState());
 						}
 						else if (transform.position.y == 584)
 						{
@@ -320,8 +323,8 @@ public:
 						}
 						else if (transform.position.y == 680)
 						{
-							Game::Instance()->GetStateMachine()->PopState();
-							Game::Instance()->GetStateMachine()->PushState(new EditorState());
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new EditorState());
 						}
 						GamePadSystem::buttonDown = true;
 					}

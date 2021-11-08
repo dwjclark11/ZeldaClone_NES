@@ -98,7 +98,7 @@ Entity Registry::CreateEntity()
 void Registry::KillEntity(Entity entity)
 {
 	entitiesToBeKilled.insert(entity);
-	Logger::Log("Entity " + std::to_string(entity.GetID()) + " was killed");
+	//Logger::Log("Entity " + std::to_string(entity.GetID()) + " was killed");
 }
 
 void Registry::AddEntityToSystem(Entity entity)
