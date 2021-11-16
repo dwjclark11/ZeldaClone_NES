@@ -56,15 +56,15 @@ public:
 
 						if (game.GetPlayerNum() == 1)
 						{
-							loader.SavePlayerDataToLuaTable("1", game.GetAssetManager(), game.GetRenderer());
+							loader.SavePlayerDataToLuaTable("1");
 						}
 						else if (game.GetPlayerNum() == 2)
 						{
-							loader.SavePlayerDataToLuaTable("2", game.GetAssetManager(), game.GetRenderer());
+							loader.SavePlayerDataToLuaTable("2");
 						}
 						else if (game.GetPlayerNum() == 3)
 						{
-							loader.SavePlayerDataToLuaTable("3", game.GetAssetManager(), game.GetRenderer());
+							loader.SavePlayerDataToLuaTable("3");
 						}
 
 						//Entity saving = Registry::Instance()->CreateEntity();

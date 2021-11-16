@@ -49,16 +49,9 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			//Logger::Log("Colliders: " + std::to_string(Registry::Instance()->GetEntitiesByGroup("colliders").size()));
-
-			if (entity.BelongsToGroup("colliders") /*|| entity.BelongsToGroup("trigger")*/)
+			if (entity.BelongsToGroup("colliders") || entity.BelongsToGroup("trigger"))
 			{
-				Registry::Instance()->RemoveEntityFromSystems(entity);	
-				//Registry::Instance()->RemoveEntityFromPool(entity);
-				Registry::Instance()->RemoveEntityGroup(entity);	
-				Registry::Instance()->RemoveEntityTag(entity);	
-
-				//entity.Kill();
+				entity.Kill();
 			}
 		}
 	}

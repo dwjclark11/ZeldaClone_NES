@@ -26,8 +26,8 @@ level = {
 				frame_rate = 10,
 				vertical = true, 
 				looped = true, 
-				frame_offset = 0,
-			}
+				frame_offset = 0
+			} 
 		}
 	},
 	-- FIRE RIGHT
@@ -53,7 +53,7 @@ level = {
 				frame_rate = 10,
 				vertical = true, 
 				looped = true, 
-				frame_offset = 0,
+				frame_offset = 0
 			}
 		}
 	},

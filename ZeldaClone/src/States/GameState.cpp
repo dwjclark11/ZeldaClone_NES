@@ -46,7 +46,7 @@ int GameState::totalKeys = 0;
 
 
 GameState::GameState()
-	: game(*Game::Instance()), reg(*Registry::Instance())
+	: game(*Game::Instance()), reg(*Registry::Instance()), cameraOffset(glm::vec2(0))
 {
 }
 
@@ -81,14 +81,14 @@ void GameState::Update(const double& deltaTime)
 	// Reset the event manager queue
 	game.GetEventManager()->Reset();
 
-	
 	reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	
+
 	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
+	
 	// Update the registry values
 	reg.Update();
 	
@@ -99,17 +99,13 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<AnimationSystem>().Update();
 	reg.GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 
-
 	reg.GetSystem<MovementSystem>().Update(deltaTime);
 	reg.GetSystem<CameraMovementSystem>().Update(game.GetCamera());
 	reg.GetSystem<ProjectileLifeCycleSystem>().Update();
-	reg.GetSystem<CollisionSystem>().Update(game.GetEventManager(), game.GetAssetManager(), game.GetCamera());
+	reg.GetSystem<CollisionSystem>().Update(game.GetEventManager());
 
 	//reg.GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	reg.GetSystem<AISystem>().Update();
-	// Update the registry values
-	//reg.Update();
-
 
 	ConvertHUDNumbers();
 }
@@ -162,9 +158,9 @@ bool GameState::OnEnter()
 		Game::isDebug = false;
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
-		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies", game.GetAssetManager());
-		loader.LoadColliders(game.GetAssetManager(), game.GetRenderer(), "colliders");
-
+		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
+		loader.LoadColliders("colliders");
+		
 		// Player is now created from a Lua script instead of Hard Coded
 		if (!game.GetplayerCreated())
 		{
@@ -181,7 +177,7 @@ bool GameState::OnEnter()
 			}
 			else if (game.GetPlayerNum() == 3)
 			{
-				loader.LoadLevelAssets(game.GetRenderer(), game.GetAssetManager(), "Level1.txt");
+				loader.LoadLevelAssets(game.GetAssetManager(), "Level1.txt");
 				loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save3");
 			}
 		}
@@ -208,7 +204,7 @@ bool GameState::OnEnter()
 
 		game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
 
-		loader.LoadMap(game.GetAssetManager(), "map", 4096, 1344);
+		loader.LoadMap("map", 4096, 1344);
 		//Entity bombItem = reg.CreateEntity();
 		//bombItem.AddComponent<TransformComponent>(glm::vec2(7648, 4750), glm::vec2(4, 4), 0.0);
 		//bombItem.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);

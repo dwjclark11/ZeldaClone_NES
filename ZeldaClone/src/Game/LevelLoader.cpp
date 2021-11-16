@@ -7,6 +7,9 @@
 #include "../Components/HealthComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/PlayerComponent.h"
+#include "../Components/EnemyComponent.h"
+#include "../Components/ColliderComponent.h"
 #include "../Components/HUDComponent.h"
 #include "../Components/MenuComponent.h"
 #include "../Components/TileComponent.h"
@@ -36,7 +39,7 @@ LevelLoader::~LevelLoader()
 }
 
 
-void LevelLoader::LoadMap(const std::unique_ptr<AssetManager>& assetManager, std::string mapName, int image_width, int image_height)
+void LevelLoader::LoadMap(std::string mapName, int image_width, int image_height)
 {
 	Entity secret = reg.CreateEntity();
 	secret.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
@@ -45,27 +48,12 @@ void LevelLoader::LoadMap(const std::unique_ptr<AssetManager>& assetManager, std
 	secret.Group("map");
 }
 
-void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string fileName, std::string imageName)
+void LevelLoader::LoadTilemap(std::string fileName, std::string imageName)
 {
 	// Adding Textures to the asset Manager
 	std::string assetID = imageName;
-	
-	// Remove the .png
-	for (int i = 0; i < 4; i++)
-		assetID.pop_back();
-	//Logger::Err("Before: " + imageName);
-	std::string tileMapImage = SetName(imageName);
-	//Logger::Err("After: " + tileMapImage);
 
-	//Logger::Log("AssetID: " + assetID);
-	assetManager->AddTextures(renderer, tileMapImage, imageName);
-
-	//Logger::Err("Before: " + imageName);
-	//std::string tileMapImage = SetName(imageName);
-	//Logger::Err("After: " + tileMapImage);
-
-	// Load the tilemap
-	int tileSize = 16;
+	int tileSize = 16; // Should not be hard coded
 
 	// Open and read the text file
 	std::fstream mapFile;
@@ -92,7 +80,7 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 		int tileWidth = 0;
 		int tileHeight = 0;
 		std::string group = "";
-		std::string assetID = "";
+		//std::string assetID = "";
 		glm::vec2 offset = glm::vec2(0, 0);
 		bool collider = false;
 
@@ -107,21 +95,22 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 
 		// Create a new entity for each tile
 		Entity tile = reg.CreateEntity();
-		tile.AddComponent<SpriteComponent>(tileMapImage, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
+		tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
+		tile.AddComponent<ColliderComponent>();
 		if (zIndex < 2)
 		{
 			tile.AddComponent<TileComponent>();
 			tile.Group(group);
 		}
-			
+
 		else
 		{
 			//Logger::Log("Game Tile");
-			tile.AddComponent<GameComponent>();
+			tile.AddComponent<GameComponent>(); // RenderTileSystem needs to be changed to to layers
 			tile.Group("layered");
 		}
-			
+
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{
@@ -133,7 +122,7 @@ void LevelLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager,
 	mapFile.close();
 }
 
-void LevelLoader::LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const std::string& fileName)
+void LevelLoader::LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, const std::string& fileName)
 {
 	std::fstream lvlFile;
 	lvlFile.open("Assets/LevelAssets/" + fileName);
@@ -155,13 +144,11 @@ void LevelLoader::LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetM
 
 		assetType = ConvertToAssetType(type);
 
-		//Entity newEntity = reg.CreateEntity();
-		//Logger::Log(assetPath);
 		switch (assetType)
 		{
 		case TEXTURE:
-			assetManager->AddTextures(renderer, assetID, (path + assetPath));
-			//Logger::Log("Texture Added with ID " + assetID);
+			assetManager->AddTextures(game.GetRenderer(), assetID, (path + assetPath));
+			Logger::Log("Texture Added with ID " + assetID);
 			break;
 
 		case MUSIC:
@@ -169,7 +156,7 @@ void LevelLoader::LoadLevelAssets(SDL_Renderer* renderer, std::unique_ptr<AssetM
 			break;
 		case SOUNDFX:
 			assetManager->AddSoundFX(assetID, path + assetPath);
-				break;
+			break;
 		case FONT:
 			assetManager->AddFonts(assetID, path + assetPath, 14);
 			break;
@@ -191,116 +178,8 @@ AssetType LevelLoader::ConvertToAssetType(std::string& type)
 		return FONT;
 	if (type == "MUSIC")
 		return MUSIC;
-
 }
 
-void LevelLoader::LoadMenuScreen(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, unsigned int& slotNum)
-{
-	// Open and read the th text file
-	std::fstream menufile;
-	menufile.open("./Assets/LevelAssets/menuFiles" + std::to_string(slotNum) + ".txt");
-
-	if (!menufile.is_open())
-	{
-		Logger::Err("Unable to open file");
-	}
-
-	while (!menufile.eof())
-	{
-		// Mapfile variables
-		int srcRectX = 0;
-		int srcRectY = 0;
-		int transformX = 0;
-		int transformY = 0;
-		int tileWidth = 0;
-		int tileHeight = 0;
-		int tileScaleX = 0;
-		int tileScaleY = 0;
-		int zIndex = 0;
-		size_t numHearts = 0;
-		int xTransform = 0;
-		int yTransform = 0;
-		std::string group = "";
-		glm::vec2 colliderOffset = glm::vec2(0);
-		bool collider = false;
-		std::string assetID = "";
-
-		// If we are at the end of the File --> Leave the file!
-		if (menufile.eof()) break;
-		// Start parsing the text file
-		menufile >> group >> assetID >> tileWidth >> tileHeight >> srcRectY >> srcRectX >> zIndex >> transformX >> transformY >> tileScaleX >> tileScaleY >> numHearts;
-
-		for (size_t i = 0; i < numHearts; i++)
-		{
-			if (i > 0) xTransform += 32;
-			if (i == 8)
-			{
-				yTransform += 32;
-				xTransform = 0;
-			}
-
-			// Create new tile Entity for each parsed tile
-			Entity tile = reg.CreateEntity();
-			tile.Group(group);
-			tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
-			tile.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(tileScaleX, tileScaleY), 0.0);
-			tile.AddComponent<MenuComponent>();
-		}
-
-	
-	} menufile.close();
-
-	// Open and read the thext file
-	std::fstream menuBox;
-	menuBox.open("./Assets/LevelAssets/menuBox.txt");
-
-	if (!menuBox.is_open())
-	{
-		Logger::Err("Unable to open file");
-	}
-
-	while (!menuBox.eof())
-	{
-		// Mapfile variables
-		int srcRectX = 0;
-		int srcRectY = 0;
-		int transformX = 0;
-		int transformY = 0;
-		int tileWidth = 0;
-		int tileHeight = 0;
-		int tileScaleX = 0;
-		int tileScaleY = 0;
-		int zIndex = 0;
-		size_t numLines = 0;
-		bool vertical = false;
-		bool horizontal = false;
-		int xTransform = 0;
-		int yTransform = 0;
-		std::string group = "";
-		glm::vec2 colliderOffset = glm::vec2(0);
-		bool collider = false;
-		std::string assetID = "";
-
-		// If we are at the end of the File --> Leave the file!
-		if (menuBox.eof()) break;
-		// Start parsing the text file
-		menuBox >> group >> assetID >> tileWidth >> tileHeight >> srcRectY >> srcRectX >> zIndex >> transformX >> transformY >> tileScaleX >> tileScaleY >> vertical >> horizontal >>numLines;
-
-		for (size_t i = 0; i < numLines; i++)
-		{
-			if (i > 0 && horizontal) xTransform += 32;
-			if (i > 0 && vertical) yTransform += 32;
-	
-			// Create new tile Entity for each parsed tile
-			Entity tile = reg.CreateEntity();
-			tile.Group(group);
-			tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
-			tile.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(tileScaleX, tileScaleY), 0.0);
-		}
-
-
-	} menuBox.close();
-}
 void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/SavedFiles/" + fileName + ".lua");
@@ -312,11 +191,11 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
-	
+
 	// Execute the script using the sol state 
 	lua.script_file("./Assets/SavedFiles/" + fileName + ".lua");
-	
-	/* Read the player data and check for: 
+
+	/* Read the player data and check for:
 					- Number of hearts
 					- Name of the Saved Player for that slot
 					- What tunic the Player has to set the sprite srcRect positions
@@ -333,7 +212,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 	int srcRectX = 0;
 	bool blueRing = false;
 	bool redRing = false;
-	
+
 	std::string entityTag = "";
 	while (true)
 	{
@@ -349,16 +228,16 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> menuSharedValues = player["menu_shared_values"];
 		if (menuSharedValues != sol::nullopt)
 		{
-			if (fileName == "save1") 
+			if (fileName == "save1")
 			{
 				MenuState::player1Name = player["menu_shared_values"]["name"];
 				ConvertName(MenuState::player1Name, 400, 220);
 				transformX = 550;
 				transformY = 200;
 				entityTag = "first_menu_slot";
-				
+
 			}
-			if (fileName == "save2") 
+			if (fileName == "save2")
 			{
 				MenuState::player2Name = player["menu_shared_values"]["name"];
 				ConvertName(MenuState::player2Name, 400, 320);
@@ -373,11 +252,11 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 				transformX = 550;
 				transformY = 400;
 				entityTag = "third_menu_slot";
-			}				
-			
+			}
+
 			// Read the number of Hearts from the file and display them accordingly on the screen
 			numHearts = player["menu_shared_values"]["num_hearts"];
-			
+
 			for (int j = 0; j < numHearts; j++)
 			{
 				if (j > 0) xTransform += 32;
@@ -394,13 +273,13 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 				heart.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(4, 4), 0.0);
 				heart.AddComponent<MenuComponent>();
 			}
-			
+
 			auto entity = reg.GetEntityByTag(entityTag);
 			auto& sprite = entity.GetComponent<SpriteComponent>();
-			
+
 			blueRing = player["menu_shared_values"]["blue_ring"];
 			redRing = player["menu_shared_values"]["red_ring"];
-			
+
 			if (blueRing && !redRing) sprite.srcRect.x = 64;
 			if (redRing) sprite.srcRect.x = 128;
 		}
@@ -495,18 +374,6 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 	}
 }
 
-void LevelLoader::LoadPauseScreen( std::unique_ptr<AssetManager>& assetManager,  SDL_Renderer* renderer)
-{
-
-	// Open and read the thext file
-	std::fstream menuBox;
-	menuBox.open("./Assets/LevelAssets/pauseMenu.txt");
-
-	if (!menuBox.is_open())
-	{
-		Logger::Err("Unable to open file");
-	}
-}
 
 std::string LevelLoader::LoadSlotName(unsigned int& slotNum)
 {
@@ -548,7 +415,7 @@ void LevelLoader::SaveSlotData(unsigned int& slotNum)
 	slotFile.close();
 }
 
-void LevelLoader::LoadLevel(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, const std::string& level)
+void LevelLoader::LoadLevel(const std::string& level)
 {
 	// Open and read the thext file
 	std::fstream mapFile;
@@ -597,7 +464,7 @@ void LevelLoader::LoadLevel(std::unique_ptr<AssetManager>& assetManager, SDL_Ren
 	mapFile.close();
 }
 
-void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, const std::string& filename)
+void LevelLoader::LoadColliders(const std::string& filename)
 {
 
 	// Open and read the text file
@@ -638,9 +505,9 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
 
 		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
-		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> 
-			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >> 
-			triggerColliderFile >> triggerTilemapFile >> triggerTilemapImage  >> triggerEntityFile >> triggerImageHeight >> triggerImageWidth;
+		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >>
+			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >>
+			triggerColliderFile >> triggerTilemapFile >> triggerTilemapImage >> triggerEntityFile >> triggerImageHeight >> triggerImageWidth;
 
 
 		triggerType = ConvertToTriggerType(type);
@@ -653,7 +520,7 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		boxCollider.Group(group);
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
 		boxCollider.AddComponent<GameComponent>();
-
+		boxCollider.AddComponent<ColliderComponent>();
 		if (collider && !trigger)
 		{
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
@@ -661,8 +528,8 @@ void LevelLoader::LoadColliders(std::unique_ptr<AssetManager>& assetManager, SDL
 		if (collider && trigger)
 		{
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y), 
-				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerEntityFile,triggerImageHeight, triggerImageWidth);
+			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y),
+				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerEntityFile, triggerImageHeight, triggerImageWidth);
 			boxCollider.AddComponent<GameComponent>();
 		}
 	}
@@ -733,7 +600,7 @@ std::string LevelLoader::SetName(std::string filePath, bool wExtension, char sep
 	return "";
 }
 
-void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, const std::string& fileName)
+void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
 
@@ -766,7 +633,7 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 		{
 			break;
 		}
-		
+
 		sol::table collider = colliders[i];
 
 		Entity newCollider = reg.CreateEntity();
@@ -777,7 +644,7 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 		{
 			newCollider.Group(collider["group"]);
 		}
-		
+
 		// Components
 		sol::optional<sol::table> hasComponents = collider["components"];
 		if (hasComponents != sol::nullopt)
@@ -792,13 +659,13 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 						collider["components"]["transform"]["position"]["y"]
 					),
 					glm::vec2(
-						collider["components"]["transform"]["scale"]["x"].get_or(1.0), 
+						collider["components"]["transform"]["scale"]["x"].get_or(1.0),
 						collider["components"]["transform"]["scale"]["y"].get_or(1.0)
 					),
 					collider["components"]["transform"]["rotation"].get_or(0.0)
-				);
+					);
 			}
-			
+
 			// Box Collider Component
 			sol::optional<sol::table> boxCollider = collider["components"]["boxCollider"];
 			if (boxCollider != sol::nullopt)
@@ -810,9 +677,9 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 						collider["components"]["boxCollider"]["offset_x"].get_or(0.0),
 						collider["components"]["boxCollider"]["offset_y"].get_or(0.0)
 					)
-				);
+					);
 			}
-			
+
 			// Trigger Component -->Still Needs to be Tested!!
 			sol::optional<sol::table> trigger = collider["triggerComponent"];
 			if (trigger != sol::nullopt)
@@ -824,7 +691,7 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 						collider["triggerComponent"]["transport_offset_y"].get_or(0.0)
 					),
 					collider["triggerComponent"]["level"]
-				);
+					);
 			}
 			//else
 			//{
@@ -835,13 +702,13 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, std::unique_ptr<Ass
 	}
 }
 
-void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 {
 	//Logger::Err("In Save Player to Lua Table Function");
 	LuaTableWriter m_writer;
 	std::fstream file;
 	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
-	
+
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
 
@@ -850,13 +717,13 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::uniqu
 	m_writer.WriteCommentLine("Save file#: " + saveNum, file);
 	m_writer.WriteCommentSeparation(file);
 	m_writer.WriteDeclareTable("player_data", file);
-	
-		
+
+
 	auto entity = reg.GetEntityByTag("player");
-		
-		
+
+
 	const auto& transform = entity.GetComponent<TransformComponent>();
-	
+
 	// Local variables that are based on the game Items
 	bool hasBoomerang = game.GetGameItems().woodBoomerang;
 	bool hasMagicBoomerang = game.GetGameItems().magicBoomerang;
@@ -888,63 +755,63 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum, const std::uniqu
 	std::string name = "";
 	m_writer.WriteStartTable(1, false, file);
 	//m_writer.WriteKeyAndQuotedValue("group", "colliders", file);
-	
+
 	if (saveNum == "1") name = MenuState::player1Name;
 	if (saveNum == "2") name = MenuState::player2Name;
 	if (saveNum == "3") name = MenuState::player3Name;
-	
+
 	m_writer.WriteDeclareTable("menu_shared_values", file);
 	m_writer.WriteKeyAndQuotedValue("name", name, file);
 	m_writer.WriteKeyAndUnquotedValue("num_hearts", numHearts, file);
-	if(hasBlueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
+	if (hasBlueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("blue_ring", "false", file);
-	if(hasRedRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
+	if (hasRedRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("red_ring", "false", file);
 	m_writer.WriteEndTable(false, file);
-	
+
 	m_writer.WriteDeclareTable("components", file);
 	m_writer.WriteDeclareTable("transform", file);
 	m_writer.WriteDeclareTable("position", file);
 	m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
-	m_writer.WriteKeyAndValue('y',transform.position.y, true, file);
+	m_writer.WriteKeyAndValue('y', transform.position.y, true, file);
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteDeclareTable("items", file);
-		
+
 	// Write if we currently have these items in our inventory
-	if(hasBoomerang) m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
+	if (hasBoomerang) m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
-	if(hasSword) m_writer.WriteKeyAndUnquotedValue("sword", "true", file);
+	if (hasSword) m_writer.WriteKeyAndUnquotedValue("sword", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("sword", "false", file);
-	if(hasMagicRod) m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
+	if (hasMagicRod) m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
-	if(hasBombs) m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
+	if (hasBombs) m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
-	if(hasFood) m_writer.WriteKeyAndUnquotedValue("food", "true", file);
+	if (hasFood) m_writer.WriteKeyAndUnquotedValue("food", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("food", "false", file);
-	if(hasFlute) m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
+	if (hasFlute) m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
-	if(hasRaft) m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
+	if (hasRaft) m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
-	if(hasLadder) m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
+	if (hasLadder) m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
-	if(hasBow) m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
+	if (hasBow) m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
-	if(hasShield) m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
+	if (hasShield) m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
-	if(hasPowerBraclet) m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
+	if (hasPowerBraclet) m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
-	if(hasMap) m_writer.WriteKeyAndUnquotedValue("map", "true", file);
+	if (hasMap) m_writer.WriteKeyAndUnquotedValue("map", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("map", "false", file);
-	if(hasBluePotion) m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
+	if (hasBluePotion) m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
-	if(hasRedPotion) m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
+	if (hasRedPotion) m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
-	if(hasMasterKey) m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
+	if (hasMasterKey) m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
 	m_writer.WriteEndTable(true, file);
-		
+
 	// Write the numbered values of current inventory and life hearts
 	m_writer.WriteDeclareTable("inventory", file);
 	m_writer.WriteKeyAndUnquotedValue("num_rupees", numRupees, file);
@@ -975,7 +842,7 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	m_writer.WriteCommentLine("Save file#: " + saveNum, file);
 	m_writer.WriteCommentSeparation(file);
 	m_writer.WriteDeclareTable("player_data", file);
-	
+
 	// Create variables for default new player
 	bool hasBoomerang = false;
 	bool hasSword = true;
@@ -1015,17 +882,17 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	m_writer.WriteDeclareTable("components", file);
 	m_writer.WriteDeclareTable("transform", file);
 	m_writer.WriteDeclareTable("position", file);
-	
+
 	// Write the default player start position
 	m_writer.WriteKeyAndValue('x', 7615, false, file);
 	m_writer.WriteKeyAndValue('y', 5060, true, file);
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(false, file);
-	
+
 	// Declare a new Table "items"
 	m_writer.WriteDeclareTable("items", file);
-	
+
 	if (hasBoomerang) m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
 	if (hasSword) m_writer.WriteKeyAndUnquotedValue("sword", "true", file);
@@ -1104,10 +971,9 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		sol::table player = data[i];
 
 		auto entity = reg.CreateEntity();
-		//Logger::Err("Player Create");
-		//Logger::Err(player["tag"]);
+
 		entity.Tag(player["tag"]);
-		
+
 		// Components
 		sol::optional<sol::table> hasComponents = player["components"];
 		if (hasComponents != sol::nullopt)
@@ -1166,7 +1032,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					player["components"]["health"]["max_hearts"].get_or(3)
 					);
 			}
-			
+
 			// Sprite
 			sol::optional<sol::table> sprite = player["components"]["sprite"];
 			if (sprite != sol::nullopt)
@@ -1238,17 +1104,24 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					));
 			}
 
+			if (entity.HasTag("player"))
+			{
+				entity.AddComponent<CameraFollowComponent>();
+				entity.AddComponent<PlayerComponent>();
+			}
+
 			entity.AddComponent<GameComponent>();
-			entity.AddComponent<CameraFollowComponent>();
+			
 		}
 		i++;
+		Logger::Log("Player Created");
 	}
 }
 
 void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/SavedFiles/" + fileName + ".lua");
-	
+
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -1280,14 +1153,14 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		}
 		//Logger::Err("Has Colliders");
 		sol::table player = data[i];
-		
+
 		// Menu Shared Values and Items
 		sol::optional<sol::table> menuSharedValues = player["menu_shared_values"];
 		if (menuSharedValues != sol::nullopt)
 		{
 			RenderHealthSystem::loadedHearts = player["menu_shared_values"]["num_hearts"].get_or(3);
 		}
-		
+
 		// Components
 		sol::optional<sol::table> hasComponents = player["components"];
 		if (hasComponents != sol::nullopt)
@@ -1304,7 +1177,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		// Items
 		sol::optional<sol::table> hasItems = player["items"];
 		if (hasItems != sol::nullopt)
-		{ 
+		{
 			game.GetGameItems().woodBoomerang = player["items"]["boomerang"].get_or(false);
 			game.GetGameItems().magicBoomerang = player["items"]["magic_boomerang"].get_or(false);
 			game.GetGameItems().woodSword = player["items"]["wood_sword"].get_or(false);
@@ -1335,13 +1208,13 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 			GameState::totalKeys = player["inventory"]["num_keys"].get_or(0);
 		}
 		i++;
+		Logger::Log("Player Loaded");
 	}
 }
 
-void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName, const std::unique_ptr<AssetManager>& assetManager)
+void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
-	//Logger::Log(fileName);
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -1362,21 +1235,20 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 	while (true)
 	{
 		sol::optional<sol::table> hasEntity = entities[i];
-		
+
 		if (hasEntity == sol::nullopt)
 		{
-			Logger::Err("There is no more Level Data");
+			//Logger::Err("There is no more Level Data");
 			break;
 		}
-		
+
 		sol::table entity = entities[i];
-		
+
 		Entity newEntity = reg.CreateEntity();
 
 		// Group 
 		newEntity.Group(entity["group"]);
 
-		
 		// Components
 		sol::optional<sol::table> hasComponents = entity["components"];
 		if (hasComponents != sol::nullopt)
@@ -1397,7 +1269,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 					entity["components"]["transform"]["rotation"].get_or(0.0)
 					);
 			}
-			
+
 			// RigidBody
 			sol::optional<sol::table> rigidBody = entity["components"]["rigidbody"];
 			if (rigidBody != sol::nullopt)
@@ -1407,7 +1279,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 						entity["components"]["rigidbody"]["velocity"]["x"].get_or(0),
 						entity["components"]["rigidbody"]["velocity"]["y"].get_or(0)
 					)
-				);
+					);
 			}
 
 			// Sprite
@@ -1426,7 +1298,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 						entity["components"]["sprite"]["offset"]["x"].get_or(0),
 						entity["components"]["sprite"]["offset"]["y"].get_or(0)
 					)
-				);
+					);
 			}
 
 			// Animation  numFrames, frameSpeedRate, vertical, isLooped ,frameOffset
@@ -1496,8 +1368,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 			{
 				AIComponent::EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"]);
 
-				//Logger::Log("Type: " + std::to_string(type));
-				
 				newEntity.AddComponent<AIComponent>(
 					glm::vec2(
 						entity["components"]["ai_component"]["enemy_pos"]["x"].get_or(0),
@@ -1505,12 +1375,13 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName,
 					type
 					);
 			}
-			//newEntity.AddComponent<ProjectileEmitterComponent>();
+
 			newEntity.AddComponent<GameComponent>();
+			newEntity.AddComponent<EnemyComponent>();
 		}
 		i++;
 	}
-	return;
+	//return;
 }
 
 void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
@@ -1546,7 +1417,7 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 		sol::table hudData = data[i];
 
 		Entity newHUDObject = reg.CreateEntity();
-		
+
 		// Add tag if there is one
 		sol::optional<std::string> tag = hudData["tag"];
 		if (tag != sol::nullopt)
@@ -1648,7 +1519,7 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 			if (!game.GetAssetManager()->HasTexture(assetID))
 			{
 				game.GetAssetManager()->AddTextures(game.GetRenderer(), assetID, asset["file"]);
-				//Logger::Log("New Texture asset loaded to the asset store, id: " + assetID);
+			//	Logger::Log("New Texture asset loaded to the asset store, id: " + assetID);
 			}
 
 		}
@@ -1737,7 +1608,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		sol::optional<sol::table> hasData = data[i];
 		if (hasData == sol::nullopt)
 		{
-			//Logger::Err("No Level Data");
+			Logger::Err("No Loaded Entity data");
 			break;
 		}
 
@@ -1794,25 +1665,25 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					);
 			}
 
-			// Add Animation Component
-			sol::optional<sol::table> animation = lvlData["components"]["animation"];
-			if (animation != sol::nullopt)
-			{
-				newLvlObject.AddComponent<AnimationComponent>(
-					lvlData["components"]["animation"]["num_frames"].get_or(1),
-					lvlData["components"]["animation"]["frame_rate"].get_or(1),
-					lvlData["components"]["animation"]["vertical"].get_or(false),
-					lvlData["components"]["animation"]["looped"].get_or(false),
-					lvlData["components"]["animation"]["frame_offset"].get_or(0)
-					);
-			}
+			//// Add Animation Component
+			//sol::optional<sol::table> animation = lvlData["components"]["animation"];
+			//if (animation != sol::nullopt)
+			//{
+			//	newLvlObject.AddComponent<AnimationComponent>(
+			//		lvlData["components"]["animation"]["num_frames"].get_or(1),
+			//		lvlData["components"]["animation"]["frame_rate"].get_or(1),
+			//		lvlData["components"]["animation"]["vertical"].get_or(false),
+			//		lvlData["components"]["animation"]["looped"].get_or(false),
+			//		lvlData["components"]["animation"]["frame_offset"].get_or(0)
+			//		);
+			//}
 
 			// Box Collider width, height, glm::vec2 offset 
 			sol::optional<sol::table> box_collider = lvlData["components"]["box_collider"];
 			if (box_collider != sol::nullopt)
 			{
 				int val = lvlData["components"]["box_collider"]["offset"]["x"].get_or(0);
-				//Logger::Err("Box_OFFSET: " + std::to_string(val));
+
 				newLvlObject.AddComponent<BoxColliderComponent>(
 					lvlData["components"]["box_collider"]["width"].get_or(16),
 					lvlData["components"]["box_collider"]["height"].get_or(16),
@@ -1826,10 +1697,8 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			sol::optional<sol::table> trigger_comp = lvlData["components"]["trigger"];
 			if (trigger_comp != sol::nullopt)
 			{
-				//Logger::Err("Has trigger Component");
 				auto type = ConvertToTriggerType(lvlData["components"]["trigger"]["trigger_type"].get_or(0));
 				newLvlObject.AddComponent<TriggerBoxComponent>(type);
-					
 			}
 
 			// Item Type Component
@@ -1839,9 +1708,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 				std::string that = lvlData["components"]["item"]["special"];
 				auto type = ItemCollectType::DEFAULT;
 				auto special = ConvertLuaStringToSpecial(that);
-				//Logger::Err("Special Num: " + that);
-				//Logger::Err("Special Num: " + std::to_string(special));
-
+	
 				newLvlObject.AddComponent<ItemComponent>(type, special);
 			}
 
@@ -1850,7 +1717,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		}
 		i++;
 	}
-	return;
+	//return;
 }
 
 
@@ -1860,13 +1727,13 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 void LevelLoader::ConvertName(std::string name, int x, int y)
 {
 	int num = name.length();
-	
+
 	// Clamp Num at 7
 	if (num > 7)
 	{
 		num = 7;
 	}
-	
+
 	// Variable for spaces in between letters
 	int space = 0;
 
@@ -2018,5 +1885,4 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 		space += 24;
 	}
 }
-
 

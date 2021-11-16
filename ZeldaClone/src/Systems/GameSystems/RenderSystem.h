@@ -2,7 +2,9 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/HealthComponent.h"
+#include "../../Components/TriggerBoxComponent.h"
 #include "../../Components/GameComponent.h"
+#include "../../Components/PlayerComponent.h"
 #include "../../Components/AIComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../ECS/ECS.h"
@@ -37,10 +39,20 @@ struct RenderSystem : public System
 		// Loop through all of the system entities
 		for (auto entity : GetSystemEntities())
 		{
-			if (!entity.BelongsToGroup("pause") && !entity.BelongsToGroup("tiles") && !entity.BelongsToGroup("hud")) //Add the other groups
+			if (entity.HasComponent<TriggerBoxComponent>())
+			{
+				const auto& trig = entity.GetComponent<TriggerBoxComponent>();
+
+				if (trig.active && trig.collected)
+				{
+					Logger::Err("KILL IT");
+					entity.Kill();
+				}
+			}
+
+			if (!entity.BelongsToGroup("pause") && !entity.BelongsToGroup("tiles") && !entity.BelongsToGroup("hud"))
 			{
 				
-
 			RenderableEntity renderableEntity;
 			renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
 			renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
@@ -107,19 +119,13 @@ struct RenderSystem : public System
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			if (entity.BelongsToGroup("enemies"))
+			if (!entity.HasComponent<PlayerComponent>()/*HasTag("player") && !entity.HasTag("the_sword") && !entity.HasTag("the_shield")*/)
 			{
-				Registry::Instance()->RemoveEntityFromSystems(entity);
+				entity.Kill();
 
 				if (entity.HasComponent<AIComponent>())
 					entity.GetComponent<AIComponent>().GarbageCollect();
 			}
-
-
-			if (!entity.HasTag("player") && !entity.BelongsToGroup("enemies"))
-			{
-				Registry::Instance()->RemoveEntityFromSystems(entity);
-			}
-		}
+		}		
 	}
 };

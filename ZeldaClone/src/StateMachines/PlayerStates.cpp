@@ -180,6 +180,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 			if (trigger.GetComponent<TriggerBoxComponent>().active)
 			{
 				trigItem = &trigger;
+				
 				itemCollected = true;
 				break;
 			}
@@ -202,21 +203,16 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	// Wait for 1 second  then change back to idle State
 	if (timer.GetTicks() > 2000)
 	{
-		//Logger::Log("Item Has Been Collected");
-		itemCollected = false;
-		//trigItem->GetComponent<TriggerBoxComponent>().active = false;
-		trigItem->Kill();
-		
-		//Registry::Instance()->RemoveEntityFromSystems(*trigItem);
-		//Registry::Instance()->RemoveEntityGroup(*trigItem);
 		pOwner->ChangeState(pOwner->idleState, entity);
 	}
 }
 
 void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
+	//trigItem->GetComponent<TriggerBoxComponent>().collected = true;
 	movedTrigItem = false;
 	trigItem = nullptr;
+	itemCollected = false;
 }
 
 void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity) 

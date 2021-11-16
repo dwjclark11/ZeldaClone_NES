@@ -29,6 +29,7 @@ public:
 			auto ai = AIComponent();
 
 			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000) % animation.numFrames;
+			
 			if (entity.HasComponent<HealthComponent>())
 				health = entity.GetComponent<HealthComponent>();
 
@@ -46,7 +47,7 @@ public:
 			else
 			{
 				// If the animation is a vertical scroll use this
-				if (animation.vertical && (entity.HasTag("player") /*|| entity.BelongsToGroup("enemies")*/))
+				if (animation.vertical && (entity.HasTag("player")))
 				{
 					if (rigidbody.velocity != glm::vec2(0))
 					{
@@ -55,7 +56,7 @@ public:
 					else if (health.isHurt) // If the enemy is hurt use this frame
 						sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 				}
-				else if (animation.vertical && !(entity.HasTag("player") || entity.BelongsToGroup("enemies")))
+				else if (animation.vertical && !entity.HasTag("player"))
 				{
 					sprite.srcRect.y = animation.currentFrame * sprite.height;
 				}
@@ -66,7 +67,6 @@ public:
 					sprite.srcRect.x = (animation.currentFrame * sprite.width) + animation.frameOffset;
 				}
 			}
-
 		}	
 	}
 };

@@ -208,7 +208,7 @@ public:
 	{
 		if (entityIDToIndex.find(entityID) != entityIDToIndex.end())
 		{
-			//Logger::Log("HERE");
+			//Logger::Log("Entity Removed: " + std::to_string(entityID));
 			Remove(entityID);
 		}
 	}
@@ -300,7 +300,7 @@ public:
 	bool EntityBelongsToGroup(Entity entity, const std::string& group) const;
 	std::vector<Entity> GetEntitiesByGroup(const std::string& group) const;
 	void RemoveEntityGroup(Entity entity);
-
+	std::set<Entity> GetEntitiesToBeKilled() const { return entitiesToBeKilled; }
 	static Registry* Instance();
 	static void ReleaseInstance();
 	// Component Management Functions

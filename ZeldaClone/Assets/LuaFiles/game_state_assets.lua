@@ -21,6 +21,7 @@ Assets =
 	{type = "texture", id = "player_death", 	file =  "./Assets/PlayerSprites/player_death.png"}, 
 	{type = "texture", id = "numbers", 			file =  "./Assets/Fonts/numbers.png"}, 
 	{type = "texture", id = "full_heart", 		file =  "./Assets/ItemSprites/full_heart.png"}, 
+	{type = "texture", id = "Dungeon_Tiles", 	file =  "./Assets/Tilemaps/Tiles/Dungeon_Tiles.png"}, 
 	{type = "soundFX", id = "magic_rod", 		file =  "./Assets/sounds/MagicalRod.wav"}, 
 	{type = "soundFX", id = "boomerang_arrow", 	file = "./Assets/sounds/Arrow_Boomerang.wav"}, 
 	{type = "soundFX", id = "candle", 			file =  "./Assets/sounds/Candle.wav"}, 

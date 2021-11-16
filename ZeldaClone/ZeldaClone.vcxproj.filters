@@ -1196,6 +1196,15 @@
     <ClInclude Include="src\Components\AIComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Components\ColliderComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\EnemyComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Components\PlayerComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\glm\detail\func_common.inl">
@@ -1602,7 +1611,6 @@
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />
     <None Include="Assets\LuaFiles\new_player_create.lua" />
     <None Include="Assets\LuaFiles\menu_state_load.lua" />
-    <None Include="Assets\Levels\sword_cave.lua" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Backgrounds\hearts_rupees.png">

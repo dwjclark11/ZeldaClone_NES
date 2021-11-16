@@ -73,8 +73,8 @@ bool MenuState::OnExit()
 	reg.GetSystem<RenderMainMenuSystem>().OnExit();
 	reg.GetSystem<RenderTextSystem>().OnExit();
 
-	reg.RemoveSystem<RenderMainMenuSystem>();
-	reg.RemoveSystem<MenuKeyboardControlSystem>();
+	//reg.RemoveSystem<RenderMainMenuSystem>();
+	//reg.RemoveSystem<MenuKeyboardControlSystem>();
 	return true;
 }
 

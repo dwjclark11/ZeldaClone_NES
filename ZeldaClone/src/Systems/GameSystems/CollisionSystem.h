@@ -7,10 +7,11 @@
 #include "../../Components/SoundComponent.h"
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/RupeeTypeComponent.h"
+#include "../../Components/ColliderComponent.h"
+#include "../../Components/PlayerComponent.h"
 #include "../../Events/EventManager.h"
 #include "../../Events/CollisionEvent.h"
 #include "../../AssetManager/AssetManager.h"
-#include "../SoundFXSystem.h"
 #include "../../Game/Game.h"
 #include "TriggerSystem.h"
 
@@ -25,8 +26,9 @@ public:
 		RequiredComponent<BoxColliderComponent>();
 	}
 
-	void Update(std::unique_ptr<EventManager>& eventManager, std::unique_ptr<AssetManager>& assetManager, SDL_Rect& camera)
+	void Update(std::unique_ptr<EventManager>& eventManager)
 	{
+		//Logger::Err("Num Ents: " + std::to_string(GetSystemEntities().size()));
 		auto entities = GetSystemEntities();
 		// Loop all the entities that the system is interested in
 		for (auto i = entities.begin(); i != entities.end(); i++)
@@ -34,8 +36,7 @@ public:
 			Entity a = *i;
 			auto& aTransform = a.GetComponent<TransformComponent>();
 			auto& aCollider = a.GetComponent<BoxColliderComponent>();
-			auto& aRigidbody = a.GetComponent<RigidBodyComponent>();
-
+			
 			// Loop all entities that still need to be checked 
 			for (auto j = i; j != entities.end(); j++)
 			{
@@ -43,19 +44,19 @@ public:
 
 				// Bypass if we are testing the same entity
 				if (a == b)
-				{
 					continue;
-				}
-
-				//if (a.BelongsToGroup("colliders") && b.BelongsToGroup("colliders"))
-				//	continue;
+				// bypass if both are colliders
+				if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
+					continue;
+				if (a.HasComponent<ColliderComponent>() && b.HasComponent<TriggerBoxComponent>())
+					continue;
+				if (a.HasComponent<TriggerBoxComponent>() && b.HasComponent<ColliderComponent>())
+					continue;
 
 				auto& bTransform = b.GetComponent<TransformComponent>();
 				auto& bCollider = b.GetComponent<BoxColliderComponent>();
-				auto& bRigidbody = b.GetComponent<RigidBodyComponent>();
 				
 				// Perform the AABB collision check between entities a and b
-				
 				bool collisionHappened = CheckAABBCollision(
 					aTransform.position.x + aCollider.offset.x,
 					aTransform.position.y + aCollider.offset.y,
@@ -69,7 +70,6 @@ public:
 
 				if (collisionHappened)
 				{
-					//Logger::Log("Entity " + std::to_string(a.GetID()) + " is Colliding with " + std::to_string(b.GetID()));
 					eventManager->EmitEvent<CollisionEvent>(a, b);
 				}
 				else
@@ -122,6 +122,4 @@ public:
 		}
 		return delta;
 	}
-
-	
 };

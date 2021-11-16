@@ -44,15 +44,13 @@ public:
 	
 	AIComponent(glm::vec2 enemyPos = glm::vec2(0, 0), EnemyType enemyType = OCTOROK);
 
-	EnemyStateMachine& GetEnemyStateMachine() { return *esm; }
-	void GarbageCollect() { delete esm; }
-	
-	glm::vec2& GetEnemyPos() { return enemyPos; }
-	void SetStunned(bool stun) { stunned = stun; }
-	
-	const bool GetStunned() { return stunned; }
+	inline EnemyStateMachine& GetEnemyStateMachine() { return *esm; }
+	inline void GarbageCollect() { delete esm; esm = nullptr; }
+	inline glm::vec2& GetEnemyPos() { return enemyPos; }
+	inline void SetStunned(bool stun) { stunned = stun; }
+	inline const bool GetStunned() { return stunned; }
+	inline const EnemyType GetEnemyType() const { return enemyType; }
+
 	const bool StateMachineCreated();
-	
 	void CreateStateMachine();
-	const EnemyType GetEnemyType() const { return enemyType; }
 };
