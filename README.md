@@ -35,13 +35,15 @@ This game/engine includes the following:
 Some of the desired changes are:
 * Change from using the SDL2 renderer to a OpenGL Graphics Pipeline 
 * Add an animation editor to the tilemap editor that allows the ability to load sprites and change animation speeds on the spot
-* Add enemies to any maps using the editor --> currently working on this!
+* Add enemies to any maps using the editor
 * Add a functional AI state machine with for entities/enemies done in lua
 * Ability for user to change keys/gamepad controls (Currently Hard Coded)
-* Currently not cross platform. FileDialogs and system specifics need to be added. Already added a fix for Sleep() for linux.
+
 
 ## There are still a lot of bugs that must be fixed to have a properly working demo
 Some of the bugs are as follows:
 * ~~SDL Window crashes when mouse goes outside of the zero boundaries -> Works fine otherwise~~
-* TODO: More to be listed
+* When changing scenes, there are issues removing mass entities.
+* Game is really slow in Debug mode. Release mode runs pretty good.
+* Game does not really work properly. You can kill enemies and collect items; however, the removal of entities when changing scenes is having undesired results.
 
