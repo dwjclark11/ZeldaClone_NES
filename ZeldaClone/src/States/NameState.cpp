@@ -50,8 +50,8 @@ bool NameState::OnEnter()
 	box.AddComponent<RegisterNameComponent>();
 	box.Tag("box");
 
-	Entity menuLabel1 = reg.CreateEntity();
-	menuLabel1.AddComponent<TextLabelComponent>(glm::vec2(260, 50), " - ENTER NAME - ", "charriot-font-60", SDL_Color{ 255,255,255,255 }, true);
+	//Entity menuLabel1 = reg.CreateEntity();
+	//menuLabel1.AddComponent<TextLabelComponent>(glm::vec2(260, 50), " - ENTER NAME - ", "charriot-font-60", SDL_Color{ 255,255,255,255 }, true);
 
 	Entity player1Name = reg.CreateEntity();
 	player1Name.AddComponent<TextLabelComponent>(glm::vec2(320, 800), "", "charriot-font-40", SDL_Color{ 255,255,255,255 }, true);
@@ -64,7 +64,7 @@ bool NameState::OnExit()
 {
 	//game.GetAssetManager()->ClearAssets();
 	reg.GetSystem<RenderNameStateTextSystem>().OnExit();
-	reg.GetSystem<RenderSystem>().OnExit();
+	//reg.GetSystem<RenderSystem>().OnExit();
 	//Logger::Err("Exiting Name state");
 	return true;
 }

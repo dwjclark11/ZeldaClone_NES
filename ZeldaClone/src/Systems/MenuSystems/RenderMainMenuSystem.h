@@ -24,8 +24,16 @@ struct RenderMainMenuSystem : public System
 		// Loop all entities that the system is interested in
 		for (auto entity : GetSystemEntities())
 		{
-			const auto transform = entity.GetComponent<TransformComponent>();
-			const auto sprite = entity.GetComponent<SpriteComponent>();
+			// Do not draw the link avatar if there is no save file associated with it
+			if (entity.HasTag("first_menu_slot") && MenuState::player1Name.size() == 0)
+				continue;
+			if (entity.HasTag("second_menu_slot") && MenuState::player2Name.size() == 0)
+				continue;
+			if (entity.HasTag("third_menu_slot") && MenuState::player3Name.size() == 0)
+				continue;
+
+			const auto& transform = entity.GetComponent<TransformComponent>();
+			const auto& sprite = entity.GetComponent<SpriteComponent>();
 
 			// Set the src Rect of our original sprite texture
 			SDL_Rect srcRect = sprite.srcRect;

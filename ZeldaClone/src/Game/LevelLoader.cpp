@@ -24,6 +24,7 @@
 #include "../Game/Game.h"
 #include "../Utilities/LuaTableWriter.h"
 #include "../Systems/GameSystems/RenderHealthSystem.h"
+#include "../Systems/SoundFXSystem.h"
 #include <string>
 #include <fstream>
 #include <SDL.h>
@@ -182,6 +183,7 @@ AssetType LevelLoader::ConvertToAssetType(std::string& type)
 
 void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName)
 {
+	bool valid = false;
 	sol::load_result script = lua.load_file("./Assets/SavedFiles/" + fileName + ".lua");
 	// Check the syntax of the Lua script 
 	if (!script.valid())
@@ -191,6 +193,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
+
 
 	// Execute the script using the sol state 
 	lua.script_file("./Assets/SavedFiles/" + fileName + ".lua");
@@ -268,7 +271,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 
 				// Create new heart Entity for each parsed tile
 				Entity heart = reg.CreateEntity();
-				heart.Group("hearts");
+				heart.Group("hearts_" + fileName);
 				heart.AddComponent<SpriteComponent>("hearts", 16, 16, 0, false, 0, 0);
 				heart.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(4, 4), 0.0);
 				heart.AddComponent<MenuComponent>();
@@ -286,6 +289,19 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 		i++;
 	}
 	i = 1;
+}
+
+void LevelLoader::EliminatePlayerToDefault(int slotNum, std::string& name)
+{
+	// Completly Delete the player
+	for (auto& nameImage : reg.GetEntitiesByGroup(name))
+		nameImage.Kill();
+
+	for (auto& playerHearts : reg.GetEntitiesByGroup("hearts_save" + std::to_string(slotNum)))
+		playerHearts.Kill();
+
+	// Play Eliminate Sound
+	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "Eliminate", 0, 1);
 }
 
 void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
@@ -830,8 +846,14 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& newName)
 {
 	//Logger::Err("In Save Player to Lua Table Function");
+	
 	LuaTableWriter m_writer;
+	
+	std::ofstream newFile ("./Assets/SavedFiles/save" + saveNum + ".lua");
+	newFile.close();
+
 	std::fstream file;
+
 	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
 
 	// Start the Lua Table
@@ -1742,143 +1764,144 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 	{
 		char letter = std::toupper(name[i]);
 
-		Entity name = reg.CreateEntity();
+		Entity nameEnt = reg.CreateEntity();
 
-		name.AddComponent<SpriteComponent>("name-letters", 16, 16, 0, true, 0, 0);
-		name.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
-		name.AddComponent<MenuComponent>();
-
+		nameEnt.Group(name);
+		nameEnt.AddComponent<SpriteComponent>("name-letters", 16, 16, 0, true, 0, 0);
+		nameEnt.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
+		nameEnt.AddComponent<MenuComponent>();
+		
 		switch (letter)
 		{
 		case 'A':
-			name.GetComponent<SpriteComponent>().srcRect.x = 0;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'B':
-			name.GetComponent<SpriteComponent>().srcRect.x = 16;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'C':
-			name.GetComponent<SpriteComponent>().srcRect.x = 32;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 32;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'D':
-			name.GetComponent<SpriteComponent>().srcRect.x = 48;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 48;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'E':
-			name.GetComponent<SpriteComponent>().srcRect.x = 64;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 64;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'F':
-			name.GetComponent<SpriteComponent>().srcRect.x = 80;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 80;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'G':
-			name.GetComponent<SpriteComponent>().srcRect.x = 96;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 96;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'H':
-			name.GetComponent<SpriteComponent>().srcRect.x = 112;
-			name.GetComponent<SpriteComponent>().srcRect.y = 0;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 112;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'I':
-			name.GetComponent<SpriteComponent>().srcRect.x = 0;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
 			break;
 		case 'J':
-			name.GetComponent<SpriteComponent>().srcRect.x = 16;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'K':
-			name.GetComponent<SpriteComponent>().srcRect.x = 32;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 32;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'L':
-			name.GetComponent<SpriteComponent>().srcRect.x = 48;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 48;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'M':
-			name.GetComponent<SpriteComponent>().srcRect.x = 64;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 64;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'N':
-			name.GetComponent<SpriteComponent>().srcRect.x = 80;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 80;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'O':
-			name.GetComponent<SpriteComponent>().srcRect.x = 96;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 96;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'P':
-			name.GetComponent<SpriteComponent>().srcRect.x = 112;
-			name.GetComponent<SpriteComponent>().srcRect.y = 32;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 112;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'Q':
-			name.GetComponent<SpriteComponent>().srcRect.x = 0;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'R':
-			name.GetComponent<SpriteComponent>().srcRect.x = 16;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'S':
-			name.GetComponent<SpriteComponent>().srcRect.x = 32;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 32;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'T':
-			name.GetComponent<SpriteComponent>().srcRect.x = 48;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 48;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'U':
-			name.GetComponent<SpriteComponent>().srcRect.x = 64;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 64;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'V':
-			name.GetComponent<SpriteComponent>().srcRect.x = 80;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 80;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'W':
-			name.GetComponent<SpriteComponent>().srcRect.x = 96;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 96;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'X':
-			name.GetComponent<SpriteComponent>().srcRect.x = 112;
-			name.GetComponent<SpriteComponent>().srcRect.y = 64;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 112;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'Y':
-			name.GetComponent<SpriteComponent>().srcRect.x = 0;
-			name.GetComponent<SpriteComponent>().srcRect.y = 96;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 96;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		case 'Z':
-			name.GetComponent<SpriteComponent>().srcRect.x = 16;
-			name.GetComponent<SpriteComponent>().srcRect.y = 96;
-			name.GetComponent<TransformComponent>().position.x += space;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 96;
+			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		}
 

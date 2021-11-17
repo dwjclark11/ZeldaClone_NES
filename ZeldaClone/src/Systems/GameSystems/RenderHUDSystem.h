@@ -41,7 +41,7 @@ public:
 				continue;
 			}
 
-			if (entity.BelongsToGroup("hud"))
+			if (entity.HasComponent<HUDComponenet>())
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 				auto& sprite = entity.GetComponent<SpriteComponent>();
@@ -140,7 +140,7 @@ public:
 					&dstRect,
 					transform.rotation,
 					NULL,					// The rotation is done on the center of the sprite, width / 2, height / 2
-					sprite.flip				// This is if we want to flup a sprite
+					sprite.flip				// This is if we want to flip a sprite
 				);
 			}
 		}
@@ -161,17 +161,9 @@ public:
 
 	void OnExit()
 	{
-		/*for (auto entity : GetSystemEntities())
+		for (auto entity : GetSystemEntities())
 		{
 			 entity.Kill();
-		}*/
-		auto entities = GetSystemEntities();
-
-		for (auto i = entities.begin(); i != entities.end(); i++)
-		{
-			Entity entity = *i;
-
-			Registry::Instance()->RemoveEntityFromSystems(*i);
 		}
 	}
 };

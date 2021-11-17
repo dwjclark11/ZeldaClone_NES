@@ -54,6 +54,9 @@ public:
 	void LoadAssetsFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadEntitiesFromLuaTable(sol::state& lua, std::string filename);
 
+	void EliminatePlayerToDefault(int slotNum, std::string& name);
+
+
 	// Helper Functions
 	void ConvertName(std::string name, int x, int y);
 	TriggerType ConvertToTriggerType(int triggerType);

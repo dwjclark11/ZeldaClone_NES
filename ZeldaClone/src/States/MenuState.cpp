@@ -43,7 +43,7 @@ void MenuState::Update(const double& deltaTime)
 
 void MenuState::Render()
 {
-	reg.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	//reg.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 	reg.GetSystem<RenderMainMenuSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 

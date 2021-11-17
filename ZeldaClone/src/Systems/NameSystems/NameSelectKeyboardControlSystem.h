@@ -84,7 +84,7 @@ public:
 				{
 
 				case SDLK_SPACE:
-	
+					Logger::Log("Name: " + text.text);
 					if (text.text.size() < 6)
 					{
 						if (transform.position.x == 260 && transform.position.y == 200)
@@ -227,7 +227,9 @@ public:
 					{
 						LevelLoader loader;
 						NameState::name = text.text.c_str();
-						//loader.SaveSlotData(slot);
+						
+						Logger::Log("Slot: " + std::to_string(slot));
+						
 						loader.SavePlayerNameToLuaTable(std::to_string(slot), NameState::name);
 						game.GetStateMachine()->PopState();
 						game.GetStateMachine()->PushState(new MenuState());

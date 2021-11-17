@@ -18,7 +18,6 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-
 			auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
 			SDL_SetRenderDrawColor(renderer, textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
@@ -56,7 +55,7 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			if (!entity.HasTag("title")) entity.Kill();
+			entity.Kill();
 		}
 	}
 };

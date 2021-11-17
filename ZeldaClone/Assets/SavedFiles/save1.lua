@@ -12,11 +12,11 @@ player_data = {
     },
     components = {
       transform = {
-        position = { x = 7604, y = 4861.6}}
+        position = { x = 7615, y = 5060}}
     },
     items = {
-      boomerang = true,
-      wood_sword = false,
+      boomerang = false,
+      sword = true,
       magic_rod = false,
       bombs = false,
       food = false,

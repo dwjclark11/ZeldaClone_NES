@@ -1603,9 +1603,6 @@
     <None Include="libs\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Assets\SavedFiles\save1.lua" />
-    <None Include="Assets\SavedFiles\save2.lua" />
-    <None Include="Assets\SavedFiles\save3.lua" />
     <None Include="Assets\LuaFiles\hud.lua" />
     <None Include="Assets\LuaFiles\game_state_assets.lua" />
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />

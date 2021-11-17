@@ -28,7 +28,6 @@ public:
 
 	void Update(std::unique_ptr<EventManager>& eventManager)
 	{
-		//Logger::Err("Num Ents: " + std::to_string(GetSystemEntities().size()));
 		auto entities = GetSystemEntities();
 		// Loop all the entities that the system is interested in
 		for (auto i = entities.begin(); i != entities.end(); i++)
