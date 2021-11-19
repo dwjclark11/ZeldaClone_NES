@@ -237,8 +237,11 @@ public:
 						else if (transform.position.y == 584)
 						{
 							Logger::Log("Eliminate");
-							eliminate = !eliminate;
-							transform.position.y = 200;
+							if (MenuState::player1Name.size() != 0 || MenuState::player2Name.size() != 0 || MenuState::player3Name.size() != 0)
+							{
+								eliminate = !eliminate;
+								transform.position.y = 200;
+							}
 						}
 						else if (transform.position.y == 680)
 						{
@@ -247,6 +250,12 @@ public:
 						}
 						break;
 					}
+					case SDLK_BACKSPACE:
+					{
+						if (eliminate)
+							eliminate = false;
+					}
+
 					default:
 						break;
 					}
