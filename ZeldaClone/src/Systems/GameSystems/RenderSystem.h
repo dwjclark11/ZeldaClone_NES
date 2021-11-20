@@ -5,6 +5,7 @@
 #include "../../Components/TriggerBoxComponent.h"
 #include "../../Components/GameComponent.h"
 #include "../../Components/PlayerComponent.h"
+#include "../../Components/PauseComponent.h"
 #include "../../Components/AIComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../ECS/ECS.h"
@@ -16,12 +17,10 @@ struct RenderSystem : public System
 {
 	RenderSystem()
 	{
-		// All Systems need a required component to help separate what entities need to 
-		// use that system
+		// Entities polled must have these component
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
 		RequiredComponent<GameComponent>();
-		
 	}
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, SDL_Rect& camera) 
@@ -38,21 +37,7 @@ struct RenderSystem : public System
 
 		// Loop through all of the system entities
 		for (auto entity : GetSystemEntities())
-		{
-			if (entity.HasComponent<TriggerBoxComponent>())
-			{
-				const auto& trig = entity.GetComponent<TriggerBoxComponent>();
-
-				if (trig.active && trig.collected)
-				{
-					Logger::Err("KILL IT");
-					entity.Kill();
-				}
-			}
-
-			if (!entity.BelongsToGroup("pause") && !entity.BelongsToGroup("tiles") && !entity.BelongsToGroup("hud"))
-			{
-				
+		{				
 			RenderableEntity renderableEntity;
 			renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
 			renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
@@ -69,13 +54,9 @@ struct RenderSystem : public System
 
 			// Bypass Rendering entities, if we are outside the camera view and are not fixed sprites
 			if (isEntityOutsideCameraView && !renderableEntity.spriteComponent.isFixed)
-			{
-
 				continue;
-			}
 
 			renderableEntities.emplace_back(renderableEntity);
-
 		}
 
 		// Sort the new vector using a lambda function that compares each renderableEntity and returns a bool value
@@ -111,7 +92,6 @@ struct RenderSystem : public System
 				NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
 				sprite.flip				// This is if we want to flup a sprite
 			);
-		}
 		}
 	}
 

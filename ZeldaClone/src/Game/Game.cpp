@@ -5,6 +5,7 @@
 #include "../Utilities/Timer.h"
 #include "../States/GameState.h"
 #include "../States/EditorState.h"
+#include "../Events/KeyPressedEvent.h"
 
 // Initialize all static variables
 Game* Game::pInstance = nullptr;
@@ -105,8 +106,6 @@ void Game::Initialize()
 	Registry::Instance()->AddSystem<RenderTitleSystem>();
 	Registry::Instance()->AddSystem<RenderCollisionSystem>();
 	Registry::Instance()->AddSystem<AnimationSystem>();
-	Registry::Instance()->AddSystem<RemoveEntitySystem>();
-	Registry::Instance()->AddSystem<AttackSystem>();
 	
 	// Initialize Camera
 	camera.x = 7168;

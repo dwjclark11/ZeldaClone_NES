@@ -1,13 +1,14 @@
 #pragma once
 #include "../ECS/ECS.h"
 #include "../Components/BoxColliderComponent.h"
+#include "../Components/TriggerBoxComponent.h"
+#include "../Components/ColliderComponent.h"
 #include "../Components/TransformComponent.h"
 #include <glm/glm.hpp>
 #include <SDL.h>
 
 class RenderCollisionSystem : public System
 {
-
 public:
 	RenderCollisionSystem()
 	{
@@ -31,7 +32,7 @@ public:
 			};
 
 			// Set the color for the trigger boxes
-			if (entity.BelongsToGroup("trigger"))
+			if (entity.HasComponent<TriggerBoxComponent>())
 			{
 				SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
 				SDL_RenderFillRect(renderer, &srcRect);
@@ -49,7 +50,7 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			if (entity.BelongsToGroup("colliders") || entity.BelongsToGroup("trigger"))
+			if (entity.HasComponent<ColliderComponent>() || entity.HasComponent<TriggerBoxComponent>())
 			{
 				entity.Kill();
 			}

@@ -193,10 +193,15 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		auto& special = trigItem->GetComponent<ItemComponent>();
 		
 		SetSpecialItem(special.special, entity);
-
-		trigItem->GetComponent<TransformComponent>().position.x = playerTransform.position.x;
-		trigItem->GetComponent<TransformComponent>().position.y = playerTransform.position.y - 64;
-
+		
+		auto& trigger = trigItem->GetComponent<TriggerBoxComponent>();
+		auto& transform = trigItem->GetComponent<TransformComponent>();
+	
+		
+		trigger.collectedTimer.Start();
+		transform.position.x = playerTransform.position.x;
+		transform.position.y = playerTransform.position.y - 64;
+		trigger.collected = true;
 		movedTrigItem = true;
 	}
 	
@@ -209,7 +214,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 
 void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
-	//trigItem->GetComponent<TriggerBoxComponent>().collected = true;
+	
 	movedTrigItem = false;
 	trigItem = nullptr;
 	itemCollected = false;

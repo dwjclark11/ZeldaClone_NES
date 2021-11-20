@@ -96,6 +96,7 @@ void GameState::Update(const double& deltaTime)
 	auto player = reg.GetEntityByTag("player");
 	game.GetPlayerStateMachine().Update(player);
 
+	reg.GetSystem<CollectItemSystem>().Update();
 	reg.GetSystem<AnimationSystem>().Update();
 	reg.GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 

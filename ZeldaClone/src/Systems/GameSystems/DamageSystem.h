@@ -278,7 +278,6 @@ public:
 		if (boomerang.BelongsToGroup("boomerang"))
 		{
 			enemyRigid.velocity = glm::vec2(0);
-			
 
 			if (!enemyAI.GetStunned())
 			{
@@ -286,7 +285,6 @@ public:
 				// Play the enemy hit sound FX
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
 			}
-			
 		}
 	}
 };

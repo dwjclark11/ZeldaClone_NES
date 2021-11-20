@@ -56,50 +56,6 @@ public:
 		std::string intructions10 = "Add a box collider if needed and set it's size and offset";
 
 
-	/*	std::string triggerText = "Trigger: " + std::to_string(isTrigger);
-		std::string trigType = "";
-		std::string trigLevelNum = "Level Num: " + triggerLevelNum;*/
-
-		//switch (triggerType)
-		//{
-		//case NO_TRIGGER:
-		//	trigType = "NO_TRIGGER";
-		//	break;
-
-		//case SECRET_AREA:
-		//	trigType = "SECRET_AREA";
-		//	break;
-
-		//case ENTER_DUNGEON:
-		//	trigType = "ENTER_DUNGEON";
-		//	break;
-
-		//case BURN_BUSHES:
-		//	trigType = "BURN_BUSHES";
-		//	break;
-
-		//case PUSH_ROCKS:
-		//	trigType = "PUSH_ROCKS";
-		//	break;
-
-		//case COLLECT_ITEM:
-		//	trigType = "CAMERA_RIGHT";
-		//	break;
-
-		//case TRAP:
-		//	trigType = "TRAP";
-		//	break;
-
-		//case HIDDEN_SWITCH:
-		//	trigType = "HIDDEN_SWITCH";
-		//	break;
-
-		//case HIDDEN_OBJECT:
-		//	trigType = "HIDDEN_OBJECT";
-		//	break;
-		//}
-
-
 		SDL_Surface* surface1 = TTF_RenderText_Blended(
 			assetManager->GetFont("charriot-font-30"),
 			colliderWidth.c_str(),

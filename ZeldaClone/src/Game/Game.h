@@ -17,8 +17,6 @@
 #include "../Systems/MusicPlayerSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
-#include "../Systems/RemoveEntitySystem.h"
-#include "../Systems/GameSystems/AttackSystem.h"
 #include "../StateMachines/EnemyStateMachine.h"
 #include "../StateMachines/PlayerStateMachine.h"
 

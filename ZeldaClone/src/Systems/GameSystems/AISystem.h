@@ -43,13 +43,10 @@ public:
 				}
 				else
 				{
-					// Stop enemy movement
+					// Stop enemy movement if not on the same panel is player
 					rigidBody.velocity = glm::vec2(0);
 				}
 			}
-
-
-			//stateMachine.GetEnemyStateMachine().Update(entity);
 		}
 	}
 };

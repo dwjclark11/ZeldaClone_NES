@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "../Utilities/Timer.h"
 
 enum TriggerType
 {
@@ -28,6 +29,7 @@ struct TriggerBoxComponent
 	std::string tileImageName;
 	std::string entityFileName;
 
+	Timer collectedTimer;
 
 	int imageHeight;
 	int imageWidth;

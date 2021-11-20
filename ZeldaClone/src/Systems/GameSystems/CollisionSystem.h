@@ -91,7 +91,7 @@ public:
 			);
 	}
 	
-	// Calculate the distance before the entities collide? 
+	// Calculate the distance before the entities collide? --> This is not used anywhere
 	glm::vec2 CalculateAABBDistance(Entity a, Entity b)
 	{
 		auto& aPos = a.GetComponent<TransformComponent>();

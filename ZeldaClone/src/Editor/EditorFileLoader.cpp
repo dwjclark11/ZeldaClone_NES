@@ -105,7 +105,6 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 		Logger::Err("Unable to open [" + fileName + "]");
 	}
 	
-	Logger::Log("Obstacles Loaded");
 	while (true)
 	{
 		int srcRectX = 0;
@@ -122,7 +121,7 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 		glm::vec2 offset = glm::vec2(0, 0);
 		bool collider = false;
 		
-		
+		// Load the file into each variable
 		mapFile >> group >> assetID >> srcRectY >> srcRectX >> zIndex >> tranX >> tranY >> tileScaleX >> tileScaleY >> collider;
 
 		if (collider) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
@@ -157,9 +156,7 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 	{
 		Logger::Err("Unable to open [" + fileName + "]");
 	}
-	
-	Logger::Log("Obstacles Loaded");
-	
+
 	while (true)
 	{
 		int tranX = 0;
@@ -299,7 +296,6 @@ void EditorFileLoader::SaveObjectMap(std::string filepath, const std::unique_ptr
 	}
 
 	mapFile.close(); // We must close the fstream after reading  
-	Logger::Log("Obstacles Saved!");
 }
 
 void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)

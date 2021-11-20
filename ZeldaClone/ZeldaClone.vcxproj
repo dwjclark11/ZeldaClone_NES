@@ -454,7 +454,6 @@
     <ClInclude Include="src\StateMachines\PlayerStateMachine.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\AssetManager\AssetManager.h" />
-    <ClInclude Include="src\Buttons\MenuButtonSystem.h" />
     <ClInclude Include="src\Components\AnimationComponent.h" />
     <ClInclude Include="src\Components\BackgroundImageComponent.h" />
     <ClInclude Include="src\Components\BoxColliderComponent.h" />
@@ -542,12 +541,10 @@
     <ClInclude Include="src\Systems\PauseSystems\RenderPauseSystem.h" />
     <ClInclude Include="src\Systems\PauseSystems\RenderSaveStateSystem.h" />
     <ClInclude Include="src\Systems\PauseSystems\SaveSelectKeyboardSystem.h" />
-    <ClInclude Include="src\Systems\RemoveEntitySystem.h" />
     <ClInclude Include="src\Systems\RenderCollisionSystem.h" />
     <ClInclude Include="src\Systems\RenderTextSystem.h" />
     <ClInclude Include="src\Systems\RenderTitleSystem.h" />
     <ClInclude Include="src\Systems\SoundFXSystem.h" />
-    <ClInclude Include="src\Systems\SoundPlayerSystem.h" />
     <ClInclude Include="src\Utilities\FileManagerUtils.h" />
     <ClInclude Include="src\Utilities\LuaTableWriter.h" />
     <ClInclude Include="src\Utilities\Timer.h" />

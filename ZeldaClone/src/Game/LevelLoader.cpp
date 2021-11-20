@@ -10,6 +10,7 @@
 #include "../Components/PlayerComponent.h"
 #include "../Components/EnemyComponent.h"
 #include "../Components/ColliderComponent.h"
+#include "../Components/KeyboardControlComponent.h"
 #include "../Components/HUDComponent.h"
 #include "../Components/MenuComponent.h"
 #include "../Components/TileComponent.h"
@@ -31,14 +32,11 @@
 LevelLoader::LevelLoader()
 	: game(*Game::Instance()), reg(*Registry::Instance())
 {
-	//Logger::Log("Level Loader Constructor run");
 }
 
 LevelLoader::~LevelLoader()
 {
-	//Logger::Log("Level Loader Constructor run");
 }
-
 
 void LevelLoader::LoadMap(std::string mapName, int image_width, int image_height)
 {
@@ -149,9 +147,7 @@ void LevelLoader::LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, c
 		{
 		case TEXTURE:
 			assetManager->AddTextures(game.GetRenderer(), assetID, (path + assetPath));
-			Logger::Log("Texture Added with ID " + assetID);
 			break;
-
 		case MUSIC:
 			assetManager->AddMusic(assetID, path + assetPath);
 			break;
@@ -161,13 +157,11 @@ void LevelLoader::LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, c
 		case FONT:
 			assetManager->AddFonts(assetID, path + assetPath, 14);
 			break;
-
 		default:
 			break;
 		}
 	}
 }
-
 
 AssetType LevelLoader::ConvertToAssetType(std::string& type)
 {
@@ -625,7 +619,6 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -660,7 +653,6 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 		{
 			newCollider.Group(collider["group"]);
 		}
-
 		// Components
 		sol::optional<sol::table> hasComponents = collider["components"];
 		if (hasComponents != sol::nullopt)
@@ -672,16 +664,12 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 				newCollider.AddComponent<TransformComponent>(
 					glm::vec2(
 						collider["components"]["transform"]["position"]["x"],
-						collider["components"]["transform"]["position"]["y"]
-					),
+						collider["components"]["transform"]["position"]["y"]),
 					glm::vec2(
 						collider["components"]["transform"]["scale"]["x"].get_or(1.0),
-						collider["components"]["transform"]["scale"]["y"].get_or(1.0)
-					),
-					collider["components"]["transform"]["rotation"].get_or(0.0)
-					);
+						collider["components"]["transform"]["scale"]["y"].get_or(1.0)),
+					collider["components"]["transform"]["rotation"].get_or(0.0));
 			}
-
 			// Box Collider Component
 			sol::optional<sol::table> boxCollider = collider["components"]["boxCollider"];
 			if (boxCollider != sol::nullopt)
@@ -691,12 +679,9 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 					collider["components"]["boxCollider"]["height"],
 					glm::vec2(
 						collider["components"]["boxCollider"]["offset_x"].get_or(0.0),
-						collider["components"]["boxCollider"]["offset_y"].get_or(0.0)
-					)
-					);
+						collider["components"]["boxCollider"]["offset_y"].get_or(0.0)));
 			}
-
-			// Trigger Component -->Still Needs to be Tested!!
+			// Trigger Component
 			sol::optional<sol::table> trigger = collider["triggerComponent"];
 			if (trigger != sol::nullopt)
 			{
@@ -704,15 +689,9 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 					collider["triggerComponent"]["type"],
 					glm::vec2(
 						collider["triggerComponent"]["transport_offset_x"].get_or(0.0),
-						collider["triggerComponent"]["transport_offset_y"].get_or(0.0)
-					),
-					collider["triggerComponent"]["level"]
-					);
+						collider["triggerComponent"]["transport_offset_y"].get_or(0.0)),
+					collider["triggerComponent"]["level"]);
 			}
-			//else
-			//{
-			//	Logger::Err("No Trigger");
-			//}
 		}
 		i++;
 	}
@@ -720,9 +699,9 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 
 void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 {
-	//Logger::Err("In Save Player to Lua Table Function");
 	LuaTableWriter m_writer;
 	std::fstream file;
+	
 	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
 
 	// Start the Lua Table
@@ -734,57 +713,64 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	m_writer.WriteCommentSeparation(file);
 	m_writer.WriteDeclareTable("player_data", file);
 
-
+	// Get the player so we can get their stats
 	auto entity = reg.GetEntityByTag("player");
-
-
+	// Player Transform
 	const auto& transform = entity.GetComponent<TransformComponent>();
 
 	// Local variables that are based on the game Items
-	bool hasBoomerang = game.GetGameItems().woodBoomerang;
-	bool hasMagicBoomerang = game.GetGameItems().magicBoomerang;
-	bool hasSword = game.GetGameItems().woodSword;
-	bool hasMagicSword = game.GetGameItems().magicSword;
-	bool hasMagicRod = game.GetGameItems().magicRod;
-	bool hasBombs = game.GetGameItems().bombs;
-	bool hasFood = game.GetGameItems().food;
-	bool hasFlute = game.GetGameItems().flute;
-	bool hasRaft = game.GetGameItems().raft;
-	bool hasLadder = game.GetGameItems().ladder;
-	bool hasBlueRing = game.GetGameItems().blueRing;
-	bool hasRedRing = game.GetGameItems().redRing;
-	bool hasBow = game.GetGameItems().bow;
-	bool hasMagicBow = game.GetGameItems().magicBow;
-	bool hasShield = game.GetGameItems().shield;
-	bool hasMagicShield = game.GetGameItems().magicShield;
-	bool hasPowerBraclet = game.GetGameItems().powerBraclet;
-	bool hasMap = game.GetGameItems().map;
-	bool hasBluePotion = game.GetGameItems().bluePotion;
-	bool hasRedPotion = game.GetGameItems().redPotion;
-	bool hasMasterKey = game.GetGameItems().masterKey;
-	int numRupees = GameState::totalRupees;
-	int numBombs = GameState::totalBombs;
-	int numArrows = 10;
-	int numHearts = RenderHealthSystem::numHearts;
-	int numKeys = GameState::totalKeys;
-	int triforcePieces = 0;
+	bool hasBoomerang 			= game.GetGameItems().woodBoomerang;
+	bool hasMagicBoomerang 		= game.GetGameItems().magicBoomerang;
+	bool hasSword 				= game.GetGameItems().woodSword;
+	bool hasSteelSword 			= game.GetGameItems().steelSword;
+	bool hasMagicSword 			= game.GetGameItems().magicSword;
+	bool hasMagicRod 			= game.GetGameItems().magicRod;
+	bool hasBombs 				= game.GetGameItems().bombs;
+	bool hasFood 				= game.GetGameItems().food;
+	bool hasFlute 				= game.GetGameItems().flute;
+	bool hasRaft 				= game.GetGameItems().raft;
+	bool hasLadder 				= game.GetGameItems().ladder;
+	bool hasBlueRing 			= game.GetGameItems().blueRing;
+	bool hasRedRing 			= game.GetGameItems().redRing;
+	bool hasBow 				= game.GetGameItems().bow;
+	bool hasMagicBow 			= game.GetGameItems().magicBow;
+	bool hasShield 				= game.GetGameItems().shield;
+	bool hasMagicShield 		= game.GetGameItems().magicShield;
+	bool hasPowerBraclet 		= game.GetGameItems().powerBraclet;
+	bool hasMap 				= game.GetGameItems().map;
+	bool hasBluePotion 			= game.GetGameItems().bluePotion;
+	bool hasRedPotion 			= game.GetGameItems().redPotion;
+	bool hasMasterKey 			= game.GetGameItems().masterKey;
+	
+	int numRupees 				= GameState::totalRupees;
+	int numBombs 				= GameState::totalBombs;
+	int numArrows 				= 10; // This needs to be changed 
+	int numHearts 				= RenderHealthSystem::numHearts;
+	int numKeys 				= GameState::totalKeys;
+	int triforcePieces 			= 0;
+	
 	std::string name = "";
+	
+	// Start a new lua table
 	m_writer.WriteStartTable(1, false, file);
-	//m_writer.WriteKeyAndQuotedValue("group", "colliders", file);
 
+	// Get the name of the player to save to the File --> Add this to the game class
 	if (saveNum == "1") name = MenuState::player1Name;
 	if (saveNum == "2") name = MenuState::player2Name;
 	if (saveNum == "3") name = MenuState::player3Name;
-
+	
+	
 	m_writer.WriteDeclareTable("menu_shared_values", file);
 	m_writer.WriteKeyAndQuotedValue("name", name, file);
 	m_writer.WriteKeyAndUnquotedValue("num_hearts", numHearts, file);
+	
 	if (hasBlueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("blue_ring", "false", file);
 	if (hasRedRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("red_ring", "false", file);
 	m_writer.WriteEndTable(false, file);
 
+	// Write the players components --> Transform is all that really matters
 	m_writer.WriteDeclareTable("components", file);
 	m_writer.WriteDeclareTable("transform", file);
 	m_writer.WriteDeclareTable("position", file);
@@ -793,39 +779,104 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(false, file);
+	
+	// Declare a new table for the player's items
 	m_writer.WriteDeclareTable("items", file);
 
 	// Write if we currently have these items in our inventory
-	if (hasBoomerang) m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
-	if (hasSword) m_writer.WriteKeyAndUnquotedValue("sword", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("sword", "false", file);
-	if (hasMagicRod) m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
-	if (hasBombs) m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
-	if (hasFood) m_writer.WriteKeyAndUnquotedValue("food", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("food", "false", file);
-	if (hasFlute) m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
-	if (hasRaft) m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
-	if (hasLadder) m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
-	if (hasBow) m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
-	if (hasShield) m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
-	if (hasPowerBraclet) m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
-	if (hasMap) m_writer.WriteKeyAndUnquotedValue("map", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("map", "false", file);
-	if (hasBluePotion) m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
-	if (hasRedPotion) m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
-	if (hasMasterKey) m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
+	// Boomerang
+	if (hasBoomerang) 
+		m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
+	// Magic Boomerang
+	if (hasMagicBoomerang) 
+		m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "false", file);
+	// Wood Sword
+	if (hasSword) 
+		m_writer.WriteKeyAndUnquotedValue("wood_sword", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("wood_sword", "false", file);
+	// Steel Sword
+	if (hasSteelSword) 
+		m_writer.WriteKeyAndUnquotedValue("steel_sword", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("steel_sword", "false", file);
+	// Magic Sword
+	if (hasMagicSword) 
+		m_writer.WriteKeyAndUnquotedValue("magic_sword", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("magic_sword", "false", file);
+	// Magic Rod
+	if (hasMagicRod) 
+		m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
+	// Bombs
+	if (hasBombs)
+		m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
+	// Food
+	if (hasFood) 
+		m_writer.WriteKeyAndUnquotedValue("food", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("food", "false", file);
+	// Flute
+	if (hasFlute)
+		m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
+	// Raft
+	if (hasRaft)
+		m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
+	// Ladder
+	if (hasLadder) 
+		m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
+	// Bow
+	if (hasBow) 
+		m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
+	// Magic Shield
+	if (hasShield)
+		m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
+	else
+		m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
+	// Power Braclet
+	if (hasPowerBraclet)
+		m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
+	// Map
+	if (hasMap)
+		m_writer.WriteKeyAndUnquotedValue("map", "true", file);
+	else
+		m_writer.WriteKeyAndUnquotedValue("map", "false", file);
+	
+	// Blue Potion
+	if (hasBluePotion) 
+		m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
+	// Red Potion
+	if (hasRedPotion)
+		m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
+	else 
+		m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
+	// Master Key
+	if (hasMasterKey)
+		m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
+	else
+		m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
+	
+	// Close the items table
 	m_writer.WriteEndTable(true, file);
 
 	// Write the numbered values of current inventory and life hearts
@@ -844,9 +895,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 
 // This is for a new player -->Default values for items
 void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& newName)
-{
-	//Logger::Err("In Save Player to Lua Table Function");
-	
+{	
 	LuaTableWriter m_writer;
 	
 	std::ofstream newFile ("./Assets/SavedFiles/save" + saveNum + ".lua");
@@ -865,42 +914,27 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	m_writer.WriteCommentSeparation(file);
 	m_writer.WriteDeclareTable("player_data", file);
 
-	// Create variables for default new player
-	bool hasBoomerang = false;
-	bool hasSword = true;
-	bool hasMagicRod = false;
-	bool hasBombs = false;
-	bool hasFood = false;
-	bool hasFlute = false;
-	bool hasRaft = false;
-	bool hasLadder = false;
-	bool hasBlueRing = false;
-	bool hasRedRing = false;
-	bool hasBow = false;
-	bool hasShield = false;
-	bool hasPowerBraclet = false;
-	bool hasMap = false;
-	bool hasBluePotion = false;
-	bool hasRedPotion = false;
-	bool hasMasterKey = false;
-	int numRupees = 0;
-	int numBombs = 0;
-	int numArrows = 0;
-	int numHearts = 3;
-	int numKeys = 0;
-	int triforcePieces = 0;
-	std::string name = newName;
+	int numRupees 			= 0;
+	int numBombs 			= 0;
+	int numArrows 			= 0;
+	int numHearts 			= 3;
+	int numKeys 			= 0;
+	int triforcePieces 		= 0;
+	
+	std::string name 		= newName;
 	m_writer.WriteStartTable(1, false, file);
 
 	m_writer.WriteDeclareTable("menu_shared_values", file);
 	m_writer.WriteKeyAndQuotedValue("name", name, file);
 	m_writer.WriteKeyAndUnquotedValue("num_hearts", numHearts, file);
-	if (hasBlueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("blue_ring", "false", file);
-	if (hasRedRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("red_ring", "false", file);
+	
+	// Write Blue Ring --> Set to false
+	m_writer.WriteKeyAndUnquotedValue("blue_ring", "false", file);
+	// Write Red Ring  --> Set to false
+	m_writer.WriteKeyAndUnquotedValue("red_ring", "false", file);
 	m_writer.WriteEndTable(false, file);
-
+	
+	// Start new table for components --> Only care about the transform here
 	m_writer.WriteDeclareTable("components", file);
 	m_writer.WriteDeclareTable("transform", file);
 	m_writer.WriteDeclareTable("position", file);
@@ -908,6 +942,8 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	// Write the default player start position
 	m_writer.WriteKeyAndValue('x', 7615, false, file);
 	m_writer.WriteKeyAndValue('y', 5060, true, file);
+	
+	// Close the above tables
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(true, file);
 	m_writer.WriteEndTable(false, file);
@@ -915,36 +951,43 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	// Declare a new Table "items"
 	m_writer.WriteDeclareTable("items", file);
 
-	if (hasBoomerang) m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
-	if (hasSword) m_writer.WriteKeyAndUnquotedValue("sword", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("sword", "false", file);
-	if (hasMagicRod) m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
-	if (hasBombs) m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
-	if (hasFood) m_writer.WriteKeyAndUnquotedValue("food", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("food", "false", file);
-	if (hasFlute) m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
-	if (hasRaft) m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
-	if (hasLadder) m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
-	if (hasBow) m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
-	if (hasShield) m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
-	if (hasPowerBraclet) m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
-	if (hasMap) m_writer.WriteKeyAndUnquotedValue("map", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("map", "false", file);
-	if (hasBluePotion) m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
-	if (hasRedPotion) m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
-	if (hasMasterKey) m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
-	else m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
+	// boomerang
+	m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
+	// magic boomerang
+	m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "false", file);
+	// Wood Sword
+	m_writer.WriteKeyAndUnquotedValue("wood_sword", "false", file);
+	// Steel Sword
+	m_writer.WriteKeyAndUnquotedValue("steel_sword", "false", file);
+	// Magic Sword
+	m_writer.WriteKeyAndUnquotedValue("magic_sword", "false", file);
+	// Magic Rod
+	m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
+	// Bomgs
+	m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
+	// Food
+	m_writer.WriteKeyAndUnquotedValue("food", "false", file);
+	// Magic Flute
+	m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
+	// Raft
+	m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
+	// Ladder
+	m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
+	// Bow
+	m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
+	// Magic Shield 
+	m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
+	// Power Braclet
+	m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
+	// Map
+	m_writer.WriteKeyAndUnquotedValue("map", "false", file);
+	// Blue Potion
+	m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
+	// Red Potion
+	m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
+	// Master Key
+	m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
+	// Write the end of the items table
 	m_writer.WriteEndTable(true, file);
 
 	// Write the numbered values of current inventory and life hearts
@@ -953,11 +996,12 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	m_writer.WriteKeyAndUnquotedValue("num_bombs", numBombs, file);
 	m_writer.WriteKeyAndUnquotedValue("num_arrows", numArrows, file);
 	m_writer.WriteKeyAndUnquotedValue("num_keys", numKeys, file);
-
+	// Close the remaining tables
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
-
+	
+	// Close the new lua file
 	file.close();
 }
 
@@ -971,7 +1015,6 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -1000,7 +1043,6 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		sol::optional<sol::table> hasComponents = player["components"];
 		if (hasComponents != sol::nullopt)
 		{
-			//Logger::Err("HAS COMPONENTS");
 			// Transform Component
 			sol::optional<sol::table> transformComp = player["components"]["transform"];
 			if (transformComp != sol::nullopt)
@@ -1012,10 +1054,8 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					),
 					glm::vec2(
 						player["components"]["transform"]["scale"]["x"].get_or(1.0),
-						player["components"]["transform"]["scale"]["y"].get_or(1.0)
-					),
-					player["components"]["transform"]["rotation"].get_or(0.0)
-					);
+						player["components"]["transform"]["scale"]["y"].get_or(1.0)),
+						player["components"]["transform"]["rotation"].get_or(0.0));
 			}
 
 			// Box Collider Component
@@ -1028,9 +1068,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					player["components"]["box_collider"]["height"],
 					glm::vec2(
 						player["components"]["box_collider"]["offset_x"].get_or(0.0),
-						player["components"]["box_collider"]["offset_y"].get_or(0.0)
-					)
-					);
+						player["components"]["box_collider"]["offset_y"].get_or(0.0)));
 			}
 
 			// Rigid Body Component
@@ -1040,21 +1078,16 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 				entity.AddComponent<RigidBodyComponent>(
 					glm::vec2(
 						player["components"]["rigidbody"]["velocity"]["x"].get_or(0),
-						player["components"]["rigidbody"]["velocity"]["y"].get_or(0)
-					)
-					);
+						player["components"]["rigidbody"]["velocity"]["y"].get_or(0)));
 			}
-
 			// Health Component
 			sol::optional<sol::table> health = player["components"]["health"];
 			if (health != sol::nullopt)
 			{
 				entity.AddComponent<HealthComponent>(
 					player["components"]["health"]["health_percentage"].get_or(9),
-					player["components"]["health"]["max_hearts"].get_or(3)
-					);
+					player["components"]["health"]["max_hearts"].get_or(3));
 			}
-
 			// Sprite
 			sol::optional<sol::table> sprite = player["components"]["sprite"];
 			if (sprite != sol::nullopt)
@@ -1069,12 +1102,9 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					player["components"]["sprite"]["src_rect_y"].get_or(0),
 					glm::vec2(
 						player["components"]["sprite"]["offset"]["x"].get_or(0),
-						player["components"]["sprite"]["offset"]["y"].get_or(0)
-					)
-					);
+						player["components"]["sprite"]["offset"]["y"].get_or(0)));
 			}
-
-			// Animation  numFrames, frameSpeedRate, vertical, isLooped ,frameOffset
+			// Animation  
 			sol::optional<sol::table> animation = player["components"]["animation"];
 			if (animation != sol::nullopt)
 			{
@@ -1083,10 +1113,8 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					player["components"]["animation"]["frame_rate"].get_or(1),
 					player["components"]["animation"]["vertical"].get_or(false),
 					player["components"]["animation"]["looped"].get_or(false),
-					player["components"]["animation"]["frame_offset"].get_or(0)
-					);
+					player["components"]["animation"]["frame_offset"].get_or(0));
 			}
-
 			// Projectile Emitter  
 			sol::optional<sol::table> projectile = player["components"]["projectile_emitter"];
 			if (projectile != sol::nullopt)
@@ -1102,8 +1130,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 					player["components"]["projectile_emitter"]["is_friendly"].get_or(false)
 					);
 			}
-
-			// Keyboard Control Component glm::vec2 upVelocity = glm::vec2(0), glm::vec2 rightVelocity = glm::vec2(0), glm::vec2 downVelocity = glm::vec2(0), glm::vec2 leftVelocity = glm::vec2(0)
+			// Keyboard Control Component 
 			sol::optional<sol::table> keyboard = player["components"]["keyboard_control"];
 			if (keyboard != sol::nullopt)
 			{
@@ -1131,12 +1158,9 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 				entity.AddComponent<CameraFollowComponent>();
 				entity.AddComponent<PlayerComponent>();
 			}
-
 			entity.AddComponent<GameComponent>();
-			
 		}
 		i++;
-		Logger::Log("Player Created");
 	}
 }
 
@@ -1149,7 +1173,6 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -1170,10 +1193,8 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> hasData = data[i];
 		if (hasData == sol::nullopt)
 		{
-			//Logger::Err("No Colliders");
 			break;
 		}
-		//Logger::Err("Has Colliders");
 		sol::table player = data[i];
 
 		// Menu Shared Values and Items
@@ -1182,7 +1203,6 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		{
 			RenderHealthSystem::loadedHearts = player["menu_shared_values"]["num_hearts"].get_or(3);
 		}
-
 		// Components
 		sol::optional<sol::table> hasComponents = player["components"];
 		if (hasComponents != sol::nullopt)
@@ -1195,39 +1215,37 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 				transform.position.y = player["components"]["transform"]["position"]["y"];
 			}
 		}
-
 		// Items
 		sol::optional<sol::table> hasItems = player["items"];
 		if (hasItems != sol::nullopt)
 		{
-			game.GetGameItems().woodBoomerang = player["items"]["boomerang"].get_or(false);
-			game.GetGameItems().magicBoomerang = player["items"]["magic_boomerang"].get_or(false);
-			game.GetGameItems().woodSword = player["items"]["wood_sword"].get_or(false);
-			game.GetGameItems().steelSword = player["items"]["steel_sword"].get_or(false);
-			game.GetGameItems().magicSword = player["items"]["magic_sword"].get_or(false);
-			game.GetGameItems().bombs = player["items"]["bombs"].get_or(false);
-			game.GetGameItems().food = player["items"]["food"].get_or(false);
-			game.GetGameItems().flute = player["items"]["flute"].get_or(false);
-			game.GetGameItems().raft = player["items"]["raft"].get_or(false);
-			game.GetGameItems().ladder = player["items"]["ladder"].get_or(false);
-			game.GetGameItems().bow = player["items"]["bow_wood"].get_or(false);
-			game.GetGameItems().magicBow = player["items"]["bow_magic"].get_or(false);
-			game.GetGameItems().shield = player["items"]["shield"].get_or(false);
-			game.GetGameItems().magicShield = player["items"]["magic_shield"].get_or(false);
-			game.GetGameItems().powerBraclet = player["items"]["power_braclet"].get_or(false);
-			game.GetGameItems().map = player["items"]["map"].get_or(false);
-			game.GetGameItems().bluePotion = player["items"]["blue_potion"].get_or(false);
-			game.GetGameItems().redPotion = player["items"]["red_potion"].get_or(false);
-			game.GetGameItems().masterKey = player["items"]["master_key"].get_or(false);
+			game.GetGameItems().woodBoomerang 	= player["items"]["boomerang"].get_or(false);
+			game.GetGameItems().magicBoomerang 	= player["items"]["magic_boomerang"].get_or(false);
+			game.GetGameItems().woodSword 		= player["items"]["wood_sword"].get_or(false);
+			game.GetGameItems().steelSword 		= player["items"]["steel_sword"].get_or(false);
+			game.GetGameItems().magicSword 		= player["items"]["magic_sword"].get_or(false);
+			game.GetGameItems().bombs 			= player["items"]["bombs"].get_or(false);
+			game.GetGameItems().food 			= player["items"]["food"].get_or(false);
+			game.GetGameItems().flute 			= player["items"]["flute"].get_or(false);
+			game.GetGameItems().raft 			= player["items"]["raft"].get_or(false);
+			game.GetGameItems().ladder 			= player["items"]["ladder"].get_or(false);
+			game.GetGameItems().bow 			= player["items"]["bow_wood"].get_or(false);
+			game.GetGameItems().magicBow 		= player["items"]["bow_magic"].get_or(false);
+			game.GetGameItems().shield 			= player["items"]["shield"].get_or(false);
+			game.GetGameItems().magicShield 	= player["items"]["magic_shield"].get_or(false);
+			game.GetGameItems().powerBraclet 	= player["items"]["power_braclet"].get_or(false);
+			game.GetGameItems().map 			= player["items"]["map"].get_or(false);
+			game.GetGameItems().bluePotion 		= player["items"]["blue_potion"].get_or(false);
+			game.GetGameItems().redPotion 		= player["items"]["red_potion"].get_or(false);
+			game.GetGameItems().masterKey 		= player["items"]["master_key"].get_or(false);
 		}
-
 		// Inventory
 		sol::optional<sol::table> inventory = player["inventory"];
 		if (inventory != sol::nullopt)
 		{
-			GameState::totalRupees = player["inventory"]["num_rupees"].get_or(0);
-			GameState::totalBombs = player["inventory"]["num_bombs"].get_or(0);
-			GameState::totalKeys = player["inventory"]["num_keys"].get_or(0);
+			GameState::totalRupees 				= player["inventory"]["num_rupees"].get_or(0);
+			GameState::totalBombs 				= player["inventory"]["num_bombs"].get_or(0);
+			GameState::totalKeys 				= player["inventory"]["num_keys"].get_or(0);
 		}
 		i++;
 		Logger::Log("Player Loaded");
@@ -1242,7 +1260,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -1260,7 +1277,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 
 		if (hasEntity == sol::nullopt)
 		{
-			//Logger::Err("There is no more Level Data");
 			break;
 		}
 
@@ -1291,7 +1307,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					entity["components"]["transform"]["rotation"].get_or(0.0)
 					);
 			}
-
 			// RigidBody
 			sol::optional<sol::table> rigidBody = entity["components"]["rigidbody"];
 			if (rigidBody != sol::nullopt)
@@ -1303,7 +1318,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					)
 					);
 			}
-
 			// Sprite
 			sol::optional<sol::table> sprite = entity["components"]["sprite"];
 			if (sprite != sol::nullopt)
@@ -1322,7 +1336,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					)
 					);
 			}
-
 			// Animation  numFrames, frameSpeedRate, vertical, isLooped ,frameOffset
 			sol::optional<sol::table> animation = entity["components"]["animation"];
 			if (animation != sol::nullopt)
@@ -1335,7 +1348,6 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					entity["components"]["animation"]["frame_offset"].get_or(0)
 					);
 			}
-
 			// Health Component int healthPercentage = 9, int maxHearts = 3
 			sol::optional<sol::table> health = entity["components"]["health"];
 			if (health != sol::nullopt)
@@ -1345,12 +1357,10 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					entity["components"]["health"]["max_hearts"].get_or(3)
 					);
 			}
-
 			// Box Collider width, height, glm::vec2 offset 
 			sol::optional<sol::table> box_collider = entity["components"]["box_collider"];
 			if (box_collider != sol::nullopt)
 			{
-				//Logger::Err("Has Box Collider Component");
 				newEntity.AddComponent<BoxColliderComponent>(
 					entity["components"]["box_collider"]["width"].get_or(16),
 					entity["components"]["box_collider"]["height"].get_or(16),
@@ -1375,7 +1385,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					);
 			}
 
-			//// Script Component
+			//// Script Component --> Not used at the moment --> Using c++ State machine --> will try to change to lua state machine
 			//sol::optional<sol::table> script = entity["components"]["on_update_script"];
 			//if (script != sol::nullopt)
 			//{
@@ -1397,13 +1407,11 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					type
 					);
 			}
-
 			newEntity.AddComponent<GameComponent>();
 			newEntity.AddComponent<EnemyComponent>();
 		}
 		i++;
 	}
-	//return;
 }
 
 void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
@@ -1415,7 +1423,6 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -1432,7 +1439,6 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 		sol::optional<sol::table> hasData = data[i];
 		if (hasData == sol::nullopt)
 		{
-			//Logger::Err("No HUD Data");
 			break;
 		}
 
@@ -1481,7 +1487,6 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 					),
 					hudData["components"]["transform"]["rotation"].get_or(0.0));
 			}
-
 			// Add Sprite Component
 			sol::optional<sol::table> sprite = hudData["components"]["sprite"];
 			if (sprite != sol::nullopt)
@@ -1511,7 +1516,6 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -1528,7 +1532,6 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 		sol::optional<sol::table> hasAssets = assets[i];
 		if (hasAssets == sol::nullopt)
 		{
-			//Logger::Err("No Assets Data");
 			break;
 		}
 
@@ -1539,43 +1542,30 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 		if (assetType == "texture")
 		{
 			if (!game.GetAssetManager()->HasTexture(assetID))
-			{
 				game.GetAssetManager()->AddTextures(game.GetRenderer(), assetID, asset["file"]);
-			//	Logger::Log("New Texture asset loaded to the asset store, id: " + assetID);
-			}
-
 		}
 
 		if (assetType == "font")
 		{
 			if (!game.GetAssetManager()->HasFont(assetID))
-			{
 				game.GetAssetManager()->AddFonts(assetID, asset["file"], asset["font_size"]);
-				//Logger::Log("New Font asset loaded to the asset store, id: " + assetID);
-			}
 		}
 
 		if (assetType == "soundFX")
 		{
 			if (!game.GetAssetManager()->HasSoundFX(assetID))
-			{
 				game.GetAssetManager()->AddSoundFX(assetID, asset["file"]);
-				//Logger::Log("New SoundFX asset loaded to the asset store, id: " + assetID);
-			}
 		}
 
 		if (assetType == "music")
 		{
 			if (!game.GetAssetManager()->HasMusic(assetID))
-			{
 				game.GetAssetManager()->AddMusic(assetID, asset["file"]);
-				//Logger::Log("New Music asset loaded to the asset store, id: " + assetID);
-			}
 		}
-
 		i++;
 	}
 }
+
 SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
 {
 	if (special == "none")
@@ -1613,7 +1603,6 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 	{
 		sol::error err = script;
 		std::string errorMessage = err.what();
-
 		Logger::Err("Error loading the Lua Script: " + errorMessage);
 		return;
 	}
@@ -1686,7 +1675,9 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					lvlData["components"]["sprite"]["src_rect_y"].get_or(0)
 					);
 			}
-
+			
+			// !!! This is not working right now!! Causes issues when leaving moving to a new scene !!!
+			
 			//// Add Animation Component
 			//sol::optional<sol::table> animation = lvlData["components"]["animation"];
 			//if (animation != sol::nullopt)
@@ -1733,17 +1724,11 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 	
 				newLvlObject.AddComponent<ItemComponent>(type, special);
 			}
-
-
 			newLvlObject.AddComponent<GameComponent>();
 		}
 		i++;
 	}
-	//return;
 }
-
-
-
 
 // This is a letter parser to deal with the SDL_Text issues
 void LevelLoader::ConvertName(std::string name, int x, int y)
@@ -1904,7 +1889,6 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 			nameEnt.GetComponent<TransformComponent>().position.x += space;
 			break;
 		}
-
 		space += 24;
 	}
 }

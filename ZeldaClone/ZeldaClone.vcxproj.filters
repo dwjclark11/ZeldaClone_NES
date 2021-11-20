@@ -926,9 +926,6 @@
     <ClInclude Include="src\Systems\MusicPlayerSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Systems\SoundPlayerSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Events\Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -977,9 +974,6 @@
     <ClInclude Include="src\Components\BackgroundImageComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Systems\RemoveEntitySystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Components\TriggerBoxComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -990,9 +984,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Editor\EditorFileLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Buttons\MenuButtonSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\States\NameState.h">

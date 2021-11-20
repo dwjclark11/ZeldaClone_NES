@@ -24,28 +24,9 @@ private:
 	MouseControlSystem choices;
 	static unsigned int imageWidth, imageHeight;
 	class Game& game;
+	
 public:
-	struct Funcs
-	{
-		static int MyResizeCallback(ImGuiInputTextCallbackData* data)
-		{
-			if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
-			{
-				ImVector<char>* my_str = (ImVector<char>*)data->UserData;
-				IM_ASSERT(my_str->begin() == data->Buf);
-				my_str->resize(data->BufSize); // NB: On resizing calls, generally data->BuFisze == data BufTextLen + 1
-				data->Buf = my_str->begin();
-			}
-			return 0;
-		}
-		// Tip: Because ImGui is a namespace you would typically add your own function into the namespace in your own files.
-		// For example, you may adda function called ImGui::InputText(const char* label, MyString* my_str);
-		static bool MyInputTextMultiline(const char* label, ImVector<char>* my_str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0)
-		{
-			IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
-			return ImGui::InputTextMultiline(label, my_str->begin(), (size_t)my_str->size(), size, flags | ImGuiInputTextFlags_CallbackResize, Funcs::MyResizeCallback, (void*)my_str);
-		}
-	};
+
 	// Setup the IMGUI Style in the Constructor --> Change to it's own style function?
 	RenderEditorGUISystem()
 		: game(*Game::Instance())
@@ -94,8 +75,6 @@ public:
 		colors[ImGuiCol_TabActive] = ImVec4(0.30f, 0.30f, 0.33f, 1.00f);
 		colors[ImGuiCol_TabUnfocused] = ImVec4(0.12f, 0.12f, 0.12f, 0.97f);
 		colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.18f, 0.18f, 0.19f, 1.00f);
-		//colors[ImGuiCol_DockingPreview] = ImVec4(0.26f, 0.59f, 0.98f, 0.50f);
-		//colors[ImGuiCol_DockingEmptyBg] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
 		colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
 		colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
 		colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
@@ -124,8 +103,6 @@ public:
 		}ImGui::End();
 
 		ImageBox(assetManager, renderer);
-
-		////ImGui::ShowDemoWindow();
 
 		ImGui::Render();
 		ImGuiSDL::Render(ImGui::GetDrawData());

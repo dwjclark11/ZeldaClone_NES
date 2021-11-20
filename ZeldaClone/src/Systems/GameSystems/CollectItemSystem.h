@@ -2,6 +2,7 @@
 #include "../../ECS/ECS.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/BoxColliderComponent.h"
+#include "../../Components/TriggerBoxComponent.h"
 #include "../../Components/AnimationComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/ProjectileComponent.h"
@@ -34,7 +35,6 @@ public:
 		: game(*Game::Instance()), reg(*Registry::Instance())
 	{
 		RequiredComponent<BoxColliderComponent>();
-		//RequiredComponent<ItemComponent>();
 		yellowCollected = false;
 		blueCollected = false;
 	}
@@ -63,13 +63,15 @@ public:
 			{
 				GameState::totalRupees += 1;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
-				reg.RemoveEntityFromSystems(item);
+				// reg.RemoveEntityFromSystems(item);
+				item.Kill();
 			}
 			if (type.type == BLUE)
 			{
 				GameState::totalRupees += 5;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
-				reg.RemoveEntityFromSystems(item);
+				//reg.RemoveEntityFromSystems(item);
+				item.Kill();
 			}
 		}
 		else if (item.BelongsToGroup("items"))
@@ -81,8 +83,8 @@ public:
 			{
 				GameState::totalBombs += 3;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
-				reg.RemoveEntityFromSystems(item);
-				//item.Kill();
+				//reg.RemoveEntityFromSystems(item);
+				item.Kill();
 			}
 			else if (type.type == HEARTS)
 			{
@@ -94,15 +96,29 @@ public:
 					health.healthPercentage = health.maxHearts * 2;
 				
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
-				reg.RemoveEntityFromSystems(item);
-				//item.Kill();
+				//reg.RemoveEntityFromSystems(item);
+				item.Kill();
 			}
 		}
 	}
 
 	void Update()
 	{
-
+		for (auto entity : GetSystemEntities())
+		{
+			if (entity.HasComponent<TriggerBoxComponent>())
+			{
+				auto& trigger = entity.GetComponent<TriggerBoxComponent>();
+				if (trigger.collected && trigger.collectedTimer.GetTicks() > 2000)
+				{
+					Logger::Log("Killed");
+					entity.Kill();
+				}
+					
+			}
+			else
+				continue;
+		}
 	}
 };
 
