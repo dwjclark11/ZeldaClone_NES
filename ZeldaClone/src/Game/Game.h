@@ -132,7 +132,7 @@ public:
 	
 	void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
 	Uint8 GetFadeAlpha() { return fadeAlpha; }
-
+	const double& GetDeltaTime() const { return deltaTime; }
 
 	template<typename TSystem> TSystem& GetSystem();
 

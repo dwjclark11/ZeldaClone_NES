@@ -108,235 +108,205 @@ public:
 
 	void UseItem(ItemAttrib& attrib)
 	{
-		for (auto entity : GetSystemEntities())
+		auto player = Registry::Instance()->GetEntityByTag("player");
+
+		auto& projectileEmitter = player.GetComponent<ProjectileEmitterComponent>();
+		const auto& transform = player.GetComponent<TransformComponent>();
+		const auto& rigidbody = player.GetComponent<RigidBodyComponent>();
+
+		// If the entity has a sprite --> Position the projectile in the center
+		glm::vec2 projectilePosition = transform.position;
+
+		auto sprite = player.GetComponent<SpriteComponent>();
+		projectilePosition.x += (transform.scale.x * sprite.width / 2);
+		projectilePosition.y += (transform.scale.y * sprite.height / 2);
+
+		glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
+		glm::vec2 BoxOffset = glm::vec2(0, 0);
+		glm::vec2 BoxSize = glm::vec2(0, 0);
+
+		// If the duration is not put in, default duration 
+		if (attrib.duration == 0)
 		{
-			if (entity.HasTag("player"))
-			{
-				auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-				const auto& transform = entity.GetComponent<TransformComponent>();
-				const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
-
-				// If the entity has a sprite --> Position the projectile in the center
-				glm::vec2 projectilePosition = transform.position;
-
-				auto sprite = entity.GetComponent<SpriteComponent>();
-				projectilePosition.x += (transform.scale.x * sprite.width / 2);
-				projectilePosition.y += (transform.scale.y * sprite.height / 2);
-
-				glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
-				glm::vec2 BoxOffset = glm::vec2(0, 0);
-				glm::vec2 BoxSize = glm::vec2(0, 0);
-
-				// If the duration is not put in, default duration 
-				if (attrib.duration == 0)
-				{
-					attrib.duration = projectileEmitter.projectileDuration;
-				}
-
-				// Create direction variables the change the velocity direction based on which way we are facing
-				int directionX = 0;
-				int directionY = 0;
-
-				// Use the fire ahead of the player in the direction the player is facing
-				if (KeyboardControlSystem::dir == UP)
-				{
-					if (attrib.numFrames == 1)
-					{
-						projectilePosition.x = (transform.position.x + attrib.transOffsetUp.x);
-						projectilePosition.y = (transform.position.y + attrib.transOffsetUp.x) - sprite.height * 3;
-					}
-					else
-					{
-						projectilePosition.x = (transform.position.x + attrib.transOffsetUp.x);
-						projectilePosition.y = (transform.position.y + attrib.transOffsetUp.x) - sprite.height * 3;
-						// attrib.srcRectX  += attrib.width * 1;
-
-					}
-					BoxSize = attrib.boxSizeUp;
-					BoxOffset = attrib.upOffset;
-					directionY = -1;
-				}
-				if (KeyboardControlSystem::dir == RIGHT)
-				{
-					if (attrib.numFrames == 1)
-					{
-						projectilePosition.x = ((transform.position.x + attrib.transOffsetRight.x) + sprite.width * 3);
-						projectilePosition.y = (transform.position.y + attrib.transOffsetRight.y);
-					}
-					else
-					{
-						projectilePosition.x = ((transform.position.x + attrib.transOffsetRight.x) + sprite.width * 3);
-						projectilePosition.y = (transform.position.y + attrib.transOffsetRight.y);
-						attrib.srcRectX += attrib.width * 1;
-					}
-					BoxSize = attrib.boxSizeRight;
-					BoxOffset = attrib.rightOffset;
-					directionX = 1;
-				}
-				if (KeyboardControlSystem::dir == DOWN)
-				{
-					if (attrib.numFrames == 1)
-					{
-						projectilePosition.x = (transform.position.x + attrib.transOffsetDown.x);
-						projectilePosition.y = ((transform.position.y + attrib.transOffsetDown.y) + sprite.height * 3);
-					}
-					else
-					{
-						projectilePosition.x = (transform.position.x + attrib.transOffsetDown.x);
-						projectilePosition.y = ((transform.position.y + attrib.transOffsetDown.y) + sprite.height * 3);
-						attrib.srcRectX += attrib.width * 2;
-					}
-					BoxSize = attrib.boxSizeDown;
-					BoxOffset = attrib.downOffset;
-					directionY = 1;
-				}
-				if (KeyboardControlSystem::dir == LEFT)
-				{
-					if (attrib.numFrames == 1)
-					{
-						projectilePosition.x = ((transform.position.x + attrib.transOffsetLeft.x) - sprite.width * 3);
-						projectilePosition.y = (transform.position.y + attrib.transOffsetLeft.y);
-					}
-					else
-					{
-						projectilePosition.x = ((transform.position.x + attrib.transOffsetLeft.x) - sprite.width * 3);
-						projectilePosition.y = (transform.position.y + attrib.transOffsetLeft.y);
-						attrib.srcRectX += attrib.width * 3;
-					}
-					BoxSize = attrib.boxSizeLeft;
-					BoxOffset = attrib.leftOffset;
-					directionX = -1;
-				}
-				
-				// Create new projectile entity and add it to the world
-				Entity newItem = entity.registry->CreateEntity();
-				newItem.Group(attrib.group);
-				newItem.AddComponent<TransformComponent>(projectilePosition, glm::vec2(attrib.scale.x, attrib.scale.y), 0.0);
-
-				if (attrib.group != "bomber")
-				{
-					// Set the projectile velocity based on the direction 
-					projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
-					projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
-					newItem.AddComponent<RigidBodyComponent>(projectileVelocity);
-					newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
-				}else Logger::Log("Bomber");
-				// Does the projectile have an animation component?
-				if (attrib.animation)
-				{
-					// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
-					newItem.AddComponent<AnimationComponent>(attrib.numFrames, 20, attrib.vertical, true);
-				}
-				projectileEmitter.isFriendly = true;
-				newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
-				newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0,attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
-				newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration);
-				newItem.AddComponent<GameComponent>();
-
-				if (attrib.group == "boomerang")
-				{
-					auto& boomerTimer = newItem.GetComponent<ProjectileComponent>();
-					boomerTimer.boomTimer.Start();
-				}
-			}
+			attrib.duration = projectileEmitter.projectileDuration;
 		}
+
+		// Create direction variables the change the velocity direction based on which way we are facing
+		int directionX = 0;
+		int directionY = 0;
+
+		// Use the fire ahead of the player in the direction the player is facing
+		if (KeyboardControlSystem::dir == UP)
+		{
+			if (attrib.numFrames == 1)
+			{
+				projectilePosition.x = (transform.position.x + attrib.transOffsetUp.x);
+				projectilePosition.y = (transform.position.y + attrib.transOffsetUp.x) - sprite.height * 3;
+			}
+			else
+			{
+				projectilePosition.x = (transform.position.x + attrib.transOffsetUp.x);
+				projectilePosition.y = (transform.position.y + attrib.transOffsetUp.x) - sprite.height * 3;
+				// attrib.srcRectX  += attrib.width * 1;
+
+			}
+			BoxSize = attrib.boxSizeUp;
+			BoxOffset = attrib.upOffset;
+			directionY = -1;
+		}
+		if (KeyboardControlSystem::dir == RIGHT)
+		{
+			if (attrib.numFrames == 1)
+			{
+				projectilePosition.x = ((transform.position.x + attrib.transOffsetRight.x) + sprite.width * 3);
+				projectilePosition.y = (transform.position.y + attrib.transOffsetRight.y);
+			}
+			else
+			{
+				projectilePosition.x = ((transform.position.x + attrib.transOffsetRight.x) + sprite.width * 3);
+				projectilePosition.y = (transform.position.y + attrib.transOffsetRight.y);
+				attrib.srcRectX += attrib.width * 1;
+			}
+			BoxSize = attrib.boxSizeRight;
+			BoxOffset = attrib.rightOffset;
+			directionX = 1;
+		}
+		if (KeyboardControlSystem::dir == DOWN)
+		{
+			if (attrib.numFrames == 1)
+			{
+				projectilePosition.x = (transform.position.x + attrib.transOffsetDown.x);
+				projectilePosition.y = ((transform.position.y + attrib.transOffsetDown.y) + sprite.height * 3);
+			}
+			else
+			{
+				projectilePosition.x = (transform.position.x + attrib.transOffsetDown.x);
+				projectilePosition.y = ((transform.position.y + attrib.transOffsetDown.y) + sprite.height * 3);
+				attrib.srcRectX += attrib.width * 2;
+			}
+			BoxSize = attrib.boxSizeDown;
+			BoxOffset = attrib.downOffset;
+			directionY = 1;
+		}
+		if (KeyboardControlSystem::dir == LEFT)
+		{
+			if (attrib.numFrames == 1)
+			{
+				projectilePosition.x = ((transform.position.x + attrib.transOffsetLeft.x) - sprite.width * 3);
+				projectilePosition.y = (transform.position.y + attrib.transOffsetLeft.y);
+			}
+			else
+			{
+				projectilePosition.x = ((transform.position.x + attrib.transOffsetLeft.x) - sprite.width * 3);
+				projectilePosition.y = (transform.position.y + attrib.transOffsetLeft.y);
+				attrib.srcRectX += attrib.width * 3;
+			}
+			BoxSize = attrib.boxSizeLeft;
+			BoxOffset = attrib.leftOffset;
+			directionX = -1;
+		}
+				
+		// Create new projectile entity and add it to the world
+		Entity newItem = player.registry->CreateEntity();
+		newItem.Group(attrib.group);
+		newItem.AddComponent<TransformComponent>(projectilePosition, glm::vec2(attrib.scale.x, attrib.scale.y), 0.0);
+
+		if (attrib.group != "bomber")
+		{
+			// Set the projectile velocity based on the direction 
+			projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
+			projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
+			newItem.AddComponent<RigidBodyComponent>(projectileVelocity);
+			newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
+		}else Logger::Log("Bomber");
+		// Does the projectile have an animation component?
+		if (attrib.animation)
+		{
+			// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
+			newItem.AddComponent<AnimationComponent>(attrib.numFrames, 20, attrib.vertical, true);
+		}
+		projectileEmitter.isFriendly = true;
+		newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
+		newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0,attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
+		newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration);
+		newItem.AddComponent<GameComponent>();
+
+		if (attrib.group == "boomerang")
+		{
+			auto& boomerTimer = newItem.GetComponent<ProjectileComponent>();
+			boomerTimer.boomTimer.Start();
+		}
+
 	}
 	void UseSword()
 	{
-		for (auto entity : GetSystemEntities())
+
+		auto player = Registry::Instance()->GetEntityByTag("player");
+		auto& playerSprite = player.GetComponent<SpriteComponent>();
+		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
+		const auto& playerHealth = player.GetComponent<HealthComponent>();
+
+		auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
+		
+		auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+		auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
+
+		if (KeyboardControlSystem::dir == UP)
 		{
-			// Change the sprite srcRect based on the direction facing
-			if (entity.HasTag("player"))
-			{
-				const auto health = entity.GetComponent<HealthComponent>();
-				auto& sprite = entity.GetComponent<SpriteComponent>();
-				auto& box = entity.GetComponent<BoxColliderComponent>();
+			playerSprite.srcRect.y = playerSprite.height * 5;
+			playerCollider.offset.y = 60;
 
-				if (KeyboardControlSystem::dir == UP)
-				{
-					sprite.srcRect.y = sprite.height * 5;
-					box.offset.y = 60;
-				}
+			swordCollider.height = 40;
+			swordCollider.width = 10;
+			swordCollider.offset.x = 60;
+			swordCollider.offset.y = 12;
 
-				if (KeyboardControlSystem::dir == RIGHT)
-				{
-					sprite.srcRect.y = sprite.height * 5;
-					box.offset.x = 30;
-				}
-
-				if (KeyboardControlSystem::dir == DOWN)
-				{
-					sprite.srcRect.y = sprite.height * 5;
-					box.offset.y = 30;
-				}
-
-				if (KeyboardControlSystem::dir == LEFT)
-				{
-					sprite.srcRect.y = sprite.height * 5;
-					box.offset.x = 60;
-				}
-
-				// Check to see if health is full for sword beam
-				if (health.healthPercentage == (health.maxHearts * 2)) fullLife = true;
-				else fullLife = false;
-			}
-			// Set the size and Position of the Sword BoxCollider based on direction facing
-			if (entity.HasTag("the_sword"))
-			{
-				auto& box = entity.GetComponent<BoxColliderComponent>();
-
-				if (KeyboardControlSystem::dir == UP)
-				{
-					box.height = 40;
-					box.width = 10;
-					box.offset.x = 60;
-					box.offset.y = 12;
-				}
-				if (KeyboardControlSystem::dir == RIGHT)
-				{
-					box.height = 10;
-					box.width = 40;
-					box.offset.x = 78;
-					box.offset.y = 58;
-				}
-				if (KeyboardControlSystem::dir == DOWN)
-				{
-					box.height = 40;
-					box.width = 10;
-					box.offset.x = 64;
-					box.offset.y = 74;
-				}
-				if (KeyboardControlSystem::dir == LEFT)
-				{
-					box.height = 10;
-					box.width = 40;
-					box.offset.x = 12;
-					box.offset.y = 56;
-				}
-			}
-
-			if (entity.HasTag("the_shield"))
-			{
-				auto& box = entity.GetComponent<BoxColliderComponent>();
-
-				if (KeyboardControlSystem::dir == UP)
-				{
-					box.offset.y = 60;
-				}
-				if (KeyboardControlSystem::dir == RIGHT)
-				{
-					box.offset.x = 70;
-				}
-				if (KeyboardControlSystem::dir == DOWN)
-				{
-					box.offset.y = 60;
-				}
-				if (KeyboardControlSystem::dir == LEFT)
-				{
-					box.offset.x = 64;
-				}
-			}
+			shieldCollider.offset.y = 60;
 		}
+
+		if (KeyboardControlSystem::dir == RIGHT)
+		{
+			playerSprite.srcRect.y = playerSprite.height * 5;
+			playerCollider.offset.x = 30;
+
+			swordCollider.height = 10;
+			swordCollider.width = 40;
+			swordCollider.offset.x = 78;
+			swordCollider.offset.y = 58;
+
+			shieldCollider.offset.x = 70;
+		}
+
+		if (KeyboardControlSystem::dir == DOWN)
+		{
+			playerSprite.srcRect.y = playerSprite.height * 5;
+			playerCollider.offset.y = 30;
+
+			swordCollider.height = 40;
+			swordCollider.width = 10;
+			swordCollider.offset.x = 64;
+			swordCollider.offset.y = 74;
+
+			shieldCollider.offset.y = 60;
+		}
+
+		if (KeyboardControlSystem::dir == LEFT)
+		{
+			playerSprite.srcRect.y = playerSprite.height * 5;
+			playerCollider.offset.x = 60;
+
+			swordCollider.height = 10;
+			swordCollider.width = 40;
+			swordCollider.offset.x = 12;
+			swordCollider.offset.y = 56;
+
+			shieldCollider.offset.x = 64;
+		}
+
+		// Check to see if health is full for sword beam
+		if (playerHealth.healthPercentage == (playerHealth.maxHearts * 2)) fullLife = true;
+		else fullLife = false;
 	}
 	
 	void UseMagicWand()

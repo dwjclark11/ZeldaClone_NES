@@ -134,7 +134,6 @@ bool PauseState::OnEnter()
 			bombs.Group("pause");
 		}
 
-
 		if (game.GetGameItems().bow)
 		{
 			Entity bow = reg.CreateEntity();
