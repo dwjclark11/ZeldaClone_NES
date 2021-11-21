@@ -108,10 +108,17 @@ public:
 	bool& GetCameraMoving(){ return cameraMoving;}
 	bool& GetGameRunning(){ return mIsRunning;}
 	bool& GetplayerCreated() { return playerCreated; }
+	
+	bool& StartFadeIn() { return startFadeIn; }
+	bool& StartFadeOut() { return startFadeOut; }
+	bool& FadeFinished() { return fadeFinished; }
+
 	int& GetLevelWidth() { return mLevelWidth; }
 	int& GetLevelHeight() { return mLevelHeight; }
 	GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	
+	void FadeScreen();
+
 	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } 
 	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
 	
@@ -122,6 +129,10 @@ public:
 	sol::state& GetLuaState() { return lua; }
 	bool& GetPlayerItem() { return playerItem; }
 	bool& GetPlayerDead() { return playerDead; }
+	
+	void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
+	Uint8 GetFadeAlpha() { return fadeAlpha; }
+
 
 	template<typename TSystem> TSystem& GetSystem();
 
@@ -139,6 +150,11 @@ private:
 	bool playerCreated;
 	bool playerItem = false;
 	bool playerDead = false;
+
+	bool startFadeIn = false;
+	bool startFadeOut = false;
+	bool fadeFinished = true;
+	
 	unsigned gamePlayerNum;
 	
 	SDL_Window* mWindow;
@@ -150,7 +166,7 @@ private:
 	SDL_Rect camera;
 	SDL_Rect mouseBox;
 	SDL_Event sdlEvent;
-
+	Uint8 fadeAlpha;
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
 	GameItems mGameItems;

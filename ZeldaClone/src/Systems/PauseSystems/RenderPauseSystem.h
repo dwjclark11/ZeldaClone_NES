@@ -30,12 +30,11 @@ struct RenderPauseSystem : public System
 			{
 				entity.Kill();
 			}
-			
 
 			if (entity.BelongsToGroup("pause") || entity.HasTag("pauseSelector"))
 			{
-				const auto transform = entity.GetComponent<TransformComponent>();
-				const auto sprite = entity.GetComponent<SpriteComponent>();
+				const auto& transform = entity.GetComponent<TransformComponent>();
+				const auto& sprite = entity.GetComponent<SpriteComponent>();
 
 				// Set the src Rect of our original sprite texture
 				SDL_Rect srcRect = sprite.srcRect;
@@ -47,10 +46,16 @@ struct RenderPauseSystem : public System
 					static_cast<int>(sprite.width * transform.scale.x),
 					static_cast<int>(sprite.height * transform.scale.y)
 				};
+				Game::Instance()->FadeScreen();
+
+				SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
+				SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+				SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
 
 				SDL_RenderCopyEx(
 					renderer,
-					assetManager->GetTexture(sprite.assetID),
+					//assetManager->GetTexture(sprite.assetID),
+					tex,
 					&srcRect,
 					&dstRect,
 					transform.rotation,
@@ -63,22 +68,9 @@ struct RenderPauseSystem : public System
 
 	void OnExit()
 	{
-		//for (auto entity : GetSystemEntities())
-		//{
-		//	/*if (!entity.HasTag("selectedItem"))
-		//	{*/
-		//		entity.Kill();
-		//	//}	
-		//}
-
-		auto entities = GetSystemEntities();
-
-		for (auto i = entities.begin(); i != entities.end() - 1; i++)
+		for (auto entity : GetSystemEntities())
 		{
-			Entity entity = *i;
-
-			Registry::Instance()->RemoveEntityFromSystems(*i);
+			entity.Kill();
 		}
-
 	}
 };

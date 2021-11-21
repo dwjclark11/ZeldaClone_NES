@@ -37,6 +37,15 @@ void PauseState::Update(const double& deltaTime)
 		game.GetGameItems().bombs = true;
 	}
 
+	if (game.GetFadeAlpha() == 0 && !game.FadeFinished())
+	{
+		GameState::unpause = true;
+		GamePadSystem::paused = false;
+		game.FadeFinished() = true;
+		game.StartFadeOut() = false;
+		game.GetStateMachine()->PopState();
+	}
+
 	if (GameState::totalBombs == 0 && game.GetGameItems().bombs) game.GetGameItems().bombs = false;
 	if (State::exitToMain) game.GetStateMachine()->PopState();
 }
@@ -46,7 +55,7 @@ void PauseState::Render()
 	game.GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 	game.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 	game.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	reg.GetSystem<AnimationSystem>().Update();
+	//reg.GetSystem<AnimationSystem>().Update();
 }
 
 bool PauseState::OnEnter()
@@ -54,6 +63,7 @@ bool PauseState::OnEnter()
 	// Turn music volume down while paused
 	Mix_VolumeMusic(3);
 
+	game.StartFadeIn() = true;
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
 	// =============================================================================================================================
@@ -187,7 +197,6 @@ bool PauseState::OnEnter()
 bool PauseState::OnExit()
 {
 	//reg.GetSystem<RenderPauseSystem>().OnExit();
-	//Logger::Err("Exiting Pause State");
 	return true;
 }
 
@@ -200,7 +209,8 @@ void PauseState::OnKeyDown(SDL_Event* event)
 {
 	if (event->key.keysym.sym == SDLK_x)
 	{
-		game.GetStateMachine()->PopState();
+		game.FadeFinished() = false;
+		game.StartFadeOut() = true;	
 	}
 
 	if (event->key.keysym.sym == SDLK_m)

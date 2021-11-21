@@ -46,133 +46,110 @@ public:
 	// Callback function
 	void OnKeyPressed(KeyPressedEvent& event)
 	{
-		auto entities = GetSystemEntities();
-
-		// Loop all the entities that the system is interested in
-		for (auto i = entities.begin(); i != entities.end(); i++)
+		if (game.GetFadeAlpha() == 255)
 		{
+			auto player				= Registry::Instance()->GetEntityByTag("player");
+			auto& playerTransform	= player.GetComponent<TransformComponent>();
+			auto& playerCollider	= player.GetComponent<BoxColliderComponent>();
+			auto& playerRigidbody	= player.GetComponent<RigidBodyComponent>();
+			auto& playerSprite		= player.GetComponent<SpriteComponent>();
+			auto& playerControl		= player.GetComponent<KeyboardControlComponent>();
+			
+			auto shield				= Registry::Instance()->GetEntityByTag("the_shield");
+			auto& shieldTransform	= shield.GetComponent<TransformComponent>();
+			auto& shieldCollider	= shield.GetComponent<BoxColliderComponent>();
+			auto& shieldRigidbody	= shield.GetComponent<RigidBodyComponent>();
+
+			auto sword				= Registry::Instance()->GetEntityByTag("the_sword");
+			auto& swordTransform	= sword.GetComponent<TransformComponent>();
+			auto& swordCollider		= sword.GetComponent<BoxColliderComponent>();
+			auto& swordRigidbody	= sword.GetComponent<RigidBodyComponent>();
+
 			if (!game.GetPlayerItem())
 			{
-				if (i->HasTag("player"))
+				switch (event.symbol)
 				{
-					Entity a = *i;
-					auto& playerTransform = a.GetComponent<TransformComponent>();
-					auto& playerCollider = a.GetComponent<BoxColliderComponent>();
-					auto& playerRigidbody = a.GetComponent<RigidBodyComponent>();
-					auto& sprite = a.GetComponent<SpriteComponent>();
-					const auto& keyboardControl = a.GetComponent<KeyboardControlComponent>();
+				case SDLK_w:
+									
+					playerRigidbody.velocity	= playerControl.upVelocity;
+					playerSprite.srcRect.x		= playerSprite.width * 2;
 
-					// Loop all entities that still need to be checked 
-					for (auto j = i; j != entities.end(); j++)
-					{
-						if (j->HasTag("the_sword") || j->HasTag("the_shield"))
-						{
-							Entity b = *j;
+					shieldTransform.position	= playerTransform.position;
+					shieldCollider.height		= 2;
+					shieldCollider.width		= 24;
+					shieldCollider.offset		= glm::vec2(48, 32);
+					shieldRigidbody				= playerRigidbody;
 
-							// Bypass if we are testing the same entity
-							if (a == b)
-								continue;
+					swordTransform.position		= playerTransform.position;
+					swordCollider.height		= 2;
+					swordCollider.width			= 2;
+					swordCollider.offset		= glm::vec2(64, 60);
+					swordRigidbody				= playerRigidbody;
 
-							auto& bTransform = b.GetComponent<TransformComponent>();
-							auto& bCollider = b.GetComponent<BoxColliderComponent>();
-							auto& bRigidbody = b.GetComponent<RigidBodyComponent>();
+					dir = UP;
+					break;
 
-							bool shield = false;
-							bool sword = false;
-							if (b.HasTag("the_shield")) shield = true;
-							if (b.HasTag("the_sword")) sword = true;
+				case SDLK_d:
+					playerSprite.srcRect.x		= playerSprite.width * 3;
+					playerRigidbody.velocity	= playerControl.rightVelocity;
 
-							playerRigidbody.velocity = glm::vec2(0);
-							bRigidbody.velocity = playerRigidbody.velocity;
-							switch (event.symbol)
-							{
-							case SDLK_w:
-								bTransform.position = playerTransform.position;
-								playerRigidbody.velocity = keyboardControl.upVelocity;
-								bRigidbody = playerRigidbody;
-								sprite.srcRect.x = sprite.width * 2;
-								if (shield)
-								{
-									bCollider.height = 2;
-									bCollider.width = 24;
-									bCollider.offset = glm::vec2(48, 32);
-								}
-								else if (sword)
-								{
-									bCollider.height = 2;
-									bCollider.width = 2;
-									bCollider.offset = glm::vec2(64, 60);
-								}
-								dir = UP;
-								break;
+					shieldTransform.position	= playerTransform.position;
+					shieldCollider.height		= 30;
+					shieldCollider.width		= 2;
+					shieldCollider.offset		= glm::vec2(90, 56);
+					shieldRigidbody				= playerRigidbody;
 
-							case SDLK_d:
-								bTransform.position = playerTransform.position;
-								playerRigidbody.velocity = keyboardControl.rightVelocity;
-								bRigidbody = playerRigidbody;
-								sprite.srcRect.x = sprite.width * 3;
-								if (shield)
-								{
-									bCollider.height = 30;
-									bCollider.width = 2;
-									bCollider.offset = glm::vec2(90, 56);
-								}
-								else if (sword)
-								{
-									bCollider.height = 2;
-									bCollider.width = 2;
-									bCollider.offset = glm::vec2(64, 60);
-								}
-								dir = RIGHT;
-								break;
+					swordTransform.position		= playerTransform.position;
+					swordCollider.height		= 2;
+					swordCollider.width			= 2;
+					swordCollider.offset		= glm::vec2(64, 60);
+					swordRigidbody				= playerRigidbody;
 
-							case SDLK_s:
-								bTransform.position = playerTransform.position;
-								playerRigidbody.velocity = keyboardControl.downVelocity;
-								bRigidbody = playerRigidbody;
-								sprite.srcRect.x = sprite.width * 0;
-								if (shield)
-								{
-									bCollider.height = 2;
-									bCollider.width = 24;
-									bCollider.offset = glm::vec2(40, 84);
-								}
-								else if (sword)
-								{
-									bCollider.height = 2;
-									bCollider.width = 2;
-									bCollider.offset = glm::vec2(64, 60);
-								}
-								dir = DOWN;
-								break;
+					dir = RIGHT;
+					break;
 
-							case SDLK_a:
-								bTransform.position = playerTransform.position;
-								playerRigidbody.velocity = keyboardControl.leftVelocity;
-								bRigidbody = playerRigidbody;
-								sprite.srcRect.x = sprite.width * 1;
-								if (shield)
-								{
-									bCollider.height = 30;
-									bCollider.width = 2;
-									bCollider.offset = glm::vec2(30, 50);
-								}
-								else if (sword)
-								{
-									bCollider.height = 2;
-									bCollider.width = 2;
-									bCollider.offset = glm::vec2(64, 60);
-								}
+				case SDLK_s:
+					playerRigidbody.velocity	= playerControl.downVelocity;
+					playerSprite.srcRect.x		= playerSprite.width * 0;
+									
+					shieldTransform.position	= playerTransform.position;
+					shieldCollider.height		= 2;
+					shieldCollider.width		= 24;
+					shieldCollider.offset		= glm::vec2(40, 84);
+					shieldRigidbody				= playerRigidbody;
 
-								dir = LEFT;
-								break;
-							}
-						}
-					}
+					swordTransform.position		= playerTransform.position;
+					swordCollider.height		= 2;
+					swordCollider.width			= 2;
+					swordCollider.offset		= glm::vec2(64, 60);
+					swordRigidbody				= playerRigidbody;
+
+					dir = DOWN;
+					break;
+
+				case SDLK_a:
+					playerRigidbody.velocity	= playerControl.leftVelocity;
+					playerSprite.srcRect.x		= playerSprite.width * 1;
+									
+					shieldTransform.position	= playerTransform.position;
+					shieldCollider.height		= 30;
+					shieldCollider.width		= 2;
+					shieldCollider.offset		= glm::vec2(30, 50);
+					shieldRigidbody				= playerRigidbody;
+
+					swordTransform.position		= playerTransform.position;
+					swordCollider.height		= 2;
+					swordCollider.width			= 2;
+					swordCollider.offset		= glm::vec2(64, 60);
+					swordRigidbody				= playerRigidbody;
+
+					dir = LEFT;
+					break;
 				}
 			}
 		}
 	}
+
 	void UpdatePlayer();
 
 };

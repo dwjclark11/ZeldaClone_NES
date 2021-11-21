@@ -125,6 +125,12 @@ void Game::Initialize()
 	assetManager->AddFonts("charriot-font-40", "./Assets/Fonts/charriot.ttf", 40);
 	assetManager->AddFonts("charriot-font-60", "./Assets/Fonts/charriot.ttf", 60);
 	
+	// Set Initial Fade Alpha
+	fadeAlpha = 255;
+	fadeFinished = true;
+	startFadeIn = false;
+	startFadeOut = false;
+
 	// Create the finite Game State Machine
 	gameStateMachine = new GameStateMachine();
 	
@@ -282,6 +288,33 @@ SDL_Event& Game::GetEvent()
 bool& Game::GetAttack()
 {
 	return attack;
+}
+
+void Game::FadeScreen()
+{
+	if (startFadeIn)
+	{
+		if (fadeAlpha < 255)
+		{
+			fadeAlpha += 5;
+		}
+		else
+		{
+			startFadeIn = false;
+		}
+	}
+
+	if (startFadeOut)
+	{
+		if (fadeAlpha > 0)
+		{
+			fadeAlpha -= 5;
+		}
+		else
+		{
+			startFadeOut = false;
+		}
+	}
 }
 
 unsigned& Game::GetPlayerNum()

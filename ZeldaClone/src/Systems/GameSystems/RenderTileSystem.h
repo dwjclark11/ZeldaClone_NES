@@ -38,7 +38,7 @@ public:
 		// Loop through all of the system entities
 		for (auto entity : GetSystemEntities())
 		{
-			if (entity.BelongsToGroup("tiles") || entity.BelongsToGroup("map")) //Add the other groups
+			if (entity.HasComponent<TileComponent>()) //Add the other groups
 			{
 				RenderableEntity renderableEntity;
 				renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
@@ -91,9 +91,13 @@ public:
 				if (game.GetPlayerDead())
 					SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 0, 0);
 
+				SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
+				SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+				SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
+
 				SDL_RenderCopyEx(
 					renderer,
-					assetManager->GetTexture(sprite.assetID),
+					tex,
 					&srcRect,
 					&dstRect,
 					transform.rotation,
@@ -109,16 +113,6 @@ public:
 		for (auto entity : GetSystemEntities())
 		{
 			 entity.Kill();
-			 if (entity.BelongsToGroup("map"))
-				Logger::Err("Deleted map" + std::to_string(entity.GetID()));
 		}
-		//auto entities = GetSystemEntities();
-
-		//for (auto i = entities.begin(); i != entities.end(); i++)
-		//{
-		//	Entity entity = *i;
-
-		//	Registry::Instance()->RemoveEntityFromSystems(*i);
-		//}
 	}
 };

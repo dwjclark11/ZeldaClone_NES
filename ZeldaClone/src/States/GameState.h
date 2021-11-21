@@ -15,7 +15,7 @@ public:
 	static int totalBombs;
 	static int totalKeys;
 	static bool firstEntered;
-	
+	static bool unpause;
 	// Constructor
 	GameState();
 	~GameState();
@@ -41,4 +41,5 @@ private:
 	glm::vec2 cameraOffset;
 	class Game& game;
 	class Registry& reg;
+	
 };

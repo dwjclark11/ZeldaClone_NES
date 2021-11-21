@@ -133,9 +133,14 @@ public:
 					(sprite.height * transform.scale.y)
 				};
 
+				SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
+				SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+				SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
+
 				SDL_RenderCopyEx(
 					renderer,
-					assetManager->GetTexture(sprite.assetID),
+					//assetManager->GetTexture(sprite.assetID),
+					tex,
 					&srcRect,
 					&dstRect,
 					transform.rotation,

@@ -40,6 +40,7 @@
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
 bool GameState::firstEntered = false;
+bool GameState::unpause = false;
 int GameState::totalRupees = 0;
 int GameState::totalBombs = 0;
 int GameState::totalKeys = 0;
@@ -65,13 +66,24 @@ GameState::GameState(glm::vec2 cameraOffset)
 
 void GameState::Update(const double& deltaTime)
 {
+	if (GamePadSystem::paused && game.GetFadeAlpha() == 0)
+	{
+		game.FadeFinished() = true;
+		game.StartFadeOut() = false;
+
+		game.GetStateMachine()->PushState(new PauseState());
+	}
+
 	// Check to see if level music has been paused
-	if (GamePadSystem::paused)
+	if (!GamePadSystem::paused && unpause)
 	{
 		// Turn music volume up
 		Mix_VolumeMusic(10);
-		GamePadSystem::paused = false;
+		
+		game.StartFadeIn() = true;
+		unpause = false;
 	}
+
 	if (State::exitToMain) 
 	{
 		game.GetStateMachine()->PopState();
@@ -109,6 +121,7 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<AISystem>().Update();
 
 	ConvertHUDNumbers();
+
 }
 
 void GameState::Render()
@@ -142,6 +155,7 @@ void GameState::Render()
 
 bool GameState::OnEnter()
 {
+	
 	if (!firstEntered)
 	{
 		LevelLoader loader;
@@ -206,15 +220,6 @@ bool GameState::OnEnter()
 		game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
 
 		loader.LoadMap("map", 4096, 1344);
-		//Entity bombItem = reg.CreateEntity();
-		//bombItem.AddComponent<TransformComponent>(glm::vec2(7648, 4750), glm::vec2(4, 4), 0.0);
-		//bombItem.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
-		//bombItem.AddComponent<RigidBodyComponent>(glm::vec2(0));
-		//bombItem.AddComponent<ItemComponent>(BOMBS);
-		//bombItem.AddComponent<BoxColliderComponent>(8, 16, glm::vec2(15, 0));
-		//bombItem.AddComponent<GameComponent>();
-		//bombItem.AddComponent<TriggerBoxComponent>(COLLECT_ITEM);
-		//bombItem.Group("trigger");
 
 		firstEntered = true;
 		reg.GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
@@ -247,8 +252,11 @@ void GameState::OnKeyDown(SDL_Event* event)
 	// Set to paused
 	if (event->key.keysym.sym == SDLK_q)
 	{
+		game.FadeFinished() = false;
+		game.StartFadeOut() = true;
+		game.StartFadeIn() = false;
 		GamePadSystem::paused = true;
-		game.GetStateMachine()->PushState(new PauseState());
+		
 	}
 }
 

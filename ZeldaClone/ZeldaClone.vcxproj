@@ -188,6 +188,7 @@
     <ClCompile Include="src\Systems\GameSystems\KeyboardControlSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\ProjectileLifeCycleSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderHealthSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\RenderSystem.cpp" />
     <ClCompile Include="src\Systems\PauseSystems\ItemSelectKeyboardSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTitleSystem.cpp" />
     <ClCompile Include="src\Utilities\FileManagerUtils.cpp" />
