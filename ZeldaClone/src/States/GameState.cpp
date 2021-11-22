@@ -199,22 +199,22 @@ bool GameState::OnEnter()
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
 		// =============================================================================================================================
-		if (!reg.HasSystem<RenderHUDSystem>()) reg.AddSystem<RenderHUDSystem>();
+		if (!reg.HasSystem<RenderHUDSystem>())			reg.AddSystem<RenderHUDSystem>();
 		if (!reg.HasSystem<ProjectileEmitterSystem>()) reg.AddSystem<ProjectileEmitterSystem>();
 		if (!reg.HasSystem<ProjectileLifeCycleSystem>()) reg.AddSystem<ProjectileLifeCycleSystem>();
-		if (!reg.HasSystem<DamageSystem>()) reg.AddSystem<DamageSystem>();
-		if (!reg.HasSystem<RenderHealthSystem>()) reg.AddSystem<RenderHealthSystem>();	
-		if (!reg.HasSystem<RenderTileSystem>()) reg.AddSystem<RenderTileSystem>();
-		if (!reg.HasSystem<HealthSystem>()) reg.AddSystem<HealthSystem>();
-		if (!reg.HasSystem<CollisionSystem>()) reg.AddSystem<CollisionSystem>();
-		if (!reg.HasSystem<MovementSystem>()) reg.AddSystem<MovementSystem>();
-		if (!reg.HasSystem<TriggerSystem>()) reg.AddSystem<TriggerSystem>();
-		if (!reg.HasSystem<CollectItemSystem>()) reg.AddSystem<CollectItemSystem>();
+		if (!reg.HasSystem<DamageSystem>())				reg.AddSystem<DamageSystem>();
+		if (!reg.HasSystem<RenderHealthSystem>())		reg.AddSystem<RenderHealthSystem>();	
+		if (!reg.HasSystem<RenderTileSystem>())			reg.AddSystem<RenderTileSystem>();
+		if (!reg.HasSystem<HealthSystem>())				reg.AddSystem<HealthSystem>();
+		if (!reg.HasSystem<CollisionSystem>())			reg.AddSystem<CollisionSystem>();
+		if (!reg.HasSystem<MovementSystem>())			reg.AddSystem<MovementSystem>();
+		if (!reg.HasSystem<TriggerSystem>())			reg.AddSystem<TriggerSystem>();
+		if (!reg.HasSystem<CollectItemSystem>())		reg.AddSystem<CollectItemSystem>();
 		if (!reg.HasSystem<KeyboardControlSystem>()) 	reg.AddSystem<KeyboardControlSystem>();
-		if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
-		if (!reg.HasSystem<GamePadSystem>()) 	reg.AddSystem<GamePadSystem>();
-		if (!reg.HasSystem<ScriptSystem>()) 	reg.AddSystem<ScriptSystem>();
-		if (!reg.HasSystem<AISystem>()) 	reg.AddSystem<AISystem>();
+		if (!reg.HasSystem<RenderTextSystem>())			reg.AddSystem<RenderTextSystem>();
+		if (!reg.HasSystem<GamePadSystem>()) 			reg.AddSystem<GamePadSystem>();
+		if (!reg.HasSystem<ScriptSystem>()) 			reg.AddSystem<ScriptSystem>();
+		if (!reg.HasSystem<AISystem>()) 				reg.AddSystem<AISystem>();
 		// =============================================================================================================================
 
 		game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);

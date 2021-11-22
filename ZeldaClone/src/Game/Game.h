@@ -62,10 +62,8 @@ public:
 	static int windowWidth;
 	static int windowHeight;
 	static bool isDebug;
-	
-	// Constructor / Destructor
-	Game();
 	~Game();
+
 	
 	// Creation of the singleton Game
 	static Game* Instance()
@@ -104,35 +102,35 @@ public:
 		return false;
 	}
 	bool& GetAttack();
-	bool& IsRunning() { return mIsRunning; }
-	bool& GetCameraMoving(){ return cameraMoving;}
-	bool& GetGameRunning(){ return mIsRunning;}
-	bool& GetplayerCreated() { return playerCreated; }
+	inline bool& IsRunning() { return mIsRunning; }
+	inline bool& GetCameraMoving(){ return cameraMoving;}
+	inline bool& GetGameRunning(){ return mIsRunning;}
+	inline bool& GetplayerCreated() { return playerCreated; }
 	
-	bool& StartFadeIn() { return startFadeIn; }
-	bool& StartFadeOut() { return startFadeOut; }
-	bool& FadeFinished() { return fadeFinished; }
+	inline bool& StartFadeIn() { return startFadeIn; }
+	inline bool& StartFadeOut() { return startFadeOut; }
+	inline bool& FadeFinished() { return fadeFinished; }
 
-	int& GetLevelWidth() { return mLevelWidth; }
-	int& GetLevelHeight() { return mLevelHeight; }
-	GameStateMachine* GetStateMachine() { return gameStateMachine; }
+	inline int& GetLevelWidth() { return mLevelWidth; }
+	inline int& GetLevelHeight() { return mLevelHeight; }
+	inline GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	
 	void FadeScreen();
 
-	std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; } 
-	std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
+	inline std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; }
+	inline std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
 	
-	GameItems& GetGameItems() { return mGameItems; }
+	inline GameItems& GetGameItems() { return mGameItems; }
 	unsigned& GetPlayerNum();
-	glm::vec2& GetPlayerPos() { return mPlayerPos; }
+	inline glm::vec2& GetPlayerPos() { return mPlayerPos; }
 	double& GetDeltaTime();
-	sol::state& GetLuaState() { return lua; }
-	bool& GetPlayerItem() { return playerItem; }
-	bool& GetPlayerDead() { return playerDead; }
+	inline sol::state& GetLuaState() { return lua; }
+	inline bool& GetPlayerItem() { return playerItem; }
+	inline bool& GetPlayerDead() { return playerDead; }
 	
-	void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
-	Uint8 GetFadeAlpha() { return fadeAlpha; }
-	const double& GetDeltaTime() const { return deltaTime; }
+	inline void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
+	inline Uint8 GetFadeAlpha() { return fadeAlpha; }
+	inline const double& GetDeltaTime() const { return deltaTime; }
 
 	template<typename TSystem> TSystem& GetSystem();
 
@@ -179,6 +177,9 @@ private:
 	PlayerStateMachine psm;
 
 	sol::state lua;
+
+	// Constructor / Destructor
+	Game();
 };
 
 

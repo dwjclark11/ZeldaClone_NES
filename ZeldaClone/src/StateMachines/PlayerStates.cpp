@@ -5,6 +5,8 @@
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/ItemComponent.h"
+
 #include "../Components/AIComponent.h"
 #include "../States/GameOverState.h" 
 

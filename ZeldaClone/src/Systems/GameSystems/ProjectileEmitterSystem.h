@@ -218,7 +218,7 @@ public:
 			projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
 			newItem.AddComponent<RigidBodyComponent>(projectileVelocity);
 			newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
-		}else Logger::Log("Bomber");
+		}
 		// Does the projectile have an animation component?
 		if (attrib.animation)
 		{
@@ -236,8 +236,8 @@ public:
 			auto& boomerTimer = newItem.GetComponent<ProjectileComponent>();
 			boomerTimer.boomTimer.Start();
 		}
-
 	}
+
 	void UseSword()
 	{
 
@@ -311,35 +311,11 @@ public:
 	
 	void UseMagicWand()
 	{
-		for (auto entity : GetSystemEntities())
-		{
-			// Change the sprite srcRect position based on direction we are facing
-			if (entity.HasTag("player"))
-			{
-				const auto health = entity.GetComponent<HealthComponent>();
-				auto& sprite = entity.GetComponent<SpriteComponent>();
+		auto player = Registry::Instance()->GetEntityByTag("player");
 
-				if (KeyboardControlSystem::dir == UP)
-				{
-					sprite.srcRect.y = sprite.height * 3;
-				}
-
-				if (KeyboardControlSystem::dir == RIGHT)
-				{
-					sprite.srcRect.y = sprite.height * 3;
-				}
-
-				if (KeyboardControlSystem::dir == DOWN)
-				{
-					sprite.srcRect.y = sprite.height * 3;
-				}
-
-				if (KeyboardControlSystem::dir == LEFT)
-				{
-					sprite.srcRect.y = sprite.height * 3;
-				}
-			}
-		}
+		const auto health = player.GetComponent<HealthComponent>();
+		auto& sprite = player.GetComponent<SpriteComponent>();
+		sprite.srcRect.y = sprite.height * 6;
 	}
 	
 	void OnKeyPressed(KeyPressedEvent& event)

@@ -8,8 +8,6 @@ private:
 	class Game& game;
 public:
 	ProjectileLifeCycleSystem();
-
-
 	void Update();
 
 };

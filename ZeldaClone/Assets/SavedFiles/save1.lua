@@ -1,11 +1,11 @@
 ----------------------------------------------------------
--- Save file#: 2
+-- Save file#: 1
 ----------------------------------------------------------
 
 player_data = {
   [1] = {
     menu_shared_values = {
-      name = "DUSTIN",
+      name = "PORTFO",
       num_hearts = 3,
       blue_ring = false,
       red_ring = false
@@ -15,12 +15,12 @@ player_data = {
         position = { x = 7615, y = 5060}}
     },
     items = {
-      boomerang = true,
+      boomerang = false,
       magic_boomerang = false,
       wood_sword = false,
       steel_sword = false,
       magic_sword = false,
-      magic_rod = false,
+      magic_rod = true,
       bombs = false,
       food = false,
       flute = false,

@@ -10,6 +10,18 @@
 #include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
 
+#include <SDL.h>
+#include <algorithm>
+#include <vector>
+
+RenderSystem::RenderSystem()
+{
+	// Entities polled must have these component
+	RequiredComponent<TransformComponent>();
+	RequiredComponent<SpriteComponent>();
+	RequiredComponent<GameComponent>();
+}
+
 void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, SDL_Rect& camera)
 {
 	// Create a temporary struct to help sort the entities

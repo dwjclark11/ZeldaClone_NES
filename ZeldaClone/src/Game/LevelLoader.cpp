@@ -1224,6 +1224,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 			game.GetGameItems().woodSword 		= player["items"]["wood_sword"].get_or(false);
 			game.GetGameItems().steelSword 		= player["items"]["steel_sword"].get_or(false);
 			game.GetGameItems().magicSword 		= player["items"]["magic_sword"].get_or(false);
+			game.GetGameItems().magicRod		= player["items"]["magic_rod"].get_or(false);
 			game.GetGameItems().bombs 			= player["items"]["bombs"].get_or(false);
 			game.GetGameItems().food 			= player["items"]["food"].get_or(false);
 			game.GetGameItems().flute 			= player["items"]["flute"].get_or(false);

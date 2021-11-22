@@ -86,8 +86,6 @@ bool PauseState::OnEnter()
 		pauseSelector.Tag("pauseSelector");
 		pauseSelector.Group("pause");
 
-
-
 		Entity selectedItem = reg.CreateEntity();
 		selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
 		selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
