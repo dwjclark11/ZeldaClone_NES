@@ -2,6 +2,18 @@
 -- C:\Users\dwjcl\Desktop\ZeldaClone\ZeldaClone\Assets\Levels\enemies.lua
 ----------------------------------------------------------
 
+local sm = loadfile("C:/Development/ZeldaClone/ZeldaClone/Assets/Levels/StateMachine.lua")
+sm()
+local success, error = loadfile("C:/Development/ZeldaClone/ZeldaClone/Assets/Levels/testState.lua")
+
+if not success then
+    print("Not Successful ", error)
+else
+    print("Successful")
+end
+success()
+
+
 enemies = {
   [1] = {
     group = "enemies",
@@ -332,7 +344,24 @@ enemies = {
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
             enemy_type = "moblin",
-      }
+      },
+      on_update_script = -- This is the scripting components of the Lua files
+	  {
+        instance = TestState:Create(),
+        states = {instance},
+        gStateMachine = StateMachine:Create(states),
+        --gStateMachine:Change(instance),
+		[0] = 
+        
+		function(entity, delta_time, elapsed_time)
+           
+           -- gStateMachine:Update(delta_time)
+			-- Change the position of the tank to follow a sine wave movement
+			--local new_x = elapsed_time * 0.09
+			--local new_y = 200 + (math.sin(elapsed_time * 0.001) * 50)
+			--set_position(entity, new_x, new_y) -- Set the new position
+		end
+	 }
     }
   }
 }

@@ -1,7 +1,3 @@
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-
 #include "Game/Game.h"
 #include "Systems/CameraMovementSystem.h"
 #include "Systems/NameSystems/NameSelectKeyboardControlSystem.h"
@@ -25,5 +21,5 @@ int main()
 	// Run the game Instance--> There is a loop inside this
 	Game::Instance()->Run();
 	Game::Instance()->Shutdown();
-	_CrtDumpMemoryLeaks();
-}
+
+}	

@@ -26,18 +26,25 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 	// Loop all the entities that the system is interested in
 	for (auto i = entities.begin(); i != entities.end(); i++)
 	{
-		Entity a = *i;
+		Entity& a = *i;
 		auto& aTransform = a.GetComponent<TransformComponent>();
-		auto& aCollider = a.GetComponent<BoxColliderComponent>();
+		const auto& aCollider = a.GetComponent<BoxColliderComponent>();
 
 		// Loop all entities that still need to be checked 
 		for (auto j = i; j != entities.end(); j++)
 		{
-			Entity b = *j;
-
+			Entity& b = *j;
+			int checkX = aTransform.position.x / 1024;
+			int checkY = aTransform.position.y / 672;
+			
+			// Check to see if the collider is in the same panel as the player, if not skip the check
+			if (checkX != Game::Instance()->GetPlayerPos().x && checkY != Game::Instance()->GetPlayerPos().y)
+				continue;
+			
 			// Bypass if we are testing the same entity
 			if (a == b)
 				continue;
+			
 			// bypass if both are colliders
 			if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
 				continue;
@@ -47,7 +54,7 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 				continue;
 
 			auto& bTransform = b.GetComponent<TransformComponent>();
-			auto& bCollider = b.GetComponent<BoxColliderComponent>();
+			const auto& bCollider = b.GetComponent<BoxColliderComponent>();
 
 			// Perform the AABB collision check between entities a and b
 			bool collisionHappened = CheckAABBCollision(

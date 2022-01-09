@@ -79,10 +79,17 @@ void IdleState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	glm::vec2 playerSpeed = glm::vec2(0);
 	auto player = entity;
 	
+	auto& playerHealth = player.GetComponent<HealthComponent>();
+
 	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
 		pOwner->ChangeState(pOwner->moveState, entity);
 	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
 		pOwner->ChangeState(pOwner->moveState, entity);
+
+	// If the player is hurt while in Idle state --> Switch to hurt state
+	if (playerHealth.isHurt)
+		pOwner->ChangeState(pOwner->hurtState, entity);
+
 }
 
 void AttackState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)

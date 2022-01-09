@@ -117,7 +117,7 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<ProjectileLifeCycleSystem>().Update();
 	reg.GetSystem<CollisionSystem>().Update(game.GetEventManager());
 
-	//reg.GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
+	reg.GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	reg.GetSystem<AISystem>().Update();
 
 	ConvertHUDNumbers();

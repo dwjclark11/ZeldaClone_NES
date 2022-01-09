@@ -555,11 +555,14 @@
     <ClInclude Include="src\Utilities\Utility.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Levels\foo.lua" />
+    <None Include="Assets\Levels\testState.lua" />
     <None Include="Assets\LuaFiles\game_state_assets.lua" />
     <None Include="Assets\LuaFiles\hud.lua" />
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />
     <None Include="Assets\LuaFiles\menu_state_load.lua" />
     <None Include="Assets\LuaFiles\new_player_create.lua" />
+    <None Include="Assets\Levels\StateMachine.lua" />
     <None Include="libs\glm\detail\func_common.inl" />
     <None Include="libs\glm\detail\func_common_simd.inl" />
     <None Include="libs\glm\detail\func_exponential.inl" />

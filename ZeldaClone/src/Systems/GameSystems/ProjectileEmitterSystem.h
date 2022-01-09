@@ -385,7 +385,6 @@ public:
 					// Create Sword beam projectile
 					ItemAttrib beam("beam", "Sword", 32, 32, 0, 0, 4, glm::vec2(4, 4), glm::vec2(0, 45), glm::vec2(0, 25), glm::vec2(15, 20), glm::vec2(65, 20), glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(56, 30), 
 						glm::vec2(56, 40), glm::vec2(30, 60), glm::vec2(10, 60), 1000, true, true);
-
 					UseItem(beam);
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
 				}

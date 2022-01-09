@@ -5,81 +5,78 @@ bool KeyboardControlSystem::keyDown = false;
 
 void KeyboardControlSystem::UpdatePlayer()
 {
-	for (auto entity : GetSystemEntities())
+	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto& playerTransform = player.GetComponent<TransformComponent>();
+	auto& playerCollider = player.GetComponent<BoxColliderComponent>();
+	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
+	auto& playerSprite = player.GetComponent<SpriteComponent>();
+	auto& playerControl = player.GetComponent<KeyboardControlComponent>();
+
+	auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+	auto& shieldTransform = shield.GetComponent<TransformComponent>();
+	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
+	auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
+
+	auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+	auto& swordTransform = sword.GetComponent<TransformComponent>();
+	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
+	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
+
+	// reset the sword
+	swordRigidbody = glm::vec2(0);
+	swordCollider.offset = glm::vec2(64, 60);
+	swordCollider.height = 4;
+	swordCollider.width = 4;
+	
+	// Reset Player velocity and box collider
+	playerRigidbody = glm::vec2(0);
+	playerCollider.offset = glm::vec2(45, 45);
+
+	if (dir == UP)
 	{
-		if (entity.HasTag("the_sword"))
-		{
-			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
-			auto& box = entity.GetComponent<BoxColliderComponent>();
-			rigidBody = glm::vec2(0);
-			box.offset = glm::vec2(64, 60);
-			box.height = 4;
-			box.width = 4;
-		}
-
-		if (entity.HasTag("player"))
-		{
-			auto& playerBox = entity.GetComponent<BoxColliderComponent>(); 
-			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
-			auto& sprite = entity.GetComponent<SpriteComponent>();
-				
-			// Reset velocity and box collider
-			rigidBody = glm::vec2(0);
-			playerBox.offset = glm::vec2(45, 45);
-
-			if (dir == UP)
-			{
-				sprite.srcRect.x = sprite.width * 2;
-				sprite.srcRect.y = sprite.height * 0;
-			}
-			else if (dir == RIGHT)
-			{
-				sprite.srcRect.x = sprite.width * 3;
-				sprite.srcRect.y = sprite.height * 0;
-			}
-			else if (dir == DOWN)
-			{
-				sprite.srcRect.x = sprite.width * 0;
-				sprite.srcRect.y = sprite.height * 0;
-			}
-			else if (dir == LEFT)
-			{
-				sprite.srcRect.x = sprite.width * 1;
-				sprite.srcRect.y = sprite.height * 0;
-			}
-		}
+		playerSprite.srcRect.x = playerSprite.width * 2;
+		playerSprite.srcRect.y = playerSprite.height * 0;
+	}
+	else if (dir == RIGHT)
+	{
+		playerSprite.srcRect.x = playerSprite.width * 3;
+		playerSprite.srcRect.y = playerSprite.height * 0;
+	}
+	else if (dir == DOWN)
+	{
+		playerSprite.srcRect.x = playerSprite.width * 0;
+		playerSprite.srcRect.y = playerSprite.height * 0;
+	}
+	else if (dir == LEFT)
+	{
+		playerSprite.srcRect.x = playerSprite.width * 1;
+		playerSprite.srcRect.y = playerSprite.height * 0;
+	}
 			
-		if (entity.HasTag("the_shield"))
-		{
-			auto& shieldBox = entity.GetComponent<BoxColliderComponent>();
-			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
-			auto& sprite = entity.GetComponent<SpriteComponent>();
-			rigidBody = glm::vec2(0);
-
-			if (dir == UP)
-			{
-				shieldBox.height = 2;
-				shieldBox.width = 24;
-				shieldBox.offset = glm::vec2(48, 32);
-			}
-			else if (dir == RIGHT)
-			{
-				shieldBox.height = 30;
-				shieldBox.width = 2;
-				shieldBox.offset = glm::vec2(90, 56);
-			}
-			else if (dir == DOWN)
-			{
-				shieldBox.height = 2;
-				shieldBox.width = 24;
-				shieldBox.offset = glm::vec2(40, 84);
-			}
-			else if (dir == LEFT)
-			{
-				shieldBox.height = 30;
-				shieldBox.width = 2;
-				shieldBox.offset = glm::vec2(30, 50);
-			}
-		}
+	// Reset the Shield based on player direction
+	shieldRigidbody = glm::vec2(0);
+	if (dir == UP)
+	{
+		swordCollider.height = 2;
+		swordCollider.width = 24;
+		swordCollider.offset = glm::vec2(48, 32);
+	}
+	else if (dir == RIGHT)
+	{
+		swordCollider.height = 30;
+		swordCollider.width = 2;
+		swordCollider.offset = glm::vec2(90, 56);
+	}
+	else if (dir == DOWN)
+	{
+		swordCollider.height = 2;
+		swordCollider.width = 24;
+		swordCollider.offset = glm::vec2(40, 84);
+	}
+	else if (dir == LEFT)
+	{
+		swordCollider.height = 30;
+		swordCollider.width = 2;
+		swordCollider.offset = glm::vec2(30, 50);
 	}
 }

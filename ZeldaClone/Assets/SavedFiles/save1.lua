@@ -5,7 +5,7 @@
 player_data = {
   [1] = {
     menu_shared_values = {
-      name = "PORTFO",
+      name = "DUSTIN",
       num_hearts = 3,
       blue_ring = false,
       red_ring = false
@@ -20,7 +20,7 @@ player_data = {
       wood_sword = false,
       steel_sword = false,
       magic_sword = false,
-      magic_rod = true,
+      magic_rod = false,
       bombs = false,
       food = false,
       flute = false,

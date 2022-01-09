@@ -1386,15 +1386,15 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					);
 			}
 
-			//// Script Component --> Not used at the moment --> Using c++ State machine --> will try to change to lua state machine
-			//sol::optional<sol::table> script = entity["components"]["on_update_script"];
-			//if (script != sol::nullopt)
-			//{
-			//	//Logger::Log("HERE");
-			//	sol::function func = entity["components"]["on_update_script"][0];
-			//	newEntity.AddComponent<ScriptComponent>(func);
-			//}
-			// 
+			// Script Component --> Not used at the moment --> Using c++ State machine --> will try to change to lua state machine
+			sol::optional<sol::table> script = entity["components"]["on_update_script"];
+			if (script != sol::nullopt)
+			{
+				//Logger::Log("HERE");
+				sol::function func = entity["components"]["on_update_script"][0];
+				newEntity.AddComponent<ScriptComponent>(func);
+			}
+			 
 			// AI Component
 			sol::optional<sol::table> ai = entity["components"]["ai_component"];
 			if (ai != sol::nullopt)
