@@ -53,7 +53,7 @@ public:
 
 	void Update(SDL_Rect& camera)
 	{
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();

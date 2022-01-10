@@ -19,7 +19,7 @@ public:
 	void Update(SDL_Renderer* renderer, SDL_Rect& camera)
 	{
 		auto entities = GetSystemEntities();
-		for (auto entity : entities)
+		for (const auto& entity : entities)
 		{
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& collider = entity.GetComponent<BoxColliderComponent>();

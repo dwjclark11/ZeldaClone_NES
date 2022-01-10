@@ -24,12 +24,12 @@ struct RenderPauseSystem : public System
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
 	{
 		// Loop all entities that the system is interested in
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
-			if (entity.HasTag("bombItem") && GameState::totalBombs == 0)
+	/*		if (entity.HasTag("bombItem") && GameState::totalBombs == 0)
 			{
 				entity.Kill();
-			}
+			}*/
 
 			if (entity.BelongsToGroup("pause") || entity.HasTag("pauseSelector"))
 			{
@@ -68,7 +68,7 @@ struct RenderPauseSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			entity.Kill();
 		}

@@ -158,6 +158,7 @@ bool GameState::OnEnter()
 	
 	if (!firstEntered)
 	{
+		Logger::Err("Loading");
 		LevelLoader loader;
 		
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
@@ -195,6 +196,16 @@ bool GameState::OnEnter()
 				loader.LoadLevelAssets(game.GetAssetManager(), "Level1.txt");
 				loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save3");
 			}
+
+
+			auto player = Registry::Instance()->GetEntityByTag("player");
+			auto& playerHealth = player.GetComponent<HealthComponent>();
+			if (playerHealth.healthPercentage <= 0)
+			{
+				Logger::Log("Restting Health!");
+				playerHealth.healthPercentage = 6;
+			}
+			
 		}
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered

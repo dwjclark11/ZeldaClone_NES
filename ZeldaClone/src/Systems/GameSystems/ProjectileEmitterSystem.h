@@ -117,7 +117,7 @@ public:
 		// If the entity has a sprite --> Position the projectile in the center
 		glm::vec2 projectilePosition = transform.position;
 
-		auto sprite = player.GetComponent<SpriteComponent>();
+		const auto& sprite = player.GetComponent<SpriteComponent>();
 		projectilePosition.x += (transform.scale.x * sprite.width / 2);
 		projectilePosition.y += (transform.scale.y * sprite.height / 2);
 
@@ -313,7 +313,7 @@ public:
 	{
 		auto player = Registry::Instance()->GetEntityByTag("player");
 
-		const auto health = player.GetComponent<HealthComponent>();
+		const auto& health = player.GetComponent<HealthComponent>();
 		auto& sprite = player.GetComponent<SpriteComponent>();
 		sprite.srcRect.y = sprite.height * 6;
 	}
@@ -399,7 +399,7 @@ public:
 	
 	void Update(Registry* registry)
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			// Make the boomerang come back to the player and destroy it when it returns
 			if (entity.BelongsToGroup("boomerang"))

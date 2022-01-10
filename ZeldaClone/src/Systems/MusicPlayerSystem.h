@@ -14,13 +14,11 @@ public:
 		{
 			Logger::Err("Unable to open the Music Mixer!");
 		}
-		//Logger::Log("Music Player Constructor Called");
 	}
 	
 	~MusicPlayerSystem()
 	{
 		Mix_Quit();
-		//Logger::Err("Music Destructor called");
 	}
 	
 	void PlayMusic(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops)

@@ -25,8 +25,8 @@ public:
 
 	void Update(SDL_Renderer* renderer, SDL_Rect& camera)
 	{
-		auto entities = GetSystemEntities();
-		for (auto entity : entities)
+		const auto& entities = GetSystemEntities();
+		for (const auto& entity : entities)
 		{
 			if (entity.HasTag("player"))
 			{
@@ -92,7 +92,7 @@ public:
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			if (!entity.HasTag("player"))
 				entity.Kill();

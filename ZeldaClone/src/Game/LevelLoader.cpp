@@ -1646,6 +1646,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		sol::optional<sol::table> hasComponents = lvlData["components"];
 		if (hasComponents != sol::nullopt)
 		{
+			newLvlObject.AddComponent<GameComponent>();
 			// Transform Component
 			sol::optional<sol::table> transform = lvlData["components"]["transform"];
 			if (transform != sol::nullopt)
@@ -1679,18 +1680,18 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			
 			// !!! This is not working right now!! Causes issues when leaving moving to a new scene !!!
 			
-			//// Add Animation Component
-			//sol::optional<sol::table> animation = lvlData["components"]["animation"];
-			//if (animation != sol::nullopt)
-			//{
-			//	newLvlObject.AddComponent<AnimationComponent>(
-			//		lvlData["components"]["animation"]["num_frames"].get_or(1),
-			//		lvlData["components"]["animation"]["frame_rate"].get_or(1),
-			//		lvlData["components"]["animation"]["vertical"].get_or(false),
-			//		lvlData["components"]["animation"]["looped"].get_or(false),
-			//		lvlData["components"]["animation"]["frame_offset"].get_or(0)
-			//		);
-			//}
+			// Add Animation Component
+			sol::optional<sol::table> animation = lvlData["components"]["animation"];
+			if (animation != sol::nullopt)
+			{
+				newLvlObject.AddComponent<AnimationComponent>(
+					lvlData["components"]["animation"]["num_frames"].get_or(1),
+					lvlData["components"]["animation"]["frame_rate"].get_or(1),
+					lvlData["components"]["animation"]["vertical"].get_or(false),
+					lvlData["components"]["animation"]["looped"].get_or(false),
+					lvlData["components"]["animation"]["frame_offset"].get_or(0)
+					);
+			}
 
 			// Box Collider width, height, glm::vec2 offset 
 			sol::optional<sol::table> box_collider = lvlData["components"]["box_collider"];
@@ -1724,8 +1725,12 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 				auto special = ConvertLuaStringToSpecial(that);
 	
 				newLvlObject.AddComponent<ItemComponent>(type, special);
+			
+				if (special == SpecialItemType::WOOD_SWORD && game.GetGameItems().woodSword)
+				{
+					newLvlObject.Kill();
+				}
 			}
-			newLvlObject.AddComponent<GameComponent>();
 		}
 		i++;
 	}

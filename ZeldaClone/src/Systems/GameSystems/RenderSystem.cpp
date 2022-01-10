@@ -35,7 +35,7 @@ void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>&
 	std::vector<RenderableEntity> renderableEntities;
 
 	// Loop through all of the system entities
-	for (auto entity : GetSystemEntities())
+	for (const auto& entity : GetSystemEntities())
 	{
 		RenderableEntity renderableEntity;
 		renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
@@ -66,10 +66,10 @@ void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>&
 		});
 
 	// Loop all entities that the system is interested in
-	for (auto entity : renderableEntities)
+	for (const auto& entity : renderableEntities)
 	{
-		const auto transform = entity.transformComponent;
-		const auto sprite = entity.spriteComponent;
+		const auto& transform = entity.transformComponent;
+		const auto& sprite = entity.spriteComponent;
 
 		// Set the src Rect of our original sprite texture
 		SDL_Rect srcRect = sprite.srcRect;
@@ -102,8 +102,17 @@ void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>&
 
 void RenderSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
+		if (entity.BelongsToGroup("NPC"))
+		{
+			if (entity.HasComponent<AnimationComponent>())
+				entity.RemoveComponent<AnimationComponent>();
+			
+			entity.Kill();
+			continue;
+		}
+
 		if (!entity.HasComponent<PlayerComponent>()/*HasTag("player") && !entity.HasTag("the_sword") && !entity.HasTag("the_shield")*/)
 		{
 			entity.Kill();

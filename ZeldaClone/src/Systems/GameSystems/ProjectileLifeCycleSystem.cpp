@@ -16,7 +16,7 @@ ProjectileLifeCycleSystem::ProjectileLifeCycleSystem()
 
 void ProjectileLifeCycleSystem::Update()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		auto& projectile = entity.GetComponent<ProjectileComponent>();
 
@@ -27,7 +27,7 @@ void ProjectileLifeCycleSystem::Update()
 			
 		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && entity.BelongsToGroup("bomber"))
 		{
-			Entity explosion = entity.registry->CreateEntity();
+			auto explosion = entity.registry->CreateEntity();
 			explosion.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>().position, glm::vec2(4, 4), 0.0);
 			explosion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 112);
 			explosion.AddComponent<RigidBodyComponent>(glm::vec2(0));

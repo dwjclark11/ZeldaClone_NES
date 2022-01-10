@@ -26,8 +26,8 @@ struct RenderSaveStateSystem : public System
 		// Loop all entities that the system is interested in
 		for (auto entity : GetSystemEntities())
 		{		
-			const auto transform = entity.GetComponent<TransformComponent>();
-			const auto sprite = entity.GetComponent<SpriteComponent>();
+			const auto& transform = entity.GetComponent<TransformComponent>();
+			const auto& sprite = entity.GetComponent<SpriteComponent>();
 
 			// Set the src Rect of our original sprite texture
 			SDL_Rect srcRect = sprite.srcRect;

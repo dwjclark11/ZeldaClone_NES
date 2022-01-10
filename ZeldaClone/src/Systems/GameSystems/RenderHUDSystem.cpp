@@ -24,7 +24,7 @@ RenderHUDSystem::RenderHUDSystem()
 void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
 {
 	// Loop all entities that the system is interested in
-	for (auto entity : GetSystemEntities())
+	for (const auto& entity : GetSystemEntities())
 	{
 		if (!game.GetGameItems().woodSword && entity.HasTag("hudSword"))
 		{
@@ -156,7 +156,7 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 
 void RenderHUDSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		entity.Kill();
 	}

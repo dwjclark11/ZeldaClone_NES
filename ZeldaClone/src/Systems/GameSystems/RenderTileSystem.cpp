@@ -31,7 +31,7 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 	std::vector<RenderableEntity> renderableEntities;
 
 	// Loop through all of the system entities
-	for (auto entity : GetSystemEntities())
+	for (const auto& entity : GetSystemEntities())
 	{
 		if (entity.HasComponent<TileComponent>()) //Add the other groups
 		{
@@ -66,10 +66,10 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 			});
 
 		// Loop all entities that the system is interested in
-		for (auto entity : renderableEntities)
+		for (const auto& entity : renderableEntities)
 		{
-			const auto transform = entity.transformComponent;
-			const auto sprite = entity.spriteComponent;
+			const auto& transform = entity.transformComponent;
+			const auto& sprite = entity.spriteComponent;
 
 			// Set the src Rect of our original sprite texture
 			SDL_Rect srcRect = sprite.srcRect;
@@ -84,7 +84,11 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 			// If the player is dead change the background tile color to red
 			if (game.GetPlayerDead())
+			{
 				SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 0, 0);
+			}
+			else
+				SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 255, 255);
 
 			SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
@@ -105,7 +109,7 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 void RenderTileSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		entity.Kill();
 	}

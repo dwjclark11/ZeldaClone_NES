@@ -1,6 +1,7 @@
 #pragma once
 #include "../../ECS/ECS.h"
 #include "../../Components/TextLabelComponent.h"
+#include "../Components/RegisterNameComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
 
@@ -11,7 +12,8 @@ class RenderNameStateTextSystem : public System
 public:
 	RenderNameStateTextSystem()
 	{
-		RequiredComponent<TextLabelComponent>();
+		//RequiredComponent<TextLabelComponent>();
+		RequiredComponent<RegisterNameComponent>();
 	}
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const SDL_Rect& camera)

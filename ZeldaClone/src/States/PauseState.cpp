@@ -73,8 +73,8 @@ bool PauseState::OnEnter()
 		reg.AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
 
-	if (!firstEnter)
-	{
+	//if (!firstEnter)
+	//{
 		Logger::Log("Entered!");
 		game.GetAssetManager()->AddTextures(game.GetRenderer(), "pause_hud", "./Assets/HUDSprites/pauseHud.png");
 		firstEnter = true;
@@ -186,14 +186,14 @@ bool PauseState::OnEnter()
 			magicalRod.AddComponent<PauseComponent>();
 			magicalRod.Group("pause");
 		}
-	}
+	//}
 	
 	return false;
 }
 
 bool PauseState::OnExit()
 {
-	//reg.GetSystem<RenderPauseSystem>().OnExit();
+	reg.GetSystem<RenderPauseSystem>().OnExit();
 	return true;
 }
 

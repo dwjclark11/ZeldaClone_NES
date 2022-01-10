@@ -24,7 +24,7 @@ public:
 	
 	void Update()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			auto& stateMachine = entity.GetComponent<AIComponent>();
 			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();

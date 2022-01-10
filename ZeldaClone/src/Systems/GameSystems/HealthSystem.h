@@ -24,7 +24,7 @@ public:
 
 	void Update()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			// If the Player is Dead --> Remove the Enemies from the screen
 			if (entity.BelongsToGroup("enemies") && game.GetPlayerDead())

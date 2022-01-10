@@ -39,8 +39,8 @@ public:
 
 	void OnTrigger(CollisionEvent& event)
 	{
-		Entity a = event.a;
-		Entity b = event.b;
+		Entity& a = event.a;
+		Entity& b = event.b;
 
 		// Check to see if the player has activated a trigger
 		if (a.BelongsToGroup("trigger") && b.HasTag("player"))
@@ -54,7 +54,7 @@ public:
 		}
 	}
 
-	void OnEnterTrigger(Entity player, Entity trigger)
+	void OnEnterTrigger(Entity& player, Entity& trigger)
 	{
 		// Get needed componenets from the triger
 		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
@@ -63,19 +63,20 @@ public:
 		// Get the needed componenets from the player
 
 		// Set variables for the files to load assets/tilemaps/enemies/ etc.
-		std::string assetFile = trig.assetFile;
+		std::string& assetFile = trig.assetFile;
 		std::string mapFile = "Assets/Tilemaps/Maps/" + trig.tileMapName + ".map";
 		std::string tileFile = "Assets/Tilemaps/Tiles/" + trig.tileImageName + ".png";
-		std::string entityFile = trig.entityFileName;
-		std::string colliderFile = trig.colliderFile;
-		std::string enemyFile = trig.enemyFile;
-		std::string levelMusic = trig.levelMusic;
-		std::string tileMapName = trig.tileMapName;
-		std::string tileImageName = trig.tileImageName;
-		auto width = trig.imageWidth;
-		auto height = trig.imageHeight;
-		auto camPosX = trig.cameraOffset.x;
-		auto camPosY = trig.cameraOffset.y;
+		std::string& entityFile = trig.entityFileName;
+		std::string& colliderFile = trig.colliderFile;
+		std::string& enemyFile = trig.enemyFile;
+		std::string& levelMusic = trig.levelMusic;
+		std::string& tileMapName = trig.tileMapName;
+		std::string& tileImageName = trig.tileImageName;
+		
+		const auto& width = trig.imageWidth;
+		const auto& height = trig.imageHeight;
+		const auto& camPosX = trig.cameraOffset.x;
+		const auto& camPosY = trig.cameraOffset.y;
 
 
 		Timer loadTimer;
@@ -183,27 +184,21 @@ public:
 		case COLLECT_ITEM:
 		{
 			auto& trig = trigger.GetComponent<TriggerBoxComponent>();
-			// Play the fanfare sound
+			
 			if (!trig.active)
 			{
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, 1);
 				game.GetPlayerItem() = true;
 				trig.active = true;
 			}
-
 			break;
 		}
 		case RETURN_WORLD:
 			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, 1);
 			//transform.position = trig.transportOffset;
-
 			break;
 		default:
-
 			break;
 		}
-
-
 	}
-
 };

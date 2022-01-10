@@ -21,12 +21,12 @@ struct RenderGameOverSystem : public System
 	{
 
 		// Loop all entities that the system is interested in
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 			if (entity.BelongsToGroup("game_over"))
 			{
-				const auto transform = entity.GetComponent<TransformComponent>();
-				const auto sprite = entity.GetComponent<SpriteComponent>();
+				const auto& transform = entity.GetComponent<TransformComponent>();
+				const auto& sprite = entity.GetComponent<SpriteComponent>();
 
 				// Set the src Rect of our original sprite texture
 				SDL_Rect srcRect = sprite.srcRect;
@@ -55,7 +55,7 @@ struct RenderGameOverSystem : public System
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			if (entity.BelongsToGroup("game_over"))
 			{

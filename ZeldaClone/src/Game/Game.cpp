@@ -296,7 +296,7 @@ void Game::FadeScreen()
 	{
 		if (fadeAlpha < 255)
 		{
-			fadeAlpha += 5;
+			fadeAlpha += 15;
 		}
 		else
 		{
@@ -308,7 +308,7 @@ void Game::FadeScreen()
 	{
 		if (fadeAlpha > 0)
 		{
-			fadeAlpha -= 5;
+			fadeAlpha -= 15;
 		}
 		else
 		{

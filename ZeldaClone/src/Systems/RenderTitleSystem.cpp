@@ -12,7 +12,7 @@ void RenderTitleSystem::OnExit()
 
 	for (auto i = entities.begin(); i != entities.end() - 1; i++)
 	{
-		Entity entity = *i;
+		Entity& entity = *i;
 
 		Registry::Instance()->RemoveEntityFromSystems(*i);
 	}

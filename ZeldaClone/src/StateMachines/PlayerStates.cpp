@@ -197,9 +197,9 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	}
 
 	// Set the Triggered Item to the player position - the height of the player
-	if (trigItem && !movedTrigItem)
+	if (trigItem && !movedTrigItem && itemCollected)
 	{
-		auto& special = trigItem->GetComponent<ItemComponent>();
+		const auto& special = trigItem->GetComponent<ItemComponent>();
 		
 		SetSpecialItem(special.special, entity);
 		
@@ -318,13 +318,14 @@ void PlayerDeathState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 			Registry::Instance()->GetSystem<RenderHealthSystem>().OnExit();
 			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(new GameOverState());
-			entity.Kill();
+			pOwner->ChangeState(pOwner->idleState, entity);
 		}
 	}
 }
 
 void PlayerDeathState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
+	entity.Kill();
 	// Animation does not have to return to regular because the entity is destroyed!
 }
 

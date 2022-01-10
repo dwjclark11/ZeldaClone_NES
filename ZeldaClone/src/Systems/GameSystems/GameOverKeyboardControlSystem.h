@@ -64,7 +64,8 @@ public:
 				{
 					if (transform.position.y == 475)
 					{
-						game.GetPlayerNum() = 1;
+						game.GetplayerCreated() = false;
+						game.GetPlayerDead() = false;
 						game.GetStateMachine()->PopState();
 						game.GetStateMachine()->PushState(new GameState());
 					}

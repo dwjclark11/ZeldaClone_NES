@@ -20,13 +20,18 @@ public:
 
 	void Update()
 	{
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 			auto& animation = entity.GetComponent<AnimationComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();
-			const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
+
+//			const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
 			auto health = HealthComponent();
 			auto ai = AIComponent();
+			auto rigidbody = RigidBodyComponent();
+
+			if (entity.HasComponent<RigidBodyComponent>())
+				rigidbody = entity.GetComponent<RigidBodyComponent>();
 
 			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000) % animation.numFrames;
 			

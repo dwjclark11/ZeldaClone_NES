@@ -86,7 +86,7 @@ public:
 	}
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			 entity.Kill();
 		}

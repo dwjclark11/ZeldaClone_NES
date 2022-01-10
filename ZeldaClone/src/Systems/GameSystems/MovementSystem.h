@@ -32,7 +32,7 @@ public:
 	void Update(const double& deltaTime)
 	{
 		// Update entity position based on its velocity
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
