@@ -30,17 +30,18 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 		auto& aTransform = a.GetComponent<TransformComponent>();
 		const auto& aCollider = a.GetComponent<BoxColliderComponent>();
 
+		int checkAX = aTransform.position.x / 1024;
+		int checkAY = aTransform.position.y / 672;
+
+		// Check to see if the collider is in the same panel as the player, if not skip the check
+		if (checkAX != Game::Instance()->GetPlayerPos().x && checkAY != Game::Instance()->GetPlayerPos().y)
+			continue;
+		
 		// Loop all entities that still need to be checked 
 		for (auto j = i; j != entities.end(); j++)
 		{
 			Entity& b = *j;
-			int checkX = aTransform.position.x / 1024;
-			int checkY = aTransform.position.y / 672;
-			
-			// Check to see if the collider is in the same panel as the player, if not skip the check
-			if (checkX != Game::Instance()->GetPlayerPos().x && checkY != Game::Instance()->GetPlayerPos().y)
-				continue;
-			
+
 			// Bypass if we are testing the same entity
 			if (a == b)
 				continue;
@@ -55,7 +56,12 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 
 			auto& bTransform = b.GetComponent<TransformComponent>();
 			const auto& bCollider = b.GetComponent<BoxColliderComponent>();
+			int checkBX = bTransform.position.x / 1024;
+			int checkBY = bTransform.position.y / 672;
 
+			// Check to see if the collider is in the same panel as the player, if not skip the check
+			if (checkBX != Game::Instance()->GetPlayerPos().x && checkBY != Game::Instance()->GetPlayerPos().y)
+				continue;
 			// Perform the AABB collision check between entities a and b
 			bool collisionHappened = CheckAABBCollision(
 				aTransform.position.x + aCollider.offset.x,

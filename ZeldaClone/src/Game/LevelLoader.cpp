@@ -1595,6 +1595,27 @@ SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
 		return SpecialItemType::NOT_SPECIAL;
 }
 
+bool LevelLoader::CheckForItemInInventory(SpecialItemType& type)
+{
+	switch (type)
+	{
+	case SpecialItemType::WOOD_SWORD:
+		if (game.GetGameItems().woodSword)
+			return true;
+		else
+			return false;
+		break;
+	case SpecialItemType::LADDER:
+		if (game.GetGameItems().ladder)
+			return true;
+		else
+			return false;
+		break;
+	default:
+		return false;
+	}
+}
+
 void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/" + filename + ".lua");
@@ -1726,7 +1747,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 	
 				newLvlObject.AddComponent<ItemComponent>(type, special);
 			
-				if (special == SpecialItemType::WOOD_SWORD && game.GetGameItems().woodSword)
+				if (CheckForItemInInventory(special))
 				{
 					newLvlObject.Kill();
 				}

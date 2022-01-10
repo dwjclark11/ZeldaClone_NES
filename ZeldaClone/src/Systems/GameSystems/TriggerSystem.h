@@ -183,7 +183,7 @@ public:
 
 		case COLLECT_ITEM:
 		{
-			auto& trig = trigger.GetComponent<TriggerBoxComponent>();
+			//auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 			
 			if (!trig.active)
 			{

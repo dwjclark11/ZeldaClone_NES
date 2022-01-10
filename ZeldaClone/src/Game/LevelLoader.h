@@ -23,6 +23,16 @@ class LevelLoader
 private:
 	class Game& game;
 	class Registry& reg;
+	// Helper Functions
+	void ConvertName(std::string name, int x, int y);
+	TriggerType ConvertToTriggerType(int triggerType);
+	TriggerType ConvertToTriggerType(std::string triggerType);
+	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
+	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
+	AssetType ConvertToAssetType(std::string& type);
+	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
+	bool CheckForItemInInventory(SpecialItemType& type);
+
 public:
 	LevelLoader();
 	~LevelLoader();
@@ -30,9 +40,9 @@ public:
 	void LoadMap(std::string mapName, int image_width, int image_height);
 	void LoadTilemap(std::string fileName, std::string imageName);
 	void LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, const std::string& fileName);
-	AssetType ConvertToAssetType(std::string& type);
+	//AssetType ConvertToAssetType(std::string& type);
 
-	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
+	//SpecialItemType ConvertLuaStringToSpecial(std::string& special);
 
 	std::string LoadSlotName(unsigned int& slotNum);
 	void SaveSlotData(unsigned int& slotNum);
@@ -57,10 +67,10 @@ public:
 	void EliminatePlayerToDefault(int slotNum, std::string& name);
 
 
-	// Helper Functions
-	void ConvertName(std::string name, int x, int y);
-	TriggerType ConvertToTriggerType(int triggerType);
-	TriggerType ConvertToTriggerType(std::string triggerType);
-	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
-	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
+	//// Helper Functions
+	//void ConvertName(std::string name, int x, int y);
+	//TriggerType ConvertToTriggerType(int triggerType);
+	//TriggerType ConvertToTriggerType(std::string triggerType);
+	//AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
+	//std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 };

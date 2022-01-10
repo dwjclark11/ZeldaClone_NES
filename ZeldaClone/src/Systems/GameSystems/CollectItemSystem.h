@@ -104,7 +104,7 @@ public:
 
 	void Update()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			if (entity.HasComponent<TriggerBoxComponent>())
 			{
