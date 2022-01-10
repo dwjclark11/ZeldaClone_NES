@@ -37,6 +37,7 @@ Some of the desired changes are:
 * Add an animation editor to the tilemap editor that allows the ability to load sprites and change animation speeds on the spot
 * Add enemies to any maps using the editor
 * Add a functional AI state machine with for entities/enemies done in lua
+       ** Currently this is done in C++, Not easy to make small changes!
 * Ability for user to change keys/gamepad controls (Currently Hard Coded)
 
 
