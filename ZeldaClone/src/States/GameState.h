@@ -12,8 +12,11 @@ class GameState : public State
 public:
 	// Statics 
 	static int totalRupees;
+	static int totalPrevRupees;
 	static int totalBombs;
+	static int totalPrevBombs;
 	static int totalKeys;
+	static int totalPrevKeys;
 	static bool firstEntered;
 	static bool unpause;
 	// Constructor

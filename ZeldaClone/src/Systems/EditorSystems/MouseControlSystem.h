@@ -568,5 +568,5 @@ TriggerType MouseControlSystem::triggerType = NO_TRIGGER;
 unsigned MouseControlSystem::triggerNum = 0;
 std::string MouseControlSystem::triggerLevelNum = "";
 
-int MouseControlSystem::CanvasWidth = 992;
-int MouseControlSystem::CanvasHeight = 992;
+int MouseControlSystem::CanvasWidth = 6144;
+int MouseControlSystem::CanvasHeight = 4224;

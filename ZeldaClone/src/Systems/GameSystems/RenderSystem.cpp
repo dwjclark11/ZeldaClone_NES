@@ -113,6 +113,7 @@ void RenderSystem::OnExit()
 			continue;
 		}
 
+		
 		if (!entity.HasComponent<PlayerComponent>()/*HasTag("player") && !entity.HasTag("the_sword") && !entity.HasTag("the_shield")*/)
 		{
 			entity.Kill();

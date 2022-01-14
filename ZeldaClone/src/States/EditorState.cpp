@@ -104,6 +104,12 @@ bool EditorState::OnEnter()
 	if(!reg.HasSystem<RenderEditorLabelSystem>()) reg.AddSystem<RenderEditorLabelSystem>();
 	//reg.AddSystem<AnimationSystem>();
 	
+	auto newMap = reg.CreateEntity();
+	newMap.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4));
+	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "Eagle_Level", "Assets/Backgrounds/Level1.png");
+	newMap.AddComponent<SpriteComponent>("Eagle_Level", 1536, 1056);
+	newMap.AddComponent<EditorComponent>();
+
 	// Assign values to varialbes
 	editor = false;
 	keyDown = false;
@@ -155,6 +161,12 @@ void EditorState::OnKeyDown(SDL_Event* event)
 			editor = !editor;
 		}
 		
+		if (event->key.keysym.sym == SDLK_SPACE)
+		{
+			game.GetCamera().x = 0;
+			game.GetCamera().y = 0;
+		}
+
 		keyDown = true;
 	}
 }

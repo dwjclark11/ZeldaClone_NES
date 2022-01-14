@@ -22,16 +22,22 @@ class NameSelectKeyboardControlSystem : public System
 {
 private:
 	class Game& game;
+	int row;
+	int col;
+
 public:
 
 	unsigned int slot;
-
+	
 	NameSelectKeyboardControlSystem()
 		: game(*Game::Instance())
+		, row(0)
+		, col(0)
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
 		this->slot = 0;
+
 	}
 
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
@@ -55,26 +61,49 @@ public:
 				case SDLK_UP:
 					transform.position.y -= sprite.height * transform.scale.y * 2;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.y < 200) transform.position.y = 584;
+					row--;
+					if (transform.position.y < 200)
+					{
+						transform.position.y = 584;
+						row = 3;
+					}
+					Logger::Log("row: " + std::to_string(row));
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += sprite.height * transform.scale.y * 2;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.y > 584) transform.position.y = 200;
+					row++;
+					if (transform.position.y > 584)
+					{
+						transform.position.y = 200;
+						row = 0;
+					}
+					Logger::Log("row: " + std::to_string(row));
 					break;
 
 				case SDLK_RIGHT:
 					transform.position.x += sprite.width * transform.scale.x;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.x > 708) transform.position.x = 260;
+					col++;
+					if (transform.position.x > 708)
+					{
+						transform.position.x = 260;
+						col = 0;
+					}
+					Logger::Log("col: " + std::to_string(col));
 					break;
 
 				case SDLK_LEFT:
 					transform.position.x -= sprite.width * transform.scale.x;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.x < 260) transform.position.x = 708;
-
+					col--;
+					if (transform.position.x < 260)
+					{
+						transform.position.x = 708;
+						col = 7;
+					}
+					Logger::Log("col: " + std::to_string(col));
 					break;
 				default:
 					break;
@@ -84,139 +113,24 @@ public:
 				{
 
 				case SDLK_SPACE:
-					Logger::Log("Name: " + text.text);
+	
 					if (text.text.size() < 6)
 					{
-						if (transform.position.x == 260 && transform.position.y == 200)
+						bool valid = true;
+						// Make sure that the row and col have a valid letter based on the 
+						// name-letters sprite
+						if (row == 3 && col > 1)
 						{
-							char a = 'A';
-							text.text += a;
+							valid = false;
 						}
-						else if (transform.position.x == 324 && transform.position.y == 200)
-						{
-							char b = 'B';
-							text.text += b;
-						}
-						else if (transform.position.x == 388 && transform.position.y == 200)
-						{
-							char c = 'C';
-							text.text += c;
-						}
-						else if (transform.position.x == 452 && transform.position.y == 200)
-						{
-							char d = 'D';
-							text.text += d;
-						}
-						else if (transform.position.x == 516 && transform.position.y == 200)
-						{
-							char e = 'E';
-							text.text += e;
-						}
-						else if (transform.position.x == 580 && transform.position.y == 200)
-						{
-							char f = 'F';
-							text.text += f;
-						}
-						else if (transform.position.x == 644 && transform.position.y == 200)
-						{
-							char g = 'G';
-							text.text += g;
-						}
-						else if (transform.position.x == 708 && transform.position.y == 200)
-						{
-							char h = 'H';
-							text.text += h;
-						}
-						else if (transform.position.x == 260 && transform.position.y == 328)
-						{
-							char i = 'I';
-							text.text += i;
-						}
-						else if (transform.position.x == 324 && transform.position.y == 328)
-						{
-							char j = 'J';
-							text.text += j;
-						}
-						else if (transform.position.x == 388 && transform.position.y == 328)
-						{
-							char k = 'K';
-							text.text += k;
-						}
-						else if (transform.position.x == 452 && transform.position.y == 328)
-						{
-							char l = 'L';
-							text.text += l;
-						}
-						else if (transform.position.x == 516 && transform.position.y == 328)
-						{
-							char m = 'M';
-							text.text += m;
-						}
-						else if (transform.position.x == 580 && transform.position.y == 328)
-						{
-							char n = 'N';
-							text.text += n;
-						}
-						else if (transform.position.x == 644 && transform.position.y == 328)
-						{
-							char o = 'O';
-							text.text += o;
-						}
-						else if (transform.position.x == 708 && transform.position.y == 328)
-						{
-							char p = 'P';
-							text.text += p;
-						}
-						else if (transform.position.x == 260 && transform.position.y == 456)
-						{
-							char q = 'Q';
-							text.text += q;
-						}
-						else if (transform.position.x == 324 && transform.position.y == 456)
-						{
-							char r = 'R';
-							text.text += r;
-						}
-						else if (transform.position.x == 388 && transform.position.y == 456)
-						{
-							char s = 'S';
-							text.text += s;
-						}
-						else if (transform.position.x == 452 && transform.position.y == 456)
-						{
-							char t = 'T';
-							text.text += t;
-						}
-						else if (transform.position.x == 516 && transform.position.y == 456)
-						{
-							char u = 'U';
-							text.text += u;
-						}
-						else if (transform.position.x == 580 && transform.position.y == 456)
-						{
-							char v = 'V';
-							text.text += v;
-						}
-						if (transform.position.x == 644 && transform.position.y == 456)
-						{
-							char w = 'W';
-							text.text += w;
-						}
-						else if (transform.position.x == 708 && transform.position.y == 456)
-						{
-							char x = 'X';
-							text.text += x;
-						}
-						else if (transform.position.x == 260 && transform.position.y == 584)
-						{
-							char y = 'Y';
-							text.text += y;
-						}
-						else if (transform.position.x == 324 && transform.position.y == 584)
-						{
-							char z = 'Z';
-							text.text += z;
-						}
+
+						// Create a new char based on ASCII Upper characters and the letter position
+						// on the sprite
+						char newChar = (row * 8) + col + 65;
+
+						if (valid)
+							text.text += newChar;
+
 					}
 					if (transform.position.x == 452 && transform.position.y == 584)
 					{
@@ -228,8 +142,9 @@ public:
 						LevelLoader loader;
 						NameState::name = text.text.c_str();
 						
-						Logger::Log("Slot: " + std::to_string(slot));
-						
+						// Reset the column and the row after name is entered
+						row = 0;
+						col = 0;
 						loader.SavePlayerNameToLuaTable(std::to_string(slot), NameState::name);
 						game.GetStateMachine()->PopState();
 						game.GetStateMachine()->PushState(new MenuState());
@@ -252,5 +167,4 @@ public:
 		else if (MenuState::player3Name.size() == 0)
 			slot = 3;
 	}
-
 };

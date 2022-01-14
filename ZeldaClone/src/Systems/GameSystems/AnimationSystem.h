@@ -25,19 +25,23 @@ public:
 			auto& animation = entity.GetComponent<AnimationComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 
-//			const auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
+			
 			auto health = HealthComponent();
 			auto ai = AIComponent();
 			auto rigidbody = RigidBodyComponent();
 
+			// Check to see if the entity has a rigid body component
 			if (entity.HasComponent<RigidBodyComponent>())
 				rigidbody = entity.GetComponent<RigidBodyComponent>();
 
+			// Set the cuurent frame
 			animation.currentFrame = ((SDL_GetTicks() - animation.startTime) * animation.frameSpeedRate / 1000) % animation.numFrames;
 			
+			// Check to see if the entity has a Health Component
 			if (entity.HasComponent<HealthComponent>())
 				health = entity.GetComponent<HealthComponent>();
 
+			// Check for AI component
 			if (entity.HasComponent<AIComponent>())
 			{
 				ai = entity.GetComponent<AIComponent>();

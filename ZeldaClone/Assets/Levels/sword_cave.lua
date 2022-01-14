@@ -3,8 +3,11 @@
 --------------------------------------------------------------------
 
 level = {
+	[1] = {
+		level_item = "wood_sword"
+	},
 	-- FIRE LEFT
-	[1] ={
+	[2] ={
 		group = "NPC",	
 		components = {
 			transform = {
@@ -31,7 +34,7 @@ level = {
 		}
 	},
 	-- FIRE RIGHT
-	[2] ={
+	[3] ={
 		group = "NPC",	
 		components = {
 			transform = {
@@ -58,7 +61,7 @@ level = {
 		}
 	},
 	-- OLD MAN
-	[3] ={
+	[4] ={
 		group = "NPC",	
 		components = {
 			transform = {
@@ -78,7 +81,7 @@ level = {
 		}
 	},
 	-- WOOD SWORD
-	[4] ={
+	[5] ={
 		group = "trigger",	
 		components = {
 			transform = {
@@ -111,4 +114,17 @@ level = {
 			}
 		}
 	},
+	-- Caption
+	[6] ={
+		group = "caption",	
+		components = {
+			caption = {
+				captions = "It's Dangerous to go Alone! Take this",
+				x_pos = 235,
+				y_pos = 135,
+				num_frames = 37,
+			},
+		}
+	},
+
 }

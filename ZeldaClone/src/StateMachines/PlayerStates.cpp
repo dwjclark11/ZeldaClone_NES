@@ -150,7 +150,6 @@ void MoveState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 void CollectItemState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
 	timer.Start();
-	trigItem = nullptr;
 }
 
 void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
@@ -225,7 +224,6 @@ void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	
 	movedTrigItem = false;
-	trigItem = nullptr;
 	itemCollected = false;
 }
 

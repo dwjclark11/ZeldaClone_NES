@@ -9,6 +9,7 @@
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Systems/GameSystems/MovementSystem.h"
 #include "../Systems/RenderTextSystem.h"
+#include "../Systems/GameSystems/CaptionSystem.h"
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/RenderTileSystem.h"
@@ -29,6 +30,7 @@
 #include "../Components/RupeeTypeComponent.h"
 #include "../Components/ItemComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
+#include "../Components/CaptionComponent.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../Events/EventManager.h"
 #include "../Events/TriggerEvent.h"
@@ -37,13 +39,19 @@
 #include "../Utilities/Utility.h"
 
 
+#include <thread>
+
+
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
 bool GameState::firstEntered = false;
 bool GameState::unpause = false;
 int GameState::totalRupees = 0;
+int GameState::totalPrevRupees = 0;
 int GameState::totalBombs = 0;
+int GameState::totalPrevBombs = 0;
 int GameState::totalKeys = 0;
+int GameState::totalPrevKeys = 0;
 
 
 GameState::GameState()
@@ -66,6 +74,7 @@ GameState::GameState(glm::vec2 cameraOffset)
 
 void GameState::Update(const double& deltaTime)
 {
+
 	if (GamePadSystem::paused && game.GetFadeAlpha() == 0)
 	{
 		game.FadeFinished() = true;
@@ -119,9 +128,11 @@ void GameState::Update(const double& deltaTime)
 
 	reg.GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	reg.GetSystem<AISystem>().Update();
+	reg.GetSystem<CaptionSystem>().Update();
 
-	ConvertHUDNumbers();
-
+	if (totalBombs != totalPrevBombs || totalKeys != totalPrevKeys || totalRupees != totalPrevRupees)
+		ConvertHUDNumbers();
+	
 }
 
 void GameState::Render()
@@ -167,8 +178,7 @@ bool GameState::OnEnter()
 			game.GetCamera().x = 7168;
 			game.GetCamera().y = 4416;
 		}
-		
-		
+
 		// Open the lua libraries into the game
 		game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 		Game::isDebug = false;
@@ -226,15 +236,28 @@ bool GameState::OnEnter()
 		if (!reg.HasSystem<GamePadSystem>()) 			reg.AddSystem<GamePadSystem>();
 		if (!reg.HasSystem<ScriptSystem>()) 			reg.AddSystem<ScriptSystem>();
 		if (!reg.HasSystem<AISystem>()) 				reg.AddSystem<AISystem>();
+		if (!reg.HasSystem<CaptionSystem>()) 			reg.AddSystem<CaptionSystem>();
 		// =============================================================================================================================
 
 		game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
 
 		loader.LoadMap("map", 4096, 1344);
+		//game.GetAssetManager()->AddTextures(game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
+		//Entity continue_text = Registry::Instance()->CreateEntity();
+		//continue_text.AddComponent<TransformComponent>(glm::vec2(7615, 5060), glm::vec2(2, 2), 0.0);
+		//continue_text.AddComponent<SpriteComponent>("game_over_words", 0, 16, 5, false, 0, 16);
+		//continue_text.AddComponent<CaptionComponent>(true, 8);
+		//continue_text.AddComponent<GameComponent>();
+
+		//std::string test = "It is dangerous out there";
+
+		//ConvertCaptionParser(test, "test", 7175, 4450);
+		//std::thread CCP(ConvertCaptionParser, test, "test", 7175, 4450);
 
 		firstEntered = true;
 		reg.GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
 	}
+	
 	return true;
 }
 
@@ -280,14 +303,33 @@ void GameState::OnKeyUp(SDL_Event* event)
 
 void GameState::ConvertHUDNumbers()
 {
-	// Convert the total Rupees
-	ConvertNumberParser("rupee_hundreds", totalRupees, 2);
-	ConvertNumberParser("rupee_tens", totalRupees, 1);
-	ConvertNumberParser("rupee_ones", totalRupees, 0);
-	ConvertNumberParser("keys_tens", totalKeys, 1);
-	ConvertNumberParser("key_ones", totalKeys, 0);
-	ConvertNumberParser("bombs_tens", totalBombs, 1);
-	ConvertNumberParser("bombs_ones", totalBombs, 0);
+	
+	if (totalRupees != totalPrevRupees)
+	{
+		ConvertNumberParser("rupee_hundreds", totalRupees, 2);
+		ConvertNumberParser("rupee_tens", totalRupees, 1);
+		ConvertNumberParser("rupee_ones", totalRupees, 0);
+		totalPrevRupees = totalRupees;
+		Logger::Log("Rupee Changed");
+	}
+	
+	if (totalKeys != totalPrevKeys)
+	{
+		ConvertNumberParser("keys_tens", totalKeys, 1);
+		ConvertNumberParser("key_ones", totalKeys, 0);
+		totalPrevKeys = totalKeys;
+		Logger::Log("Key Changed");
+	}
+
+	if (totalBombs != totalPrevBombs)
+	{
+		ConvertNumberParser("bombs_tens", totalBombs, 1);
+		ConvertNumberParser("bombs_ones", totalBombs, 0);
+		totalPrevBombs = totalBombs;
+		Logger::Log("Bomb Changed");
+	}
+
+	
 }
 
 

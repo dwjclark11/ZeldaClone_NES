@@ -5,6 +5,11 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/HUDComponent.h"
+#include "../Components/GameComponent.h"
+#include "../Systems/SoundFXSystem.h"
+#include "../Game/Game.h"
+#include <Windows.h>
+#include "Timer.h"
 
 void ConvertNumberParser(std::string group, int num, int power)
 {
@@ -74,74 +79,11 @@ void ConvertNumberParser(std::string group, int num, int power)
 			
 			// Create a variable entity and have it equal the given tag
 			auto entity = Registry::Instance()->GetEntityByTag(group);
-
-			// After Calulations --> Change the srcRectX location based on outcome
-			switch (temp_num)
+			if (temp_num >= 0 && temp_num <= 9)
 			{
-			case 0: // Zero is the Default value
-				entity.GetComponent<SpriteComponent>().srcRect.x = 0;
+				entity.GetComponent<SpriteComponent>().srcRect.x = 8 * temp_num;
 				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				//std::cout << temp_num << std::endl;
-				break;
-
-			case 1:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 8;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				//std::cout << temp_num << std::endl;
-				break;
-
-			case 2:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 16;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 3:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 24;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 4:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 32;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 5:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 40;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 6:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 48;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 7:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 56;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 8:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 64;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-
-			case 9:
-				entity.GetComponent<SpriteComponent>().srcRect.x = 72;
-				entity.GetComponent<SpriteComponent>().srcRect.y = 0;
-				// std::cout << temp_num << std::endl;
-				break;
-			default:
-				break;
 			}
 		}
 	}
 }
-
-

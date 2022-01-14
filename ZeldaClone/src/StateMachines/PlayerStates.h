@@ -33,7 +33,6 @@ class CollectItemState : public TState<class PlayerStateMachine>
 private:
 	bool itemCollected = false;
 	bool movedTrigItem = false;
-	Entity* trigItem;
 
 public:
 	void OnEnter(PlayerStateMachine* pOwner, Entity& entity) override;

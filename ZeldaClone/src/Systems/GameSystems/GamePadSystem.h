@@ -56,7 +56,7 @@ public:
 	{
 		for (auto entity : GetSystemEntities())
 		{
-			const auto keyboardControl = entity.GetComponent<KeyboardControlComponent>();
+			const auto& keyboardControl = entity.GetComponent<KeyboardControlComponent>();
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 			auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
 			auto& transform = entity.GetComponent<TransformComponent>();

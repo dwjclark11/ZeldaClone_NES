@@ -14,6 +14,7 @@
 #include "../Components/HUDComponent.h"
 #include "../Components/MenuComponent.h"
 #include "../Components/TileComponent.h"
+#include "../Components/CaptionComponent.h"
 #include "../Components/GameComponent.h"
 #include "../Components/ScriptComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
@@ -562,14 +563,15 @@ TriggerType LevelLoader::ConvertToTriggerType(int triggerType)
 	case 7: return HIDDEN_SWITCH; break;
 	case 8: return HIDDEN_OBJECT; break;
 	case 9: return RETURN_WORLD; break;
+	default: break;
 	}
 }
 
-TriggerType LevelLoader::ConvertToTriggerType(std::string triggerType)
-{
-	if (triggerType == "NO_TRIGGER") return NO_TRIGGER;
-	else if (triggerType == "SECRET_AREA") return SECRET_AREA;
-}
+//TriggerType LevelLoader::ConvertToTriggerType(std::string triggerType)
+//{
+//	if (triggerType == "NO_TRIGGER") return NO_TRIGGER;
+//	else if (triggerType == "SECRET_AREA") return SECRET_AREA;
+//}
 
 AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
 {
@@ -1611,6 +1613,24 @@ bool LevelLoader::CheckForItemInInventory(SpecialItemType& type)
 		else
 			return false;
 		break;
+	case SpecialItemType::WOOD_BOOMERANG:
+		if (game.GetGameItems().woodBoomerang)
+			return true;
+		else
+			return false;
+		break;
+	case SpecialItemType::MAGIC_BOOMERANG:
+		if (game.GetGameItems().magicBoomerang)
+			return true;
+		else
+			return false;
+		break;
+	case SpecialItemType::STEEL_SWORD:
+		if (game.GetGameItems().steelSword)
+			return true;
+		else
+			return false;
+		break;
 	default:
 		return false;
 	}
@@ -1646,6 +1666,19 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		}
 
 		sol::table lvlData = data[i];
+
+		// Check to see if the special item has been loaded, if it has break out!
+		sol::optional<std::string> level_item = lvlData["level_item"];
+		if (level_item != sol::nullopt)
+		{
+			std::string item = lvlData["level_item"];
+			SpecialItemType spec = ConvertLuaStringToSpecial(item);
+			if (CheckForItemInInventory(spec))
+			{
+				Logger::Err("Breaking");
+				break;
+			}
+		}
 
 		Entity newLvlObject = reg.CreateEntity();
 
@@ -1752,6 +1785,19 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					newLvlObject.Kill();
 				}
 			}
+
+			// Caption Component
+			sol::optional<sol::table> caption = lvlData["components"]["caption"];
+			if (caption != sol::nullopt)
+			{
+				Logger::Log("Gots Captions");
+				newLvlObject.AddComponent<CaptionComponent>(
+					lvlData["components"]["caption"]["captions"],
+					lvlData["components"]["caption"]["x_pos"].get_or(0),
+					lvlData["components"]["caption"]["y_pos"].get_or(0),
+					lvlData["components"]["caption"]["num_frames"].get_or(1)
+					);
+			}
 		}
 		i++;
 	}
@@ -1779,143 +1825,23 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 		Entity nameEnt = reg.CreateEntity();
 
 		nameEnt.Group(name);
-		nameEnt.AddComponent<SpriteComponent>("name-letters", 16, 16, 0, true, 0, 0);
+		nameEnt.AddComponent<SpriteComponent>("caption_letters", 16, 16, 0, true, 0, 0);
 		nameEnt.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
 		nameEnt.AddComponent<MenuComponent>();
 		
-		switch (letter)
+		/*
+			Created a new sprite that allows me to make the code cleaner
+			Code may have to be adjusted if the sprite changes
+		*/
+
+		// check to see if the char is part of the upper alphabet
+		if (letter >= 65 && letter <= 97)
 		{
-		case 'A':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
+			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16 * (letter - 65);
 			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
 			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'B':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'C':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 32;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'D':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 48;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'E':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 64;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'F':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 80;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'G':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 96;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'H':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 112;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 0;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'I':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
-			break;
-		case 'J':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'K':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 32;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'L':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 48;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'M':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 64;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'N':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 80;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'O':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 96;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'P':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 112;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 32;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'Q':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'R':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'S':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 32;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'T':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 48;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'U':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 64;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'V':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 80;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'W':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 96;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'X':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 112;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 64;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'Y':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 0;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 96;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
-		case 'Z':
-			nameEnt.GetComponent<SpriteComponent>().srcRect.x = 16;
-			nameEnt.GetComponent<SpriteComponent>().srcRect.y = 96;
-			nameEnt.GetComponent<TransformComponent>().position.x += space;
-			break;
 		}
+		// Create a space between the letters
 		space += 24;
 	}
 }

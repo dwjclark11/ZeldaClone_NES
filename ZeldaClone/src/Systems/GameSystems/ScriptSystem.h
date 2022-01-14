@@ -15,7 +15,7 @@ std::tuple<double, double> GetEntityPosition(Entity entity)
 {
 	if (entity.HasComponent<TransformComponent>())
 	{
-		const auto transform = entity.GetComponent<TransformComponent>();
+		const auto& transform = entity.GetComponent<TransformComponent>();
 		return std::make_tuple(transform.position.x, transform.position.y);
 	}
 	else
@@ -29,7 +29,7 @@ std::tuple<double, double> GetEntityVelocity(Entity entity)
 {
 	if (entity.HasComponent<RigidBodyComponent>())
 	{
-		const auto rigidBody = entity.GetComponent<RigidBodyComponent>();
+		const auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
 		return std::make_tuple(rigidBody.velocity.x, rigidBody.velocity.y);
 	}
 	else
@@ -187,7 +187,7 @@ public:
 	void Update(double deltaTime, int elapsedTime)
 	{
 		// Loop all the entities that have a script component and invoke their lua functions
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			const auto script = entity.GetComponent<ScriptComponent>();
 			script.func(entity, deltaTime, elapsedTime); // Here is where we invoke a sol::function

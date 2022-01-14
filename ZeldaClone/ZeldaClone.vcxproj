@@ -450,6 +450,7 @@
     <ClInclude Include="libs\imgui\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\imstb_truetype.h" />
     <ClInclude Include="src\Components\AIComponent.h" />
+    <ClInclude Include="src\Components\CaptionComponent.h" />
     <ClInclude Include="src\Components\ColliderComponent.h" />
     <ClInclude Include="src\Components\EnemyComponent.h" />
     <ClInclude Include="src\Components\PlayerComponent.h" />
@@ -517,6 +518,7 @@
     <ClInclude Include="src\Systems\GameSystems\AISystem.h" />
     <ClInclude Include="src\Systems\GameSystems\AnimationSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\AttackSystem.h" />
+    <ClInclude Include="src\Systems\GameSystems\CaptionSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\CollectItemSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\CollisionSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\DamageSystem.h" />
