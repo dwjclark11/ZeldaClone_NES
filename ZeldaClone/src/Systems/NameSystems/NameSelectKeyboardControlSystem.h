@@ -126,7 +126,7 @@ public:
 
 						// Create a new char based on ASCII Upper characters and the letter position
 						// on the sprite
-						char newChar = (row * 8) + col + 65;
+						char newChar = (row * 8) + col + 65; // 65 is 'A'
 
 						if (valid)
 							text.text += newChar;

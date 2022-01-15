@@ -87,86 +87,89 @@ public:
 
 		case SECRET_AREA:
 		{
-
-			auto _player = Registry::Instance()->GetEntityByTag("player");
-
-			auto& rigidbody = _player.GetComponent<RigidBodyComponent>();
-			auto& sprite = _player.GetComponent<SpriteComponent>();
-
-			// Stop the player movement during the scene transition
-			rigidbody.velocity = glm::vec2(0);
-
-			if (trig.collectedTimer.GetTicks() == 0)
+			if (game.GetStairsFinished())
 			{
-				trig.collectedTimer.Start();
-				Logger::Log("Started Timer");
-			}
-				
+				auto _player = Registry::Instance()->GetEntityByTag("player");
 
-			if (game.GetFadeAlpha() > 0)
-			{
-				game.StartFadeOut() = true;
+				auto& rigidbody = _player.GetComponent<RigidBodyComponent>();
+				auto& sprite = _player.GetComponent<SpriteComponent>();
+
+				// Stop the player movement during the scene transition
+				rigidbody.velocity = glm::vec2(0);
+
+				if (trig.collectedTimer.GetTicks() == 0)
+				{
+					trig.collectedTimer.Start();
+				}
+
+				if (game.GetFadeAlpha() > 0)
+				{
+					game.StartFadeOut() = true;
+				}
+				else
+				{
+					//// Remove all the prior assets/entities from the current scene
+					game.GetSystem<RenderSystem>().OnExit();
+					game.GetSystem<RenderTileSystem>().OnExit();
+					game.GetSystem<RenderCollisionSystem>().OnExit();
+
+					// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
+					if (assetFile != "no_file")
+					{
+						loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
+					}
+
+					if (tileMapName != "no_file" && tileImageName != "no_file")
+					{
+						Logger::Log("Image: " + tileImageName);
+						loader.LoadTilemap(mapFile, tileImageName);
+					}
+
+					if (tileImageName != "no_file" && tileMapName == "no_file")
+					{
+						loader.LoadMap(tileImageName, width, height);
+					}
+
+					// Start the new scene's music || stop the music
+					if (levelMusic != "stop")
+						game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), levelMusic, -1);
+					else
+						game.GetSystem<MusicPlayerSystem>().StopMusic();
+
+					if (entityFile != "no_file")
+					{
+						loader.LoadEntitiesFromLuaTable(game.GetLuaState(), entityFile);
+					}
+
+					// Adjust the camera location to the trigger offset
+					game.GetCamera().x = camPosX;
+					game.GetCamera().y = camPosY;
+
+					if (colliderFile != "no_file")
+						loader.LoadColliders(colliderFile);
+
+					if (enemyFile != "no_file")
+					{
+						loader.LoadEnemiesFromLuaTable(game.GetLuaState(), enemyFile);
+					}
+
+					// Set player Position
+					_player.GetComponent<TransformComponent>().position.x = x;
+					_player.GetComponent<TransformComponent>().position.y = y;
+					game.StartFadeOut() = false;
+					game.StartFadeIn() = true;
+
+					trigger.Kill();
+					game.SetStairsFinished(false);
+					// Set player sprite back to start
+					sprite.srcRect.y = 0;
+				}
 			}
 			else
 			{
-				//// Remove all the prior assets/entities from the current scene
-				game.GetSystem<RenderSystem>().OnExit();
-				game.GetSystem<RenderTileSystem>().OnExit();
-				game.GetSystem<RenderCollisionSystem>().OnExit();
-
-				// Play stairs sound
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, 1);
-
-				// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
-				if (assetFile != "no_file")
-				{
-					loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
-				}
-
-				if (tileMapName != "no_file" && tileImageName != "no_file")
-				{
-					Logger::Log("Image: " + tileImageName);
-					loader.LoadTilemap(mapFile, tileImageName);
-				}
-
-				if (tileImageName != "no_file" && tileMapName == "no_file")
-				{
-					Logger::Log("MAPPERD");
-					loader.LoadMap(tileImageName, width, height);
-				}
-
-				// Start the new scene's music || stop the music
-				if (levelMusic != "stop")
-					game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), levelMusic, -1);
-				else
-					game.GetSystem<MusicPlayerSystem>().StopMusic();
-
-				if (entityFile != "no_file")
-				{
-					loader.LoadEntitiesFromLuaTable(game.GetLuaState(), entityFile);
-				}
-
-				// Adjust the camera location to the trigger offset
-				game.GetCamera().x = camPosX;
-				game.GetCamera().y = camPosY;
-
-				if (colliderFile != "no_file")
-					loader.LoadColliders(colliderFile);
-
-				if (enemyFile != "no_file")
-				{
-					loader.LoadEnemiesFromLuaTable(game.GetLuaState(), enemyFile);
-				}
-
-				// Set player Position
-				_player.GetComponent<TransformComponent>().position.x = x;
-				_player.GetComponent<TransformComponent>().position.y = y;
-				game.StartFadeOut() = false;
-				game.StartFadeIn() = true;
-
-				trigger.Kill();		
+				game.SetPlayerOnStairs(true);
 			}
-			
+
 			break;
 		}
 		case ENTER_DUNGEON:
@@ -183,8 +186,6 @@ public:
 
 		case COLLECT_ITEM:
 		{
-			//auto& trig = trigger.GetComponent<TriggerBoxComponent>();
-			
 			if (!trig.active)
 			{
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, 1);

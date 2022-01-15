@@ -127,7 +127,12 @@ public:
 	inline sol::state& GetLuaState() { return lua; }
 	inline bool& GetPlayerItem() { return playerItem; }
 	inline bool& GetPlayerDead() { return playerDead; }
-	
+	inline bool GetPlayerOnStairs() { return onStairs; }
+	inline void SetPlayerOnStairs(bool stairs) { onStairs = stairs; }
+
+	inline bool GetStairsFinished() { return stairsFinished; }
+	inline void SetStairsFinished(bool finished) { stairsFinished = finished; }
+
 	inline void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
 	inline Uint8 GetFadeAlpha() { return fadeAlpha; }
 	inline const double& GetDeltaTime() const { return deltaTime; }
@@ -148,6 +153,9 @@ private:
 	bool playerCreated;
 	bool playerItem = false;
 	bool playerDead = false;
+
+	bool onStairs = false;
+	bool stairsFinished = false;
 
 	bool startFadeIn = false;
 	bool startFadeOut = false;

@@ -139,12 +139,16 @@ void MoveState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	if (game.GetPlayerItem())
 	{
 		pOwner->ChangeState(pOwner->collectItemState, entity);
+		//pOwner->ChangeState(pOwner->stairState, entity);
 	}
 	
 	// If the player is hurt --> Move to the HurtState
 	if (playerHealth.isHurt)
 		pOwner->ChangeState(pOwner->hurtState, entity);
 	
+	if (game.GetPlayerOnStairs())
+		pOwner->ChangeState(pOwner->stairState, entity);
+
 }
 
 void CollectItemState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
@@ -181,18 +185,18 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	}
 
 	// Loop through the triggers and set the trigItem* to the active triggered item
-	if (!itemCollected)
-	{
+	/*if (!itemCollected)
+	{*/
 		for (auto& trigger : Registry::Instance()->GetEntitiesByGroup("trigger"))
 		{
 			auto& trig = trigger.GetComponent<TriggerBoxComponent>();
-			if (trig.active)
-			{
-				
-				itemCollected = true;
-			}
+			//if (trig.active)
+			//{
+			//	
+			//	itemCollected = true;
+			//}
 
-			if (!movedTrigItem && itemCollected)
+			if (/*!movedTrigItem *//*&& itemCollected*/ /*&&*/ trig.active)
 			{
 				if (trigger.HasComponent<ItemComponent>())
 				{
@@ -206,11 +210,12 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 					transform.position.x = playerTransform.position.x;
 					transform.position.y = playerTransform.position.y - 64;
 					trig.collected = true;
-					movedTrigItem = true;
+					/*movedTrigItem = true;*/
+					trig.active = false;
 					break;
 				}
 			}
-		}
+		//}
 	}
 	
 	// Wait for 1 second  then change back to idle State
@@ -223,8 +228,8 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
 	
-	movedTrigItem = false;
-	itemCollected = false;
+	//movedTrigItem = false;
+	//itemCollected = false;
 }
 
 void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity) 
@@ -279,8 +284,6 @@ void PlayerHurtState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 // Death State
 void PlayerDeathState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
-	// TODO: Start Death timer to run the death animation! 
-	
 	auto& health = entity.GetComponent <HealthComponent> ();
 	auto& animation = entity.GetComponent<AnimationComponent>();
 		
@@ -327,3 +330,39 @@ void PlayerDeathState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 	// Animation does not have to return to regular because the entity is destroyed!
 }
 
+void PlayerStairsState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
+{
+	// Check to see if the timer is already started, if so stop the timer
+	if (timer.isStarted())
+		timer.Stop();
+	
+	steps++;
+
+	timer.Start();
+	
+	// Play the stairs soundFX
+	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
+}
+
+void PlayerStairsState::Execute(PlayerStateMachine* pOwner, Entity& entity)
+{
+	auto& playerSprite = entity.GetComponent<SpriteComponent>();
+	
+	// increment the steps based on time
+	if (timer.GetTicks() >= 300 * steps)
+	{
+		playerSprite.srcRect.x = playerSprite.width * 2;
+		playerSprite.srcRect.y = playerSprite.height * (8 + steps);
+		steps++;
+	}
+
+	if (steps >= 4)
+		pOwner->ChangeState(pOwner->idleState, entity);	
+}
+
+void PlayerStairsState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
+{
+	steps = 0;
+	game.SetPlayerOnStairs(false);
+	game.SetStairsFinished(true);
+}

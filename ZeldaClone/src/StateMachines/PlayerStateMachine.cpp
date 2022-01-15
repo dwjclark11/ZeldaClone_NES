@@ -11,6 +11,7 @@ PlayerStateMachine::PlayerStateMachine()
 	collectItemState 	= new CollectItemState();
 	hurtState 			= new PlayerHurtState();
 	deathState 			= new PlayerDeathState();
+	stairState 			= new PlayerStairsState();
 	
 	TStateMachine<PlayerStateMachine>::Init(this, idleState);
 }

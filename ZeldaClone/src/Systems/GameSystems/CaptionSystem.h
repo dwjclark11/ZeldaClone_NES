@@ -43,7 +43,7 @@ public:
 				}
 
 				// Scoll is based on time
-				if (caption.scrollTimer.GetTicks() >= 250 * caption.currentFrame)
+				if (caption.scrollTimer.GetTicks() >= 200 * caption.currentFrame)
 				{
 					int spaceX = caption.currentFrame * 32; // Change this to not a magic number!   
 					int spaceY = 0;
