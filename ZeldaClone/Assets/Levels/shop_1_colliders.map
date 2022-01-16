@@ -36,4 +36,4 @@ colliders 64 320 4 4 1 0 16 16 0 0
 colliders 64 256 4 4 1 0 16 16 0 0 
 colliders 64 192 4 4 1 0 16 16 0 0 
 colliders 64 128 4 4 1 0 16 16 0 0 
-trigger 448 664 4 4 1 1 32 16 0 0 1 6560 4118 6144 3744 Overworld game_state_assets overworld_enemies colliders no_file map no_file 4096 1344
+trigger 448 600 4 4 1 1 32 16 0 0 1 6560 4118 6144 3744 Overworld game_state_assets overworld_enemies colliders no_file map no_file 4096 1344

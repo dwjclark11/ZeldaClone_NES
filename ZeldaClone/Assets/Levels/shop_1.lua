@@ -168,8 +168,35 @@ level = {
 			},
 		}
 	},
-	-- Caption -- MERCHANT
+	-- RUPEE animation
 	[7] ={
+		--group = "NPC",	
+		components = {
+			transform = {
+				position = { x = 160, y = 360},
+				scale = { x = 4, y = 4},
+				rotation = 0.0
+			},
+			sprite = {
+				assetID = "hearts",
+				width = 16,
+				height = 16,
+				layer = 4,
+				fixed = false,
+				src_rect_x = 48, 
+				src_rect_y = 0 
+			}, 
+			animation = {
+				num_frames = 2,
+				frame_rate = 10,
+				vertical = false, 
+				looped = true, 
+				frame_offset = 48
+			}
+		}
+	},
+	-- Caption -- MERCHANT
+	[8] ={
 		group = "caption",	
 		components = {
 			caption = {
@@ -181,12 +208,13 @@ level = {
 		}
 	},
 	-- Caption -- SHIELD PRICE
-	[8] ={
+	[9] ={
 		group = "caption",	
 		components = {
 			caption = {
 				captions = "no_caption",
 				scrollable = false,
+				numbers = true,
 				x_pos = 284,
 				y_pos = 400,
 				num_frames = 3,
@@ -197,12 +225,13 @@ level = {
 		}
 	},
 	-- Caption -- BOMB PRICE
-	[9] ={
+	[10] ={
 		group = "caption",	
 		components = {
 			caption = {
 				captions = "no_caption",
 				scrollable = false,
+				numbers = true,
 				x_pos = 480,
 				y_pos = 400,
 				num_frames = 3,
@@ -213,18 +242,33 @@ level = {
 		}
 	},
 	-- Caption -- ARROW PRICE
-	[10] ={
+	[11] ={
 		group = "caption",	
 		components = {
 			caption = {
 				captions = "no_caption",
 				scrollable = false,
+				numbers = true,
 				x_pos = 660,
 				y_pos = 400,
 				num_frames = 3,
 				ones = 0,
 				tens = 8, 
 				hundreds = 0
+			},
+		}
+	},
+	-- Caption -- X
+	[12] ={
+		group = "caption",	
+		components = {
+			caption = {
+				captions = "X",
+				scrollable = false,
+				numbers = false,
+				x_pos = 212,
+				y_pos = 400,
+				num_frames = 1,
 			},
 		}
 	},

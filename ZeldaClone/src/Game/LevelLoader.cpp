@@ -1796,6 +1796,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 				newLvlObject.AddComponent<CaptionComponent>(
 					lvlData["components"]["caption"]["captions"],
 					lvlData["components"]["caption"]["scrollable"].get_or(true),
+					lvlData["components"]["caption"]["numbers"].get_or(false),
 					lvlData["components"]["caption"]["x_pos"].get_or(0),
 					lvlData["components"]["caption"]["y_pos"].get_or(0),
 					lvlData["components"]["caption"]["num_frames"].get_or(1),

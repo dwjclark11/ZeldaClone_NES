@@ -10,7 +10,7 @@ struct CaptionComponent
 	bool finished;
 	int xPos;
 	int yPos;
-	//bool firstRow;
+	bool numbers;
 	int numFrames;
 	int currentFrame;
 	int ones;
@@ -19,7 +19,7 @@ struct CaptionComponent
 
 	Timer scrollTimer;
 
-	CaptionComponent(std::string caption = "no_caption", bool scrollable = true, int xPos = 0, int yPos = 0, int numFrames = 1, int ones = 0, int tens = 0, int hundreds = 0)
+	CaptionComponent(std::string caption = "no_caption", bool scrollable = true, bool numbers = false, int xPos = 0, int yPos = 0, int numFrames = 1, int ones = 0, int tens = 0, int hundreds = 0)
 	{
 		this->caption = caption;
 		this->scrollable = scrollable;
@@ -27,7 +27,7 @@ struct CaptionComponent
 		this->started = false;
 		this->xPos = xPos;
 		this->yPos = yPos;
-		//this->firstRow = firstRow;
+		this->numbers = numbers;
 		this->numFrames = numFrames;
 		this->currentFrame = 0;
 		this->ones = ones;
