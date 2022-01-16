@@ -194,7 +194,7 @@ public:
 			}
 			break;
 		}
-		case RETURN_WORLD:
+		case SHOP_ITEM:
 			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, 1);
 			//transform.position = trig.transportOffset;
 			break;

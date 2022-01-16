@@ -26,43 +26,34 @@ struct RenderPauseSystem : public System
 		// Loop all entities that the system is interested in
 		for (auto& entity : GetSystemEntities())
 		{
-	/*		if (entity.HasTag("bombItem") && GameState::totalBombs == 0)
-			{
-				entity.Kill();
-			}*/
+			const auto& transform = entity.GetComponent<TransformComponent>();
+			const auto& sprite = entity.GetComponent<SpriteComponent>();
 
-			if (entity.BelongsToGroup("pause") || entity.HasTag("pauseSelector"))
-			{
-				const auto& transform = entity.GetComponent<TransformComponent>();
-				const auto& sprite = entity.GetComponent<SpriteComponent>();
+			// Set the src Rect of our original sprite texture
+			SDL_Rect srcRect = sprite.srcRect;
 
-				// Set the src Rect of our original sprite texture
-				SDL_Rect srcRect = sprite.srcRect;
+			// Set the destination rect with the x, y position to be rendered
+			SDL_Rect dstRect = {
+				static_cast<int>(transform.position.x),
+				static_cast<int>(transform.position.y),
+				static_cast<int>(sprite.width * transform.scale.x),
+				static_cast<int>(sprite.height * transform.scale.y)
+			};
+			Game::Instance()->FadeScreen();
 
-				// Set the destination rect with the x, y position to be rendered
-				SDL_Rect dstRect = {
-					static_cast<int>(transform.position.x),
-					static_cast<int>(transform.position.y),
-					static_cast<int>(sprite.width * transform.scale.x),
-					static_cast<int>(sprite.height * transform.scale.y)
-				};
-				Game::Instance()->FadeScreen();
+			SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
+			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
+			SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
 
-				SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
-				SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-				SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
-
-				SDL_RenderCopyEx(
-					renderer,
-					//assetManager->GetTexture(sprite.assetID),
-					tex,
-					&srcRect,
-					&dstRect,
-					transform.rotation,
-					NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
-					sprite.flip				// This is if we want to flup a sprite
-				);
-			}
+			SDL_RenderCopyEx(
+				renderer,
+				tex,
+				&srcRect,
+				&dstRect,
+				transform.rotation,
+				NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
+				sprite.flip				// This is if we want to flup a sprite
+			);
 		}		
 	}
 

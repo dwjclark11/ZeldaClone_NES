@@ -152,7 +152,6 @@ void GameState::Render()
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 	
 	game.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-/*	game.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera())*/;
 
 	reg.GetSystem<HealthSystem>().Update();
 	game.GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
@@ -193,30 +192,18 @@ bool GameState::OnEnter()
 			loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
 			game.GetplayerCreated() = true;
 
-			if (game.GetPlayerNum() == 1)
-			{
-				loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save1");
-			}
-			else if (game.GetPlayerNum() == 2)
-			{
-				loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save2");
-			}
-			else if (game.GetPlayerNum() == 3)
-			{
-				loader.LoadLevelAssets(game.GetAssetManager(), "Level1.txt");
-				loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save3");
-			}
-
+			// Load the player file based on the selected slot
+			loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + game.GetPlayerNum());
 
 			auto player = Registry::Instance()->GetEntityByTag("player");
 			auto& playerHealth = player.GetComponent<HealthComponent>();
 			if (playerHealth.healthPercentage <= 0)
 			{
-				Logger::Log("Restting Health!");
 				playerHealth.healthPercentage = 6;
 			}
 			
 		}
+
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
 		// =============================================================================================================================
@@ -241,18 +228,8 @@ bool GameState::OnEnter()
 
 		game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
 
+		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
-		//game.GetAssetManager()->AddTextures(game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
-		//Entity continue_text = Registry::Instance()->CreateEntity();
-		//continue_text.AddComponent<TransformComponent>(glm::vec2(7615, 5060), glm::vec2(2, 2), 0.0);
-		//continue_text.AddComponent<SpriteComponent>("game_over_words", 0, 16, 5, false, 0, 16);
-		//continue_text.AddComponent<CaptionComponent>(true, 8);
-		//continue_text.AddComponent<GameComponent>();
-
-		//std::string test = "It is dangerous out there";
-
-		//ConvertCaptionParser(test, "test", 7175, 4450);
-		//std::thread CCP(ConvertCaptionParser, test, "test", 7175, 4450);
 
 		firstEntered = true;
 		reg.GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
@@ -266,7 +243,6 @@ bool GameState::OnExit()
 	game.GetSystem<RenderCollisionSystem>().OnExit();
 	game.GetSystem<RenderSystem>().OnExit();
 	game.GetSystem<RenderTileSystem>().OnExit();
-	//game.GetSystem<RenderTextSystem>().OnExit();
 	firstEntered = false;
 	return true;
 }
@@ -290,14 +266,12 @@ void GameState::OnKeyDown(SDL_Event* event)
 		game.StartFadeOut() = true;
 		game.StartFadeIn() = false;
 		GamePadSystem::paused = true;
-		
 	}
 }
 
 void GameState::OnKeyUp(SDL_Event* event)
 {
 	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
-	//game.GetEventManager()->Reset();
 	KeyboardControlSystem::keyDown = false;
 }
 
@@ -310,7 +284,6 @@ void GameState::ConvertHUDNumbers()
 		ConvertNumberParser("rupee_tens", totalRupees, 1);
 		ConvertNumberParser("rupee_ones", totalRupees, 0);
 		totalPrevRupees = totalRupees;
-		Logger::Log("Rupee Changed");
 	}
 	
 	if (totalKeys != totalPrevKeys)
@@ -318,7 +291,6 @@ void GameState::ConvertHUDNumbers()
 		ConvertNumberParser("keys_tens", totalKeys, 1);
 		ConvertNumberParser("key_ones", totalKeys, 0);
 		totalPrevKeys = totalKeys;
-		Logger::Log("Key Changed");
 	}
 
 	if (totalBombs != totalPrevBombs)
@@ -326,10 +298,7 @@ void GameState::ConvertHUDNumbers()
 		ConvertNumberParser("bombs_tens", totalBombs, 1);
 		ConvertNumberParser("bombs_ones", totalBombs, 0);
 		totalPrevBombs = totalBombs;
-		Logger::Log("Bomb Changed");
 	}
-
-	
 }
 
 

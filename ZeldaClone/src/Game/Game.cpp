@@ -285,6 +285,14 @@ SDL_Event& Game::GetEvent()
 	return sdlEvent;
 }
 
+bool Game::PlayerHold()
+{
+	if (playerDead || onStairs || playerItem)
+		return true;
+	else
+		return false;
+}
+
 bool& Game::GetAttack()
 {
 	return attack;

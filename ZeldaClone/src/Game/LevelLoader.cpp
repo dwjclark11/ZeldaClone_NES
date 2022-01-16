@@ -538,6 +538,7 @@ void LevelLoader::LoadColliders(const std::string& filename)
 		}
 		if (collider && trigger)
 		{
+			Logger::Log("Trigger Created");
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y),
 				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerEntityFile, triggerImageHeight, triggerImageWidth);
@@ -562,7 +563,7 @@ TriggerType LevelLoader::ConvertToTriggerType(int triggerType)
 	case 6: return TRAP; break;
 	case 7: return HIDDEN_SWITCH; break;
 	case 8: return HIDDEN_OBJECT; break;
-	case 9: return RETURN_WORLD; break;
+	case 9: return SHOP_ITEM; break;
 	default: break;
 	}
 }
@@ -1669,10 +1670,12 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 
 		// Check to see if the special item has been loaded, if it has break out!
 		sol::optional<std::string> level_item = lvlData["level_item"];
+
 		if (level_item != sol::nullopt)
 		{
 			std::string item = lvlData["level_item"];
 			SpecialItemType spec = ConvertLuaStringToSpecial(item);
+
 			if (CheckForItemInInventory(spec))
 			{
 				Logger::Err("Breaking");
@@ -1790,12 +1793,15 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			sol::optional<sol::table> caption = lvlData["components"]["caption"];
 			if (caption != sol::nullopt)
 			{
-				Logger::Log("Gots Captions");
 				newLvlObject.AddComponent<CaptionComponent>(
 					lvlData["components"]["caption"]["captions"],
+					lvlData["components"]["caption"]["scrollable"].get_or(true),
 					lvlData["components"]["caption"]["x_pos"].get_or(0),
 					lvlData["components"]["caption"]["y_pos"].get_or(0),
-					lvlData["components"]["caption"]["num_frames"].get_or(1)
+					lvlData["components"]["caption"]["num_frames"].get_or(1),
+					lvlData["components"]["caption"]["ones"].get_or(0),
+					lvlData["components"]["caption"]["tens"].get_or(0),
+					lvlData["components"]["caption"]["hundreds"].get_or(0)
 					);
 			}
 		}

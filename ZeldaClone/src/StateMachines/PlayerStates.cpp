@@ -109,7 +109,7 @@ void AttackState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 
 void MoveState::OnEnter(PlayerStateMachine* pOwner, Entity& entity)
 {
-	//Logger::Log("Enter Move State");
+	
 }
 
 void MoveState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
@@ -119,10 +119,15 @@ void MoveState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 
 void MoveState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 {
+	
 	glm::vec2 playerSpeed = glm::vec2(0);
 	auto player = entity;// Registry::Instance()->GetEntityByTag("player");
 	
 	auto& playerHealth = player.GetComponent<HealthComponent>();
+	auto& playerTransform = player.GetComponent<TransformComponent>();
+
+	//Logger::Log("X: " + std::to_string(playerTransform.position.x) + ", Y: " + std::to_string(playerTransform.position.y));
+	//Logger::Log("X: " + std::to_string(game.GetPlayerPos().x) + ", Y: " + std::to_string(game.GetPlayerPos().y));
 	
 	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
 	{
@@ -227,7 +232,6 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 
 void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
-	
 	//movedTrigItem = false;
 	//itemCollected = false;
 }

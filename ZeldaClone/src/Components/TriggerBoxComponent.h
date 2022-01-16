@@ -13,7 +13,7 @@ enum TriggerType
 	TRAP = 6,
 	HIDDEN_SWITCH = 7,
 	HIDDEN_OBJECT = 8,
-	RETURN_WORLD = 9
+	SHOP_ITEM = 9
 };
 
 struct TriggerBoxComponent

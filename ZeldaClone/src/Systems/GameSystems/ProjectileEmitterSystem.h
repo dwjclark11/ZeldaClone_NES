@@ -320,79 +320,82 @@ public:
 	
 	void OnKeyPressed(KeyPressedEvent& event)
 	{
-		if (event.symbol == SDLK_SPACE && !KeyboardControlSystem::keyDown)
+		if (!game.PlayerHold())
 		{
-			if (ItemSelectKeyboardControlSystem::itemType == WOOD_BOW || ItemSelectKeyboardControlSystem::itemType == MAGIC_BOW)
+			if (event.symbol == SDLK_SPACE && !KeyboardControlSystem::keyDown)
 			{
-				ItemAttrib bow("projectile", "items", 16, 16, 0, 64, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
-					glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
-				
-				UseItem(bow);
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
-				KeyboardControlSystem::keyDown = true;
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == BOMB)
-			{
-				ItemAttrib bomb("bomber", "items", 16, 16, 64, 112, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
-					glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
-				
-				UseItem(bomb);
-				GameState::totalBombs--;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
-				KeyboardControlSystem::keyDown = true;
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == CANDLE)
-			{
-				ItemAttrib candle("projectile", "items", 16, 16, 0, 96, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
-					glm::vec2(16, 16), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 500, false, false);
-				
-				UseItem(candle);
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
-				KeyboardControlSystem::keyDown = true;
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == BOOMERANG)
-			{
-				if (!boomerangReturned/* && !playerSet*/)
+				if (ItemSelectKeyboardControlSystem::itemType == WOOD_BOW || ItemSelectKeyboardControlSystem::itemType == MAGIC_BOW)
 				{
-					ItemAttrib boomerang("boomerang", "items", 16, 16, 0, 112, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(-40, -40),
-						glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(10, 10), glm::vec2(10, 10), glm::vec2(20, 20), glm::vec2(18, 18), 3000, true, false);
-					
-					UseItem(boomerang);
+					ItemAttrib bow("projectile", "items", 16, 16, 0, 64, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
+						glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
+
+					UseItem(bow);
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					KeyboardControlSystem::keyDown = true;
 				}
-			}
-			else if (ItemSelectKeyboardControlSystem::itemType == MAGIC_ROD)
-			{
-				ItemAttrib beam("projectile", "items", 16, 16, 64, 96, 4, glm::vec2(4, 4), glm::vec2(0, 60), glm::vec2(30, 60), glm::vec2(30, 60), glm::vec2(30, 60),
-					glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 2000, false, false);
-				
-				UseMagicWand();
-				UseItem(beam);
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
-				KeyboardControlSystem::keyDown = true;
-			}
-		}
-		else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
-		{
-			// Do not use the sword if we do not have a sword
-			if (game.HasSword()) 
-			{
-				UseSword();
-				// If the player life is full, allow sword beam projectile
-				if (fullLife)
+				else if (ItemSelectKeyboardControlSystem::itemType == BOMB)
 				{
-					// Create Sword beam projectile
-					ItemAttrib beam("beam", "Sword", 32, 32, 0, 0, 4, glm::vec2(4, 4), glm::vec2(0, 45), glm::vec2(0, 25), glm::vec2(15, 20), glm::vec2(65, 20), glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(56, 30), 
-						glm::vec2(56, 40), glm::vec2(30, 60), glm::vec2(10, 60), 1000, true, true);
-					UseItem(beam);
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
-				}
-				else
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
+					ItemAttrib bomb("bomber", "items", 16, 16, 64, 112, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
+						glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
 
-				swordTimer.Start();
-				KeyboardControlSystem::keyDown = true;
+					UseItem(bomb);
+					GameState::totalBombs--;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					KeyboardControlSystem::keyDown = true;
+				}
+				else if (ItemSelectKeyboardControlSystem::itemType == CANDLE)
+				{
+					ItemAttrib candle("projectile", "items", 16, 16, 0, 96, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
+						glm::vec2(16, 16), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 500, false, false);
+
+					UseItem(candle);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
+					KeyboardControlSystem::keyDown = true;
+				}
+				else if (ItemSelectKeyboardControlSystem::itemType == BOOMERANG)
+				{
+					if (!boomerangReturned/* && !playerSet*/)
+					{
+						ItemAttrib boomerang("boomerang", "items", 16, 16, 0, 112, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(-40, -40),
+							glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(10, 10), glm::vec2(10, 10), glm::vec2(20, 20), glm::vec2(18, 18), 3000, true, false);
+
+						UseItem(boomerang);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+						KeyboardControlSystem::keyDown = true;
+					}
+				}
+				else if (ItemSelectKeyboardControlSystem::itemType == MAGIC_ROD)
+				{
+					ItemAttrib beam("projectile", "items", 16, 16, 64, 96, 4, glm::vec2(4, 4), glm::vec2(0, 60), glm::vec2(30, 60), glm::vec2(30, 60), glm::vec2(30, 60),
+						glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 2000, false, false);
+
+					UseMagicWand();
+					UseItem(beam);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
+					KeyboardControlSystem::keyDown = true;
+				}
+			}
+			else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
+			{
+				// Do not use the sword if we do not have a sword
+				if (game.HasSword())
+				{
+					UseSword();
+					// If the player life is full, allow sword beam projectile
+					if (fullLife)
+					{
+						// Create Sword beam projectile
+						ItemAttrib beam("beam", "Sword", 32, 32, 0, 0, 4, glm::vec2(4, 4), glm::vec2(0, 45), glm::vec2(0, 25), glm::vec2(15, 20), glm::vec2(65, 20), glm::vec2(10, 40), glm::vec2(10, 40), glm::vec2(40, 10), glm::vec2(40, 10), glm::vec2(56, 30),
+							glm::vec2(56, 40), glm::vec2(30, 60), glm::vec2(10, 60), 1000, true, true);
+						UseItem(beam);
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
+					}
+					else
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
+
+					swordTimer.Start();
+					KeyboardControlSystem::keyDown = true;
+				}
 			}
 		}
 	}

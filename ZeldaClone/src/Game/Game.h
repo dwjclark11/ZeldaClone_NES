@@ -101,6 +101,9 @@ public:
 		
 		return false;
 	}
+	
+	bool PlayerHold();
+	
 	bool& GetAttack();
 	inline bool& IsRunning() { return mIsRunning; }
 	inline bool& GetCameraMoving(){ return cameraMoving;}

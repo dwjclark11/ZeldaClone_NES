@@ -58,7 +58,7 @@ public:
 	// Callback function
 	void OnKeyPressed(KeyPressedEvent& event)
 	{
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 			auto& sprite = entity.GetComponent<SpriteComponent>();
 			auto& transform = entity.GetComponent<TransformComponent>();

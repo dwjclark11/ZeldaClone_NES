@@ -5,7 +5,7 @@ ItemType ItemSelectKeyboardControlSystem::itemType = EMPTY;
 
 void ItemSelectKeyboardControlSystem::Update()
 {
-	for (auto entity : GetSystemEntities())
+	for (const auto& entity : GetSystemEntities())
 	{
 		auto& sprite = entity.GetComponent<SpriteComponent>();
 		auto& transform = entity.GetComponent<TransformComponent>();
