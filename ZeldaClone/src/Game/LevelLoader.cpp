@@ -538,7 +538,6 @@ void LevelLoader::LoadColliders(const std::string& filename)
 		}
 		if (collider && trigger)
 		{
-			Logger::Log("Trigger Created");
 			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y),
 				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerEntityFile, triggerImageHeight, triggerImageWidth);
@@ -567,12 +566,6 @@ TriggerType LevelLoader::ConvertToTriggerType(int triggerType)
 	default: break;
 	}
 }
-
-//TriggerType LevelLoader::ConvertToTriggerType(std::string triggerType)
-//{
-//	if (triggerType == "NO_TRIGGER") return NO_TRIGGER;
-//	else if (triggerType == "SECRET_AREA") return SECRET_AREA;
-//}
 
 AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
 {
@@ -1252,7 +1245,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 			GameState::totalKeys 				= player["inventory"]["num_keys"].get_or(0);
 		}
 		i++;
-		Logger::Log("Player Loaded");
+		Logger::Log("Player Loaded Today");
 	}
 }
 
@@ -1569,7 +1562,17 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 		i++;
 	}
 }
-
+ItemCollectType LevelLoader::ConvertLuaStringToItem(std::string& type)
+{
+	if (type == "default")
+		return ItemCollectType::DEFAULT;
+	else if (type == "bombs")
+		return ItemCollectType::BOMBS;
+	else if (type == "heart")
+		return ItemCollectType::HEARTS;
+	else
+		return ItemCollectType::DEFAULT;
+}
 SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
 {
 	if (special == "none")
@@ -1594,6 +1597,8 @@ SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
 		return SpecialItemType::MAGIC_BOOMERANG;
 	else if (special == "ladder")
 		return SpecialItemType::LADDER;
+	else if (special == "arrows")
+		return SpecialItemType::ARROWS;
 	else
 		return SpecialItemType::NOT_SPECIAL;
 }
@@ -1777,9 +1782,10 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			sol::optional<sol::table> item_comp = lvlData["components"]["item"];
 			if (item_comp != sol::nullopt)
 			{
-				std::string that = lvlData["components"]["item"]["special"];
-				auto type = ItemCollectType::DEFAULT;
-				auto special = ConvertLuaStringToSpecial(that);
+				std::string specialType = lvlData["components"]["item"]["special"];
+				std::string itemType = lvlData["components"]["item"]["item_type"];
+				auto type = ConvertLuaStringToItem(itemType);
+				auto special = ConvertLuaStringToSpecial(specialType);
 	
 				newLvlObject.AddComponent<ItemComponent>(
 					type,

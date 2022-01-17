@@ -35,6 +35,8 @@ public:
 		: game(*Game::Instance()), reg(*Registry::Instance())
 	{
 		RequiredComponent<BoxColliderComponent>();
+		RequiredComponent<TriggerBoxComponent>();
+
 		yellowCollected = false;
 		blueCollected = false;
 	}
@@ -62,15 +64,11 @@ public:
 			if (type.type == YELLOW)
 			{
 				GameState::scrollRupees += 1;
-				//game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
-				// reg.RemoveEntityFromSystems(item);
 				item.Kill();
 			}
 			if (type.type == BLUE)
 			{
 				GameState::scrollRupees += 5;
-				//game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
-				//reg.RemoveEntityFromSystems(item);
 				item.Kill();
 			}
 		}
@@ -83,7 +81,6 @@ public:
 			{
 				GameState::totalBombs += 3;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
-				//reg.RemoveEntityFromSystems(item);
 				item.Kill();
 			}
 			else if (type.type == HEARTS)
@@ -96,7 +93,6 @@ public:
 					health.healthPercentage = health.maxHearts * 2;
 				
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
-				//reg.RemoveEntityFromSystems(item);
 				item.Kill();
 			}
 		}
@@ -106,18 +102,20 @@ public:
 	{
 		for (auto& entity : GetSystemEntities())
 		{
-			if (entity.HasComponent<TriggerBoxComponent>())
-			{
+		/*	if (entity.HasComponent<TriggerBoxComponent>())
+			{*/
 				auto& trigger = entity.GetComponent<TriggerBoxComponent>();
 				if (trigger.collected && trigger.collectedTimer.GetTicks() > 2000)
 				{
 					Logger::Log("Killed");
 					entity.Kill();
 				}
+				else
+					continue;
 					
-			}
+	/*		}
 			else
-				continue;
+				continue;*/
 		}
 	}
 };

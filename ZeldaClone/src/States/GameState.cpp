@@ -38,10 +38,6 @@
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Utilities/Utility.h"
 
-
-#include <thread>
-
-
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
 bool GameState::firstEntered = false;
@@ -55,16 +51,12 @@ int GameState::totalPrevBombs = 0;
 int GameState::totalKeys = 0;
 int GameState::totalPrevKeys = 0;
 
-
 GameState::GameState()
 	: game(*Game::Instance()), reg(*Registry::Instance()), cameraOffset(glm::vec2(0)), index(0)
 {
 }
 
-GameState::~GameState()
-{
-	
-}
+GameState::~GameState() {}
 
 GameState::GameState(glm::vec2 cameraOffset)
 	: GameState()
@@ -171,12 +163,10 @@ void GameState::Render()
 
 bool GameState::OnEnter()
 {
-	
+	LevelLoader loader;
+
 	if (!firstEntered)
 	{
-		Logger::Err("Loading");
-		LevelLoader loader;
-		
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
 		if (game.GetCamera().x != 7168 && game.GetCamera().x != 4416)
 		{
@@ -186,29 +176,13 @@ bool GameState::OnEnter()
 
 		// Open the lua libraries into the game
 		game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
+		
+		// Make sure the game is not in debug mode!!
 		Game::isDebug = false;
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
 		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
 		loader.LoadColliders("colliders");
-		
-		// Player is now created from a Lua script instead of Hard Coded
-		if (!game.GetplayerCreated())
-		{
-			loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
-			game.GetplayerCreated() = true;
-
-			// Load the player file based on the selected slot
-			loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()));
-
-			auto player = Registry::Instance()->GetEntityByTag("player");
-			auto& playerHealth = player.GetComponent<HealthComponent>();
-			if (playerHealth.healthPercentage <= 0)
-			{
-				playerHealth.healthPercentage = 6;
-			}
-			
-		}
 
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
@@ -240,7 +214,23 @@ bool GameState::OnEnter()
 		firstEntered = true;
 		reg.GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
 	}
-	
+
+	if (!game.GetplayerCreated())
+	{
+		loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
+		// Load the player file based on the selected slot
+		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()));
+
+		auto player = Registry::Instance()->GetEntityByTag("player");
+		// Reset the player health after pressing continue [Game Over]
+		auto& playerHealth = player.GetComponent<HealthComponent>();
+		if (playerHealth.healthPercentage <= 0)
+		{
+			playerHealth.healthPercentage = 6;
+		}
+		ConvertHUDNumbers();
+		game.GetplayerCreated() = true;
+	}
 	return true;
 }
 
@@ -283,8 +273,7 @@ void GameState::OnKeyUp(SDL_Event* event)
 
 void GameState::ConvertHUDNumbers()
 {
-	
-	if (totalRupees != totalPrevRupees)
+	if (totalRupees != totalPrevRupees || !game.GetplayerCreated())
 	{
 		ConvertNumberParser("rupee_hundreds", totalRupees, 2);
 		ConvertNumberParser("rupee_tens", totalRupees, 1);
@@ -292,14 +281,14 @@ void GameState::ConvertHUDNumbers()
 		totalPrevRupees = totalRupees;
 	}
 	
-	if (totalKeys != totalPrevKeys)
+	if (totalKeys != totalPrevKeys || !game.GetplayerCreated())
 	{
 		ConvertNumberParser("keys_tens", totalKeys, 1);
 		ConvertNumberParser("key_ones", totalKeys, 0);
 		totalPrevKeys = totalKeys;
 	}
 
-	if (totalBombs != totalPrevBombs)
+	if (totalBombs != totalPrevBombs || !game.GetplayerCreated())
 	{
 		ConvertNumberParser("bombs_tens", totalBombs, 1);
 		ConvertNumberParser("bombs_ones", totalBombs, 0);

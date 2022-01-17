@@ -31,6 +31,7 @@ private:
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 	AssetType ConvertToAssetType(std::string& type);
 	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
+	ItemCollectType ConvertLuaStringToItem(std::string& type);
 	bool CheckForItemInInventory(SpecialItemType& type);
 
 public:

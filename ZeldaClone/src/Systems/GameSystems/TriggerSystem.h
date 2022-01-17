@@ -45,6 +45,10 @@ private:
 			if (game.GetGameItems().candle)
 				return true;
 			break;
+		case SpecialItemType::ARROWS:
+			if (game.GetGameItems().bow)
+				return true;
+			break;
 		default:
 			return false;
 			break;
@@ -56,6 +60,10 @@ private:
 
 	void SetInventory(SpecialItemType& item)
 	{
+		auto player = Registry::Instance()->GetEntityByTag("player");
+
+		auto& playerHealth = player.GetComponent<HealthComponent>();
+
 		switch (item)
 		{
 		case NOT_SPECIAL:
@@ -75,7 +83,7 @@ private:
 
 		case FULL_HEART:
 		{
-			//health.addHeart = true;
+			playerHealth.addHeart = true;
 			break;
 		}
 		case RAFT:
@@ -95,6 +103,9 @@ private:
 			break;
 		case LADDER:
 			game.GetGameItems().ladder = true;
+			break;
+		case ARROWS:
+			game.GetGameItems().bow = true;
 			break;
 		default:
 			break;
@@ -275,7 +286,7 @@ public:
 		}
 		case SHOP_ITEM:
 			// Check to see if the trigger has an Item Components
-			if (trigger.HasComponent<ItemComponent>())
+			if (trigger.HasComponent<ItemComponent>() && GameState::scrollRupees == 0)
 			{
 				auto& shopItem = trigger.GetComponent<ItemComponent>();
 				// Check to see if the player has enough rupees
@@ -295,17 +306,18 @@ public:
 						Logger::Log("Item is Already in the inventory!");
 						break;
 					}
-
-					// Test --> Collect the item
-					if (!trig.active)
-					{
-						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, -1);
-						game.GetPlayerItem() = true;
-						trig.active = true;
-						GameState::scrollRupees = shopItem.price;
-						GameState::buyItem = true;
-					}
 				}
+				
+				// Test --> Collect the item
+				if (!trig.active)
+				{
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, -1);
+					game.GetPlayerItem() = true;
+					trig.active = true;
+					GameState::scrollRupees = shopItem.price;
+					GameState::buyItem = true;
+				}
+				
 			}
 			else
 			{

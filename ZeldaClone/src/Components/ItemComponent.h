@@ -3,7 +3,6 @@
 enum ItemCollectType
 {
 	BOMBS = 0,
-	ARROWS,
 	HEARTS,
 	DEFAULT
 };
@@ -21,6 +20,7 @@ enum SpecialItemType
 	WOOD_BOOMERANG,
 	MAGIC_BOOMERANG,
 	LADDER,
+	ARROWS,
 };
 
 struct ItemComponent

@@ -45,7 +45,7 @@ player =
         frame_offset = 0
       },
       projectile_emitter = {
-        velocity = { x = 300, y = 300 },
+        velocity = { x = 400, y = 400 },
         repeat_frequency = 0,
         projectile_duration = 3000,
         hit_percentage_damage = 10,

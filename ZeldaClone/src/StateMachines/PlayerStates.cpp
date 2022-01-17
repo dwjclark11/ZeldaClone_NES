@@ -9,6 +9,7 @@
 
 #include "../Components/AIComponent.h"
 #include "../States/GameOverState.h" 
+//#include "../States/GameState.h"
 
 Timer timer;
 Game& game = *Game::Instance();
@@ -57,9 +58,27 @@ void SetSpecialItem(SpecialItemType special, Entity& player)
 	case LADDER:
 		game.GetGameItems().ladder = true;
 		break;
+	case ARROWS:
+		game.GetGameItems().bow = true;
+		break;
 	default:
 		break;
 	}
+}
+
+void SetItemCollect(ItemCollectType type)
+{
+	switch (type)
+	{
+	case ItemCollectType::BOMBS:
+		GameState::totalBombs += 4;
+		break;
+	}
+}
+
+void CheckItem(ItemCollectType type)
+{
+
 }
 
 // Player Idle State definitions
@@ -189,41 +208,35 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
 
-	// Loop through the triggers and set the trigItem* to the active triggered item
-	/*if (!itemCollected)
-	{*/
-		for (auto& trigger : Registry::Instance()->GetEntitiesByGroup("trigger"))
+	for (auto& trigger : Registry::Instance()->GetEntitiesByGroup("trigger"))
+	{
+		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
+
+		if (trig.active)
 		{
-			auto& trig = trigger.GetComponent<TriggerBoxComponent>();
-			//if (trig.active)
-			//{
-			//	
-			//	itemCollected = true;
-			//}
-
-			if (/*!movedTrigItem *//*&& itemCollected*/ /*&&*/ trig.active)
+			if (trigger.HasComponent<ItemComponent>())
 			{
-				if (trigger.HasComponent<ItemComponent>())
-				{
-					const auto& special = trigger.GetComponent<ItemComponent>();
+				const auto& special = trigger.GetComponent<ItemComponent>();
 
+				if (special.special != SpecialItemType::NOT_SPECIAL)
 					SetSpecialItem(special.special, entity);
+				
+				if (special.type != ItemCollectType::DEFAULT)
+					SetItemCollect(special.type);
+				
+				auto& transform = trigger.GetComponent<TransformComponent>();
 
-					auto& transform = trigger.GetComponent<TransformComponent>();
-
-					trig.collectedTimer.Start();
-					transform.position.x = playerTransform.position.x;
-					transform.position.y = playerTransform.position.y - 64;
-					trig.collected = true;
-					/*movedTrigItem = true;*/
-					trig.active = false;
-					break;
-				}
+				trig.collectedTimer.Start();
+				transform.position.x = playerTransform.position.x;
+				transform.position.y = playerTransform.position.y - 64;
+				trig.active = false;
+				trig.collected = true;
+				break;
 			}
-		//}
+		}
 	}
 	
-	// Wait for 1 second  then change back to idle State
+	// Wait for 2 seconds then change back to idle State
 	if (timer.GetTicks() > 2000)
 	{
 		pOwner->ChangeState(pOwner->idleState, entity);
@@ -232,8 +245,7 @@ void CollectItemState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 
 void CollectItemState::OnExit(PlayerStateMachine* pOwner, Entity& entity)
 {
-	//movedTrigItem = false;
-	//itemCollected = false;
+	
 }
 
 void PlayerHurtState::OnEnter(PlayerStateMachine* pOwner, Entity& entity) 

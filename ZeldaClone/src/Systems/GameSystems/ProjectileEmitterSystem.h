@@ -326,11 +326,19 @@ public:
 			{
 				if (ItemSelectKeyboardControlSystem::itemType == WOOD_BOW || ItemSelectKeyboardControlSystem::itemType == MAGIC_BOW)
 				{
-					ItemAttrib bow("projectile", "items", 16, 16, 0, 64, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
-						glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
+					// Bow uses rupees, must be greater than zero!
+					if (GameState::totalRupees > 0)
+					{
+						ItemAttrib bow("projectile", "items", 16, 16, 0, 64, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
+							glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
 
-					UseItem(bow);
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+						UseItem(bow);
+
+						// Play the arrow sound!
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+						// Subtract from the total rupees when using the bow!
+						GameState::totalRupees--;
+					}
 					KeyboardControlSystem::keyDown = true;
 				}
 				else if (ItemSelectKeyboardControlSystem::itemType == BOMB)

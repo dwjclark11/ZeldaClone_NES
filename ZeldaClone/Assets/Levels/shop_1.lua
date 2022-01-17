@@ -141,6 +141,11 @@ level = {
 				offset = {0, 0},
 				camera_offset = {0, 0},
 			},
+			item = {
+				item_type = "bombs",
+				special = "none",
+				price = 20
+			},
 		}
 	},
 	-- ARROWS
@@ -170,6 +175,11 @@ level = {
 				trigger_type = 9, -- Collect Item -- Need to convert to enum 
 				offset = {0, 0},
 				camera_offset = {0, 0},
+			},
+			item = {
+				item_type = "default",
+				special = "arrows",
+				price = 80
 			},
 		}
 	},

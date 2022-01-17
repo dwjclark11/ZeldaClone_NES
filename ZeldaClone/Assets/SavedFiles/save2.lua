@@ -1,23 +1,23 @@
 ----------------------------------------------------------
--- Save file#: 1
+-- Save file#: 2
 ----------------------------------------------------------
 
 player_data = {
   [1] = {
     menu_shared_values = {
-      name = "DUSTIN",
-      num_hearts = 4,
+      name = "ELIJAH",
+      num_hearts = 3,
       blue_ring = false,
       red_ring = false
     },
     components = {
       transform = {
-        position = { x = 7567.81, y = 5039.81}}
+        position = { x = 7615, y = 5060}}
     },
     items = {
       boomerang = false,
       magic_boomerang = false,
-      wood_sword = true,
+      wood_sword = false,
       steel_sword = false,
       magic_sword = false,
       magic_rod = false,
@@ -26,7 +26,7 @@ player_data = {
       flute = false,
       raft = false,
       ladder = false,
-      bow_wood = true,
+      bow_wood = false,
       magic_shield = false,
       power_braclet = false,
       map = false,
@@ -34,9 +34,9 @@ player_data = {
       red_potion = false,
       master_key = false},
     inventory = {
-      num_rupees = 270,
+      num_rupees = 500,
       num_bombs = 0,
-      num_arrows = 10,
+      num_arrows = 0,
       num_keys = 0
     }
   }
