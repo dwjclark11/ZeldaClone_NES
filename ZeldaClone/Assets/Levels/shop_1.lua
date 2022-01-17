@@ -106,6 +106,11 @@ level = {
 				offset = {0, 0},
 				camera_offset = {0, 0},
 			},
+			item = {
+				item_type = "default",
+				special = "red_candle",
+				price = 130
+			},
 		}
 	},
 	-- BOMBS

@@ -1781,8 +1781,12 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 				auto type = ItemCollectType::DEFAULT;
 				auto special = ConvertLuaStringToSpecial(that);
 	
-				newLvlObject.AddComponent<ItemComponent>(type, special);
-			
+				newLvlObject.AddComponent<ItemComponent>(
+					type,
+					special,
+					lvlData["components"]["item"]["price"].get_or(0)
+					);
+
 				if (CheckForItemInInventory(special))
 				{
 					newLvlObject.Kill();

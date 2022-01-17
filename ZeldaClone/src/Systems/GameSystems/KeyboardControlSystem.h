@@ -65,7 +65,7 @@ public:
 			auto& swordCollider		= sword.GetComponent<BoxColliderComponent>();
 			auto& swordRigidbody	= sword.GetComponent<RigidBodyComponent>();
 
-			if (/*!game.GetPlayerItem()*/!game.PlayerHold())
+			if (!game.PlayerHold() && event.symbol != SDLK_RSHIFT)
 			{
 				switch (event.symbol)
 				{

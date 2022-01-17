@@ -61,15 +61,15 @@ public:
 
 			if (type.type == YELLOW)
 			{
-				GameState::totalRupees += 1;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
+				GameState::scrollRupees += 1;
+				//game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
 				// reg.RemoveEntityFromSystems(item);
 				item.Kill();
 			}
 			if (type.type == BLUE)
 			{
-				GameState::totalRupees += 5;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
+				GameState::scrollRupees += 5;
+				//game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 1);
 				//reg.RemoveEntityFromSystems(item);
 				item.Kill();
 			}

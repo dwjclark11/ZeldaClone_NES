@@ -46,6 +46,8 @@
 const std::string GameState::gameID = "GAMESTATE";
 bool GameState::firstEntered = false;
 bool GameState::unpause = false;
+bool GameState::buyItem = false;
+int GameState::scrollRupees = 0;
 int GameState::totalRupees = 0;
 int GameState::totalPrevRupees = 0;
 int GameState::totalBombs = 0;
@@ -55,7 +57,7 @@ int GameState::totalPrevKeys = 0;
 
 
 GameState::GameState()
-	: game(*Game::Instance()), reg(*Registry::Instance()), cameraOffset(glm::vec2(0))
+	: game(*Game::Instance()), reg(*Registry::Instance()), cameraOffset(glm::vec2(0)), index(0)
 {
 }
 
@@ -130,6 +132,10 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<AISystem>().Update();
 	reg.GetSystem<CaptionSystem>().Update();
 
+	// Update the rupeeScroll 
+	if (scrollRupees > 0)
+		RupeeScroll();
+
 	if (totalBombs != totalPrevBombs || totalKeys != totalPrevKeys || totalRupees != totalPrevRupees)
 		ConvertHUDNumbers();
 	
@@ -193,7 +199,7 @@ bool GameState::OnEnter()
 			game.GetplayerCreated() = true;
 
 			// Load the player file based on the selected slot
-			loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + game.GetPlayerNum());
+			loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()));
 
 			auto player = Registry::Instance()->GetEntityByTag("player");
 			auto& playerHealth = player.GetComponent<HealthComponent>();
@@ -301,4 +307,42 @@ void GameState::ConvertHUDNumbers()
 	}
 }
 
+void GameState::RupeeScroll()
+{
+	// Check to see if the rupee scoll timer has started
+	if (!rupeeTimer.isStarted())
+		rupeeTimer.Start();
 
+	if (rupeeTimer.GetTicks() >= 50 * index)
+	{
+		// if we are buying an item, decrement from total Rupees
+		if (buyItem)
+		{
+			if (scrollRupees > 0 && totalRupees >= scrollRupees)
+				totalRupees--;
+		}
+		else // If we collect rupees, increment total rupees the desired amount!
+		{
+			// Do not go over the max amount of rupees
+			if (scrollRupees > 0 && totalRupees < MAX_RUPEES) 
+				totalRupees++;
+		}
+		// Play the collect rupee sound
+		Mix_Volume(8, 10);
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 8);
+		scrollRupees--;
+
+		// Check for money scroll completion
+		if (scrollRupees <= 0)
+		{
+			rupeeTimer.Stop();
+			buyItem = false;
+			index = 0;
+			scrollRupees = 0;
+		}
+		else
+		{
+			index++;
+		}
+	}
+}

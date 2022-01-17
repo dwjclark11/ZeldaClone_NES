@@ -27,10 +27,12 @@ struct ItemComponent
 {
 	ItemCollectType type;
 	SpecialItemType special;
+	int price;
 
-	ItemComponent(ItemCollectType type = DEFAULT, SpecialItemType special = NOT_SPECIAL)
+	ItemComponent(ItemCollectType type = DEFAULT, SpecialItemType special = NOT_SPECIAL, int price = 0)
 	{
 		this->type = type;
 		this->special = special;
+		this->price = price;
 	}
 };

@@ -11,6 +11,7 @@ class GameState : public State
 {
 public:
 	// Statics 
+	static int scrollRupees;
 	static int totalRupees;
 	static int totalPrevRupees;
 	static int totalBombs;
@@ -19,6 +20,7 @@ public:
 	static int totalPrevKeys;
 	static bool firstEntered;
 	static bool unpause;
+	static bool buyItem;
 	// Constructor
 	GameState();
 	~GameState();
@@ -37,12 +39,18 @@ public:
 
 	virtual std::string GetStateID() const { return gameID; }
 	
-	void ConvertHUDNumbers();
 	
 private:
 	static const std::string gameID;
 	glm::vec2 cameraOffset;
 	class Game& game;
 	class Registry& reg;
+
+	Timer rupeeTimer;
+	int index;
+	const int MAX_RUPEES = 255;
+	// Private Gamestate Helper Functions
+	void ConvertHUDNumbers();
+	void RupeeScroll();
 	
 };

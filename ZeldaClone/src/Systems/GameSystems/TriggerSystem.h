@@ -23,6 +23,85 @@ private:
 	sol::state lua;
 	LevelLoader loader;
 	class Game& game;
+
+	bool CheckInventory(SpecialItemType& item)
+	{
+		// Check to see the item is in the inventory
+		switch (item)
+		{
+		case SpecialItemType::WOOD_SWORD:
+			if (game.GetGameItems().woodSword)
+				return true;
+			break;
+		case SpecialItemType::STEEL_SWORD:
+			if (game.GetGameItems().steelSword)
+				return true;
+			break;
+		case SpecialItemType::MAGIC_SWORD:
+			if (game.GetGameItems().magicSword)
+				return true;
+			break;
+		case SpecialItemType::RED_CANDLE:
+			if (game.GetGameItems().candle)
+				return true;
+			break;
+		default:
+			return false;
+			break;
+		}
+
+		// If the item is not in the inventory return false
+		return false;
+	}
+
+	void SetInventory(SpecialItemType& item)
+	{
+		switch (item)
+		{
+		case NOT_SPECIAL:
+			break;
+
+		case WOOD_SWORD:
+			game.GetGameItems().woodSword = true;
+			break;
+
+		case STEEL_SWORD:
+			game.GetGameItems().steelSword = true;
+			break;
+
+		case MAGIC_SWORD:
+			game.GetGameItems().magicSword = true;
+			break;
+
+		case FULL_HEART:
+		{
+			//health.addHeart = true;
+			break;
+		}
+		case RAFT:
+			game.GetGameItems().raft = true;
+			break;
+		case POWER_BRACLET:
+			game.GetGameItems().powerBraclet = true;
+			break;
+		case RED_CANDLE:
+			game.GetGameItems().candle = true;
+			break;
+		case WOOD_BOOMERANG:
+			game.GetGameItems().woodBoomerang = true;
+			break;
+		case MAGIC_BOOMERANG:
+			game.GetGameItems().magicBoomerang = true;
+			break;
+		case LADDER:
+			game.GetGameItems().ladder = true;
+			break;
+		default:
+			break;
+		}
+	}
+
+
 public:
 
 	TriggerSystem()
@@ -195,8 +274,44 @@ public:
 			break;
 		}
 		case SHOP_ITEM:
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, 1);
-			//transform.position = trig.transportOffset;
+			// Check to see if the trigger has an Item Components
+			if (trigger.HasComponent<ItemComponent>())
+			{
+				auto& shopItem = trigger.GetComponent<ItemComponent>();
+				// Check to see if the player has enough rupees
+				if (GameState::totalRupees < shopItem.price)
+				{
+					// Maybe make a cancel sound?
+					Logger::Log("Player Does not Have Enough Rupees!");
+					break;
+				}
+
+				// Check to see if key item and if it is already in the inventory
+				if (shopItem.special != SpecialItemType::NOT_SPECIAL)
+				{
+					// Check to see if the item is in the inventory
+					if (CheckInventory(shopItem.special))
+					{
+						Logger::Log("Item is Already in the inventory!");
+						break;
+					}
+
+					// Test --> Collect the item
+					if (!trig.active)
+					{
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, -1);
+						game.GetPlayerItem() = true;
+						trig.active = true;
+						GameState::scrollRupees = shopItem.price;
+						GameState::buyItem = true;
+					}
+				}
+			}
+			else
+			{
+				Logger::Log("TRIGGER: __SHOP_ITEM: All Shop Items must have an ItemComponent!");
+				break;
+			}
 			break;
 		default:
 			break;

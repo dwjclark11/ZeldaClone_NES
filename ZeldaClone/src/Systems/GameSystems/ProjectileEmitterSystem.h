@@ -337,10 +337,12 @@ public:
 				{
 					ItemAttrib bomb("bomber", "items", 16, 16, 64, 112, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
 						glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 3000, false, false);
-
-					UseItem(bomb);
-					GameState::totalBombs--;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					if (GameState::totalBombs > 0)
+					{
+						UseItem(bomb);
+						GameState::totalBombs--;
+						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					}
 					KeyboardControlSystem::keyDown = true;
 				}
 				else if (ItemSelectKeyboardControlSystem::itemType == CANDLE)
@@ -354,7 +356,7 @@ public:
 				}
 				else if (ItemSelectKeyboardControlSystem::itemType == BOOMERANG)
 				{
-					if (!boomerangReturned/* && !playerSet*/)
+					if (!boomerangReturned)
 					{
 						ItemAttrib boomerang("boomerang", "items", 16, 16, 0, 112, 4, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(-40, -40),
 							glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(8, 8), glm::vec2(10, 10), glm::vec2(10, 10), glm::vec2(20, 20), glm::vec2(18, 18), 3000, true, false);
