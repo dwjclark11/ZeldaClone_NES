@@ -103,10 +103,10 @@ level = {
 				height = 16,
 				offset = {x = 32, y = 32}
 			},
-			trigger = {
-				trigger_type = 5, -- Collect Item -- Need to convert to enum 
-				offset = {0, 0},
-				camera_offset = {0, 0},
+			trigger_box = {
+				trigger_type = "collect_item", -- Collect Item -- Need to convert to enum 
+				transport_offset = { x = 0, y = 0},
+				camera_offset = {x = 0, y = 0},
 			},
 			item = {
 				item_type = "default",
@@ -119,7 +119,7 @@ level = {
 		group = "caption",	
 		components = {
 			caption = {
-				captions = "It's Dangerous to go Alone! Take this",
+				captions = "It's Dangerous to go   Alone! Take this",
 				x_pos = 235,
 				y_pos = 135,
 				num_frames = 37,

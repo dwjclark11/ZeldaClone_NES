@@ -101,10 +101,10 @@ level = {
 				height = 16,
 				offset = {x = 0, y = 0}
 			},
-			trigger = {
-				trigger_type = 9, -- Collect Item -- Need to convert to enum 
-				offset = {0, 0},
-				camera_offset = {0, 0},
+			trigger_box = {
+				trigger_type = "shop_item", 
+				transport_offset = { x = 0, y = 0},
+				camera_offset = { x = 0, y = 0},
 			},
 			item = {
 				item_type = "default",
@@ -136,10 +136,10 @@ level = {
 				height = 16,
 				offset = {x = 0, y = 0}
 			},
-			trigger = {
-				trigger_type = 9, -- Collect Item -- Need to convert to enum 
-				offset = {0, 0},
-				camera_offset = {0, 0},
+			trigger_box = {
+				trigger_type = "shop_item", 
+				transport_offset = { x = 0, y = 0},
+				camera_offset = { x = 0, y = 0},
 			},
 			item = {
 				item_type = "bombs",
@@ -171,10 +171,10 @@ level = {
 				height = 16,
 				offset = {x = 0, y = 0}
 			},
-			trigger = {
-				trigger_type = 9, -- Collect Item -- Need to convert to enum 
-				offset = {0, 0},
-				camera_offset = {0, 0},
+			trigger_box = {
+				trigger_type = "shop_item", 
+				transport_offset = { x = 0, y = 0},
+				camera_offset = { x = 0, y = 0},
 			},
 			item = {
 				item_type = "default",

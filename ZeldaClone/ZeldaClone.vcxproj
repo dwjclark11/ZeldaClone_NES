@@ -558,7 +558,6 @@
     <ClInclude Include="src\Utilities\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Levels\foo.lua" />
     <None Include="Assets\Levels\testState.lua" />
     <None Include="Assets\LuaFiles\game_state_assets.lua" />
     <None Include="Assets\LuaFiles\hud.lua" />

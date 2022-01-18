@@ -25,12 +25,13 @@ private:
 	class Registry& reg;
 	// Helper Functions
 	void ConvertName(std::string name, int x, int y);
-	TriggerType ConvertToTriggerType(int triggerType);
+	//TriggerType ConvertToTriggerType(int triggerType);
 	TriggerType ConvertToTriggerType(std::string triggerType);
 	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 	AssetType ConvertToAssetType(std::string& type);
 	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
+	TriggerType ConvertStringToTriggerType(std::string type);
 	ItemCollectType ConvertLuaStringToItem(std::string& type);
 	bool CheckForItemInInventory(SpecialItemType& type);
 
@@ -51,7 +52,7 @@ public:
 	void LoadLevel(const std::string& level);
 	void LoadColliders(const std::string& filename);
 
-	void LoadCollidersFromLuaTable(sol::state& lua, const std::string& fileName);
+	void LoadTriggers(sol::state& lua, const std::string& fileName);
 
 	void SavePlayerDataToLuaTable(std::string saveNum);
 	void SavePlayerNameToLuaTable(std::string saveNum, std::string& name);
@@ -67,11 +68,4 @@ public:
 
 	void EliminatePlayerToDefault(int slotNum, std::string& name);
 
-
-	//// Helper Functions
-	//void ConvertName(std::string name, int x, int y);
-	//TriggerType ConvertToTriggerType(int triggerType);
-	//TriggerType ConvertToTriggerType(std::string triggerType);
-	//AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
-	//std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 };

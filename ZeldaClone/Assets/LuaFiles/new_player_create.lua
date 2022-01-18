@@ -52,10 +52,10 @@ player =
         is_friendly = true
       },
         keyboard_control = {
-        up_velocity = { x = 0, y = -200 },
-        right_velocity = { x = 200, y = 0 },
-        down_velocity = { x = 0, y = 200 },
-        left_velocity = { x = -200, y = 0 }
+        up_velocity = { x = 0, y = -300 },
+        right_velocity = { x = 300, y = 0 },
+        down_velocity = { x = 0, y = 300 },
+        left_velocity = { x = -300, y = 0 }
       },
     }
   },

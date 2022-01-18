@@ -157,12 +157,13 @@ public:
 		std::string mapFile = "Assets/Tilemaps/Maps/" + trig.tileMapName + ".map";
 		std::string tileFile = "Assets/Tilemaps/Tiles/" + trig.tileImageName + ".png";
 		std::string& entityFile = trig.entityFileName;
+		std::string& triggerFile = trig.triggerFile;
 		std::string& colliderFile = trig.colliderFile;
 		std::string& enemyFile = trig.enemyFile;
 		std::string& levelMusic = trig.levelMusic;
 		std::string& tileMapName = trig.tileMapName;
 		std::string& tileImageName = trig.tileImageName;
-		
+
 		const auto& width = trig.imageWidth;
 		const auto& height = trig.imageHeight;
 		const auto& camPosX = trig.cameraOffset.x;
@@ -175,7 +176,7 @@ public:
 		case NO_TRIGGER:
 			break;
 
-		case SECRET_AREA:
+		case SECRET_AREA: // Change this to scene transition TriggerType::CHANGE_SCENE?
 		{
 			if (game.GetStairsFinished())
 			{
@@ -205,20 +206,18 @@ public:
 
 					// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
 					if (assetFile != "no_file")
-					{
 						loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
-					}
 
+					// load the tilemap only if there is an image and a corresponding map
 					if (tileMapName != "no_file" && tileImageName != "no_file")
 					{
 						Logger::Log("Image: " + tileImageName);
 						loader.LoadTilemap(mapFile, tileImageName);
 					}
 
+					// If there is only an image name than it is a full map image, not tiles --> Just load the map
 					if (tileImageName != "no_file" && tileMapName == "no_file")
-					{
 						loader.LoadMap(tileImageName, width, height);
-					}
 
 					// Start the new scene's music || stop the music
 					if (levelMusic != "stop")
@@ -226,30 +225,38 @@ public:
 					else
 						game.GetSystem<MusicPlayerSystem>().StopMusic();
 
+					// If there is an entity file, NPCs, Store Items, etc. Load it
 					if (entityFile != "no_file")
-					{
 						loader.LoadEntitiesFromLuaTable(game.GetLuaState(), entityFile);
-					}
 
 					// Adjust the camera location to the trigger offset
 					game.GetCamera().x = camPosX;
 					game.GetCamera().y = camPosY;
 
+					// Check to see if there is a collider file
 					if (colliderFile != "no_file")
 						loader.LoadColliders(colliderFile);
-
-					if (enemyFile != "no_file")
+					// Check to see if there is a trigger file
+					if (trig.triggerFile != "no_file")
 					{
-						loader.LoadEnemiesFromLuaTable(game.GetLuaState(), enemyFile);
+						Logger::Log("Trig " + trig.triggerFile);
+						loader.LoadTriggers(game.GetLuaState(), trig.triggerFile);
 					}
+
+					// Check to see if there is an enemy file
+					if (enemyFile != "no_file")
+						loader.LoadEnemiesFromLuaTable(game.GetLuaState(), enemyFile);
 
 					// Set player Position
 					_player.GetComponent<TransformComponent>().position.x = x;
 					_player.GetComponent<TransformComponent>().position.y = y;
+
+					// Finish the fade screen 
 					game.StartFadeOut() = false;
 					game.StartFadeIn() = true;
-
+					// Remove the current trigger
 					trigger.Kill();
+
 					game.SetStairsFinished(false);
 					// Set player sprite back to start
 					sprite.srcRect.y = 0;
@@ -262,16 +269,12 @@ public:
 
 			break;
 		}
-		case ENTER_DUNGEON:
-
-			break;
-
 		case BURN_BUSHES:
-
+			// TODO: 
 			break;
 
 		case PUSH_ROCKS:
-
+			// TODO: 
 			break;
 
 		case COLLECT_ITEM:
@@ -307,7 +310,7 @@ public:
 						break;
 					}
 				}
-				
+
 				// Test --> Collect the item
 				if (!trig.active)
 				{
@@ -317,7 +320,7 @@ public:
 					GameState::scrollRupees = shopItem.price;
 					GameState::buyItem = true;
 				}
-				
+
 			}
 			else
 			{

@@ -386,46 +386,6 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 }
 
 
-std::string LevelLoader::LoadSlotName(unsigned int& slotNum)
-{
-
-	// open slot file
-	std::fstream slotFile;
-	slotFile.open("./Assets/SavedFiles/slot" + std::to_string(slotNum) + ".txt");
-	std::string name = "";
-	if (!slotFile.is_open())
-	{
-		Logger::Err("Unable to open slot " + std::to_string(slotNum) + " File");
-	}
-
-	while (true)
-	{
-		if (slotFile.eof()) break;
-
-		slotFile >> name;
-
-	}slotFile.close();
-
-	return name;
-}
-
-void LevelLoader::SaveSlotData(unsigned int& slotNum)
-{
-	std::fstream slotFile;
-	slotFile.open("./Assets/SavedFiles/slot" + std::to_string(slotNum) + ".txt");
-
-	if (!slotFile.is_open())
-	{
-		Logger::Err("Unable to open slot " + std::to_string(slotNum) + " File");
-	}
-
-	std::string name = NameState::name;
-	slotFile << name;
-
-	//Logger::Log("Slot number " + std::to_string(slotNum) + " is open");
-	slotFile.close();
-}
-
 void LevelLoader::LoadLevel(const std::string& level)
 {
 	// Open and read the thext file
@@ -477,7 +437,6 @@ void LevelLoader::LoadLevel(const std::string& level)
 
 void LevelLoader::LoadColliders(const std::string& filename)
 {
-
 	// Open and read the text file
 	std::fstream mapFile;
 	mapFile.open("./Assets/Levels/" + filename + ".map");
@@ -497,31 +456,8 @@ void LevelLoader::LoadColliders(const std::string& filename)
 		int colliderScaleY = 0;
 		std::string group = "";
 		glm::vec2 offset = glm::vec2(0, 0);
-		glm::vec2 triggerOffset = glm::vec2(0, 0);
-		glm::vec2 triggerCamOffset = glm::vec2(0, 0);
-		bool collider = false;
-		bool trigger = false;
-		int type = 0;
-		std::string triggerLevel = "";
-		std::string triggerAssetFile = "";
-		std::string triggerEnemyFile = "";
-		std::string triggerColliderFile = "";
-		std::string triggerTilemapFile = "";
-		std::string triggerTilemapImage = "";
-		std::string triggerEntityFile = "";
-		int triggerImageHeight = 0;
-		int triggerImageWidth = 0;
-		TriggerType triggerType = NO_TRIGGER;
 
-		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
-
-		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
-		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >>
-			triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel >> triggerAssetFile >> triggerEnemyFile >>
-			triggerColliderFile >> triggerTilemapFile >> triggerTilemapImage >> triggerEntityFile >> triggerImageHeight >> triggerImageWidth;
-
-
-		triggerType = ConvertToTriggerType(type);
+		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> colWidth >> colHeight >> offset.x >> offset.y;
 
 		// If we are at the end of the File --> Leave the File!!
 		if (mapFile.eof()) break;
@@ -532,39 +468,31 @@ void LevelLoader::LoadColliders(const std::string& filename)
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
 		boxCollider.AddComponent<GameComponent>();
 		boxCollider.AddComponent<ColliderComponent>();
-		if (collider && !trigger)
-		{
-			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-		}
-		if (collider && trigger)
-		{
-			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-			boxCollider.AddComponent<TriggerBoxComponent>(triggerType, glm::vec2(triggerOffset.x, triggerOffset.y), glm::vec2(triggerCamOffset.x, triggerCamOffset.y),
-				triggerLevel, triggerAssetFile, triggerEnemyFile, triggerColliderFile, triggerTilemapFile, triggerTilemapImage, triggerEntityFile, triggerImageHeight, triggerImageWidth);
-			boxCollider.AddComponent<GameComponent>();
-		}
+		boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 	}
 	mapFile.close();
 }
 
-TriggerType LevelLoader::ConvertToTriggerType(int triggerType)
+TriggerType LevelLoader::ConvertStringToTriggerType(std::string type)
 {
-	// This function takes the int value from the text file and converts it to the 
-	// proper trigger type enum value.
-	switch (triggerType)
-	{
-	case 0: return NO_TRIGGER; break;
-	case 1: return SECRET_AREA; break;
-	case 2: return ENTER_DUNGEON; break;
-	case 3: return BURN_BUSHES; break;
-	case 4: return PUSH_ROCKS; break;
-	case 5: return COLLECT_ITEM; break;
-	case 6: return TRAP; break;
-	case 7: return HIDDEN_SWITCH; break;
-	case 8: return HIDDEN_OBJECT; break;
-	case 9: return SHOP_ITEM; break;
-	default: break;
-	}
+	if (type == "no_trigger")
+		return TriggerType::NO_TRIGGER;
+	else if (type == "secret_area")
+		return TriggerType::SECRET_AREA;
+	else if (type == "enter_dungeon")
+		return TriggerType::ENTER_DUNGEON;
+	else if (type == "push_rocks")
+		return TriggerType::PUSH_ROCKS;
+	else if (type == "collect_item")
+		return TriggerType::COLLECT_ITEM;
+	else if (type == "trap")
+		return TriggerType::TRAP;
+	else if (type == "hidden_switch")
+		return TriggerType::HIDDEN_SWITCH;
+	else if (type == "hidden_object")
+		return TriggerType::HIDDEN_OBJECT;
+	else if (type == "shop_item")
+		return TriggerType::SHOP_ITEM;
 }
 
 AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
@@ -606,7 +534,7 @@ std::string LevelLoader::SetName(std::string filePath, bool wExtension, char sep
 	return "";
 }
 
-void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& fileName)
+void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
 
@@ -623,70 +551,89 @@ void LevelLoader::LoadCollidersFromLuaTable(sol::state& lua, const std::string& 
 	lua.script_file("./Assets/Levels/" + fileName + ".lua");
 
 	// =========================================================================================================
-	// Read the colliders
+	// Read the Triggers
 	// =========================================================================================================
 
 	// Read the big table for the colliders
-	sol::table colliders = lua["colliders"];
+	sol::table triggers = lua["triggers"];
 
 	int i = 1;
 
 	while (true)
 	{
-		sol::optional<sol::table> hasCollider = colliders[i];
-		if (hasCollider == sol::nullopt)
+		sol::optional<sol::table> hasTrigger = triggers[i];
+		if (hasTrigger == sol::nullopt)
 		{
 			break;
 		}
 
-		sol::table collider = colliders[i];
+		sol::table trigger = triggers[i];
 
-		Entity newCollider = reg.CreateEntity();
+		Entity newTrigger = reg.CreateEntity();
 
 		// Group
-		sol::optional<std::string> group = collider["group"];
+		sol::optional<std::string> group = trigger["group"];
 		if (group != sol::nullopt)
 		{
-			newCollider.Group(collider["group"]);
+			newTrigger.Group(trigger["group"]);
 		}
 		// Components
-		sol::optional<sol::table> hasComponents = collider["components"];
+		sol::optional<sol::table> hasComponents = trigger["components"];
 		if (hasComponents != sol::nullopt)
 		{
 			// Transform Component
-			sol::optional<sol::table> transform = collider["components"]["transform"];
+			sol::optional<sol::table> transform = trigger["components"]["transform"];
 			if (transform != sol::nullopt)
 			{
-				newCollider.AddComponent<TransformComponent>(
+				newTrigger.AddComponent<TransformComponent>(
 					glm::vec2(
-						collider["components"]["transform"]["position"]["x"],
-						collider["components"]["transform"]["position"]["y"]),
+						trigger["components"]["transform"]["position"]["x"],
+						trigger["components"]["transform"]["position"]["y"]),
 					glm::vec2(
-						collider["components"]["transform"]["scale"]["x"].get_or(1.0),
-						collider["components"]["transform"]["scale"]["y"].get_or(1.0)),
-					collider["components"]["transform"]["rotation"].get_or(0.0));
+						trigger["components"]["transform"]["scale"]["x"].get_or(1.0),
+						trigger["components"]["transform"]["scale"]["y"].get_or(1.0)),
+					trigger["components"]["transform"]["rotation"].get_or(0.0));
 			}
 			// Box Collider Component
-			sol::optional<sol::table> boxCollider = collider["components"]["boxCollider"];
+			sol::optional<sol::table> boxCollider = trigger["components"]["box_collider"];
 			if (boxCollider != sol::nullopt)
 			{
-				newCollider.AddComponent<BoxColliderComponent>(
-					collider["components"]["boxCollider"]["width"],
-					collider["components"]["boxCollider"]["height"],
+				newTrigger.AddComponent<BoxColliderComponent>(
+					trigger["components"]["box_collider"]["width"],
+					trigger["components"]["box_collider"]["height"],
 					glm::vec2(
-						collider["components"]["boxCollider"]["offset_x"].get_or(0.0),
-						collider["components"]["boxCollider"]["offset_y"].get_or(0.0)));
+						trigger["components"]["box_collider"]["offset_x"].get_or(0.0),
+						trigger["components"]["box_collider"]["offset_y"].get_or(0.0)));
 			}
 			// Trigger Component
-			sol::optional<sol::table> trigger = collider["triggerComponent"];
-			if (trigger != sol::nullopt)
+			sol::optional<sol::table> triggerBox = trigger["components"]["trigger_box"];
+			if (triggerBox != sol::nullopt)
 			{
-				newCollider.AddComponent<TriggerBoxComponent>(
-					collider["triggerComponent"]["type"],
+				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
+				Logger::Log(trigger["components"]["trigger_box"]["trigger_file"]);
+				TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
+
+				newTrigger.AddComponent<TriggerBoxComponent>(
+					triggerType,
 					glm::vec2(
-						collider["triggerComponent"]["transport_offset_x"].get_or(0.0),
-						collider["triggerComponent"]["transport_offset_y"].get_or(0.0)),
-					collider["triggerComponent"]["level"]);
+						trigger["components"]["trigger_box"]["transport_offset"]["x"].get_or(0.0),
+						trigger["components"]["trigger_box"]["transport_offset"]["y"].get_or(0.0)
+					),
+					glm::vec2(
+						trigger["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
+						trigger["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
+					),
+					trigger["components"]["trigger_box"]["level_music"],
+					trigger["components"]["trigger_box"]["asset_file"],
+					trigger["components"]["trigger_box"]["enemy_file"],
+					trigger["components"]["trigger_box"]["collider_file"],
+					trigger["components"]["trigger_box"]["tilemap_name"],
+					trigger["components"]["trigger_box"]["tilemap_image"],
+					trigger["components"]["trigger_box"]["entity_file"],
+					trigger["components"]["trigger_box"]["image_width"].get_or(0),
+					trigger["components"]["trigger_box"]["image_height"].get_or(0),
+					trigger["components"]["trigger_box"]["trigger_file"]
+					);
 			}
 		}
 		i++;
@@ -1771,11 +1718,34 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			}
 
 			// Trigger Component
-			sol::optional<sol::table> trigger_comp = lvlData["components"]["trigger"];
-			if (trigger_comp != sol::nullopt)
+			sol::optional<sol::table> triggerBox = lvlData["components"]["trigger_box"];
+			if (triggerBox != sol::nullopt)
 			{
-				auto type = ConvertToTriggerType(lvlData["components"]["trigger"]["trigger_type"].get_or(0));
-				newLvlObject.AddComponent<TriggerBoxComponent>(type);
+				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
+				Logger::Log(lvlData["components"]["trigger_box"]["trigger_file"]);
+				TriggerType triggerType = ConvertStringToTriggerType(lvlData["components"]["trigger_box"]["trigger_type"]);
+
+				newLvlObject.AddComponent<TriggerBoxComponent>(
+					triggerType,
+					glm::vec2(
+						lvlData["components"]["trigger_box"]["transport_offset"]["x"].get_or(0.0),
+						lvlData["components"]["trigger_box"]["transport_offset"]["y"].get_or(0.0)
+					),
+					glm::vec2(
+						lvlData["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
+						lvlData["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
+					),
+					lvlData["components"]["trigger_box"]["level_music"],
+					lvlData["components"]["trigger_box"]["asset_file"],
+					lvlData["components"]["trigger_box"]["enemy_file"],
+					lvlData["components"]["trigger_box"]["collider_file"],
+					lvlData["components"]["trigger_box"]["tilemap_name"],
+					lvlData["components"]["trigger_box"]["tilemap_image"],
+					lvlData["components"]["trigger_box"]["entity_file"],
+					lvlData["components"]["trigger_box"]["image_width"].get_or(0),
+					lvlData["components"]["trigger_box"]["image_height"].get_or(0),
+					lvlData["components"]["trigger_box"]["trigger_file"]
+					);
 			}
 
 			// Item Type Component
@@ -1862,4 +1832,3 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 		space += 24;
 	}
 }
-

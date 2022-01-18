@@ -258,8 +258,9 @@ public:
 	{
 		auto& playerTransform = player.GetComponent<TransformComponent>();
 		auto& playerHealth = player.GetComponent<HealthComponent>();
+		const auto& enemyHealth = enemy.GetComponent<HealthComponent>();
 
-		if (enemy.BelongsToGroup("enemies") && player.HasTag("player") && !playerHealth.isHurt)
+		if (enemy.BelongsToGroup("enemies") && enemyHealth.healthPercentage > 0 && player.HasTag("player") && !playerHealth.isHurt)
 		{
 			playerHealth.healthPercentage -= 1;
 			playerTransform.position.x += 5;

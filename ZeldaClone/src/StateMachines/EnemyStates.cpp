@@ -385,7 +385,7 @@ void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& sprite	= entity.GetComponent<SpriteComponent>();
 	
-	entity.RemoveComponent<BoxColliderComponent>();
+	//entity.RemoveComponent<BoxColliderComponent>();
 	sprite.assetID = "enemy_death";
 	sprite.height = 16;
 	sprite.width = 16;
@@ -403,14 +403,11 @@ void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	srand(SDL_GetTicks());
 
 	int chance = rand();
-	//Logger::Log("Chance: " + std::to_string(chance));
 	if (chance % 2 == 0)
 	{
 		ItemDrop(entity);
 	}
-	/*else
-		Logger::Log("Not Created");*/
-
+	
 }
 void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 {
@@ -418,8 +415,9 @@ void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		
 	if (ai.deathTimer.GetTicks() > 500)
 	{
-		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
+		
 		entity.Kill();
+		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
 	}
 }
 

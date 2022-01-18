@@ -61,7 +61,7 @@ GameState::~GameState() {}
 GameState::GameState(glm::vec2 cameraOffset)
 	: GameState()
 {
-	this->cameraOffset = cameraOffset; 
+	this->cameraOffset = cameraOffset;
 	game.GetCamera().x = this->cameraOffset.x;
 	game.GetCamera().y = this->cameraOffset.y;
 }
@@ -82,12 +82,12 @@ void GameState::Update(const double& deltaTime)
 	{
 		// Turn music volume up
 		Mix_VolumeMusic(10);
-		
+
 		game.StartFadeIn() = true;
 		unpause = false;
 	}
 
-	if (State::exitToMain) 
+	if (State::exitToMain)
 	{
 		game.GetStateMachine()->PopState();
 		game.GetStateMachine()->PushState(new MenuState());
@@ -99,14 +99,15 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 
-	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-	
+
+
 	// Update the registry values
 	reg.Update();
-	
+
 	// Update all Game systems
 	auto player = reg.GetEntityByTag("player");
 	game.GetPlayerStateMachine().Update(player);
@@ -130,30 +131,30 @@ void GameState::Update(const double& deltaTime)
 
 	if (totalBombs != totalPrevBombs || totalKeys != totalPrevKeys || totalRupees != totalPrevRupees)
 		ConvertHUDNumbers();
-	
+
 }
 
 void GameState::Render()
 {
 	// Create the HUD rect --> black rectangle that all the HUD items are on
-	SDL_Rect hudRect = { 0, 0, game.windowWidth, game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64};
-	
+	SDL_Rect hudRect = { 0, 0, game.windowWidth, game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64 };
+
 	game.GetSystem<RenderTileSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	
+
 	// Update all other render systems
 	game.GetSystem<RenderSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	
+
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 	SDL_RenderFillRect(game.GetRenderer(), &hudRect);
 	SDL_RenderDrawRect(game.GetRenderer(), &hudRect);
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-	
+
 	game.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 
 	reg.GetSystem<HealthSystem>().Update();
 	game.GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
-	
+
 	// If the game is in debug mode, render the collision system
 	if (Game::isDebug)
 	{
@@ -176,13 +177,14 @@ bool GameState::OnEnter()
 
 		// Open the lua libraries into the game
 		game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
-		
+
 		// Make sure the game is not in debug mode!!
 		Game::isDebug = false;
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
 		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
-		loader.LoadColliders("colliders");
+		loader.LoadColliders("overworld_colliders");
+		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
 
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
@@ -191,7 +193,7 @@ bool GameState::OnEnter()
 		if (!reg.HasSystem<ProjectileEmitterSystem>()) reg.AddSystem<ProjectileEmitterSystem>();
 		if (!reg.HasSystem<ProjectileLifeCycleSystem>()) reg.AddSystem<ProjectileLifeCycleSystem>();
 		if (!reg.HasSystem<DamageSystem>())				reg.AddSystem<DamageSystem>();
-		if (!reg.HasSystem<RenderHealthSystem>())		reg.AddSystem<RenderHealthSystem>();	
+		if (!reg.HasSystem<RenderHealthSystem>())		reg.AddSystem<RenderHealthSystem>();
 		if (!reg.HasSystem<RenderTileSystem>())			reg.AddSystem<RenderTileSystem>();
 		if (!reg.HasSystem<HealthSystem>())				reg.AddSystem<HealthSystem>();
 		if (!reg.HasSystem<CollisionSystem>())			reg.AddSystem<CollisionSystem>();
@@ -280,7 +282,7 @@ void GameState::ConvertHUDNumbers()
 		ConvertNumberParser("rupee_ones", totalRupees, 0);
 		totalPrevRupees = totalRupees;
 	}
-	
+
 	if (totalKeys != totalPrevKeys || !game.GetplayerCreated())
 	{
 		ConvertNumberParser("keys_tens", totalKeys, 1);
@@ -313,7 +315,7 @@ void GameState::RupeeScroll()
 		else // If we collect rupees, increment total rupees the desired amount!
 		{
 			// Do not go over the max amount of rupees
-			if (scrollRupees > 0 && totalRupees < MAX_RUPEES) 
+			if (scrollRupees > 0 && totalRupees < MAX_RUPEES)
 				totalRupees++;
 		}
 		// Play the collect rupee sound
