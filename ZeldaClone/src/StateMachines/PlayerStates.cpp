@@ -5,11 +5,13 @@
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/RigidBodyComponent.h"
+#include "../Components/HealthComponent.h"
 #include "../Components/ItemComponent.h"
 
 #include "../Components/AIComponent.h"
 #include "../States/GameOverState.h" 
-//#include "../States/GameState.h"
+#include "../States/GameState.h"
 
 Timer timer;
 Game& game = *Game::Instance();

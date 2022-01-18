@@ -17,11 +17,11 @@ public:
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const SDL_Rect& camera)
 	{
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 			if (entity.BelongsToGroup("game_over"))
 			{
-				auto& textLabel = entity.GetComponent<TextLabelComponent>();
+				const auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
 				SDL_SetRenderDrawColor(renderer, textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
 
@@ -57,7 +57,7 @@ public:
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
 			entity.Kill();
 		}

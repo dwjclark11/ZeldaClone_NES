@@ -154,7 +154,7 @@ void GameState::Render()
 
 	reg.GetSystem<HealthSystem>().Update();
 	game.GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
-
+	
 	// If the game is in debug mode, render the collision system
 	if (Game::isDebug)
 	{
@@ -228,7 +228,8 @@ bool GameState::OnEnter()
 		auto& playerHealth = player.GetComponent<HealthComponent>();
 		if (playerHealth.healthPercentage <= 0)
 		{
-			playerHealth.healthPercentage = 6;
+			//playerHealth.healthPercentage = 6; // 2 * playerHealth.maxHearts;
+			playerHealth.healthPercentage = 2 * playerHealth.maxHearts;
 		}
 		ConvertHUDNumbers();
 		game.GetplayerCreated() = true;
@@ -265,6 +266,13 @@ void GameState::OnKeyDown(SDL_Event* event)
 		game.StartFadeIn() = false;
 		GamePadSystem::paused = true;
 	}
+	auto player = reg.GetEntityByTag("player");
+	auto& health = player.GetComponent<HealthComponent>();
+
+	//if (event->key.keysym.sym == SDLK_p)
+	//{
+	//	health.addHeart = true;
+	//}
 }
 
 void GameState::OnKeyUp(SDL_Event* event)

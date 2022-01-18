@@ -1,11 +1,14 @@
 #pragma once
 #include "../../ECS/ECS.h"
 #include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/RigidBodyComponent.h"
+#include "../../Components/SpriteComponent.h"
 #include "KeyboardControlSystem.h"
 #include <SDL.h>
 #include "../../States/PauseState.h"
 #include "../../States/MenuState.h"
 #include "../../States/GameState.h"
+#include "../../Game/Game.h"
 
 class GamePadSystem : public System
 {

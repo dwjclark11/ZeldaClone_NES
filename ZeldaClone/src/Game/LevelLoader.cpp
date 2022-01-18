@@ -25,7 +25,7 @@
 #include "../States/GameState.h"
 #include "../Game/Game.h"
 #include "../Utilities/LuaTableWriter.h"
-#include "../Systems/GameSystems/RenderHealthSystem.h"
+#include "../Systems/GameSystems/HealthSystem.h"
 #include "../Systems/SoundFXSystem.h"
 #include <string>
 #include <fstream>
@@ -688,7 +688,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	int numRupees 				= GameState::totalRupees;
 	int numBombs 				= GameState::totalBombs;
 	int numArrows 				= 10; // This needs to be changed 
-	int numHearts 				= RenderHealthSystem::numHearts;
+	int numHearts				= entity.GetComponent<HealthComponent>().maxHearts;//RenderHealthSystem::numHearts;
 	int numKeys 				= GameState::totalKeys;
 	int triforcePieces 			= 0;
 	
@@ -1144,7 +1144,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> menuSharedValues = player["menu_shared_values"];
 		if (menuSharedValues != sol::nullopt)
 		{
-			RenderHealthSystem::loadedHearts = player["menu_shared_values"]["num_hearts"].get_or(3);
+			HealthSystem::loadedHearts = player["menu_shared_values"]["num_hearts"].get_or(3);
 		}
 		// Components
 		sol::optional<sol::table> hasComponents = player["components"];

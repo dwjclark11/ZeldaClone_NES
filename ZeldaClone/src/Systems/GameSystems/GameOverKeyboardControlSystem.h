@@ -66,6 +66,7 @@ public:
 					{
 						game.GetplayerCreated() = false;
 						game.GetPlayerDead() = false;
+						HealthSystem::numHearts = 3;
 						game.GetStateMachine()->PopState();
 						game.GetStateMachine()->PushState(new GameState());
 					}

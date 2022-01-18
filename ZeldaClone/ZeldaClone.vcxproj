@@ -184,7 +184,12 @@
     <ClCompile Include="src\States\SaveGameState.cpp" />
     <ClCompile Include="src\States\State.cpp" />
     <ClCompile Include="src\States\TitleState.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\AISystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\AnimationSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\CaptionSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\CollectItemSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\CollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\DamageSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\GamePadSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\HealthSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\KeyboardControlSystem.cpp" />
@@ -193,6 +198,7 @@
     <ClCompile Include="src\Systems\GameSystems\RenderHUDSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderTileSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\TriggerSystem.cpp" />
     <ClCompile Include="src\Systems\PauseSystems\ItemSelectKeyboardSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTitleSystem.cpp" />
     <ClCompile Include="src\Utilities\FileManagerUtils.cpp" />

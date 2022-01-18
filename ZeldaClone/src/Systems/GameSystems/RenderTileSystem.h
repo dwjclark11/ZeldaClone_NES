@@ -1,9 +1,10 @@
 #pragma once
+#include "../../ECS/ECS.h"
 
 struct SDL_Renderer;
 struct SDL_Rect;
 class AssetManager;
-#include "../../ECS/ECS.h"
+
 
 class RenderTileSystem : public System
 {

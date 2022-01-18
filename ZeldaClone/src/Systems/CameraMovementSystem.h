@@ -2,6 +2,7 @@
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/CameraFollowComponent.h"
+#include "../Components/RigidBodyComponent.h"
 #include <SDL.h>
 #include "../Game/Game.h"
 
