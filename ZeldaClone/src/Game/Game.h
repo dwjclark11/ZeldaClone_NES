@@ -140,6 +140,11 @@ public:
 	inline Uint8 GetFadeAlpha() { return fadeAlpha; }
 	inline const double& GetDeltaTime() const { return deltaTime; }
 
+	void AddGameSecrets(const std::string& locationID, bool found);
+	bool HasSecret(const std::string& locationID);
+	bool IsSecretFound(const std::string& locationID);
+	void SetSecretFound(const std::string& locationID, bool found);
+	std::map<std::string, bool> GetGameSecrets() { return gameSecrets; }
 	template<typename TSystem> TSystem& GetSystem();
 
 	int milliSecondsPreviousFrame;
@@ -191,6 +196,7 @@ private:
 
 	// Constructor / Destructor
 	Game();
+	std::map<std::string, bool> gameSecrets;
 };
 
 

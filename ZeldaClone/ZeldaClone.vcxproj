@@ -461,6 +461,7 @@
     <ClInclude Include="src\Components\ColliderComponent.h" />
     <ClInclude Include="src\Components\EnemyComponent.h" />
     <ClInclude Include="src\Components\PlayerComponent.h" />
+    <ClInclude Include="src\Components\SecretComponent.h" />
     <ClInclude Include="src\StateMachines\EnemyStateMachine.h" />
     <ClInclude Include="src\StateMachines\EnemyStates.h" />
     <ClInclude Include="src\StateMachines\PlayerStateMachine.h" />

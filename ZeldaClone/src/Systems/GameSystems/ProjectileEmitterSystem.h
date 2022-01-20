@@ -51,9 +51,9 @@ private:
 		bool animation;
 		bool vertical;
 
-		ItemAttrib(std::string group, std::string sprite_name, int width, int height, int src_rect_x, int src_rect_y, int num_frames, glm::vec2 scale, 
-			glm::vec2 trans_offset_up, glm::vec2 trans_offset_down, glm::vec2 trans_offset_right, glm::vec2 trans_offset_left, glm::vec2 box_size_up, 
-			glm::vec2 box_size_down, glm::vec2 box_size_left, glm::vec2 box_size_right, glm::vec2 box_up_offset, glm::vec2 box_down_offset, 
+		ItemAttrib(std::string group, std::string sprite_name, int width, int height, int src_rect_x, int src_rect_y, int num_frames, glm::vec2 scale,
+			glm::vec2 trans_offset_up, glm::vec2 trans_offset_down, glm::vec2 trans_offset_right, glm::vec2 trans_offset_left, glm::vec2 box_size_up,
+			glm::vec2 box_size_down, glm::vec2 box_size_left, glm::vec2 box_size_right, glm::vec2 box_up_offset, glm::vec2 box_down_offset,
 			glm::vec2 box_right_offset, glm::vec2 box_left_offset, int duration = 3000, bool animation = false, bool vertical = false)
 		{
 			this->group = group;
@@ -205,7 +205,7 @@ public:
 			BoxOffset = attrib.leftOffset;
 			directionX = -1;
 		}
-				
+
 		// Create new projectile entity and add it to the world
 		Entity newItem = player.registry->CreateEntity();
 		newItem.Group(attrib.group);
@@ -227,7 +227,7 @@ public:
 		}
 		projectileEmitter.isFriendly = true;
 		newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
-		newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0,attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
+		newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0, attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
 		newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration);
 		newItem.AddComponent<GameComponent>();
 
@@ -248,7 +248,7 @@ public:
 
 		auto sword = Registry::Instance()->GetEntityByTag("the_sword");
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
-		
+
 		auto shield = Registry::Instance()->GetEntityByTag("the_shield");
 		auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
 
@@ -308,7 +308,7 @@ public:
 		if (playerHealth.healthPercentage == (playerHealth.maxHearts * 2)) fullLife = true;
 		else fullLife = false;
 	}
-	
+
 	void UseMagicWand()
 	{
 		auto player = Registry::Instance()->GetEntityByTag("player");
@@ -317,7 +317,7 @@ public:
 		auto& sprite = player.GetComponent<SpriteComponent>();
 		sprite.srcRect.y = sprite.height * 6;
 	}
-	
+
 	void OnKeyPressed(KeyPressedEvent& event)
 	{
 		if (!game.PlayerHold())
@@ -355,8 +355,8 @@ public:
 				}
 				else if (ItemSelectKeyboardControlSystem::itemType == CANDLE)
 				{
-					ItemAttrib candle("projectile", "items", 16, 16, 0, 96, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
-						glm::vec2(16, 16), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 500, false, false);
+					ItemAttrib candle("fire", "items", 16, 16, 0, 96, 1, glm::vec2(4, 4), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0),
+						glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(16, 16), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), glm::vec2(0, 0), 500, false, false);
 
 					UseItem(candle);
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
@@ -409,7 +409,7 @@ public:
 			}
 		}
 	}
-	
+
 	void Update(Registry* registry)
 	{
 		for (auto& entity : GetSystemEntities())
@@ -438,12 +438,12 @@ public:
 				if (boomerangReturned)
 				{
 					bool setKill = false;
-					
+
 					// If the boomerang position is within any of these given parameters --> Kill it
-					if (rigidbody.velocity.x > 0 && rigidbody.velocity.y > 0 && 
+					if (rigidbody.velocity.x > 0 && rigidbody.velocity.y > 0 &&
 						transform.position.x >= playerPos.position.x - 32 && transform.position.y >= playerPos.position.y - 32)
 						setKill = true;
-					else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y > 0 && 
+					else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y > 0 &&
 						transform.position.x <= playerPos.position.x + 32 && transform.position.y >= playerPos.position.y - 32)
 						setKill = true;
 					else if (rigidbody.velocity.x > 0 && rigidbody.velocity.y < 0 &&
@@ -470,7 +470,7 @@ public:
 			}
 
 			// This is the wait time for the player sword 
-			if (swordTimer.GetTicks() > 250) 
+			if (swordTimer.GetTicks() > 250)
 				swordTimer.Stop();
 
 			// Check the enemy projectile 
@@ -480,7 +480,7 @@ public:
 				auto& projectileTransform = entity.GetComponent<TransformComponent>();
 				auto& rigid = entity.GetComponent<RigidBodyComponent>();
 				const auto& ai = entity.GetComponent<AIComponent>();
-				
+
 				if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
 				{
 					Entity enemyProjectile = entity.registry->CreateEntity();
@@ -491,37 +491,37 @@ public:
 					int srcRectX = 0;
 					int srcRectY = 0;
 					int scale = 0;
-				
+
 					switch (ai.GetEnemyType())
 					{
-						case AIComponent::EnemyType::OCTOROK:
-							srcRectX = 48;
-							srcRectY = 0;
-							scale = 2;
-							break;
-						
-						case AIComponent::EnemyType::MOBLIN:
-							// Set the srcRect for the projectile sprite
-							srcRectY = 4 * 16;
-							scale = 4;
-							if (projectileEmitter.shootUp)
-								srcRectX = 0 * 16;
-							else if (projectileEmitter.shootRight)
-								srcRectX = 1 * 16;
-							else if (projectileEmitter.shootDown)
-								srcRectX = 2 * 16;
-							else if (projectileEmitter.shootLeft)
-								srcRectX = 3 * 16;
-							break;
+					case AIComponent::EnemyType::OCTOROK:
+						srcRectX = 48;
+						srcRectY = 0;
+						scale = 2;
+						break;
 
-						case AIComponent::EnemyType::ZORA:
-							// TODO: Create a sprite sheet of enemy projectiles
-							// enemyProjectile.AddComponent<AnimationComponent>(4, 20, false);
-							break;
-						default:
-							break;
+					case AIComponent::EnemyType::MOBLIN:
+						// Set the srcRect for the projectile sprite
+						srcRectY = 4 * 16;
+						scale = 4;
+						if (projectileEmitter.shootUp)
+							srcRectX = 0 * 16;
+						else if (projectileEmitter.shootRight)
+							srcRectX = 1 * 16;
+						else if (projectileEmitter.shootDown)
+							srcRectX = 2 * 16;
+						else if (projectileEmitter.shootLeft)
+							srcRectX = 3 * 16;
+						break;
+
+					case AIComponent::EnemyType::ZORA:
+						// TODO: Create a sprite sheet of enemy projectiles
+						// enemyProjectile.AddComponent<AnimationComponent>(4, 20, false);
+						break;
+					default:
+						break;
 					}
-				
+
 					// Set the velocity and direction of the projectile based on when it 
 					// was triggered
 					if (projectileEmitter.shootUp)
@@ -531,7 +531,7 @@ public:
 						rigid.up = true;
 						offsetX = 20;
 						offsetY = 0;
-					
+
 					}
 					else if (projectileEmitter.shootRight)
 					{
@@ -569,7 +569,7 @@ public:
 					enemyProjectile.AddComponent<GameComponent>();
 
 					projectileEmitter.shotFired = true;
-				}	
+				}
 			}
 		}
 	}

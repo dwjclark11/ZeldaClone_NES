@@ -109,7 +109,7 @@ public:
 				MouseControlSystem::triggerType = COLLECT_ITEM;
 				break;
 			case 6:
-				MouseControlSystem::triggerType = TRAP;
+				MouseControlSystem::triggerType = BOMB_SECRET;
 				break;
 			case 7:
 				MouseControlSystem::triggerType = HIDDEN_SWITCH;

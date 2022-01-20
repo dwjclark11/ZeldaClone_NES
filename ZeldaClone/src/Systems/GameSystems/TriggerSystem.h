@@ -19,4 +19,7 @@ public:
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager);
 	void OnTrigger(class CollisionEvent& event);
 	void OnEnterTrigger(Entity& player, Entity& trigger);
+
+
+	void SecretTrigger(Entity& trigger, bool startup = false);
 };

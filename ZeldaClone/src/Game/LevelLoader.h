@@ -29,7 +29,7 @@ private:
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 	AssetType ConvertToAssetType(std::string& type);
 	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
-	TriggerType ConvertStringToTriggerType(std::string type);
+	
 	ItemCollectType ConvertLuaStringToItem(std::string& type);
 	bool CheckForItemInInventory(SpecialItemType& type);
 	void ConvertName(std::string name, int x, int y);
@@ -59,5 +59,10 @@ public:
 	void LoadEntitiesFromLuaTable(sol::state& lua, std::string filename);
 
 	void EliminatePlayerToDefault(int slotNum, std::string& name);
+
+	void SaveSecrets();
+	void ReadInSecrets(sol::state& lua);
+
+	TriggerType ConvertStringToTriggerType(std::string type);
 
 };

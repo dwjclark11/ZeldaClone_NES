@@ -524,7 +524,7 @@ public:
 				}
 				else if (current_item == "TRAP")
 				{
-					MouseControlSystem::triggerType = TRAP;
+					MouseControlSystem::triggerType = BOMB_SECRET;
 				}
 				else if (current_item == "HIDDEN_SWITCH")
 				{

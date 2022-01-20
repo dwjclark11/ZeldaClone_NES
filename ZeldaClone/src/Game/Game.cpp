@@ -334,3 +334,43 @@ double& Game::GetDeltaTime()
 {
 	return deltaTime;
 }
+
+void Game::AddGameSecrets(const std::string& locationID, bool found)
+{
+	if (gameSecrets.find(locationID) == gameSecrets.end())
+	{
+		gameSecrets.emplace(locationID, found);
+	}
+	else
+	{
+		Logger::Err("Already in the map");
+	}
+
+}
+
+bool Game::HasSecret(const std::string& locationID)
+{
+	if (gameSecrets.find(locationID) != gameSecrets.end())
+		return true;
+
+	// If the location is not in the map return false
+	return false;
+}
+
+bool Game::IsSecretFound(const std::string& locationID)
+{
+	if (gameSecrets.find(locationID) != gameSecrets.end())
+	{
+		return gameSecrets[locationID];
+	}
+
+	return false;
+}
+
+void Game::SetSecretFound(const std::string& locationID, bool found)
+{
+	if (gameSecrets.find(locationID) != gameSecrets.end())
+	{
+		gameSecrets[locationID] = found;
+	}
+}

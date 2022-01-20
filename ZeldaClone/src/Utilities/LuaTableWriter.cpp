@@ -4,7 +4,7 @@ void LuaTableWriter::WriteIndent(std::fstream& file)
 {
 	for (int level = indent; level; --level)
 	{
-		Write("  ", file);
+		Write("    ", file);
 	}
 }
 
@@ -118,7 +118,9 @@ void LuaTableWriter::WriteEndTable(bool sameLine, std::fstream& file)
 	--indent;
 	if (valueWritten && !sameLine)
 	{
+		//PrepareNewLine(file);
 		WriteNewLine(file);
+		//WriteIndent(file);
 	}
 	Write('}', file);
 	newLine = false;

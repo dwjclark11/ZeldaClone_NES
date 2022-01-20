@@ -96,4 +96,84 @@ triggers = {
 			},
 		}
 	},	
+	-- Test Secret 
+	[4] = {
+		group = "secret",
+		components = {
+			transform = {
+				position = { x = 7600, y = 4768},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "bomb_secret",
+				transport_offset 	= { x = 450, y = 500 },
+				camera_offset 		= { x = 0, y = -288 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "secret_dungeon_colliders", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "secret_dungeon",
+				entity_file			= "sword_cave",
+				trigger_file		= "sword_cave_triggers",
+				image_width			= 256,
+				image_height		= 176
+			},
+			secret = {
+				location_id			= "Sword_cave_Area",
+				new_trigger			= "secret_area",
+				new_sprite_id		= "Dungeon_Tiles",
+				sprite_width		= 16,
+				sprite_height		= 16,
+				sprite_src_x		= 64,
+				sprite_src_y		= 0
+			},
+		}
+	},	
+		-- Test Secret 
+	[5] = {
+		group = "secret",
+		components = {
+			transform = {
+				position = { x = 8576, y = 5012},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "burn_bush",
+				transport_offset 	= { x = 450, y = 500 },
+				camera_offset 		= { x = 0, y = -288 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "secret_dungeon_colliders", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "secret_dungeon",
+				entity_file			= "sword_cave",
+				trigger_file		= "sword_cave_triggers",
+				image_width			= 256,
+				image_height		= 176
+			},
+			secret = {
+				location_id			= "Burn_Bush_Area",
+				new_trigger			= "secret_area",
+				new_sprite_id		= "Dungeon_Tiles",
+				sprite_width		= 16,
+				sprite_height		= 16,
+				sprite_src_x		= 64,
+				sprite_src_y		= 0
+			},
+		}
+	},	
 }

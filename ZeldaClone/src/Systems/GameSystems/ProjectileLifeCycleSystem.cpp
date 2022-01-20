@@ -35,7 +35,8 @@ void ProjectileLifeCycleSystem::Update()
 			explosion.AddComponent<BoxColliderComponent>(16, 16);
 			explosion.AddComponent<AnimationComponent>(3, 10, false, false, 80);
 			explosion.AddComponent<GameComponent>();
-			explosion.Group("projectile");
+			//explosion.Group("projectile");
+			explosion.Group("explode");
 			entity.Kill();
 
 			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_blow", 0, 1);

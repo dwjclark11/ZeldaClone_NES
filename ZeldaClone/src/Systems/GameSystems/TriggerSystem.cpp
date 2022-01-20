@@ -4,7 +4,9 @@
 #include "../../Components/TriggerBoxComponent.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/SpriteComponent.h"
+#include "../../Components/GameComponent.h"
 #include "../../Components/RigidBodyComponent.h"
+#include "../../Components/SecretComponent.h"
 #include "../../Systems/GameSystems/RenderTileSystem.h"
 #include "../../Events/CollisionEvent.h"
 #include "../../Events/TriggerEvent.h"
@@ -104,6 +106,43 @@ void TriggerSystem::SetInventory(SpecialItemType& item)
 	}
 }
 
+void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
+{
+	auto& secret = trigger.GetComponent<SecretComponent>();
+	if (!secret.found)
+	{
+		auto& secretCollider = trigger.GetComponent<BoxColliderComponent>();
+		auto& secretTrigger = trigger.GetComponent<TriggerBoxComponent>();
+		auto& secretTransform = trigger.GetComponent<TransformComponent>();
+
+		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
+
+		auto secretArea = Registry::Instance()->CreateEntity();
+		secretArea.Group("trigger");
+		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
+		secretArea.AddComponent<TriggerBoxComponent>(trigType,
+			secretTrigger.transportOffset, secretTrigger.cameraOffset,
+			secretTrigger.levelMusic, secretTrigger.assetFile,
+			secretTrigger.enemyFile, secretTrigger.colliderFile,
+			secretTrigger.tileMapName, secretTrigger.tileImageName,
+			secretTrigger.entityFileName, secretTrigger.imageWidth, secretTrigger.imageHeight, secretTrigger.triggerFile);
+
+		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
+		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
+		secretArea.AddComponent<GameComponent>();
+
+		if (!startup)
+		{
+			Logger::Log("Blasted open " + secret.locationID + " Secret!");
+			secret.found = true;
+			game.SetSecretFound(secret.locationID, true);
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+
+			loader.SaveSecrets();
+		}
+	}
+}
+
 TriggerSystem::TriggerSystem()
 	: game(*Game::Instance())
 {
@@ -131,6 +170,30 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	if (b.BelongsToGroup("trigger") && a.HasTag("player"))
 	{
 		OnEnterTrigger(a, b);
+	}
+
+	// Check for secret Component 
+	if (b.HasComponent<SecretComponent>())
+	{
+
+		auto& trig = b.GetComponent<TriggerBoxComponent>();
+		if (trig.triggerType == BOMB_SECRET && a.BelongsToGroup("explode"))
+			OnEnterTrigger(a, b);
+		if (trig.triggerType == BURN_BUSHES && a.BelongsToGroup("fire"))
+			OnEnterTrigger(a, b);
+		if (trig.triggerType == PUSH_ROCKS && a.HasTag("player"))
+			OnEnterTrigger(a, b);
+	}
+
+	if (a.HasComponent<SecretComponent>())
+	{
+		auto& trig = a.GetComponent<TriggerBoxComponent>();
+		if (trig.triggerType == BOMB_SECRET && b.BelongsToGroup("explode"))
+			OnEnterTrigger(b, a);
+		if (trig.triggerType == BURN_BUSHES && b.BelongsToGroup("fire"))
+			OnEnterTrigger(b, a);
+		if (trig.triggerType == PUSH_ROCKS && b.HasTag("player"))
+			OnEnterTrigger(b, a);
 	}
 }
 
@@ -164,6 +227,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	switch (trig.triggerType)
 	{
 	case NO_TRIGGER:
+		Logger::Err("TRIGGER_SYSTEM: __LINE: 174 - There is not trigger set for this entity");
 		break;
 
 	case SECRET_AREA: // Change this to scene transition TriggerType::CHANGE_SCENE?
@@ -201,7 +265,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				// load the tilemap only if there is an image and a corresponding map
 				if (tileMapName != "no_file" && tileImageName != "no_file")
 				{
-					Logger::Log("Image: " + tileImageName);
+
 					loader.LoadTilemap(mapFile, tileImageName);
 				}
 
@@ -237,6 +301,8 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				if (enemyFile != "no_file")
 					loader.LoadEnemiesFromLuaTable(game.GetLuaState(), enemyFile);
 
+				loader.ReadInSecrets(game.GetLuaState());
+				
 				// Set player Position
 				_player.GetComponent<TransformComponent>().position.x = x;
 				_player.GetComponent<TransformComponent>().position.y = y;
@@ -246,7 +312,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				game.StartFadeIn() = true;
 				// Remove the current trigger
 				trigger.Kill();
-
+				Logger::Log("Image: " + tileImageName);
 				game.SetStairsFinished(false);
 				// Set player sprite back to start
 				sprite.srcRect.y = 0;
@@ -260,7 +326,12 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		break;
 	}
 	case BURN_BUSHES:
-		// TODO: 
+		if (trigger.HasComponent<SecretComponent>())
+		{
+			SecretTrigger(trigger);
+			// After the new trigger is created, remove the current trigger!
+			trigger.Kill();
+		}
 		break;
 
 	case PUSH_ROCKS:
@@ -277,6 +348,16 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 		break;
 	}
+	case BOMB_SECRET:
+		if (trigger.HasComponent<SecretComponent>())
+		{
+			SecretTrigger(trigger);
+
+			// After the new trigger is created, remove the current trigger!
+			trigger.Kill();
+		}
+
+		break;
 	case SHOP_ITEM:
 		// Check to see if the trigger has an Item Components
 		if (trigger.HasComponent<ItemComponent>() && GameState::scrollRupees == 0)

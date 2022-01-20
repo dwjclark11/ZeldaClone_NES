@@ -28,6 +28,7 @@
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/ProjectileComponent.h"
 #include "../Components/RupeeTypeComponent.h"
+#include "../Components/SecretComponent.h"
 #include "../Components/ItemComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/CaptionComponent.h"
@@ -154,7 +155,7 @@ void GameState::Render()
 
 	reg.GetSystem<HealthSystem>().Update();
 	game.GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
-	
+
 	// If the game is in debug mode, render the collision system
 	if (Game::isDebug)
 	{
@@ -177,15 +178,16 @@ bool GameState::OnEnter()
 
 		// Open the lua libraries into the game
 		game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
-
+		
 		// Make sure the game is not in debug mode!!
 		Game::isDebug = false;
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
+		
 		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
 		loader.LoadColliders("overworld_colliders");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
-
+		
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
 		// =============================================================================================================================
@@ -228,12 +230,29 @@ bool GameState::OnEnter()
 		auto& playerHealth = player.GetComponent<HealthComponent>();
 		if (playerHealth.healthPercentage <= 0)
 		{
-			//playerHealth.healthPercentage = 6; // 2 * playerHealth.maxHearts;
 			playerHealth.healthPercentage = 2 * playerHealth.maxHearts;
 		}
 		ConvertHUDNumbers();
 		game.GetplayerCreated() = true;
 	}
+
+	// Test Read in all secrets!!
+	loader.ReadInSecrets(game.GetLuaState());
+
+
+	//for (auto& entity : Registry::Instance()->GetEntitiesByGroup("secret"))
+	//{
+	//	auto& secret = entity.GetComponent<SecretComponent>();
+	//	if (game.IsSecretFound(secret.locationID))
+	//	{
+	//		// Call the Trigger Function
+	//		game.GetSystem<TriggerSystem>().SecretTrigger(entity, true);
+	//		Logger::Log(secret.locationID + " has already been discovered!");
+	//	}
+	//	else
+	//		continue;
+	//}
+
 	return true;
 }
 
@@ -258,16 +277,9 @@ void GameState::OnKeyDown(SDL_Event* event)
 	{
 		Game::isDebug = !Game::isDebug;
 	}
-	// Set to paused
-	if (event->key.keysym.sym == SDLK_q)
-	{
-		game.FadeFinished() = false;
-		game.StartFadeOut() = true;
-		game.StartFadeIn() = false;
-		GamePadSystem::paused = true;
-	}
-	auto player = reg.GetEntityByTag("player");
-	auto& health = player.GetComponent<HealthComponent>();
+
+	/*auto player = reg.GetEntityByTag("player");
+	auto& health = player.GetComponent<HealthComponent>();*/
 
 	//if (event->key.keysym.sym == SDLK_p)
 	//{
@@ -277,9 +289,19 @@ void GameState::OnKeyDown(SDL_Event* event)
 
 void GameState::OnKeyUp(SDL_Event* event)
 {
+	// Set to paused
+	if (event->key.keysym.sym == SDLK_q)
+	{
+		game.FadeFinished() = false;
+		game.StartFadeOut() = true;
+		game.StartFadeIn() = false;
+		GamePadSystem::paused = true;
+	}
+
 	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
 	KeyboardControlSystem::keyDown = false;
 }
+
 
 void GameState::ConvertHUDNumbers()
 {

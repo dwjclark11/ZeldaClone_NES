@@ -200,11 +200,7 @@ void PauseState::ProcessEvents(SDL_Event& event)
 
 void PauseState::OnKeyDown(SDL_Event* event)
 {
-	if (event->key.keysym.sym == SDLK_BACKSPACE)
-	{
-		game.FadeFinished() = false;
-		game.StartFadeOut() = true;	
-	}
+
 
 	if (event->key.keysym.sym == SDLK_m)
 	{
@@ -214,7 +210,11 @@ void PauseState::OnKeyDown(SDL_Event* event)
 
 void PauseState::OnKeyUp(SDL_Event* event)
 {
-
+	if (event->key.keysym.sym == SDLK_q)
+	{
+		game.FadeFinished() = false;
+		game.StartFadeOut() = true;
+	}
 }
 
 

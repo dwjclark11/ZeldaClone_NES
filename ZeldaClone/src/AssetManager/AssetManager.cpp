@@ -69,10 +69,10 @@ TTF_Font* AssetManager::GetFont(const std::string& assetID)
 bool AssetManager::HasFont(const std::string& assetID)
 {
 	// search the map of font and return true if the key has been found
-	for (size_t i = 0; i < fonts.size(); i++)
-	{
+	/*for (size_t i = 0; i < fonts.size(); i++)
+	{*/
 		if (fonts.find(assetID) != fonts.end()) return true;
-	}
+	//}
 	
 	// Unable to find the key, return false
 	return false;
@@ -90,10 +90,10 @@ Mix_Music* AssetManager::GetMusic(const std::string& assetID)
 
 bool AssetManager::HasMusic(const std::string& assetID)
 {
-	for (size_t i = 0; i < music.size(); i++)
-	{
+	/*for (size_t i = 0; i < music.size(); i++)
+	{*/
 		if (music.find(assetID) != music.end()) return true;
-	}
+	//}
 
 	return false;
 }
@@ -110,38 +110,38 @@ Mix_Chunk* AssetManager::GetSoundFX(const std::string& assetID)
 
 bool AssetManager::HasSoundFX(const std::string& assetID)
 {
-	for (size_t i = 0; i < soundFX.size(); i++)
-	{
+	//for (size_t i = 0; i < soundFX.size(); i++)
+	//{
 		if (soundFX.find(assetID) != soundFX.end()) return true;
-	}
+	//}
 
 	return false;
 }
 
 void AssetManager::ClearAssets()
 {
-	for (auto texture : textures)
+	for (auto& texture : textures)
 	{
 		// Destroy all the textures
 		SDL_DestroyTexture(texture.second); // Clear the SDL_Textures
 	}
 	textures.clear();
 
-	for (auto font : fonts)
+	for (auto& font : fonts)
 	{
 		TTF_CloseFont(font.second);
 	}
 	fonts.clear();
 	
 	// Destroy/ Remove all Music
-	for (auto fx : soundFX)
+	for (auto& fx : soundFX)
 	{
 		Mix_FreeChunk(fx.second);
 	}
 	soundFX.clear();
 
 	// Destroy / Remove all SoundFX
-	for (auto music : music)
+	for (auto& music : music)
 	{
 		Mix_FreeMusic(music.second);
 	}
