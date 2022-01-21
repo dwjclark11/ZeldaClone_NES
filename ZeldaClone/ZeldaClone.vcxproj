@@ -184,6 +184,8 @@
     <ClCompile Include="src\States\SaveGameState.cpp" />
     <ClCompile Include="src\States\State.cpp" />
     <ClCompile Include="src\States\TitleState.cpp" />
+    <ClCompile Include="src\Systems\EditorSystems\MouseControlSystem.cpp" />
+    <ClCompile Include="src\Systems\EditorSystems\RenderEditorGUISystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\AISystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\AnimationSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\CaptionSystem.cpp" />
@@ -566,6 +568,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Levels\testState.lua" />
+    <None Include="Assets\LuaFiles\editor_assets.lua" />
     <None Include="Assets\LuaFiles\game_state_assets.lua" />
     <None Include="Assets\LuaFiles\hud.lua" />
     <None Include="Assets\LuaFiles\menu_state_assets.lua" />

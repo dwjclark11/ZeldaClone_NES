@@ -9,9 +9,11 @@
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/EditorComponent.h"
+#include "../Components/AIComponent.h"
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "../Systems/EditorSystems/MouseControlSystem.h"
 
 EditorFileLoader::EditorFileLoader()
 	: reg(*Registry::Instance())
@@ -169,19 +171,19 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		glm::vec2 offset = glm::vec2(0, 0);
 		glm::vec2 triggerOffset = glm::vec2(0, 0);
 		glm::vec2 triggerCamOffset = glm::vec2(0, 0);
-		bool collider = false;
-		bool trigger = false;
-		int type = 0;
-		std::string triggerLevel = "";
-		TriggerType triggerType = NO_TRIGGER;
+		//bool collider = false;
+		//bool trigger = false;
+		//int type = 0;
+		//std::string triggerLevel = "";
+		//TriggerType triggerType = NO_TRIGGER;
 		
-		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY >> collider >> trigger;
+		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY /*>> collider >> trigger*/ >> colWidth >> colHeight >> offset.x >> offset.y;
 
-		if (collider && !trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y;
-		else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel;
+		//if (collider && !trigger) mapFile >> ;
+		//else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel;
 		
-		// Convert the trigger type to TriggerType enum
-		triggerType = ConvertToTriggerType(type);
+		//// Convert the trigger type to TriggerType enum
+		//triggerType = ConvertToTriggerType(type);
 
 		// If we are at the end of the File --> Leave the File!!
 		if (mapFile.eof()) break;
@@ -190,18 +192,19 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		Entity boxCollider = reg.CreateEntity();
 		boxCollider.Group(group);
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
-		
-		// Check to see if it has only a box collider
-		if (collider && !trigger)
-		{
-			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-		}
-		// Check to see if there is both a box collider and a trigger 
-		if (collider && trigger)
-		{
-			boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-			boxCollider.AddComponent<TriggerBoxComponent>(triggerType);
-		}
+		boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
+
+		//// Check to see if it has only a box collider
+		//if (collider && !trigger)
+		//{
+		//	
+		//}
+		//// Check to see if there is both a box collider and a trigger 
+		//if (collider && trigger)
+		//{
+		//	boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
+		//	boxCollider.AddComponent<TriggerBoxComponent>(triggerType);
+		//}
 	}
 	// Close the file
 	mapFile.close();
@@ -315,46 +318,18 @@ void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::uniqu
 			std::string group = "colliders";
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& collision = entity.GetComponent<BoxColliderComponent>();
-			
-			mapFile << group << " " << transform.position.x << " " << transform.position.y << " " << transform.scale.x << " " << transform.scale.y << " ";
 
-			if (entity.HasComponent<BoxColliderComponent>() && !entity.HasComponent<TriggerBoxComponent>())
-			{
-				//auto& trig = entity.GetComponent<TriggerBoxComponent>();
-				collider = true;
-				trigger = false;
-				mapFile << collider << " " << trigger << " " << collision.width << " " << collision.height << " " << collision.offset.x << " " << collision.offset.y << " " << std::endl;
-			}
+			mapFile << group << " " << transform.position.x << " " << transform.position.y << " " << transform.scale.x << " "
+				<< transform.scale.y << " " << collision.width << " " << collision.height << " " << collision.offset.x << " "
+				<< collision.offset.y << " " << std::endl;;
 		}
 	}
 
-	if (!reg.GetEntitiesByGroup("trigger").empty())
-	{
-		for (auto entity : reg.GetEntitiesByGroup("trigger"))
-		{
-			bool collider = false;
-			bool trigger = false;
-			std::string group = "trigger";
-			auto& transform = entity.GetComponent<TransformComponent>();
-			auto collision = entity.GetComponent<BoxColliderComponent>();
-			auto trig = entity.GetComponent<TriggerBoxComponent>();
-
-			mapFile << group << " " << transform.position.x << " " << transform.position.y << " " << transform.scale.x << " " << transform.scale.y << " ";
-
-			if (entity.HasComponent<BoxColliderComponent>() && entity.HasComponent<TriggerBoxComponent>())
-			{
-				collider = true;
-				trigger = true;
-				mapFile << collider << " " << trigger << " " << collision.width << " " << collision.height << " " << collision.offset.x << " " << collision.offset.y << " " <<
-					trig.triggerType << " " << trig.transportOffset.x << " " << trig.transportOffset.y << " " << trig.levelMusic << " " << std::endl;
-			}
-		}
-	}
 	// Close the mapfile
 	mapFile.close(); 
 }
 
-void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath)
 {
 	// Create variables
 	LuaTableWriter m_writer;
@@ -377,14 +352,8 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 	// If there are colliders in the registry, save them to a lua file, using the LuaTableWriter
 	if (!reg.GetEntitiesByGroup("colliders").empty())
 	{
-		for (auto entity : reg.GetEntitiesByGroup("colliders"))
+		for (const auto& entity : reg.GetEntitiesByGroup("colliders"))
 		{
-			Logger::Log("In the collider");
-			bool collider = false;
-			bool trigger = false;
-			std::string group = "colliders";
-			
-			
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& collision = entity.GetComponent<BoxColliderComponent>();
 
@@ -415,76 +384,13 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath, const s
 			m_writer.WriteEndTableWithSeparator(false, file);
 			
 			i++;
+			
 		}
 	}
-	m_writer.WriteEndTable(false, file);
-	// Currently there is a glitch with the save --> There must be at least one trigger 
-	
-	// If there are triggers in the registry, save them to a lua file, using the LuaTableWriter
-	if (!reg.GetEntitiesByGroup("trigger").empty())
-	{
-		// reset i to 1
-		i = 1;
-		m_writer.WriteDeclareTable("triggers", file);
-		// Loop through all Triggers
-		for (auto entity : reg.GetEntitiesByGroup("trigger"))
-		{
-			Logger::Log("In the trigger");
-			bool collider = false;
-			bool trigger = true;
-			
-			std::string group = "trigger";
-			const auto& transform = entity.GetComponent<TransformComponent>();
-			const auto& trig = entity.GetComponent<TriggerBoxComponent>();
-			const auto& collision = entity.GetComponent<BoxColliderComponent>();
-			
-			m_writer.WriteStartTable(i, false, file);
-			m_writer.WriteKeyAndQuotedValue("group", "trigger", file);
-			m_writer.WriteDeclareTable("components", file);
-			m_writer.WriteDeclareTable("transform", file);
-			m_writer.WriteDeclareTable("position", file);
-			m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
-			m_writer.WriteKeyAndValue('y',transform.position.y, true, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteDeclareTable("scale", file);
-			m_writer.WriteKeyAndValue('x', transform.scale.x, false, file);
-			m_writer.WriteKeyAndValue('y', transform.scale.y, true, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteDeclareTable("rotation", file);
-			m_writer.WriteUnquotedValue(transform.rotation, false, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteEndTable(false, file);
-			
-			// Write box Collider --> All triggers are box Colliders
-			m_writer.WriteDeclareTable("boxCollider", file);
-			m_writer.WriteKeyAndUnquotedValue("width", collision.width, file);
-			m_writer.WriteKeyAndUnquotedValue("height", collision.height, file);
-			m_writer.WriteKeyAndUnquotedValue("offset_x", collision.offset.x, file);
-			m_writer.WriteKeyAndUnquotedValue("offset_y", collision.offset.y, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteEndTable(false, file);
-			
-			// Add the type of trigger
-			m_writer.WriteDeclareTable("triggerComponent", file);
-			m_writer.WriteKeyAndUnquotedValue("type", trig.triggerType, file);
-			m_writer.WriteKeyAndUnquotedValue("transport_offset_x", trig.transportOffset.x, file);
-			m_writer.WriteKeyAndUnquotedValue("transport_offset_y", trig.transportOffset.y, file);
-			m_writer.WriteKeyAndUnquotedValue("level", trig.levelMusic, file);
-			//m_writer.WriteEndTable(false, file);
-			m_writer.WriteEndTable(false, file);
-		
-			m_writer.WriteEndTableWithSeparator(false, file);
-			
-			// This is to number the triggers
-			i++;
-		}	
-	}
 
-	Logger::Log("Out the trigger written");
-	// Write the end of the tables and close the file
-	//m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
 	Logger::Log("Out the table written");
+	m_writer.WriteEndDocument(file);
 	file.close();
 	
 }
@@ -518,6 +424,7 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			bool projectile = false;
 			bool script = false;
 			bool rigid = false;
+			bool ai = false;
 
 			auto animationComponent = AnimationComponent();
 			if (entity.HasComponent<AnimationComponent>())
@@ -546,6 +453,14 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 				rigidbody = entity.GetComponent<RigidBodyComponent>();
 				rigid = true;
 			}
+
+			auto ai_comp = AIComponent();
+			if (entity.HasComponent<AIComponent>())
+			{
+				ai_comp = entity.GetComponent<AIComponent>();
+				ai = true;
+			}
+
 
 			// All Enemies will have these Components
 			const auto& transform = entity.GetComponent<TransformComponent>();
@@ -626,7 +541,7 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 				m_writer.WriteKeyAndUnquotedValue("projectile_duration", projectileEmitter.projectileDuration, file);
 				m_writer.WriteKeyAndUnquotedValue("hit_percent_damage", projectileEmitter.hitPercentDamage, file);
 				m_writer.WriteKeyAndUnquotedValue("is_friendly", (projectileEmitter.isFriendly ? "true" : "false"), file);
-				m_writer.WriteEndTable(true, file);
+				//m_writer.WriteEndTable(true, file);
 				m_writer.WriteEndTable(false, file);
 			}
 
@@ -642,13 +557,27 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 				//m_writer.WriteEndTable(false, file);
 				m_writer.WriteEndTable(false, file);
 			}
-			// Script Component
-			if (script)
+
+			if (ai)
 			{
-				// TODO: Add a proper way to save the scripts to a lua table
-				// ImGui::EnterText? MultiText? 
+				std::string enemy_type_str = ConvertAIEnemyToString(ai_comp.GetEnemyType());
+				m_writer.WriteDeclareTable("ai_component", file);
+				m_writer.WriteDeclareTable("enemy_pos", file);
+				m_writer.WriteKeyAndValue("x", 0, false, file);
+				m_writer.WriteKeyAndValue("y", 0, true, file);
+				m_writer.WriteEndTable(true, file);
+				m_writer.WriteKeyAndQuotedValue("enemy_type", enemy_type_str, file);
+				m_writer.WriteEndTable(false, file);
+
 			}
-			m_writer.WriteEndTable(false, file);
+			//// Script Component
+			//if (script)
+			//{
+			//	// TODO: Add a proper way to save the scripts to a lua table
+			//	// ImGui::EnterText? MultiText? 
+			//}
+			//m_writer.WriteEndTable(false, file);
+			m_writer.WriteEndTableWithSeparator(false, file);
 			m_writer.WriteEndTableWithSeparator(false, file);
 
 			i++;
@@ -685,6 +614,143 @@ std::string EditorFileLoader::SetName(std::string filePath, bool wExtension, cha
 	return "";
 }
 
+void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& fileName, std::string& enemy_name)
+{
+	sol::load_result script = lua.load_file("./Assets/EditorFiles/" + fileName + ".lua");
+	// This checks the syntax of our script, but it does not execute the script
+	if (!script.valid())
+	{
+		sol::error err = script;
+		std::string errorMessage = err.what();
+		Logger::Err("Error loading the Lua Script: " + errorMessage);
+		return;
+	}
+
+	// Executes the script using the sol State
+	lua.script_file("./Assets/EditorFiles/" + fileName + ".lua");
+
+	sol::table enemy = lua[enemy_name];
+
+	sol::optional<sol::table> hasComponents = enemy["components"];
+	if (hasComponents != sol::nullopt)
+	{
+		// Set the imageID 
+		sol::optional<sol::table> sprite = enemy["components"]["sprite"];
+		if (sprite != sol::nullopt)
+		{
+			MouseControlSystem::imageID = enemy["components"]["sprite"]["asset_id"];
+			MouseControlSystem::imageSrcX = enemy["components"]["sprite"]["src_rect_x"].get_or(0);
+			MouseControlSystem::imageSrcY = enemy["components"]["sprite"]["src_rect_y"].get_or(0);
+		}
+	}
+}
+
+void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy)
+{
+	sol::load_result script = lua.load_file("./Assets/EditorFiles/" + fileName + ".lua");
+	// This checks the syntax of our script, but it does not execute the script
+	if (!script.valid())
+	{
+		sol::error err = script;
+		std::string errorMessage = err.what();
+		Logger::Err("Error loading the Lua Script: " + errorMessage);
+		return;
+	}
+
+	// Executes the script using the sol State
+	lua.script_file("./Assets/EditorFiles/" + fileName + ".lua");
+
+	sol::table enemy = lua[enemy_name];
+
+	sol::optional<sol::table> hasComponents = enemy["components"];
+	if (hasComponents != sol::nullopt)
+	{
+		// Set the Sprite Component 
+		sol::optional<sol::table> sprite = enemy["components"]["sprite"];
+		if (sprite != sol::nullopt)
+		{
+			newEnemy.AddComponent<SpriteComponent>(
+				enemy["components"]["sprite"]["asset_id"], 
+				enemy["components"]["sprite"]["width"], 
+				enemy["components"]["sprite"]["height"], 
+				enemy["components"]["sprite"]["layer"].get_or(1), 
+				enemy["components"]["sprite"]["fixed"].get_or(false), 
+				enemy["components"]["sprite"]["src_rect_x"].get_or(0), 
+				enemy["components"]["sprite"]["src_rect_y"].get_or(0) 	
+				);
+		}
+
+		// Set the BoxCollider Component
+		sol::optional<sol::table> box_collider = enemy["components"]["box_collider"];
+		if (box_collider != sol::nullopt)
+		{
+			newEnemy.AddComponent<BoxColliderComponent>(
+				enemy["components"]["box_collider"]["width"],
+				enemy["components"]["box_collider"]["height"],
+				glm::vec2(
+					enemy["components"]["box_collider"]["offset"]["x"],
+					enemy["components"]["box_collider"]["offset"]["y"])
+				);
+		}
+
+		// Set the Health Component
+		sol::optional<sol::table> health = enemy["components"]["health"];
+		if (health != sol::nullopt)
+		{
+			newEnemy.AddComponent<HealthComponent>(
+				enemy["components"]["health"]["health_percentage"].get_or(100), 
+				enemy["components"]["health"]["max_hearts"].get_or(3)
+				);
+		}
+
+		// Set the Rigid Body Component 
+		sol::optional<sol::table> rigid_body = enemy["components"]["rigid_body"];
+		if (rigid_body != sol::nullopt)
+		{
+			newEnemy.AddComponent<RigidBodyComponent>(
+				glm::vec2(
+					enemy["components"]["rigid_body"]["velocity"]["x"],
+					enemy["components"]["rigid_body"]["velocity"]["y"]
+				));
+		}
+
+		// Set the animation Component
+		sol::optional<sol::table> animation = enemy["components"]["animation"];
+		if (animation != sol::nullopt)
+		{
+			newEnemy.AddComponent<AnimationComponent>(
+				enemy["components"]["animation"]["num_frames"].get_or(1),
+				enemy["components"]["animation"]["frame_rate"].get_or(1),
+				enemy["components"]["animation"]["vertical"].get_or(true),
+				enemy["components"]["animation"]["looped"].get_or(true),
+				enemy["components"]["animation"]["frame_offset"].get_or(0)
+				);
+		}
+
+		// Set the Projectile Emitter Component
+		sol::optional<sol::table> projectile = enemy["components"]["projectile_emitter"];
+		if (projectile != sol::nullopt)
+		{
+			newEnemy.AddComponent<ProjectileEmitterComponent>(
+
+				);
+		}
+
+		// Set the AI Component
+		sol::optional<sol::table> ai = enemy["components"]["ai_component"];
+		if (ai != sol::nullopt)
+		{
+			newEnemy.AddComponent<AIComponent>(
+				glm::vec2(
+					enemy["components"]["ai_component"]["enemy_pos"]["x"],
+					enemy["components"]["ai_component"]["enemy_pos"]["y"]
+				),
+				enemy["components"]["ai_component"]["enemy_type"]
+				);
+		}
+	}
+}
+
 TriggerType EditorFileLoader::ConvertToTriggerType(int triggerType)
 {
 	switch (triggerType)
@@ -715,4 +781,9 @@ std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 		case HIDDEN_SWITCH: return "HIDDEN_SWITCH"; break;
 		case HIDDEN_OBJECT: return "HIDDEN_OBJECT"; break;
 	}
+}
+
+std::string EditorFileLoader::ConvertAIEnemyToString(AIComponent::EnemyType type)
+{
+	return std::string();
 }

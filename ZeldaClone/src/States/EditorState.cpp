@@ -8,6 +8,7 @@
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/EditorSystems/RenderEditorLabelSystem.h"
 #include "../Game/Game.h"
+#include "../Game/LevelLoader.h"
 
 
 const std::string EditorState::editorID = "EDITOR";
@@ -31,54 +32,37 @@ void EditorState::Update(const double& deltaTime)
 void EditorState::Render()
 {
 
-	reg.GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-
-	if (editor)
-		reg.GetSystem<RenderEditorGUISystem>().Update(game.GetAssetManager(), game.GetRenderer());
-	else
-	{
 		reg.GetSystem<MouseControlSystem>().Update(game.GetAssetManager(), game.GetRenderer(),
 			game.GetMouseBox(), game.GetEvent(), game.GetCamera());
 
-		reg.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
-		
-		// Create the HUD rect that each tilemap screen will be inside
-		SDL_Rect hudRectTop = { 0, 0, 1920, 288 };
+		//// Create the HUD rect that each tilemap screen will be inside
+		SDL_Rect hudRectTop = { 0, -1080 - game.GetCamera().y, game.GetCamera().w, 1080};
 		
 		// Test to see if this works correctly
 		// ****************************************************************** //
-		SDL_Rect hudRectBottom = { 0, 960, 1920, 120};
-		SDL_Rect hudRectLeft = { 0, 0, 448, 1080};
-		SDL_Rect hudRectRight = { 1472, 0, 448, 1080};
+		//SDL_Rect hudRectBottom = { 0, 960, 1920, 120};
+		SDL_Rect hudRectLeft = { -game.GetCamera().w - game.GetCamera().x, 0, game.GetCamera().w, 1080};
+		//SDL_Rect hudRectRight = { 1472, 0, 448, 1080};
 		// ****************************************************************** //
 
-		// Render all HUD objects
-		SDL_SetRenderDrawColor(game.GetRenderer(), 70, 70, 70, 100);
+		SDL_SetRenderDrawColor(game.GetRenderer(), 255, 70, 70, 100);
 
-		// ****************************************************************** //
-		SDL_RenderFillRect(game.GetRenderer(), &hudRectTop);
-		SDL_RenderDrawRect(game.GetRenderer(), &hudRectTop);
-		
-		SDL_RenderFillRect(game.GetRenderer(), &hudRectBottom);
-		SDL_RenderDrawRect(game.GetRenderer(), &hudRectBottom);
-		
 		SDL_RenderFillRect(game.GetRenderer(), &hudRectLeft);
 		SDL_RenderDrawRect(game.GetRenderer(), &hudRectLeft);
-		
-		SDL_RenderFillRect(game.GetRenderer(), &hudRectRight);
-		SDL_RenderDrawRect(game.GetRenderer(), &hudRectRight);
-		// ****************************************************************** //
-		
-		SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+		SDL_RenderFillRect(game.GetRenderer(), &hudRectTop);
+		SDL_RenderDrawRect(game.GetRenderer(), &hudRectTop);
+
+		reg.GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+		reg.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
+		reg.GetSystem<RenderEditorGUISystem>().Update(game.GetAssetManager(), game.GetRenderer());
 
 		// --- Render the Labels on top of the surounding rects
 		reg.GetSystem<RenderEditorLabelSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	}
-
 }	
 
 bool EditorState::OnEnter()
 {
+	LevelLoader loader;
 	// Stop any music that my be playing
 	Mix_HaltMusic();
 	// Set the desired window size/position for the editor
@@ -102,13 +86,9 @@ bool EditorState::OnEnter()
 	if(!reg.HasSystem<MouseControlSystem>()) 	reg.AddSystem<MouseControlSystem>();
 	if(!reg.HasSystem<EditorKeyboardControlSystem>()) reg.AddSystem<EditorKeyboardControlSystem>();
 	if(!reg.HasSystem<RenderEditorLabelSystem>()) reg.AddSystem<RenderEditorLabelSystem>();
+
+	loader.LoadAssetsFromLuaTable(game.GetLuaState(), "editor_assets");
 	//reg.AddSystem<AnimationSystem>();
-	
-	auto newMap = reg.CreateEntity();
-	newMap.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4));
-	Game::Instance()->GetAssetManager()->AddTextures(Game::Instance()->GetRenderer(), "Eagle_Level", "Assets/Backgrounds/Level1.png");
-	newMap.AddComponent<SpriteComponent>("Eagle_Level", 1536, 1056);
-	newMap.AddComponent<EditorComponent>();
 
 	// Assign values to varialbes
 	editor = false;
@@ -123,7 +103,7 @@ bool EditorState::OnExit()
 	reg.GetSystem<RenderEditorSystem>().OnExit();
 	
 	game.GetCamera().w = game.windowWidth;
-	game.GetCamera().y = game.windowHeight;
+	game.GetCamera().h = game.windowHeight;
 	
 	// Set the Window Size/Position to the desired Game Window Size and position
 	SDL_SetWindowSize(game.GetWindow(), 256 * 4, 240 * 4);

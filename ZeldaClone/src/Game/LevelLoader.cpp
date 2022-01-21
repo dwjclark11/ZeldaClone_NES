@@ -1413,7 +1413,7 @@ void LevelLoader::SaveSecrets()
 
 void LevelLoader::ReadInSecrets(sol::state& lua)
 {
-	sol::load_result script = lua.load_file("./Assets/SavedFiles/GameSecrets.lua");
+	sol::load_result script = lua.load_file("./Assets/SavedFiles/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
 
 	if (!script.valid())
 	{
@@ -1424,7 +1424,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 	}
 
 	// Execute the script
-	lua.script_file("./Assets/SavedFiles/GameSecrets.lua");
+	lua.script_file("./Assets/SavedFiles/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
 	sol::table data = lua["secrets"];
 
 	int i = 1;
@@ -1449,7 +1449,6 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 		{
 			// Call the Trigger Function
 			game.GetSystem<TriggerSystem>().SecretTrigger(entity, true);
-			Logger::Log(secret.locationID + " has already been discovered!");
 		}
 		else
 			continue;

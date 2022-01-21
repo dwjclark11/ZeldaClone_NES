@@ -135,10 +135,10 @@ void Game::Initialize()
 	gameStateMachine = new GameStateMachine();
 	
 	// Push the title screen
-	gameStateMachine->PushState(new TitleState());
+	//gameStateMachine->PushState(new TitleState());
 
-	// Unit Test --> Change to the state you want to work on
-	//gameStateMachine->PushState(new EditorState());
+	// Change to the state you want to work on
+	gameStateMachine->PushState(new EditorState());
 
 }
 
@@ -341,11 +341,6 @@ void Game::AddGameSecrets(const std::string& locationID, bool found)
 	{
 		gameSecrets.emplace(locationID, found);
 	}
-	else
-	{
-		Logger::Err("Already in the map");
-	}
-
 }
 
 bool Game::HasSecret(const std::string& locationID)

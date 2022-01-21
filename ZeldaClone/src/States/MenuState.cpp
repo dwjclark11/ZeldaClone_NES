@@ -80,7 +80,7 @@ bool MenuState::OnExit()
 
 void MenuState::ProcessEvents(SDL_Event& event)
 {
-	reg.GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	//reg.GetSystem<GamePadSystem>().UpdateOtherStates(event);
 }
 
 void MenuState::OnKeyDown(SDL_Event* event)

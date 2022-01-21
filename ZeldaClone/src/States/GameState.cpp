@@ -239,20 +239,6 @@ bool GameState::OnEnter()
 	// Test Read in all secrets!!
 	loader.ReadInSecrets(game.GetLuaState());
 
-
-	//for (auto& entity : Registry::Instance()->GetEntitiesByGroup("secret"))
-	//{
-	//	auto& secret = entity.GetComponent<SecretComponent>();
-	//	if (game.IsSecretFound(secret.locationID))
-	//	{
-	//		// Call the Trigger Function
-	//		game.GetSystem<TriggerSystem>().SecretTrigger(entity, true);
-	//		Logger::Log(secret.locationID + " has already been discovered!");
-	//	}
-	//	else
-	//		continue;
-	//}
-
 	return true;
 }
 

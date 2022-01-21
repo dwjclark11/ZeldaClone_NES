@@ -2,9 +2,13 @@
 #include "../ECS/ECS.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/AIComponent.h"
 #include <SDL.h>
 #include <memory>
 #include "../Utilities/LuaTableWriter.h"
+#include <sol/sol.hpp>
+
+
 
 class EditorFileLoader : public System
 {
@@ -22,7 +26,7 @@ public:
 	void SaveTilemap(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void SaveObjectMap(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void SaveBoxColliderMap(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
-	void SaveBoxColliderMapToLuaFile(std::string filepath, const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void SaveBoxColliderMapToLuaFile(std::string filepath /*const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer*/);
 	void SaveEnemiesToLuaFile(std::string filepath);
 
 	// Setters
@@ -30,10 +34,12 @@ public:
 	void SetImageName(std::string imageName);
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '\\');
 	
+	void LoadEnemiesAttributes(sol::state& lua, std::string& fileName, std::string& enemy_name);
+	void CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy);
 	// Converters
 	TriggerType ConvertToTriggerType(int triggerType);
 	std::string ConvertToString(TriggerType triggerType);
-
+	std::string ConvertAIEnemyToString(AIComponent::EnemyType type);
 private:
 	// Declaration of variables
 	std::string fileName;
