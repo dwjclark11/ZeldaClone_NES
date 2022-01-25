@@ -66,7 +66,7 @@ public:
 	template <typename TKey, typename TValue> void WriteQuotedKeyAndValue(TKey key, TValue value, std::fstream& file);
 	template <typename TKey, typename TValue> void WriteKeyAndValue(TKey key, TValue value, std::fstream& file);
 	template <typename TKey, typename TValue> void WriteKeyAndValue(TKey key, TValue value, bool finalValue, std::fstream& file);
-	template <typename TKey, typename TValue> void WriteKeyAndUnquotedValue(TKey key, TValue value, std::fstream& file);
+	template <typename TKey, typename TValue> void WriteKeyAndUnquotedValue(TKey key, TValue value, std::fstream& file, bool sameLine = false, bool lastValue = false);
 	template <typename TKey, typename TValue> void WriteKeyAndQuotedValue(TKey key, TValue value, std::fstream& file);
 
 };
@@ -163,12 +163,19 @@ void LuaTableWriter::WriteKeyAndValue(TKey key, TValue value, bool finalValue, s
 }
 
 template<typename TKey, typename TValue>
-void LuaTableWriter::WriteKeyAndUnquotedValue(TKey key, TValue value, std::fstream& file)
+void LuaTableWriter::WriteKeyAndUnquotedValue(TKey key, TValue value, std::fstream& file, bool sameLine, bool lastValue)
 {
-	PrepareNewLine(file);
+	if (!sameLine)
+		PrepareNewLine(file);
+	
 	Write(key, file);
 	Write(minimize ? "=" : " = ", file);
 	Write(value, file);
+
+	// Separate the values
+	if (sameLine && !lastValue)
+		Write(valueSeparator, file);
+
 	newLine = false;
 	valueWritten = true;
 }

@@ -137,13 +137,27 @@ void GameState::Update(const double& deltaTime)
 
 void GameState::Render()
 {
+	//SDL_SetRenderDrawBlendMode(game.GetRenderer(), SDL_BLENDMODE_MUL);
+	auto player = reg.GetEntityByTag("player");
+	auto& playerTransform = player.GetComponent<TransformComponent>();
 	// Create the HUD rect --> black rectangle that all the HUD items are on
 	SDL_Rect hudRect = { 0, 0, game.windowWidth, game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64 };
+	SDL_Rect greyRect = { 0, 0, game.windowWidth, game.windowHeight };
+	SDL_Rect whiteRect = { playerTransform.position.x, playerTransform.position.y, 64, 64};
 
 	game.GetSystem<RenderTileSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 
 	// Update all other render systems
 	game.GetSystem<RenderSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	
+	//SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+	//SDL_RenderFillRect(game.GetRenderer(), &greyRect);
+	//SDL_RenderDrawRect(game.GetRenderer(), &greyRect);
+	//
+	//SDL_SetRenderDrawColor(game.GetRenderer(), 255, 255, 255, 255);
+	//SDL_RenderFillRect(game.GetRenderer(), &whiteRect);
+	//SDL_RenderDrawRect(game.GetRenderer(), &whiteRect);
+	//
 
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
@@ -161,6 +175,7 @@ void GameState::Render()
 	{
 		game.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
 	}
+
 }
 
 bool GameState::OnEnter()

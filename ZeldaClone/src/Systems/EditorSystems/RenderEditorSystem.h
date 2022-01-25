@@ -1,9 +1,9 @@
 #pragma once
-#include "../Components/SpriteComponent.h"
-#include "../Components/TransformComponent.h"
-#include "../Components/EditorComponent.h"
-#include "../AssetManager/AssetManager.h"
-#include "../ECS/ECS.h"
+#include "../../Components/SpriteComponent.h"
+#include "../../Components/TransformComponent.h"
+#include "../../Components/EditorComponent.h"
+#include "../../AssetManager/AssetManager.h"
+#include "../../ECS/ECS.h"
 #include <SDL.h>
 #include <algorithm>
 #include <vector>
@@ -94,15 +94,15 @@ struct RenderEditorSystem : public System
 				NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
 				sprite.flip				// This is if we want to flup a sprite
 			);
-			
+
 		}
 	}
 
 	void OnExit()
 	{
-		for (auto entity : GetSystemEntities())
+		for (auto& entity : GetSystemEntities())
 		{
-			 entity.Kill();
+			entity.Kill();
 		}
 	}
 };

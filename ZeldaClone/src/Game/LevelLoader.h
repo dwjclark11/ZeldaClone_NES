@@ -25,7 +25,7 @@ private:
 	class Registry& reg;
 
 	// Helper Functions
-	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
+	
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 	AssetType ConvertToAssetType(std::string& type);
 	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
@@ -64,5 +64,5 @@ public:
 	void ReadInSecrets(sol::state& lua);
 
 	TriggerType ConvertStringToTriggerType(std::string type);
-
+	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
 };

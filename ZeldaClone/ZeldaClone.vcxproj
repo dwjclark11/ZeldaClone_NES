@@ -161,6 +161,7 @@
     <ClCompile Include="libs\imgui\imgui_draw.cpp" />
     <ClCompile Include="libs\imgui\imgui_impl_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_sdl.cpp" />
+    <ClCompile Include="libs\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Components\AIComponent.cpp" />
     <ClCompile Include="src\StateMachines\EnemyStateMachine.cpp" />
@@ -455,6 +456,7 @@
     <ClInclude Include="libs\imgui\imgui_impl_sdl.h" />
     <ClInclude Include="libs\imgui\imgui_internal.h" />
     <ClInclude Include="libs\imgui\imgui_sdl.h" />
+    <ClInclude Include="libs\imgui\imgui_stdlib.h" />
     <ClInclude Include="libs\imgui\imstb_rectpack.h" />
     <ClInclude Include="libs\imgui\imstb_textedit.h" />
     <ClInclude Include="libs\imgui\imstb_truetype.h" />

@@ -23,7 +23,7 @@ public:
 		GHINI,
 		LYNEL,
 		ZORA,
-
+		NO_TYPE,
 	};
 
 private:

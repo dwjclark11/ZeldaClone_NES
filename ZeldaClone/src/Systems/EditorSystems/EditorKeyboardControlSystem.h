@@ -31,7 +31,7 @@ public:
 		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &EditorKeyboardControlSystem::OnKeyPressed); // use the callback function
 	}
 
-	void OnKeyPressed(KeyPressedEvent& event) // Callback function
+	void OnKeyPressed(KeyPressedEvent& event)
 	{
 		switch (event.symbol)
 		{

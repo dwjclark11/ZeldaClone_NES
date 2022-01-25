@@ -10,6 +10,8 @@
 #include "../../Components/AnimationComponent.h"
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/HealthComponent.h"
+#include "../../Components/AIComponent.h"
+
 #include <SDL.h>
 #include <glm/glm.hpp>
 #include <SDL_ttf.h>
@@ -19,23 +21,10 @@
 class MouseControlSystem : public System
 {
 public:
-	enum class EditorEnemyType
-	{
-		NOT_SELECTED = 0,
-		OCTOROK,
-		MOBLIN,
-		DARKNUT,
-		LEEVER,
-		TEKTITE,
-		PEAHAT,
-		ARMOS,
-		GHINI,
-		LYNEL,
-		ZORA
-	};
 
-	static EditorEnemyType enemyType;
+	static AIComponent::EnemyType enemyType;
 
+	// Common Properties
 	static int imageSrcX;
 	static int imageSrcY;
 	static int mouseRectX;
@@ -43,11 +32,8 @@ public:
 
 	static int boxColliderWidth;
 	static int boxColliderHeight;
-	static int boxColliderOffsetX;
-	static int boxColliderOffsetY;
-
-	static int tileScaleX;
-	static int tileScaleY;
+	static glm::vec2 boxColliderOffset;
+	static glm::vec2 Scale;
 
 	static int gridSize;
 
@@ -58,6 +44,8 @@ public:
 	static bool createObstacles;
 	static bool createBoxCollider;
 	static bool createEnemy;
+	static bool createTrigger;
+	static bool secretSelected;
 
 	// Animation  attributes
 	static bool animation;
@@ -80,86 +68,66 @@ public:
 	static glm::vec2 rigidBodyVelocity;
 
 	static bool gridSnap;
-
 	static std::string imageID;
 	static int layer;
+
 	static unsigned triggerNum;
-	static TriggerType triggerType;
-	static std::string triggerLevelNum;
+	static TriggerType triggerType;	
+
+	static std::string levelMusic;
+	static std::string assetFile;
+	static std::string enemyNewFile;
+	static std::string colliderFile;
+	static std::string TileMapName;
+	static std::string TileMapImageName;
+	static std::string entityFileName;
+	static std::string triggerFile;
+
+	static glm::vec2 transportOffset;
+	static glm::vec2 cameraOffset;
+	static int imageWidth;
+	static int imageHeight;
+
+	// Secret Attributes
+	static int newSpriteWidth;
+	static int newSpriteHeight;
+	static std::string locationID;
+	static std::string newTriggerType;
+	static std::string newSpriteAssetID;
+
+	static int newSpriteSrcX;
+	static int newSpriteSrcY;
+
 
 	static int CanvasWidth;
 	static int CanvasHeight;
 
 	static bool OverImGuiWindow;
 
-	MouseControlSystem()
-	{
-		mapSize = 100;
-		layer = 0;
-		leftPressed = false;
-		rightPressed = false;
-		textOffsetX = -100;
-		imageName = "";
-		prevEnemyType = EditorEnemyType::OCTOROK;
-	}
-
+	MouseControlSystem();
 	~MouseControlSystem() {}
 
-	void Update(const std::unique_ptr<AssetManager>& assets, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera)
-	{
-		if (createTile) CreateTile(assets, renderer, mouseBox, event, camera);
-		if (createObstacles) CreateObstacles(assets, renderer, mouseBox, event, camera);
-		if (createBoxCollider) CreateBoxCollider(assets, renderer, mouseBox, event, camera);
-		if (createEnemy)
-		{
-			if (enemyType != prevEnemyType)
-			{
-				SetEnemyImage();
-				prevEnemyType = enemyType;
-			}
-				
-			CreateEnemy(assets, renderer, mouseBox, event, camera);
-		}
-
-
-	}
+	void Update(const std::unique_ptr<AssetManager>& assets, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 
 	// Are we creating Tiles?
 	void CreateTile(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	// Are we creating obstacles --> Tables/Box cases etc
 	void CreateObstacles(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	void CreateBoxCollider(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
+	void CreateTrigger(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	void CreateEnemy(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 
 	void SetEnemyImage();
 
+	void MouseBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Rect& camera, bool collider = false, bool trigger = false);
 
-
-
-
-	void SetImageName(std::string imageName)
-	{
-		this->imageName = imageName;
-	}
-
-	std::string& GetImageName()
-	{
-		return imageName;
-	}
-
-	void SetImageID(std::string& imageID)
-	{
-		this->imageIDs.push_back(imageID);
-	}
-
-	std::string& GetImageID()
-	{
-		return imageID;
-	}
-
+	inline void SetImageName(std::string imageName) { this->imageName = imageName; }
+	inline std::string& GetImageName() { return imageName; }
+	void SetImageID(std::string& imageID) { this->imageIDs.push_back(imageID); }
+	std::string& GetImageID() { return imageID; }
+	
 private:
 	int mousePosX, mousePosY;
-	//int gridSize;
 	int mapSize;
 	int textOffsetX;
 	bool leftPressed;
@@ -175,5 +143,8 @@ private:
 	std::vector<std::string> imageIDs;
 	EditorFileLoader editor_loader;
 
-	EditorEnemyType prevEnemyType;
+	AIComponent::EnemyType prevEnemyType;
+	int prevMouseX = 0;
+	int prevMouseY = 0;
+
 };

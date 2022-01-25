@@ -299,6 +299,7 @@ public:
 	void GroupEntity(Entity entity, const std::string& group);
 	bool EntityBelongsToGroup(Entity entity, const std::string& group) const;
 	std::vector<Entity> GetEntitiesByGroup(const std::string& group) const;
+	bool DoesGroupExist(const std::string& group) const;
 	void RemoveEntityGroup(Entity entity);
 	std::set<Entity> GetEntitiesToBeKilled() const { return entitiesToBeKilled; }
 	static Registry* Instance();

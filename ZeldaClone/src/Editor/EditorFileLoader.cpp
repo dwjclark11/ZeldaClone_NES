@@ -10,11 +10,15 @@
 #include "../Components/HealthComponent.h"
 #include "../Components/EditorComponent.h"
 #include "../Components/AIComponent.h"
+#include "../Components/SecretComponent.h"
+
+#include "../Game/LevelLoader.h"
+
 #include <string>
 #include <iostream>
 #include <fstream>
 #include "../Systems/EditorSystems/MouseControlSystem.h"
-
+#include <filesystem>
 EditorFileLoader::EditorFileLoader()
 	: reg(*Registry::Instance())
 {
@@ -30,9 +34,10 @@ EditorFileLoader::~EditorFileLoader()
 
 void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 {
+	std::string filename = std::filesystem::path(imageName).stem().string();
 	// Adding Textures to the asset Manager
 	assetManager->AddTextures(renderer, "image-Name", imageName);
-	Logger::Err(imageName);
+	Logger::Err(filename);
 	
 	// Load the tilemap
 	int tileSize = 16;
@@ -148,7 +153,7 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 	mapFile.close();
 }
 
-void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string& fileName)
 {
 	// Open and read the text file
 	std::fstream mapFile;
@@ -171,19 +176,9 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		glm::vec2 offset = glm::vec2(0, 0);
 		glm::vec2 triggerOffset = glm::vec2(0, 0);
 		glm::vec2 triggerCamOffset = glm::vec2(0, 0);
-		//bool collider = false;
-		//bool trigger = false;
-		//int type = 0;
-		//std::string triggerLevel = "";
-		//TriggerType triggerType = NO_TRIGGER;
-		
-		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY /*>> collider >> trigger*/ >> colWidth >> colHeight >> offset.x >> offset.y;
 
-		//if (collider && !trigger) mapFile >> ;
-		//else if (collider && trigger) mapFile >> colWidth >> colHeight >> offset.x >> offset.y >> type >> triggerOffset.x >> triggerOffset.y >> triggerCamOffset.x >> triggerCamOffset.y >> triggerLevel;
-		
-		//// Convert the trigger type to TriggerType enum
-		//triggerType = ConvertToTriggerType(type);
+		mapFile >> group >> tranX >> tranY >> colliderScaleX >> colliderScaleY  >> colWidth >> colHeight >> offset.x >> offset.y;
+
 
 		// If we are at the end of the File --> Leave the File!!
 		if (mapFile.eof()) break;
@@ -194,17 +189,6 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
 		boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 
-		//// Check to see if it has only a box collider
-		//if (collider && !trigger)
-		//{
-		//	
-		//}
-		//// Check to see if there is both a box collider and a trigger 
-		//if (collider && trigger)
-		//{
-		//	boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
-		//	boxCollider.AddComponent<TriggerBoxComponent>(triggerType);
-		//}
 	}
 	// Close the file
 	mapFile.close();
@@ -277,9 +261,9 @@ void EditorFileLoader::SaveObjectMap(std::string filepath, const std::unique_ptr
 			{
 				bool collider = false;
 				std::string group = "obstacles";
-				auto& obstacle = entity.GetComponent<SpriteComponent>();
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto collision = entity.GetComponent<BoxColliderComponent>();
+				const auto& obstacle = entity.GetComponent<SpriteComponent>();
+				const auto& transform = entity.GetComponent<TransformComponent>();
+				const auto& collision = entity.GetComponent<BoxColliderComponent>();
 
 				mapFile << group << " " << obstacle.assetID << " " << obstacle.srcRect.y << " " << obstacle.srcRect.x << " " << obstacle.layer << " " <<
 					transform.position.x << " " << transform.position.y << " " << transform.scale.x << " " << transform.scale.y << " ";
@@ -360,26 +344,12 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath)
 			m_writer.WriteStartTable(i, false, file);
 			m_writer.WriteKeyAndQuotedValue("group", "colliders", file);
 			m_writer.WriteDeclareTable("components", file);
-			m_writer.WriteDeclareTable("transform", file);
-			m_writer.WriteDeclareTable("position", file);
-			m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
-			m_writer.WriteKeyAndValue('y',transform.position.y, true, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteDeclareTable("scale", file);
-			m_writer.WriteKeyAndValue('x', transform.scale.x, false, file);
-			m_writer.WriteKeyAndValue('y', transform.scale.y, true, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteDeclareTable("rotation", file);
-			m_writer.WriteUnquotedValue(transform.rotation, false, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteEndTable(false, file);
-			m_writer.WriteDeclareTable("boxCollider", file);
-			m_writer.WriteKeyAndUnquotedValue("width", collision.width, file);
-			m_writer.WriteKeyAndUnquotedValue("height", collision.height, file);
-			m_writer.WriteKeyAndUnquotedValue("offset_x", collision.offset.x, file);
-			m_writer.WriteKeyAndUnquotedValue("offset_y", collision.offset.y, file);
-			m_writer.WriteEndTable(false, file);
-			m_writer.WriteEndTable(false, file);
+
+			WriteTransformComponent(m_writer, transform, file, false);
+			Logger::Log("Middle");
+			WriteBoxColliderComponent(m_writer, collision, file, false);
+
+			//m_writer.WriteEndTable(false, file);
 
 			m_writer.WriteEndTableWithSeparator(false, file);
 			
@@ -401,7 +371,7 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	LuaTableWriter m_writer;
 	std::fstream file;
 	int i = 1;
-	bool trigger = false;
+	//bool trigger = false;
 	Logger::Err("FilePath: " + filepath);
 	// open the file to save to
 	file.open(filepath, std::ios::out);
@@ -415,10 +385,10 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	m_writer.WriteCommentSeparation(file);
 	m_writer.WriteDeclareTable("enemies", file);
 
-	// If there are colliders in the registry, save them to a lua file, using the LuaTableWriter
+	// If there are Enemies in the registry, save them to a lua file, using the LuaTableWriter
 	if (!reg.GetEntitiesByGroup("enemies").empty())
 	{
-		for (auto entity : reg.GetEntitiesByGroup("enemies"))
+		for (const auto& entity : reg.GetEntitiesByGroup("enemies"))
 		{
 			bool animation = false;
 			bool projectile = false;
@@ -472,19 +442,22 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			m_writer.WriteStartTable(i, false, file);
 			m_writer.WriteKeyAndQuotedValue("group", "enemies", file);
 			m_writer.WriteDeclareTable("components", file);
-			m_writer.WriteDeclareTable("transform", file);
-			m_writer.WriteDeclareTable("position", file);
-			m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
-			m_writer.WriteKeyAndValue('y', transform.position.y, true, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteDeclareTable("scale", file);
-			m_writer.WriteKeyAndValue('x', transform.scale.x, false, file);
-			m_writer.WriteKeyAndValue('y', transform.scale.y, true, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteDeclareTable("rotation", file);
-			m_writer.WriteUnquotedValue(transform.rotation, false, file);
-			m_writer.WriteEndTable(true, file);
-			m_writer.WriteEndTable(false, file);
+
+			WriteTransformComponent(m_writer, transform, file, false);
+			//m_writer.WriteDeclareTable("transform", file);
+			//m_writer.WriteDeclareTable("position", file);
+			//m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
+			//m_writer.WriteKeyAndValue('y', transform.position.y, true, file);
+			//m_writer.WriteEndTable(true, file);
+			//m_writer.WriteDeclareTable("scale", file);
+			//m_writer.WriteKeyAndValue('x', transform.scale.x, false, file);
+			//m_writer.WriteKeyAndValue('y', transform.scale.y, true, file);
+			//m_writer.WriteEndTable(true, file);
+			//m_writer.WriteDeclareTable("rotation", file);
+			//m_writer.WriteUnquotedValue(transform.rotation, false, file);
+			//m_writer.WriteEndTable(true, file);
+
+			//m_writer.WriteEndTable(false, file);
 
 			// Box Collider Component
 			m_writer.WriteDeclareTable("box_collider", file);
@@ -588,6 +561,97 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	// Write the end of the tables and close the file
 	m_writer.WriteEndTable(false, file);
 	Logger::Log("Out the table written");
+	file.close();
+}
+
+void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
+{
+	// Grab the file stem for the comment Line
+	std::string commentLine = std::filesystem::path(filepath).stem().string();
+
+	// Create variables
+	LuaTableWriter m_writer;
+	std::fstream file;
+	int i = 1;
+	bool trigger = false;
+	Logger::Err("FilePath: " + filepath);
+	// open the file to save to
+	file.open(filepath, std::ios::out);
+
+	// Start the Lua Table
+	m_writer.WriteStartDocument();
+	// Write a comment in Lua format
+	m_writer.WriteCommentSeparation(file);
+	m_writer.WriteCommentLine(commentLine, file);
+	m_writer.WriteCommentSeparation(file);
+	m_writer.WriteDeclareTable("triggers", file);
+
+	// If there are Enemies in the registry, save them to a lua file, using the LuaTableWriter
+	if (reg.DoesGroupExist("trigger"))
+	{
+		// Write All of the triggers
+		for (const auto& entity : reg.GetEntitiesByGroup("trigger"))
+		{
+
+			const auto&	transform = entity.GetComponent<TransformComponent>();
+			const auto&	boxCollider = entity.GetComponent<BoxColliderComponent>();
+			const auto& triggerBox = entity.GetComponent<TriggerBoxComponent>();
+
+			// Convert trigger Type to string
+			std::string trigger_type = ConvertToString(triggerBox.triggerType);
+
+			// Start the Components/Group Tables
+			m_writer.WriteStartTable(i, false, file);
+			m_writer.WriteKeyAndQuotedValue("group", "triggers", file);
+			m_writer.WriteDeclareTable("components", file);
+			WriteTransformComponent(m_writer, transform, file, false);
+			WriteBoxColliderComponent(m_writer, boxCollider, file, false);
+
+			// Write Triggers
+			WriteTriggerBoxComponent(m_writer, triggerBox, file, trigger_type, false);
+
+			m_writer.WriteEndTable(false, file);
+			m_writer.WriteEndTableWithSeparator(false, file);
+
+			i++;
+		}
+	}
+	//
+	if (reg.DoesGroupExist("secret"))
+	{
+		// Write All of the triggers
+		for (const auto& entity : reg.GetEntitiesByGroup("secret"))
+		{
+			const auto& transform = entity.GetComponent<TransformComponent>();
+			const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
+			const auto& triggerBox = entity.GetComponent<TriggerBoxComponent>();
+			const auto& secret = entity.GetComponent<SecretComponent>();
+			// Convert trigger Type to string
+			std::string trigger_type = ConvertToString(triggerBox.triggerType);
+
+			// Start the Components/Group Tables
+			m_writer.WriteStartTable(i, false, file);
+			m_writer.WriteKeyAndQuotedValue("group", "secret", file);
+			m_writer.WriteDeclareTable("components", file);
+			WriteTransformComponent(m_writer, transform, file, false);
+			WriteBoxColliderComponent(m_writer, boxCollider, file, false);
+			// Write Triggers
+			WriteTriggerBoxComponent(m_writer, triggerBox, file, trigger_type, false);
+			WriteSecretComponent(m_writer, secret, file, false);
+
+			m_writer.WriteEndTable(false, file);
+			m_writer.WriteEndTableWithSeparator(false, file);
+
+			i++;
+		}
+	}
+	else
+	{
+		Logger::Log("Secret Does Not exist!!");
+	}
+
+	m_writer.WriteEndTable(false, file);
+	m_writer.WriteEndDocument(file);
 	file.close();
 }
 
@@ -785,5 +849,91 @@ std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 
 std::string EditorFileLoader::ConvertAIEnemyToString(AIComponent::EnemyType type)
 {
+	switch (type)
+	{
+	default:
+		break;
+	}
+
 	return std::string();
+}
+
+
+// Private Function
+void EditorFileLoader::WriteTransformComponent(LuaTableWriter& writer, const TransformComponent& transform, std::fstream& file, bool last)
+{
+	writer.WriteDeclareTable("transform", file);
+	writer.WriteDeclareTable("position", file);
+	writer.WriteKeyAndValue('x', transform.position.x, false, file);
+	writer.WriteKeyAndValue('y', transform.position.y, true, file);
+	writer.WriteEndTable(true, file);
+	writer.WriteDeclareTable("scale", file);
+	writer.WriteKeyAndValue('x', transform.scale.x, false, file);
+	writer.WriteKeyAndValue('y', transform.scale.y, true, file);
+	writer.WriteEndTable(true, file);
+	writer.WriteDeclareTable("rotation", file);
+	writer.WriteUnquotedValue(transform.rotation, false, file);
+	writer.WriteEndTable(true, file);
+	writer.WriteEndTable(false, file);
+
+	if (last)
+		writer.WriteEndTable(false, file);
+}
+
+void EditorFileLoader::WriteBoxColliderComponent(LuaTableWriter& writer, const class BoxColliderComponent& collision, std::fstream& file, bool last)
+{
+	writer.WriteDeclareTable("box_collider", file);
+	writer.WriteKeyAndUnquotedValue("width", collision.width, file);
+	writer.WriteKeyAndUnquotedValue("height", collision.height, file);
+	writer.WriteKeyAndUnquotedValue("offset_x", collision.offset.x, file);
+	writer.WriteKeyAndUnquotedValue("offset_y", collision.offset.y, file);
+	writer.WriteEndTable(false, file);
+
+	if (last)
+		writer.WriteEndTable(false, file);
+}
+
+void EditorFileLoader::WriteTriggerBoxComponent(LuaTableWriter& writer, const class TriggerBoxComponent& triggerBox, std::fstream& file, std::string& trigger_type, bool last)
+{
+	// Write Triggers
+	writer.WriteDeclareTable("trigger_box", file);
+	writer.WriteKeyAndQuotedValue("trigger_type", trigger_type, file);
+	writer.WriteDeclareTable("transport_offset", file);
+	writer.WriteKeyAndValue("x", triggerBox.transportOffset.x, false, file);
+	writer.WriteKeyAndValue("y", triggerBox.transportOffset.y, true, file);
+	writer.WriteEndTable(true, file);
+	writer.WriteDeclareTable("camera_offset", file);
+	writer.WriteKeyAndValue("x", triggerBox.cameraOffset.x, false, file);
+	writer.WriteKeyAndValue("y", triggerBox.cameraOffset.y, true, file);
+	writer.WriteEndTable(true, file);
+	writer.WriteKeyAndQuotedValue("level_music", triggerBox.levelMusic, file);
+	writer.WriteKeyAndQuotedValue("asset_file", triggerBox.assetFile, file);
+	writer.WriteKeyAndQuotedValue("enemy_file", triggerBox.enemyFile, file);
+	writer.WriteKeyAndQuotedValue("collider_file", triggerBox.colliderFile, file);
+	writer.WriteKeyAndQuotedValue("tilemap_name", triggerBox.tileMapName, file);
+	writer.WriteKeyAndQuotedValue("tilemap_image", triggerBox.tileImageName, file);
+	writer.WriteKeyAndQuotedValue("entity_file", triggerBox.entityFileName, file);
+	writer.WriteKeyAndUnquotedValue("image_width", triggerBox.imageWidth, file);
+	writer.WriteKeyAndUnquotedValue("image_height", triggerBox.imageHeight, file);
+	writer.WriteKeyAndQuotedValue("trigger_file", triggerBox.triggerFile, file);
+	writer.WriteEndTable(false, file);
+
+	if (last)
+		writer.WriteEndTable(false, file);
+}
+
+void EditorFileLoader::WriteSecretComponent(LuaTableWriter& writer, const class SecretComponent& secretComp, std::fstream& file, bool last)
+{
+	writer.WriteDeclareTable("secret", file);
+	writer.WriteKeyAndQuotedValue("location_id", secretComp.locationID, file);
+	writer.WriteKeyAndQuotedValue("new_trigger", secretComp.newTrigger, file);
+	writer.WriteKeyAndQuotedValue("new_sprite_id", secretComp.newSpriteAssetID, file);
+	writer.WriteKeyAndUnquotedValue("sprite_width", secretComp.spriteWidth, file);
+	writer.WriteKeyAndUnquotedValue("sprite_height", secretComp.spriteHeight, file);
+	writer.WriteKeyAndUnquotedValue("sprite_src_x", secretComp.spriteSrcX, file);
+	writer.WriteKeyAndUnquotedValue("sprite_src_y", secretComp.spriteSrcY, file);
+	writer.WriteEndTable(false, file);
+
+	if (last)
+		writer.WriteEndTable(false, file);
 }

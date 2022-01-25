@@ -17,15 +17,16 @@
 class RenderEditorGUISystem : public System
 {
 private:
-	std::string imageID;
 	bool imageLoaded = false;
-	bool fileLoaded = false;
+	
 	std::ofstream saveFile;
 	EditorFileLoader loader;
 	MouseControlSystem choices;
-	static unsigned int imageWidth, imageHeight;
+	static int imageWidth, imageHeight;
+	static int mapWidth, mapHeight;
+	// static std::string mapAssetID;
 	class Game& game;
-	
+
 	// Variable Declarations
 	static int zIndex;
 	static int scaleX;
@@ -36,15 +37,26 @@ private:
 	static int boxColliderHeight;
 	static int boxColliderOffsetX;
 	static int boxColliderOffsetY;
-	static bool layer;
 
+	static bool mouseImageLoaded;
+	static bool showLoadMap;
+	static bool showTileProperties;
+	static bool showCanvasProperties;
+
+	
 
 public:
+	static std::string fileName;
+	static std::string imageName;
+	static std::string imageID;
+
+	static bool fileLoaded;
 
 	// Setup the IMGUI Style in the Constructor --> Change to it's own style function?
 	RenderEditorGUISystem()
 		: game(*Game::Instance())
 	{
+		ImGuiSetup();
 		ImGuiStyle& style = ImGui::GetStyle();
 		style.TabRounding = 0.0f;
 		style.FrameBorderSize = 1.0f;
@@ -103,13 +115,42 @@ public:
 	}
 
 	void Update(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
-	
+
 	void ShowMenuFile(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
-	void ShowMenuTile(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void ShowMenuTile();
 	void EnemyProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
-	// The image Box is the holder of the Tilemap/Object selector
-	// The functionality is you click on the image and it determines the height/width/scale/offset based on the 
-	// Selections made above!
-	void ImageBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void TileProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void TriggerProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void ColliderProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void ShowMapLoaderWindow(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void CanvasSize();
 	
+	void ImGuiSetup();
+	void ImageBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	bool LoadEntireMapSprite(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	bool LoadNewImage(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string& imageID, int& image_width, int& image_height);
+
+	void ComboLoop(std::string label, std::string& current_item, const std::string handinArray[], int size);
+
+	struct ImFuncs
+	{
+		static int MyResizeCallback(ImGuiInputTextCallbackData* data)
+		{
+			if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+			{
+				std::string* my_str = (std::string*)data->UserData;
+				//IM_ASSERT(my_str->begin() == data->Buf);
+				my_str->resize(data->BufSize);
+				data->Buf = (char*)my_str;
+			}
+			return 0;
+		}
+		
+		
+		static bool MyInputText(const char* label, std::string* my_str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0)
+		{
+			IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
+			return ImGui::InputText(label, my_str,  flags | ImGuiInputTextFlags_CallbackResize, ImFuncs::MyResizeCallback, (void*)my_str);
+		}
+	};
 };

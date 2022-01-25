@@ -21,7 +21,6 @@ public:
 private:
 	bool editor;
 	bool keyDown;
-	bool bombs;
 	static const std::string editorID;
 	class Game& game;
 	class Registry& reg;

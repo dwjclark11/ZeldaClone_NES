@@ -254,6 +254,15 @@ std::vector<Entity> Registry::GetEntitiesByGroup(const std::string& group) const
 	return std::vector<Entity>(setOfEntities.begin(), setOfEntities.end()); // This create a new vector from the set
 }
 
+bool Registry::DoesGroupExist(const std::string& group) const
+{
+	// If the group exists
+	if (entitiesPerGroup.find(group) != entitiesPerGroup.end())
+		return true;
+
+	return false;
+}
+
 void Registry::RemoveEntityGroup(Entity entity)
 {
 	// If in group, remove entity from group management
