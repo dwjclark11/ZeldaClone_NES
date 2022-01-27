@@ -35,93 +35,49 @@ public:
 	{
 		switch (event.symbol)
 		{
-		// Move the camera UP
+			// Move the camera UP
 		case SDLK_w:
-			game.SetCameraY(-16); // Why 16? Should be based on the sprite_size*scale
+			//game.SetCameraY(-16); // Why 16? Should be based on the sprite_size*scale
+			game.GetCamera().y -= 100;
 			break;
-		// Move the camera RIGHT
+			// Move the camera RIGHT
 		case SDLK_d:
-			game.SetCameraX(16);
+			//game.SetCameraX(16);
+			game.GetCamera().x += 100;
 			break;
-		// Move the camera DOWN
+			// Move the camera DOWN
 		case SDLK_s:
-			game.SetCameraY(16);
+			//game.SetCameraY(16);
+			game.GetCamera().y += 100;
 			break;
-		// Move the camera LEFT
+			// Move the camera LEFT
 		case SDLK_a:
-			game.SetCameraX(-16);
+			//game.SetCameraX(-16);
+			game.GetCamera().x -= 100;
 			break;
-		// Toggle the Collision
+			// Toggle the Collision
 		case SDLK_c:
 			MouseControlSystem::isCollision = !MouseControlSystem::isCollision; // Also changed with the editor ImGui!!
 			break;
-		// Change the layer of the Object/Tile/Enemy etc!
-		case SDLK_l:
-			MouseControlSystem::layer++;
-			break;
-
-		case SDLK_k:
-			MouseControlSystem::layer--;
-			break;
-		// Toggle the trigger
-		case SDLK_t:
-			MouseControlSystem::isTrigger = !MouseControlSystem::isTrigger;
-			break;
-		// I don't think this works yet!
+			
+			// I don't think this works yet!
 		case SDLK_F1:
 			FileDialogs::SaveFile();
 			break;
-		// Change the type of trigger --> This will be removed when drop-down list is funcitonal
+			// Change the type of trigger --> This will be removed when drop-down list is funcitonal
 		case SDLK_m:
-		/*	if(MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
-				MouseControlSystem::triggerLevelNum++;*/
+			/*	if(MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
+					MouseControlSystem::triggerLevelNum++;*/
 			break;
-		// Same as above
+			// Same as above
 		case SDLK_n:
 			/*if (MouseControlSystem::triggerType == SECRET_AREA || MouseControlSystem::triggerType == ENTER_DUNGEON)
 				MouseControlSystem::triggerLevelNum--;
 			if (MouseControlSystem::triggerLevelNum-- < 0)
 				MouseControlSystem::triggerLevelNum = 0;*/
 			break;
-		// This will also be removed with the implementation of the drop-list stated above
-		case SDLK_SPACE:
-			MouseControlSystem::triggerNum += 1;
-			if (MouseControlSystem::triggerNum > 8) MouseControlSystem::triggerNum = 0;
-
-			switch (MouseControlSystem::triggerNum)
-			{
-			case 0:
-				MouseControlSystem::triggerType = NO_TRIGGER;
-				break;
-			case 1:
-				MouseControlSystem::triggerType = SECRET_AREA;
-				break;
-			case 2:
-				MouseControlSystem::triggerType = ENTER_DUNGEON;
-				break;
-			case 3:
-				MouseControlSystem::triggerType = BURN_BUSHES;
-				break;
-			case 4:
-				MouseControlSystem::triggerType = PUSH_ROCKS;
-				break;
-			case 5:
-				MouseControlSystem::triggerType = COLLECT_ITEM;
-				break;
-			case 6:
-				MouseControlSystem::triggerType = BOMB_SECRET;
-				break;
-			case 7:
-				MouseControlSystem::triggerType = HIDDEN_SWITCH;
-				break;
-			case 8:
-				MouseControlSystem::triggerType = HIDDEN_OBJECT;
-				break;
-			}
-		default:
-			break;
+			// This will also be removed with the implementation of the drop-list stated above
 		}
-
 		// These are magic numbers That should not be used!
 		levelWidth = MouseControlSystem::CanvasWidth;
 		levelHeight = MouseControlSystem::CanvasHeight;

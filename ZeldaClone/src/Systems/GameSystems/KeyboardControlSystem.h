@@ -19,6 +19,6 @@ public:
 	// Callback function
 	void OnKeyPressed(class KeyPressedEvent& event);
 	void UpdatePlayer();
-
+	void Update();
 };
 

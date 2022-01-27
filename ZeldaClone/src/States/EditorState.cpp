@@ -127,12 +127,13 @@ void EditorState::OnKeyDown(SDL_Event* event)
 	if (game.GetEvent().type == SDL_KEYDOWN && !keyDown)
 	{
 		const Uint8* state = SDL_GetKeyboardState(NULL);
-		FileDialogs dialog;
+		
 
 		if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_O])
 		{
 			if (!RenderEditorGUISystem::imageName.empty())
 			{
+				FileDialogs dialog;
 				RenderEditorGUISystem::fileName = dialog.OpenFile();
 
 				loader.SetFileName(RenderEditorGUISystem::fileName);
@@ -154,7 +155,6 @@ void EditorState::OnKeyDown(SDL_Event* event)
 				{
 					loader.SaveTilemap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
 					RenderEditorGUISystem::fileLoaded = true;
-
 				}
 			}
 

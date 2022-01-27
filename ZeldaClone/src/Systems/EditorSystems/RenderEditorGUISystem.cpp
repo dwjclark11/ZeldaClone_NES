@@ -1,9 +1,11 @@
 #include "RenderEditorGUISystem.h"
 #include "RenderEditorSystem.h"
 #include "../../Components/TransformComponent.h"
+
+#include "../../Utilities/FileManagerUtils.h"
+#include "../../States/MenuState.h"
 #include "../../Game/LevelLoader.h"
 #include <filesystem>
-
 
 // Variable Declarations
 int RenderEditorGUISystem::zIndex = 0;
@@ -19,6 +21,7 @@ int RenderEditorGUISystem::boxColliderOffsetY = 0;
 bool RenderEditorGUISystem::mouseImageLoaded = false;
 bool RenderEditorGUISystem::showLoadMap = false;
 bool RenderEditorGUISystem::showCanvasProperties = false;
+bool RenderEditorGUISystem::showImageBox = false;
 
 int RenderEditorGUISystem::imageWidth = 0;
 int RenderEditorGUISystem::imageHeight = 0;
@@ -53,15 +56,8 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 
 		if (ImGui::BeginMenu("Tools"))
 		{
-			if (ImGui::MenuItem("Tile Properties"))
-			{
-				// TODO: Show Tile ProperTies Window
-			}
-
-			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-
 			ImGui::Text("Select what to Create");
-
+			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 			if (ImGui::Checkbox("Create Tiles", &MouseControlSystem::createTile))
 			{
 				if (MouseControlSystem::createTile)
@@ -86,7 +82,6 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 
 			if (ImGui::Checkbox("Create Colliders", &MouseControlSystem::createBoxCollider))
 			{
-
 				if (MouseControlSystem::createBoxCollider)
 				{
 					MouseControlSystem::createTile = false;
@@ -98,7 +93,6 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 
 			if (ImGui::Checkbox("Create Triggers", &MouseControlSystem::createTrigger))
 			{
-
 				if (MouseControlSystem::createTrigger)
 				{
 					MouseControlSystem::createTile = false;
@@ -107,7 +101,6 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 					MouseControlSystem::createBoxCollider = false;
 				}
 			}
-
 
 			if (ImGui::Checkbox("Create Enemies", &MouseControlSystem::createEnemy))
 			{
@@ -119,7 +112,8 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 					MouseControlSystem::createTrigger = false;
 				}
 			}
-
+			// Set the mouse image to snap to the grid 
+			ImGui::Checkbox("Grip Snap", &MouseControlSystem::gridSnap);
 
 			ImGui::EndMenu();
 		}
@@ -327,6 +321,11 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 
 				fileLoaded = true;
 			}
+			if (MouseControlSystem::createTrigger)
+			{
+				if (extension == ".lua")
+					loader.SaveTriggersToLuaFile(fileName);
+			}
 		}
 	}
 
@@ -438,7 +437,7 @@ void RenderEditorGUISystem::ShowMenuTile()
 		if (mouseRectY <= 0)
 			mouseRectY = 0;
 	}
-		
+	ImGui::TextColored(ImVec4(255, 255, 0, 255), "Current Src Rect [X: %d, Y: %d]", MouseControlSystem::imageSrcX, MouseControlSystem::imageSrcY);
 	// There is no need for the layer if not a tile or enemy
 	if (!MouseControlSystem::createBoxCollider && !MouseControlSystem::createTrigger)
 	{
@@ -493,9 +492,7 @@ void RenderEditorGUISystem::EnemyProperties(const std::unique_ptr<AssetManager>&
 			MouseControlSystem::Scale.y = scaleY;
 			MouseControlSystem::mouseRectX = mouseRectX;
 			MouseControlSystem::mouseRectY = mouseRectY;
-			ImGui::End();
 		}
-
 		ImGui::End();
 	}
 }
@@ -558,6 +555,9 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		ImFuncs::MyInputText("Trigger File", &triggerFile);
 
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Is the trigger also a collider?");
+		ImGui::Checkbox("Collider", &MouseControlSystem::triggerCollider);
+		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 		ShowMenuTile();
 
@@ -565,6 +565,11 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		
 		if (MouseControlSystem::secretSelected)
 		{
+			ImGui::Checkbox("Show New Sprite TileSet", &showImageBox);
+
+			if(showImageBox)
+				ImageBox(assetManager, renderer);
+
 			ComboLoop("New Secret Trigger", new_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
 
 			ImFuncs::MyInputText("Location ID", &locationID);
@@ -619,7 +624,6 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 				MouseControlSystem::newTriggerType = "no_trigger";
 		}
 
-
 		if (ImGui::Button("Set Trigger Attributes"))
 		{
 			MouseControlSystem::Scale.x = scaleX;
@@ -631,7 +635,6 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			MouseControlSystem::mouseRectX = mouseRectX;
 			MouseControlSystem::mouseRectY = mouseRectY;
 
-			
 			MouseControlSystem::levelMusic = levelMusic;
 			MouseControlSystem::assetFile = assetFile;
 			MouseControlSystem::enemyNewFile = enemyFile;
@@ -640,7 +643,6 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			MouseControlSystem::TileMapImageName = tileMapImageName;
 			MouseControlSystem::entityFileName = entityFileName;
 			MouseControlSystem::triggerFile = triggerFile;
-
 
 			// Set Secret Attributes
 			if (MouseControlSystem::secretSelected)

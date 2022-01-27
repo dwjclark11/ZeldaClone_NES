@@ -12,15 +12,16 @@ player_data = {
         },
         components = {
             transform = {
-                position = { x = 7411.6, y = 4958.8}}
+                position = { x = 7406.8, y = 5153.8}
+            }
         },
         items = {
-            boomerang = false,
+            boomerang = true,
             magic_boomerang = false,
             wood_sword = true,
             steel_sword = false,
             magic_sword = false,
-            magic_rod = false,
+            magic_rod = true,
             bombs = true,
             food = false,
             flute = false,
@@ -32,11 +33,12 @@ player_data = {
             map = false,
             blue_potion = false,
             red_potion = false,
-            master_key = false},
+            master_key = false,
+            candle = true
+        },
         inventory = {
             num_rupees = 250,
             num_bombs = 4,
-            num_arrows = 10,
             num_keys = 0
         }
     }

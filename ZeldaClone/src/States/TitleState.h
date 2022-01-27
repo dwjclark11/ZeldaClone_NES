@@ -1,6 +1,6 @@
 #pragma once
 #include "State.h"
-#include "../Systems/GameSystems/AnimationSystem.h"
+
 class TitleState : public State
 {
 public:

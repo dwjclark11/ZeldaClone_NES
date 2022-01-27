@@ -1,16 +1,12 @@
 #pragma once
 #include "../../ECS/ECS.h"
-
-#include "MouseControlSystem.h"
-#include "../../Utilities/FileManagerUtils.h"
-#include "../../Editor/EditorFileLoader.h"
-#include "../../States/MenuState.h"
 #include <imgui/imgui.h>
 #include <imgui/imgui_sdl.h>
 #include <imgui/imgui_stdlib.h>
-#include <fstream>
-#include "../../Game/Game.h"
 
+#include "../../Game/Game.h"
+#include "../../Editor/EditorFileLoader.h"
+#include "MouseControlSystem.h"
 #include <fstream>
 #include <iostream>
 
@@ -42,8 +38,7 @@ private:
 	static bool showLoadMap;
 	static bool showTileProperties;
 	static bool showCanvasProperties;
-
-	
+	static bool showImageBox;
 
 public:
 	static std::string fileName;
@@ -146,11 +141,10 @@ public:
 			return 0;
 		}
 		
-		
 		static bool MyInputText(const char* label, std::string* my_str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0)
 		{
 			IM_ASSERT((flags & ImGuiInputTextFlags_CallbackResize) == 0);
-			return ImGui::InputText(label, my_str,  flags | ImGuiInputTextFlags_CallbackResize, ImFuncs::MyResizeCallback, (void*)my_str);
+			return ImGui::InputText(label, my_str,  flags/* | ImGuiInputTextFlags_CallbackResize*/, ImFuncs::MyResizeCallback, (void*)my_str);
 		}
 	};
 };

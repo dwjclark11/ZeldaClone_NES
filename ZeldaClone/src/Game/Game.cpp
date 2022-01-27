@@ -38,6 +38,7 @@ Game::Game()
 // Destructor
 Game::~Game()
 {
+	delete gameStateMachine;
 	// Logger::Log("Game Destructor called");
 }
 
@@ -120,11 +121,7 @@ void Game::Initialize()
 	// Add the needed sounds, textures, and fonts to the asset manager 
 	assetManager->AddSoundFX("text_slow", "./Assets/sounds/Text_Slow.wav");
 	assetManager->AddTextures(mRenderer, "map", "./Assets/Backgrounds/entire_worldmap_single_image.png");
-	assetManager->AddFonts("charriot-font-20", "./Assets/Fonts/charriot.ttf", 20);
-	assetManager->AddFonts("charriot-font-30", "./Assets/Fonts/charriot.ttf", 30);
-	assetManager->AddFonts("charriot-font-40", "./Assets/Fonts/charriot.ttf", 40);
-	assetManager->AddFonts("charriot-font-60", "./Assets/Fonts/charriot.ttf", 60);
-	
+
 	// Set Initial Fade Alpha
 	fadeAlpha = 255;
 	fadeFinished = true;

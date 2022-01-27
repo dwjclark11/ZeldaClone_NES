@@ -71,7 +71,7 @@ public:
 	static std::string imageID;
 	static int layer;
 
-	static unsigned triggerNum;
+	
 	static TriggerType triggerType;	
 
 	static std::string levelMusic;
@@ -87,6 +87,7 @@ public:
 	static glm::vec2 cameraOffset;
 	static int imageWidth;
 	static int imageHeight;
+	static bool triggerCollider;
 
 	// Secret Attributes
 	static int newSpriteWidth;

@@ -147,8 +147,8 @@ void MoveState::Execute(PlayerStateMachine* pOwner, Entity& entity)
 	auto& playerHealth = player.GetComponent<HealthComponent>();
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 
-	//Logger::Log("X: " + std::to_string(playerTransform.position.x) + ", Y: " + std::to_string(playerTransform.position.y));
-	//Logger::Log("X: " + std::to_string(game.GetPlayerPos().x) + ", Y: " + std::to_string(game.GetPlayerPos().y));
+	Logger::Log("X: " + std::to_string(playerTransform.position.x) + ", Y: " + std::to_string(playerTransform.position.y));
+	Logger::Log("X: " + std::to_string(game.GetPlayerPos().x) + ", Y: " + std::to_string(game.GetPlayerPos().y));
 	
 	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
 	{

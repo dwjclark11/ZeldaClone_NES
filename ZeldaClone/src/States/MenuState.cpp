@@ -36,7 +36,7 @@ void MenuState::Update(const double& deltaTime)
 	if (slotsFull && !full)
 	{
 		Entity slotsFull = reg.CreateEntity();
-		slotsFull.AddComponent<TextLabelComponent>(glm::vec2(300, 900), " REGISTERS ARE FULL! ", "charriot-font-40", SDL_Color{ 255,0,0,0 }, true);
+		//slotsFull.AddComponent<TextLabelComponent>(glm::vec2(300, 900), " REGISTERS ARE FULL! ", "charriot-font-40", SDL_Color{ 255,0,0,0 }, true);
 		full = true;
 	}
 }
@@ -53,7 +53,7 @@ bool MenuState::OnEnter()
 	full = false;
 
 	if (!reg.HasSystem<MenuKeyboardControlSystem>()) reg.AddSystem<MenuKeyboardControlSystem>();
-	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
+	//if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
 	if (!reg.HasSystem<RenderMainMenuSystem>()) reg.AddSystem<RenderMainMenuSystem>();
 
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
@@ -71,7 +71,7 @@ bool MenuState::OnEnter()
 bool MenuState::OnExit()
 {
 	reg.GetSystem<RenderMainMenuSystem>().OnExit();
-	reg.GetSystem<RenderTextSystem>().OnExit();
+	//reg.GetSystem<RenderTextSystem>().OnExit();
 
 	//reg.RemoveSystem<RenderMainMenuSystem>();
 	//reg.RemoveSystem<MenuKeyboardControlSystem>();

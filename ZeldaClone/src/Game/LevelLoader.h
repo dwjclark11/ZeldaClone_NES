@@ -33,12 +33,20 @@ private:
 	ItemCollectType ConvertLuaStringToItem(std::string& type);
 	bool CheckForItemInInventory(SpecialItemType& type);
 	void ConvertName(std::string name, int x, int y);
+	void ReadSpriteComponent(sol::table& table, Entity& entity);
+	void ReadBoxColliderComponent(sol::table& table, Entity& entity);
+	void ReadAnimationComponent(sol::table& table, Entity& entity);
+	void ReadHealthComponent(sol::table& table, Entity& entity);
+	void ReadKeyboardControlComponent(sol::table& table, Entity& entity);
+	void ReadProjectileEmitterComponent(sol::table& table, Entity& entity);
+	void ReadTransformComponent(sol::table& table, Entity& entity);
+	void ReadRigidBodyComponent(sol::table& table, Entity& entity);
 
 public:
 	LevelLoader();
 	~LevelLoader();
 
-	void LoadMap(std::string mapName, int image_width, int image_height);
+	void LoadMap(std::string mapName, int image_width, int image_height, bool offset = false);
 	void LoadTilemap(std::string fileName, std::string imageName);
 	void LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, const std::string& fileName);
 
@@ -65,4 +73,5 @@ public:
 
 	TriggerType ConvertStringToTriggerType(std::string type);
 	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
+
 };

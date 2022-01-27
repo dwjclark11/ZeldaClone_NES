@@ -14,7 +14,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "npcs",
+				asset_id = "npcs",
 				width = 32,
 				height = 32,
 				layer = 4,
@@ -41,7 +41,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "npcs",
+				asset_id = "npcs",
 				width = 32,
 				height = 32,
 				layer = 4,
@@ -68,7 +68,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "npcs",
+				asset_id = "npcs",
 				width = 32,
 				height = 32,
 				layer = 4,
@@ -88,7 +88,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 1,
@@ -123,7 +123,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 1,
@@ -158,7 +158,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 1,
@@ -193,7 +193,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "hearts",
+				asset_id = "hearts",
 				width = 16,
 				height = 16,
 				layer = 4,

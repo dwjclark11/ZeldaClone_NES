@@ -81,18 +81,18 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "secret_area",
-				transport_offset 	= { x = 2300, y = 4000 },
-				camera_offset 		= { x = 2048, y = 3072 },
+				transport_offset 	= { x = 2505, y = 4545 },
+				camera_offset 		= { x = 2048, y = 3744 },
 				level_music			= "dungeon",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "level1_Eagle_Test",
-				tilemap_image   	= "Dungeon_Tiles",
+				collider_file		= "Test_Colliders", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "level_1",
 				entity_file			= "no_file",
 				trigger_file		= "no_file",
-				image_width			= 0,
-				image_height		= 0
+				image_width			= 1536,
+				image_height		= 1184
 			},
 		}
 	},	
@@ -123,7 +123,8 @@ triggers = {
 				entity_file			= "sword_cave",
 				trigger_file		= "sword_cave_triggers",
 				image_width			= 256,
-				image_height		= 176
+				image_height		= 176,
+				collider			= true
 			},
 			secret = {
 				location_id			= "Sword_cave_Area",

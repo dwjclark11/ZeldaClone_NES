@@ -81,7 +81,7 @@ void DamageSystem::OnPlayerHitsProjectile(Entity projectile, Entity player)
 			playerTransform.position.y += 5;
 			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_hurt", 0, 2);
 			playerHealth.isHurt = true;
-
+			Logger::Log("Projectile Damage: " + std::to_string(project.hitPercentDamage));
 			// Remove the projectile
 			projectile.Kill();
 		}

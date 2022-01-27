@@ -109,12 +109,41 @@ void TriggerSystem::SetInventory(SpecialItemType& item)
 void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 {
 	auto& secret = trigger.GetComponent<SecretComponent>();
-	if (!secret.found)
-	{
-		auto& secretCollider = trigger.GetComponent<BoxColliderComponent>();
-		auto& secretTrigger = trigger.GetComponent<TriggerBoxComponent>();
-		auto& secretTransform = trigger.GetComponent<TransformComponent>();
+	auto& secretCollider = trigger.GetComponent<BoxColliderComponent>();
+	auto& secretTrigger = trigger.GetComponent<TriggerBoxComponent>();
+	auto& secretTransform = trigger.GetComponent<TransformComponent>();
 
+	if (!secret.found && !startup)
+	{
+		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
+		Logger::Log("Not Found!!");
+		auto secretArea = Registry::Instance()->CreateEntity();
+		secretArea.Group("trigger");
+		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
+		secretArea.AddComponent<TriggerBoxComponent>(trigType,
+			secretTrigger.transportOffset, secretTrigger.cameraOffset,
+			secretTrigger.levelMusic, secretTrigger.assetFile,
+			secretTrigger.enemyFile, secretTrigger.colliderFile,
+			secretTrigger.tileMapName, secretTrigger.tileImageName,
+			secretTrigger.entityFileName, secretTrigger.imageWidth, secretTrigger.imageHeight, secretTrigger.triggerFile);
+
+		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
+		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
+		secretArea.AddComponent<GameComponent>();
+
+		//if (!startup)
+		//{
+			Logger::Log("Blasted open " + secret.locationID + " Secret!");
+			secret.found = true;
+			game.SetSecretFound(secret.locationID, true);
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+
+			loader.SaveSecrets();
+		//}
+	}
+	else if (secret.found && startup)
+	{
+		Logger::Log("Found!!");
 		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 
 		auto secretArea = Registry::Instance()->CreateEntity();
@@ -130,17 +159,8 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
 		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
 		secretArea.AddComponent<GameComponent>();
-
-		if (!startup)
-		{
-			Logger::Log("Blasted open " + secret.locationID + " Secret!");
-			secret.found = true;
-			game.SetSecretFound(secret.locationID, true);
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
-
-			loader.SaveSecrets();
-		}
 	}
+	trigger.Kill();
 }
 
 TriggerSystem::TriggerSystem()

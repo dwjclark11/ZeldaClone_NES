@@ -50,9 +50,18 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 			if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
 				continue;
 			if (a.HasComponent<ColliderComponent>() && b.HasComponent<TriggerBoxComponent>())
-				continue;
+			{
+				// Check to see if the trigger is a collider
+				if (!b.GetComponent<TriggerBoxComponent>().collider)
+					continue;
+			}
+				
 			if (a.HasComponent<TriggerBoxComponent>() && b.HasComponent<ColliderComponent>())
-				continue;
+			{
+				// Check to see if the trigger is a collider
+				if (!a.GetComponent<TriggerBoxComponent>().collider)
+					continue;
+			}
 
 			auto& bTransform = b.GetComponent<TransformComponent>();
 			const auto& bCollider = b.GetComponent<BoxColliderComponent>();

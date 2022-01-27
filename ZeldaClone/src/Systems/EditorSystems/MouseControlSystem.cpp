@@ -57,7 +57,7 @@ std::string MouseControlSystem::imageID = "";
 // Trigger Attributes
 
 TriggerType MouseControlSystem::triggerType = NO_TRIGGER;
-unsigned MouseControlSystem::triggerNum = 0;
+//unsigned MouseControlSystem::triggerNum = 0;
 
 std::string MouseControlSystem::levelMusic = "stop";
 std::string MouseControlSystem::assetFile = "no_file";
@@ -67,6 +67,8 @@ std::string MouseControlSystem::TileMapName = "no_file";
 std::string MouseControlSystem::TileMapImageName = "no_file";
 std::string MouseControlSystem::entityFileName = "no_file";
 std::string MouseControlSystem::triggerFile = "no_file";
+bool MouseControlSystem::triggerCollider = false;
+
 
 int MouseControlSystem::newSpriteWidth = 0;
 int MouseControlSystem::newSpriteHeight = 0;
@@ -301,7 +303,7 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 					glm::vec2(cameraOffset.x, cameraOffset.y), 
 					levelMusic, assetFile, enemyNewFile, colliderFile,
 					TileMapName, TileMapImageName, entityFileName, 
-					imageWidth, imageHeight, triggerFile);
+					imageWidth, imageHeight, triggerFile, triggerCollider);
 
 			if (secretSelected)
 			{
@@ -316,7 +318,7 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 			{
 				newTrigger.Group("trigger");
 			}
-
+	
 			Logger::Log("CREATED Trigger");
 			leftPressed = true;
 
@@ -448,15 +450,26 @@ void MouseControlSystem::MouseBox(const std::unique_ptr<AssetManager>& assetMana
 	mousePosY += camera.y;
 	mousePosScreen.x = mousePosX;
 	mousePosScreen.y = mousePosY;
-	mousePosGrid.x = static_cast<int>(mousePosScreen.x) * gridSize;
-	mousePosGrid.y = static_cast<int>(mousePosScreen.y) * gridSize;
 
-	if (mousePosScreen.x >= 0) mousePosGrid.x = (static_cast<int>(mousePosScreen.x)) / gridSize;
-	if (mousePosScreen.y >= 0) mousePosGrid.y = (static_cast<int>(mousePosScreen.y)) / gridSize;
+	// If Grid Snap is enabled, snap the tile/sprite to the next grid location
+	if (gridSnap)
+	{
+		mousePosGrid.x = static_cast<int>(mousePosScreen.x) * gridSize;
+		mousePosGrid.y = static_cast<int>(mousePosScreen.y) * gridSize;
 
-	mouseBox.x = (mousePosGrid.x * gridSize) - camera.x;
-	mouseBox.y = (mousePosGrid.y * gridSize) - camera.y;
-	//SetEnemyImage();
+		if (mousePosScreen.x >= 0) mousePosGrid.x = (static_cast<int>(mousePosScreen.x)) / gridSize;
+		if (mousePosScreen.y >= 0) mousePosGrid.y = (static_cast<int>(mousePosScreen.y)) / gridSize;
+
+		mouseBox.x = (mousePosGrid.x * gridSize) - camera.x;
+		mouseBox.y = (mousePosGrid.y * gridSize) - camera.y;
+
+	}
+	else // Float the tile/sprite at the center of the mouse
+	{
+		mouseBox.x = mousePosScreen.x - camera.x - (mouseRectX * Scale.x) / 2; 
+		mouseBox.y = mousePosScreen.y - camera.y - (mouseRectY * Scale.y) / 2; 
+	}
+
 	SDL_Rect srcRect = {
 		imageSrcX,
 		imageSrcY,

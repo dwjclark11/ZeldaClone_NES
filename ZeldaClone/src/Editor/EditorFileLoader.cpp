@@ -815,35 +815,35 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, st
 	}
 }
 
-TriggerType EditorFileLoader::ConvertToTriggerType(int triggerType)
-{
-	switch (triggerType)
-	{
-	case 0: return NO_TRIGGER; break;
-	case 1: return SECRET_AREA; break;
-	case 2: return ENTER_DUNGEON; break;
-	case 3: return BURN_BUSHES; break;
-	case 4: return PUSH_ROCKS; break;
-	case 5: return COLLECT_ITEM; break;
-	case 6: return BOMB_SECRET; break;
-	case 7: return HIDDEN_SWITCH; break;
-	case 8: return HIDDEN_OBJECT; break;
-	}
-}
+//TriggerType EditorFileLoader::ConvertToTriggerType(int triggerType)
+//{
+//	switch (triggerType)
+//	{
+//	case 0: return NO_TRIGGER; break;
+//	case 1: return SECRET_AREA; break;
+//	case 2: return ENTER_DUNGEON; break;
+//	case 3: return BURN_BUSHES; break;
+//	case 4: return PUSH_ROCKS; break;
+//	case 5: return COLLECT_ITEM; break;
+//	case 6: return BOMB_SECRET; break;
+//	case 7: return HIDDEN_SWITCH; break;
+//	case 8: return HIDDEN_OBJECT; break;
+//	}
+//}
 
 std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 {
 	switch (triggerType)
 	{
-		case NO_TRIGGER: return "NO_TRIGGER"; break;
-		case SECRET_AREA: return "SECRET_AREA"; break;
-		case ENTER_DUNGEON: return "ENTER_DUNGEON"; break;
-		case BURN_BUSHES: return "BURN_BUSHES"; break;
-		case PUSH_ROCKS: return "PUSH_ROCKS"; break;
-		case COLLECT_ITEM: return "CAMERA_RIGHT"; break;
-		case BOMB_SECRET: return "TRAP"; break;
-		case HIDDEN_SWITCH: return "HIDDEN_SWITCH"; break;
-		case HIDDEN_OBJECT: return "HIDDEN_OBJECT"; break;
+		case NO_TRIGGER: return "no_trigger"; break;
+		case SECRET_AREA: return "secret_area"; break;
+		case TRANSPORT: return "transport"; break;
+		case BURN_BUSHES: return "burn_bushes"; break;
+		case PUSH_ROCKS: return "push_rocks"; break;
+		case COLLECT_ITEM: return "collect_item"; break;
+		case BOMB_SECRET: return "bomb_secret"; break;
+		case HIDDEN_SWITCH: return "hidden_switch"; break;
+		case HIDDEN_OBJECT: return "hidden_object"; break;
 	}
 }
 
@@ -916,6 +916,11 @@ void EditorFileLoader::WriteTriggerBoxComponent(LuaTableWriter& writer, const cl
 	writer.WriteKeyAndUnquotedValue("image_width", triggerBox.imageWidth, file);
 	writer.WriteKeyAndUnquotedValue("image_height", triggerBox.imageHeight, file);
 	writer.WriteKeyAndQuotedValue("trigger_file", triggerBox.triggerFile, file);
+
+	std::string collider = "false";
+	if (triggerBox.collider)
+		collider = "true";
+	writer.WriteKeyAndUnquotedValue("collider", collider, file);
 	writer.WriteEndTable(false, file);
 
 	if (last)

@@ -42,10 +42,15 @@ LevelLoader::~LevelLoader()
 {
 }
 
-void LevelLoader::LoadMap(std::string mapName, int image_width, int image_height)
+void LevelLoader::LoadMap(std::string mapName, int image_width, int image_height, bool offset)
 {
+	int x = 0;
+	int y = 0;
+	if (offset)
+		y = -192;
+
 	Entity secret = reg.CreateEntity();
-	secret.AddComponent<TransformComponent>(glm::vec2(0, 0), glm::vec2(4, 4), 0.0);
+	secret.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(4, 4), 0.0);
 	secret.AddComponent<SpriteComponent>(mapName, image_width, image_height, 1, false, 0, 0);
 	secret.AddComponent<TileComponent>();
 	secret.Group("map");
@@ -196,11 +201,6 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 	// Execute the script using the sol state 
 	lua.script_file("./Assets/SavedFiles/" + fileName + ".lua");
 
-	/* Read the player data and check for:
-					- Number of hearts
-					- Name of the Saved Player for that slot
-					- What tunic the Player has to set the sprite srcRect positions
-	*/
 	// Read the main table first
 	sol::table data = lua["player_data"];
 
@@ -302,6 +302,135 @@ void LevelLoader::EliminatePlayerToDefault(int slotNum, std::string& name)
 	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "Eliminate", 0, 1);
 }
 
+void LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> sprite = table["components"]["sprite"];
+	if (sprite != sol::nullopt)
+	{
+		entity.AddComponent<SpriteComponent>(
+			table["components"]["sprite"]["asset_id"],
+			table["components"]["sprite"]["width"],
+			table["components"]["sprite"]["height"],
+			table["components"]["sprite"]["z_index"].get_or(1), // Layer
+			table["components"]["sprite"]["is_fixed"].get_or(false),
+			table["components"]["sprite"]["src_rect_x"].get_or(0),
+			table["components"]["sprite"]["src_rect_y"].get_or(0),
+			glm::vec2(
+				table["components"]["sprite"]["offset"]["x"].get_or(0),
+				table["components"]["sprite"]["offset"]["y"].get_or(0)));
+	}
+}
+void LevelLoader::ReadBoxColliderComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> boxCollider = table["components"]["box_collider"];
+	if (boxCollider != sol::nullopt)
+	{
+		//Logger::Err("Has Box Collider Component");
+		entity.AddComponent<BoxColliderComponent>(
+			table["components"]["box_collider"]["width"],
+			table["components"]["box_collider"]["height"],
+			glm::vec2(
+				table["components"]["box_collider"]["offset_x"].get_or(0.0),
+				table["components"]["box_collider"]["offset_y"].get_or(0.0)));
+	}
+}
+
+void LevelLoader::ReadAnimationComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> animation = table["components"]["animation"];
+	if (animation != sol::nullopt)
+	{
+		entity.AddComponent<AnimationComponent>(
+			table["components"]["animation"]["num_frames"].get_or(1),
+			table["components"]["animation"]["frame_rate"].get_or(1),
+			table["components"]["animation"]["vertical"].get_or(false),
+			table["components"]["animation"]["looped"].get_or(false),
+			table["components"]["animation"]["frame_offset"].get_or(0));
+	}
+}
+
+void LevelLoader::ReadHealthComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> health = table["components"]["health"];
+	if (health != sol::nullopt)
+	{
+		entity.AddComponent<HealthComponent>(
+			table["components"]["health"]["health_percentage"].get_or(9),
+			table["components"]["health"]["max_hearts"].get_or(3));
+	}
+}
+
+void LevelLoader::ReadKeyboardControlComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> keyboard = table["components"]["keyboard_control"];
+	if (keyboard != sol::nullopt)
+	{
+		entity.AddComponent<KeyboardControlComponent>(
+			glm::vec2(
+				table["components"]["keyboard_control"]["up_velocity"]["x"].get_or(0),
+				table["components"]["keyboard_control"]["up_velocity"]["y"].get_or(0)
+			),
+			glm::vec2(
+				table["components"]["keyboard_control"]["right_velocity"]["x"].get_or(0),
+				table["components"]["keyboard_control"]["right_velocity"]["y"].get_or(0)
+			),
+			glm::vec2(
+				table["components"]["keyboard_control"]["down_velocity"]["x"].get_or(0),
+				table["components"]["keyboard_control"]["down_velocity"]["y"].get_or(0)
+			),
+			glm::vec2(
+				table["components"]["keyboard_control"]["left_velocity"]["x"].get_or(0),
+				table["components"]["keyboard_control"]["left_velocity"]["y"].get_or(0)
+			));
+	}
+}
+
+void LevelLoader::ReadProjectileEmitterComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> projectile = table["components"]["projectile_emitter"];
+	if (projectile != sol::nullopt)
+	{
+		entity.AddComponent<ProjectileEmitterComponent>(
+			glm::vec2(
+				table["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
+				table["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
+			),
+			table["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
+			table["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
+			table["components"]["projectile_emitter"]["hit_percent_damage"].get_or(2),
+			table["components"]["projectile_emitter"]["is_friendly"].get_or(false)
+			);
+	}
+}
+
+void LevelLoader::ReadTransformComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> transformComp = table["components"]["transform"];
+	if (transformComp != sol::nullopt)
+	{
+		entity.AddComponent<TransformComponent>(
+			glm::vec2(
+				table["components"]["transform"]["position"]["x"].get_or(0),
+				table["components"]["transform"]["position"]["y"].get_or(0)
+			),
+			glm::vec2(
+				table["components"]["transform"]["scale"]["x"].get_or(1.0),
+				table["components"]["transform"]["scale"]["y"].get_or(1.0)),
+			table["components"]["transform"]["rotation"].get_or(0.0));
+	}
+}
+void LevelLoader::ReadRigidBodyComponent(sol::table& table, Entity& entity)
+{
+	sol::optional<sol::table> rigidBody = table["components"]["rigidbody"];
+	if (rigidBody != sol::nullopt)
+	{
+		entity.AddComponent<RigidBodyComponent>(
+			glm::vec2(
+				table["components"]["rigidbody"]["velocity"]["x"].get_or(0),
+				table["components"]["rigidbody"]["velocity"]["y"].get_or(0)));
+	}
+}
+
 void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
@@ -317,11 +446,6 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 	// Execute the script using the sol state 
 	lua.script_file("./Assets/LuaFiles/" + fileName + ".lua");
 
-	/* Read the player data and check for:
-					- Number of hearts
-					- Name of the Saved Player for that slot
-					- What tunic the Player has to set the sprite srcRect positions
-	*/
 	// Read the main table first
 	sol::table data = lua["menu"];
 
@@ -330,16 +454,12 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 	while (true)
 	{
 		sol::optional<sol::table> hasData = data[i];
-
 		if (hasData == sol::nullopt)
 		{
-			//Logger::Err("Menu File Read!");
 			break;
 		}
 		sol::table ui = data[i];
 		auto entity = reg.CreateEntity();
-
-
 		sol::optional tag = ui["tag"];
 		if (tag != sol::nullopt)
 		{
@@ -352,36 +472,9 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 		if (hasComponents != sol::nullopt)
 		{
 			// Transform Component
-			sol::optional<sol::table> transform = ui["components"]["transform"];
-			if (transform != sol::nullopt)
-			{
-				entity.AddComponent<TransformComponent>(
-					glm::vec2(
-						ui["components"]["transform"]["position"]["x"],
-						ui["components"]["transform"]["position"]["y"]
-					),
-					glm::vec2(
-						ui["components"]["transform"]["scale"]["x"].get_or(1),
-						ui["components"]["transform"]["scale"]["y"].get_or(1)
-					),
-					ui["components"]["rotation"].get_or(0)
-					);
-			}
-
+			ReadTransformComponent(ui, entity);
 			// Sprite Component
-			sol::optional<sol::table> sprite = ui["components"]["sprite"];
-			if (sprite != sol::nullopt)
-			{
-				entity.AddComponent<SpriteComponent>(
-					ui["components"]["sprite"]["asset_id"],
-					ui["components"]["sprite"]["width"],
-					ui["components"]["sprite"]["height"],
-					ui["components"]["sprite"]["z_index"].get_or(0),
-					ui["components"]["sprite"]["fixed"].get_or(false),
-					ui["components"]["sprite"]["src_rect_x"].get_or(0),
-					ui["components"]["sprite"]["src_rect_y"].get_or(0)
-					);
-			}
+			ReadSpriteComponent(ui, entity);
 		}
 		entity.AddComponent<MenuComponent>();
 		i++;
@@ -484,8 +577,8 @@ TriggerType LevelLoader::ConvertStringToTriggerType(std::string type)
 		return TriggerType::SECRET_AREA;
 	else if (type == "burn_bush")
 		return TriggerType::BURN_BUSHES;
-	else if (type == "enter_dungeon")
-		return TriggerType::ENTER_DUNGEON;
+	else if (type == "transport")
+		return TriggerType::TRANSPORT;
 	else if (type == "push_rocks")
 		return TriggerType::PUSH_ROCKS;
 	else if (type == "collect_item")
@@ -526,18 +619,18 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 		return AIComponent::EnemyType::OCTOROK;
 }
 
-std::string LevelLoader::SetName(std::string filePath, bool wExtension, char separator)
-{
-	// Get the last '.' position
-	std::size_t sepPos = filePath.rfind(separator);
-	std::size_t found = filePath.find_last_of('.');
-	if (sepPos != std::string::npos)
-	{
-		std::string name = filePath = filePath.substr(0, found);
-		return name.substr(sepPos + 1);
-	}
-	return "";
-}
+//std::string LevelLoader::SetName(std::string filePath, bool wExtension, char separator)
+//{
+//	// Get the last '.' position
+//	std::size_t sepPos = filePath.rfind(separator);
+//	std::size_t found = filePath.find_last_of('.');
+//	if (sepPos != std::string::npos)
+//	{
+//		std::string name = filePath = filePath.substr(0, found);
+//		return name.substr(sepPos + 1);
+//	}
+//	return "";
+//}
 
 void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 {
@@ -558,12 +651,9 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 	// =========================================================================================================
 	// Read the Triggers
 	// =========================================================================================================
-
-	// Read the big table for the colliders
 	sol::table triggers = lua["triggers"];
 
 	int i = 1;
-
 	while (true)
 	{
 		sol::optional<sol::table> hasTrigger = triggers[i];
@@ -587,29 +677,9 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 		if (hasComponents != sol::nullopt)
 		{
 			// Transform Component
-			sol::optional<sol::table> transform = trigger["components"]["transform"];
-			if (transform != sol::nullopt)
-			{
-				newTrigger.AddComponent<TransformComponent>(
-					glm::vec2(
-						trigger["components"]["transform"]["position"]["x"],
-						trigger["components"]["transform"]["position"]["y"]),
-					glm::vec2(
-						trigger["components"]["transform"]["scale"]["x"].get_or(1.0),
-						trigger["components"]["transform"]["scale"]["y"].get_or(1.0)),
-					trigger["components"]["transform"]["rotation"].get_or(0.0));
-			}
+			ReadTransformComponent(trigger, newTrigger);
 			// Box Collider Component
-			sol::optional<sol::table> boxCollider = trigger["components"]["box_collider"];
-			if (boxCollider != sol::nullopt)
-			{
-				newTrigger.AddComponent<BoxColliderComponent>(
-					trigger["components"]["box_collider"]["width"],
-					trigger["components"]["box_collider"]["height"],
-					glm::vec2(
-						trigger["components"]["box_collider"]["offset_x"].get_or(0.0),
-						trigger["components"]["box_collider"]["offset_y"].get_or(0.0)));
-			}
+			ReadBoxColliderComponent(trigger, newTrigger);
 			// Trigger Component
 			sol::optional<sol::table> triggerBox = trigger["components"]["trigger_box"];
 			if (triggerBox != sol::nullopt)
@@ -637,7 +707,8 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 					trigger["components"]["trigger_box"]["entity_file"],
 					trigger["components"]["trigger_box"]["image_width"].get_or(0),
 					trigger["components"]["trigger_box"]["image_height"].get_or(0),
-					trigger["components"]["trigger_box"]["trigger_file"]
+					trigger["components"]["trigger_box"]["trigger_file"],
+					trigger["components"]["trigger_box"]["collider"].get_or(false)
 					);
 			}
 
@@ -656,7 +727,6 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 					);
 			}
 		}
-
 		i++;
 	}
 }
@@ -681,38 +751,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	auto entity = reg.GetEntityByTag("player");
 	// Player Transform
 	const auto& transform = entity.GetComponent<TransformComponent>();
-
-	// Local variables that are based on the game Items
-	bool hasBoomerang = game.GetGameItems().woodBoomerang;
-	bool hasMagicBoomerang = game.GetGameItems().magicBoomerang;
-	bool hasSword = game.GetGameItems().woodSword;
-	bool hasSteelSword = game.GetGameItems().steelSword;
-	bool hasMagicSword = game.GetGameItems().magicSword;
-	bool hasMagicRod = game.GetGameItems().magicRod;
-	bool hasBombs = game.GetGameItems().bombs;
-	bool hasFood = game.GetGameItems().food;
-	bool hasFlute = game.GetGameItems().flute;
-	bool hasRaft = game.GetGameItems().raft;
-	bool hasLadder = game.GetGameItems().ladder;
-	bool hasBlueRing = game.GetGameItems().blueRing;
-	bool hasRedRing = game.GetGameItems().redRing;
-	bool hasBow = game.GetGameItems().bow;
-	bool hasMagicBow = game.GetGameItems().magicBow;
-	bool hasShield = game.GetGameItems().shield;
-	bool hasMagicShield = game.GetGameItems().magicShield;
-	bool hasPowerBraclet = game.GetGameItems().powerBraclet;
-	bool hasMap = game.GetGameItems().map;
-	bool hasBluePotion = game.GetGameItems().bluePotion;
-	bool hasRedPotion = game.GetGameItems().redPotion;
-	bool hasMasterKey = game.GetGameItems().masterKey;
-
-	int numRupees = GameState::totalRupees;
-	int numBombs = GameState::totalBombs;
-	int numArrows = 10; // This needs to be changed 
 	int numHearts = entity.GetComponent<HealthComponent>().maxHearts;//RenderHealthSystem::numHearts;
-	int numKeys = GameState::totalKeys;
-	int triforcePieces = 0;
-
 	std::string name = "";
 
 	// Start a new lua table
@@ -728,9 +767,9 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	m_writer.WriteKeyAndQuotedValue("name", name, file);
 	m_writer.WriteKeyAndUnquotedValue("num_hearts", numHearts, file);
 
-	if (hasBlueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
+	if (game.GetGameItems().blueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("blue_ring", "false", file);
-	if (hasRedRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
+	if (game.GetGameItems().redRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("red_ring", "false", file);
 	m_writer.WriteEndTable(false, file);
 
@@ -749,93 +788,92 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 
 	// Write if we currently have these items in our inventory
 	// Boomerang
-	if (hasBoomerang)
+	if (game.GetGameItems().woodBoomerang)
 		m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
 	// Magic Boomerang
-	if (hasMagicBoomerang)
+	if (game.GetGameItems().magicBoomerang)
 		m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "false", file);
 	// Wood Sword
-	if (hasSword)
+	if (game.GetGameItems().woodSword)
 		m_writer.WriteKeyAndUnquotedValue("wood_sword", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("wood_sword", "false", file);
 	// Steel Sword
-	if (hasSteelSword)
+	if (game.GetGameItems().steelSword)
 		m_writer.WriteKeyAndUnquotedValue("steel_sword", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("steel_sword", "false", file);
 	// Magic Sword
-	if (hasMagicSword)
+	if (game.GetGameItems().magicSword)
 		m_writer.WriteKeyAndUnquotedValue("magic_sword", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_sword", "false", file);
 	// Magic Rod
-	if (hasMagicRod)
+	if (game.GetGameItems().magicRod)
 		m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
 	// Bombs
-	if (hasBombs)
+	if (game.GetGameItems().bombs)
 		m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
 	// Food
-	if (hasFood)
+	if (game.GetGameItems().food)
 		m_writer.WriteKeyAndUnquotedValue("food", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("food", "false", file);
 	// Flute
-	if (hasFlute)
+	if (game.GetGameItems().flute)
 		m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
 	// Raft
-	if (hasRaft)
+	if (game.GetGameItems().raft)
 		m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
 	// Ladder
-	if (hasLadder)
+	if (game.GetGameItems().ladder)
 		m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
 	// Bow
-	if (hasBow)
+	if (game.GetGameItems().bow)
 		m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
 	// Magic Shield
-	if (hasShield)
+	if (game.GetGameItems().magicShield)
 		m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
 	// Power Braclet
-	if (hasPowerBraclet)
+	if (game.GetGameItems().powerBraclet)
 		m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
 	// Map
-	if (hasMap)
+	if (game.GetGameItems().map)
 		m_writer.WriteKeyAndUnquotedValue("map", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("map", "false", file);
-
 	// Blue Potion
-	if (hasBluePotion)
+	if (game.GetGameItems().bluePotion)
 		m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
 	// Red Potion
-	if (hasRedPotion)
+	if (game.GetGameItems().redPotion)
 		m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
 	// Master Key
-	if (hasMasterKey)
+	if (game.GetGameItems().masterKey)
 		m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
@@ -845,11 +883,9 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 
 	// Write the numbered values of current inventory and life hearts
 	m_writer.WriteDeclareTable("inventory", file);
-	m_writer.WriteKeyAndUnquotedValue("num_rupees", numRupees, file);
-	m_writer.WriteKeyAndUnquotedValue("num_bombs", numBombs, file);
-	m_writer.WriteKeyAndUnquotedValue("num_arrows", numArrows, file);
-	m_writer.WriteKeyAndUnquotedValue("num_keys", numKeys, file);
-	//m_writer.WriteKeyAndUnquotedValue("num_hearts", numHearts, file);
+	m_writer.WriteKeyAndUnquotedValue("num_rupees", GameState::totalRupees, file);
+	m_writer.WriteKeyAndUnquotedValue("num_bombs", GameState::totalBombs, file);
+	m_writer.WriteKeyAndUnquotedValue("num_keys", GameState::totalKeys, file);
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
@@ -1008,115 +1044,21 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		if (hasComponents != sol::nullopt)
 		{
 			// Transform Component
-			sol::optional<sol::table> transformComp = player["components"]["transform"];
-			if (transformComp != sol::nullopt)
-			{
-				entity.AddComponent<TransformComponent>(
-					glm::vec2(
-						player["components"]["transform"]["position"]["x"],
-						player["components"]["transform"]["position"]["y"]
-					),
-					glm::vec2(
-						player["components"]["transform"]["scale"]["x"].get_or(1.0),
-						player["components"]["transform"]["scale"]["y"].get_or(1.0)),
-					player["components"]["transform"]["rotation"].get_or(0.0));
-			}
-
+			ReadTransformComponent(player, entity);
 			// Box Collider Component
-			sol::optional<sol::table> boxCollider = player["components"]["box_collider"];
-			if (boxCollider != sol::nullopt)
-			{
-				//Logger::Err("Has Box Collider Component");
-				entity.AddComponent<BoxColliderComponent>(
-					player["components"]["box_collider"]["width"],
-					player["components"]["box_collider"]["height"],
-					glm::vec2(
-						player["components"]["box_collider"]["offset_x"].get_or(0.0),
-						player["components"]["box_collider"]["offset_y"].get_or(0.0)));
-			}
-
+			ReadBoxColliderComponent(player, entity);
 			// Rigid Body Component
-			sol::optional<sol::table> rigidBody = player["components"]["rigidbody"];
-			if (rigidBody != sol::nullopt)
-			{
-				entity.AddComponent<RigidBodyComponent>(
-					glm::vec2(
-						player["components"]["rigidbody"]["velocity"]["x"].get_or(0),
-						player["components"]["rigidbody"]["velocity"]["y"].get_or(0)));
-			}
+			ReadRigidBodyComponent(player, entity);
 			// Health Component
-			sol::optional<sol::table> health = player["components"]["health"];
-			if (health != sol::nullopt)
-			{
-				entity.AddComponent<HealthComponent>(
-					player["components"]["health"]["health_percentage"].get_or(9),
-					player["components"]["health"]["max_hearts"].get_or(3));
-			}
+			ReadHealthComponent(player, entity);
 			// Sprite
-			sol::optional<sol::table> sprite = player["components"]["sprite"];
-			if (sprite != sol::nullopt)
-			{
-				entity.AddComponent<SpriteComponent>(
-					player["components"]["sprite"]["asset_id"],
-					player["components"]["sprite"]["width"],
-					player["components"]["sprite"]["height"],
-					player["components"]["sprite"]["z_index"].get_or(1), // Layer
-					player["components"]["sprite"]["is_fixed"].get_or(false),
-					player["components"]["sprite"]["src_rect_x"].get_or(0),
-					player["components"]["sprite"]["src_rect_y"].get_or(0),
-					glm::vec2(
-						player["components"]["sprite"]["offset"]["x"].get_or(0),
-						player["components"]["sprite"]["offset"]["y"].get_or(0)));
-			}
+			ReadSpriteComponent(player, entity);
 			// Animation  
-			sol::optional<sol::table> animation = player["components"]["animation"];
-			if (animation != sol::nullopt)
-			{
-				entity.AddComponent<AnimationComponent>(
-					player["components"]["animation"]["num_frames"].get_or(1),
-					player["components"]["animation"]["frame_rate"].get_or(1),
-					player["components"]["animation"]["vertical"].get_or(false),
-					player["components"]["animation"]["looped"].get_or(false),
-					player["components"]["animation"]["frame_offset"].get_or(0));
-			}
+			ReadAnimationComponent(player, entity);
 			// Projectile Emitter  
-			sol::optional<sol::table> projectile = player["components"]["projectile_emitter"];
-			if (projectile != sol::nullopt)
-			{
-				entity.AddComponent<ProjectileEmitterComponent>(
-					glm::vec2(
-						player["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
-						player["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
-					),
-					player["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
-					player["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
-					player["components"]["projectile_emitter"]["hit_percent_damage"].get_or(10),
-					player["components"]["projectile_emitter"]["is_friendly"].get_or(false)
-					);
-			}
+			ReadProjectileEmitterComponent(player, entity);
 			// Keyboard Control Component 
-			sol::optional<sol::table> keyboard = player["components"]["keyboard_control"];
-			if (keyboard != sol::nullopt)
-			{
-				entity.AddComponent<KeyboardControlComponent>(
-					glm::vec2(
-						player["components"]["keyboard_control"]["up_velocity"]["x"].get_or(0),
-						player["components"]["keyboard_control"]["up_velocity"]["y"].get_or(0)
-					),
-					glm::vec2(
-						player["components"]["keyboard_control"]["right_velocity"]["x"].get_or(0),
-						player["components"]["keyboard_control"]["right_velocity"]["y"].get_or(0)
-					),
-					glm::vec2(
-						player["components"]["keyboard_control"]["down_velocity"]["x"].get_or(0),
-						player["components"]["keyboard_control"]["down_velocity"]["y"].get_or(0)
-					),
-					glm::vec2(
-						player["components"]["keyboard_control"]["left_velocity"]["x"].get_or(0),
-						player["components"]["keyboard_control"]["left_velocity"]["y"].get_or(0)
-					));
-			}
-
+			ReadKeyboardControlComponent(player, entity);
 			if (entity.HasTag("player"))
 			{
 				entity.AddComponent<CameraFollowComponent>();
@@ -1203,6 +1145,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 			game.GetGameItems().bluePotion = player["items"]["blue_potion"].get_or(false);
 			game.GetGameItems().redPotion = player["items"]["red_potion"].get_or(false);
 			game.GetGameItems().masterKey = player["items"]["master_key"].get_or(false);
+			game.GetGameItems().candle = player["items"]["candle"].get_or(false);
 		}
 		// Inventory
 		sol::optional<sol::table> inventory = player["inventory"];
@@ -1257,104 +1200,23 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 		if (hasComponents != sol::nullopt)
 		{
 			// Transform
-			sol::optional<sol::table> transform = entity["components"]["transform"];
-			if (transform != sol::nullopt)
-			{
-				newEntity.AddComponent<TransformComponent>(
-					glm::vec2(
-						entity["components"]["transform"]["position"]["x"],
-						entity["components"]["transform"]["position"]["y"]
-					),
-					glm::vec2(
-						entity["components"]["transform"]["scale"]["x"].get_or(1.0),
-						entity["components"]["transform"]["scale"]["y"].get_or(1.0)
-					),
-					entity["components"]["transform"]["rotation"].get_or(0.0)
-					);
-			}
+			ReadTransformComponent(entity, newEntity);
 			// RigidBody
-			sol::optional<sol::table> rigidBody = entity["components"]["rigidbody"];
-			if (rigidBody != sol::nullopt)
-			{
-				newEntity.AddComponent<RigidBodyComponent>(
-					glm::vec2(
-						entity["components"]["rigidbody"]["velocity"]["x"].get_or(0),
-						entity["components"]["rigidbody"]["velocity"]["y"].get_or(0)
-					)
-					);
-			}
+			ReadRigidBodyComponent(entity, newEntity);
 			// Sprite
-			sol::optional<sol::table> sprite = entity["components"]["sprite"];
-			if (sprite != sol::nullopt)
-			{
-				newEntity.AddComponent<SpriteComponent>(
-					entity["components"]["sprite"]["asset_id"],
-					entity["components"]["sprite"]["width"],
-					entity["components"]["sprite"]["height"],
-					entity["components"]["sprite"]["z_index"].get_or(1), // Layer
-					entity["components"]["sprite"]["is_fixed"].get_or(false),
-					entity["components"]["sprite"]["src_rect_x"].get_or(0),
-					entity["components"]["sprite"]["src_rect_y"].get_or(0),
-					glm::vec2(
-						entity["components"]["sprite"]["offset"]["x"].get_or(0),
-						entity["components"]["sprite"]["offset"]["y"].get_or(0)
-					)
-					);
-			}
-			// Animation  numFrames, frameSpeedRate, vertical, isLooped ,frameOffset
-			sol::optional<sol::table> animation = entity["components"]["animation"];
-			if (animation != sol::nullopt)
-			{
-				newEntity.AddComponent<AnimationComponent>(
-					entity["components"]["animation"]["num_frames"].get_or(1),
-					entity["components"]["animation"]["frame_rate"].get_or(1),
-					entity["components"]["animation"]["vertical"].get_or(false),
-					entity["components"]["animation"]["looped"].get_or(false),
-					entity["components"]["animation"]["frame_offset"].get_or(0)
-					);
-			}
-			// Health Component int healthPercentage = 9, int maxHearts = 3
-			sol::optional<sol::table> health = entity["components"]["health"];
-			if (health != sol::nullopt)
-			{
-				newEntity.AddComponent<HealthComponent>(
-					entity["components"]["health"]["health_percentage"].get_or(100),
-					entity["components"]["health"]["max_hearts"].get_or(3)
-					);
-			}
-			// Box Collider width, height, glm::vec2 offset 
-			sol::optional<sol::table> box_collider = entity["components"]["box_collider"];
-			if (box_collider != sol::nullopt)
-			{
-				newEntity.AddComponent<BoxColliderComponent>(
-					entity["components"]["box_collider"]["width"].get_or(16),
-					entity["components"]["box_collider"]["height"].get_or(16),
-					glm::vec2(
-						entity["componets"]["box_collider"]["offset_x"].get_or(0),
-						entity["componets"]["box_collider"]["offset_y"].get_or(0)
-					));
-			}
+			ReadSpriteComponent(entity, newEntity);
+			// Animation  
+			ReadAnimationComponent(entity, newEntity);
+			// Health Component 
+			ReadHealthComponent(entity, newEntity);
+			// Box Collider 
+			ReadBoxColliderComponent(entity, newEntity);
 			// Projectile Emitter  
-			sol::optional<sol::table> projectile = entity["components"]["projectile_emitter"];
-			if (projectile != sol::nullopt)
-			{
-				newEntity.AddComponent<ProjectileEmitterComponent>(
-					glm::vec2(
-						entity["components"]["projectile_emitter"]["velocity"]["x"].get_or(0),
-						entity["components"]["projectile_emitter"]["velocity"]["y"].get_or(0)
-					),
-					entity["components"]["projectile_emitter"]["repeat_frequency"].get_or(0),
-					entity["components"]["projectile_emitter"]["projectile_duration"].get_or(10000),
-					entity["components"]["projectile_emitter"]["hit_percent_damage"].get_or(1),
-					entity["components"]["projectile_emitter"]["is_friendly"].get_or(false)
-					);
-			}
-
-			// Script Component --> Not used at the moment --> Using c++ State machine --> will try to change to lua state machine
+			ReadProjectileEmitterComponent(entity, newEntity);
+			// Script Component 
 			sol::optional<sol::table> script = entity["components"]["on_update_script"];
 			if (script != sol::nullopt)
 			{
-				//Logger::Log("HERE");
 				sol::function func = entity["components"]["on_update_script"][0];
 				newEntity.AddComponent<ScriptComponent>(func);
 			}
@@ -1383,7 +1245,7 @@ void LevelLoader::SaveSecrets()
 {
 	LuaTableWriter writer;
 	std::fstream file;
-	file.open("./Assets/SavedFiles/GameSecrets.lua", std::ios::out);
+	file.open("./Assets/SavedFiles/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua", std::ios::out);
 	writer.WriteStartDocument();
 	writer.WriteCommentSeparation(file);
 	writer.WriteCommentLine("Game Secrets", file);
@@ -1447,14 +1309,19 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 		auto& secret = entity.GetComponent<SecretComponent>();
 		if (game.IsSecretFound(secret.locationID))
 		{
+			entity.GetComponent<SecretComponent>().found = true;
 			// Call the Trigger Function
-			game.GetSystem<TriggerSystem>().SecretTrigger(entity, true);
+			if (entity.GetComponent<SecretComponent>().found)
+			{
+				game.GetSystem<TriggerSystem>().SecretTrigger(entity, true);
+				Logger::Log("Loading Secrets");
+			}
+				
+			
 		}
 		else
 			continue;
 	}
-
-
 }
 
 void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
@@ -1516,34 +1383,11 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 		if (hasComponents != sol::nullopt)
 		{
 			// Transform Component
-			sol::optional<sol::table> transform = hudData["components"]["transform"];
-			if (transform != sol::nullopt)
-			{
-				newHUDObject.AddComponent<TransformComponent>(
-					glm::vec2(
-						hudData["components"]["transform"]["position"]["x"].get_or(0),
-						hudData["components"]["transform"]["position"]["y"].get_or(0)
-					),
-					glm::vec2(
-						hudData["components"]["transform"]["scale"]["x"].get_or(1.0),
-						hudData["components"]["transform"]["scale"]["y"].get_or(1.0)
-					),
-					hudData["components"]["transform"]["rotation"].get_or(0.0));
-			}
+			ReadTransformComponent(hudData, newHUDObject);
+
+
 			// Add Sprite Component
-			sol::optional<sol::table> sprite = hudData["components"]["sprite"];
-			if (sprite != sol::nullopt)
-			{
-				newHUDObject.AddComponent<SpriteComponent>(
-					hudData["components"]["sprite"]["assetID"],
-					hudData["components"]["sprite"]["width"],
-					hudData["components"]["sprite"]["height"],
-					hudData["components"]["sprite"]["layer"],
-					hudData["components"]["sprite"]["fixed"],
-					hudData["components"]["sprite"]["src_rect_x"].get_or(0),
-					hudData["components"]["sprite"]["src_rect_y"].get_or(0)
-					);
-			}
+			ReadSpriteComponent(hudData, newHUDObject);
 			newHUDObject.AddComponent<HUDComponenet>();
 		}
 		i++;
@@ -1756,66 +1600,13 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		{
 			newLvlObject.AddComponent<GameComponent>();
 			// Transform Component
-			sol::optional<sol::table> transform = lvlData["components"]["transform"];
-			if (transform != sol::nullopt)
-			{
-				newLvlObject.AddComponent<TransformComponent>(
-					glm::vec2(
-						lvlData["components"]["transform"]["position"]["x"].get_or(0),
-						lvlData["components"]["transform"]["position"]["y"].get_or(0)
-					),
-					glm::vec2(
-						lvlData["components"]["transform"]["scale"]["x"].get_or(1.0),
-						lvlData["components"]["transform"]["scale"]["y"].get_or(1.0)
-					),
-					lvlData["components"]["transform"]["rotation"].get_or(0.0));
-			}
-
+			ReadTransformComponent(lvlData, newLvlObject);
 			// Add Sprite Component
-			sol::optional<sol::table> sprite = lvlData["components"]["sprite"];
-			if (sprite != sol::nullopt)
-			{
-				newLvlObject.AddComponent<SpriteComponent>(
-					lvlData["components"]["sprite"]["assetID"],
-					lvlData["components"]["sprite"]["width"],
-					lvlData["components"]["sprite"]["height"],
-					lvlData["components"]["sprite"]["layer"],
-					lvlData["components"]["sprite"]["fixed"],
-					lvlData["components"]["sprite"]["src_rect_x"].get_or(0),
-					lvlData["components"]["sprite"]["src_rect_y"].get_or(0)
-					);
-			}
-
-			// !!! This is not working right now!! Causes issues when leaving moving to a new scene !!!
-
+			ReadSpriteComponent(lvlData, newLvlObject);
 			// Add Animation Component
-			sol::optional<sol::table> animation = lvlData["components"]["animation"];
-			if (animation != sol::nullopt)
-			{
-				newLvlObject.AddComponent<AnimationComponent>(
-					lvlData["components"]["animation"]["num_frames"].get_or(1),
-					lvlData["components"]["animation"]["frame_rate"].get_or(1),
-					lvlData["components"]["animation"]["vertical"].get_or(false),
-					lvlData["components"]["animation"]["looped"].get_or(false),
-					lvlData["components"]["animation"]["frame_offset"].get_or(0)
-					);
-			}
-
-			// Box Collider width, height, glm::vec2 offset 
-			sol::optional<sol::table> box_collider = lvlData["components"]["box_collider"];
-			if (box_collider != sol::nullopt)
-			{
-				int val = lvlData["components"]["box_collider"]["offset"]["x"].get_or(0);
-
-				newLvlObject.AddComponent<BoxColliderComponent>(
-					lvlData["components"]["box_collider"]["width"].get_or(16),
-					lvlData["components"]["box_collider"]["height"].get_or(16),
-					glm::vec2(
-						lvlData["components"]["box_collider"]["offset"]["x"].get_or(0),
-						lvlData["components"]["box_collider"]["offset"]["y"].get_or(0)
-					));
-			}
-
+			ReadAnimationComponent(lvlData, newLvlObject);
+			// Box Collider 
+			ReadBoxColliderComponent(lvlData, newLvlObject);
 			// Trigger Component
 			sol::optional<sol::table> triggerBox = lvlData["components"]["trigger_box"];
 			if (triggerBox != sol::nullopt)
@@ -1893,13 +1684,9 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 void LevelLoader::ConvertName(std::string name, int x, int y)
 {
 	int num = name.length();
-
 	// Clamp Num at 7
 	if (num > 7)
-	{
 		num = 7;
-	}
-
 	// Variable for spaces in between letters
 	int space = 0;
 

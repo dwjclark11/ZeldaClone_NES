@@ -195,6 +195,18 @@ public:
 
 		if ((b.BelongsToGroup("colliders") || b.BelongsToGroup("tiles")) && a.BelongsToGroup("enemies")) OnEnemyHitsObstacle(a, b);
 		if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("colliders") || a.BelongsToGroup("tiles"))) OnEnemyHitsObstacle(b, a);
+	
+		if (a.HasComponent<TriggerBoxComponent>() && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword")))
+		{
+			if (a.GetComponent<TriggerBoxComponent>().collider)
+				OnPlayerHitsObstacle(a, b);
+		}
+
+		if (b.HasComponent<TriggerBoxComponent>() && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword")))
+		{
+			if (b.GetComponent<TriggerBoxComponent>().collider)
+				OnPlayerHitsObstacle(b, a);
+		}
 	}
 
 	void OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
@@ -234,8 +246,8 @@ public:
 	{
 		if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
 		{
-			if ((obstacle.BelongsToGroup("colliders") || obstacle.BelongsToGroup("tiles")) && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
-			{
+		/*	if ((obstacle.BelongsToGroup("colliders") || obstacle.BelongsToGroup("tiles")) && (player.HasTag("player") || player.HasTag("the_shield") || player.HasTag("the_sword")))
+			{*/
 				auto& playerTransform = player.GetComponent<TransformComponent>();
 				auto& playerCollider = player.GetComponent<BoxColliderComponent>();
 				auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
@@ -276,7 +288,7 @@ public:
 					playerTransform.position.y = playerTransform.position.y;
 				}
 			}
-		}
+		//}
 	}
 
 };

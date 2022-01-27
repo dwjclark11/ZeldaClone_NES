@@ -196,6 +196,7 @@
     <ClCompile Include="src\Systems\GameSystems\GamePadSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\HealthSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\KeyboardControlSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\ProjectileEmitterSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\ProjectileLifeCycleSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderHealthSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderHUDSystem.cpp" />

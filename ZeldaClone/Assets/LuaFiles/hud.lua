@@ -14,7 +14,7 @@ hud = {
 				rotation = 45.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -34,7 +34,7 @@ hud = {
 				rotation = 0.0,
 			},
 			sprite = {
-				assetID = "hud_holder",
+				asset_id = "hud_holder",
 				width = 32,
 				height = 32,
 				layer = 5,
@@ -54,7 +54,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "hud_holder",
+				asset_id = "hud_holder",
 				width = 32, 
 				height = 32, 
 				layer = 5,
@@ -74,7 +74,7 @@ hud = {
 				rotation = 45.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -94,7 +94,7 @@ hud = {
 				rotation = 45.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -114,7 +114,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -134,7 +134,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "items",
+				asset_id = "items",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -154,7 +154,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "world_location",
+				asset_id = "world_location",
 				width = 128,
 				height = 64,
 				layer = 5,
@@ -174,7 +174,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "locator",
+				asset_id = "locator",
 				width = 4,
 				height = 4,
 				layer = 6,
@@ -194,7 +194,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "hud_hearts",
+				asset_id = "hud_hearts",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -214,7 +214,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "hud_hearts",
+				asset_id = "hud_hearts",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -234,7 +234,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "hud_hearts",
+				asset_id = "hud_hearts",
 				width = 16,
 				height = 16,
 				layer = 5,
@@ -254,7 +254,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -274,7 +274,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -294,7 +294,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -314,7 +314,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -334,7 +334,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -354,7 +354,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -374,7 +374,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "numbers",
+				asset_id = "numbers",
 				width = 8,
 				height = 8,
 				layer = 5,
@@ -394,7 +394,7 @@ hud = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "hud_words",
+				asset_id = "hud_words",
 				width = 112,
 				height = 16,
 				layer = 5,

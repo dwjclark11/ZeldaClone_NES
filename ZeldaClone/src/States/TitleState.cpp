@@ -6,7 +6,7 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/GameSystems/GamePadSystem.h"
-
+#include "../Systems/GameSystems/AnimationSystem.h"
 const std::string TitleState::titleID = "TITLESTATE";
 
 TitleState::TitleState()
@@ -47,7 +47,6 @@ void TitleState::Update(const double& deltaTime)
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
 		if (reg.GetSystem<CameraMovementSystem>().GetScrollFinished())
 		{
-			Logger::Log("HERE");
 			reg.GetSystem<CameraMovementSystem>().GetScrollFinished() = false;
 			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(new TitleState());
@@ -104,7 +103,7 @@ bool TitleState::OnExit()
 	game.GetSystem<CameraMovementSystem>().OnExit();
 	
 	// Remove the Render Title System If we are not using it!
-	//reg.RemoveSystem<RenderTitleSystem>();
+	reg.RemoveSystem<RenderTitleSystem>();
 	return true;
 }
 

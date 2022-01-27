@@ -16,7 +16,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "npcs",
+				asset_id = "npcs",
 				width = 32,
 				height = 32,
 				layer = 4,
@@ -43,7 +43,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "npcs",
+				asset_id = "npcs",
 				width = 32,
 				height = 32,
 				layer = 4,
@@ -70,7 +70,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "npcs",
+				asset_id = "npcs",
 				width = 32,
 				height = 32,
 				layer = 4,
@@ -90,7 +90,7 @@ level = {
 				rotation = 0.0
 			},
 			sprite = {
-				assetID = "Sword",
+				asset_id = "Sword",
 				width = 32,
 				height = 32,
 				layer = 1,

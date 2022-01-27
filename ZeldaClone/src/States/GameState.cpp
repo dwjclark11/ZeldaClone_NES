@@ -99,11 +99,11 @@ void GameState::Update(const double& deltaTime)
 
 	reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(game.GetEventManager());
+	
 	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-
+	reg.GetSystem<ProjectileEmitterSystem>().SubscribeToEvents(game.GetEventManager());
 
 
 	// Update the registry values
@@ -116,6 +116,8 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<CollectItemSystem>().Update();
 	reg.GetSystem<AnimationSystem>().Update();
 	reg.GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
+	
+	//reg.GetSystem<KeyboardControlSystem>().Update();
 
 	reg.GetSystem<MovementSystem>().Update(deltaTime);
 	reg.GetSystem<CameraMovementSystem>().Update(game.GetCamera());
