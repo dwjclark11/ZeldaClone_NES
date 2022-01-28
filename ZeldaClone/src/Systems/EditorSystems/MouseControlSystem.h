@@ -45,7 +45,9 @@ public:
 	static bool createBoxCollider;
 	static bool createEnemy;
 	static bool createTrigger;
+
 	static bool secretSelected;
+	static bool spriteSelected;
 
 	// Animation  attributes
 	static bool animation;

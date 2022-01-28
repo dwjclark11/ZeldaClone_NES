@@ -29,6 +29,7 @@
 #include "../Components/ProjectileComponent.h"
 #include "../Components/RupeeTypeComponent.h"
 #include "../Components/SecretComponent.h"
+#include "../Components/GameComponent.h"
 #include "../Components/ItemComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/CaptionComponent.h"
@@ -127,6 +128,7 @@ void GameState::Update(const double& deltaTime)
 	reg.GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	reg.GetSystem<AISystem>().Update();
 	reg.GetSystem<CaptionSystem>().Update();
+	reg.GetSystem<TriggerSystem>().Update();
 
 	// Update the rupeeScroll 
 	if (scrollRupees > 0)
@@ -256,6 +258,16 @@ bool GameState::OnEnter()
 	// Test Read in all secrets!!
 	loader.ReadInSecrets(game.GetLuaState());
 
+	// Create New Trigger Test
+	auto newTrigger = reg.CreateEntity();
+	newTrigger.AddComponent<TriggerBoxComponent>(TriggerType::PUSH_ROCKS);
+	newTrigger.AddComponent<TransformComponent>(glm::vec2(7424, 4900), glm::vec2(4, 4), 0);
+	newTrigger.AddComponent<BoxColliderComponent>(16, 16);
+	newTrigger.AddComponent<SpriteComponent>("Overworld_Tiles", 16, 16, 2, false, 16, 0);
+	newTrigger.GetComponent<TriggerBoxComponent>().collider = true;
+	newTrigger.AddComponent<SecretComponent>();
+	newTrigger.GetComponent<SecretComponent>().startPos = newTrigger.GetComponent<TransformComponent>().position;
+	newTrigger.AddComponent<GameComponent>();
 	return true;
 }
 

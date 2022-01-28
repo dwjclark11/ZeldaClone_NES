@@ -90,7 +90,7 @@ triggers = {
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "level_1",
 				entity_file			= "no_file",
-				trigger_file		= "no_file",
+				trigger_file		= "level_1_trigger_test",
 				image_width			= 1536,
 				image_height		= 1184
 			},

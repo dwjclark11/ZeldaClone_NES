@@ -167,7 +167,6 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 
 void ProjectileEmitterSystem::UseSword()
 {
-
 	auto player = Registry::Instance()->GetEntityByTag("player");
 	auto& playerSprite = player.GetComponent<SpriteComponent>();
 	auto& playerCollider = player.GetComponent<BoxColliderComponent>();

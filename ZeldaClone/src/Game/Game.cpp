@@ -284,7 +284,7 @@ SDL_Event& Game::GetEvent()
 
 bool Game::PlayerHold()
 {
-	if (playerDead || onStairs || playerItem)
+	if (playerDead || onStairs || playerItem || startFadeOut || startFadeIn)
 		return true;
 	else
 		return false;

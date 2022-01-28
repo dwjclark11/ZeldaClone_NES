@@ -294,6 +294,30 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 			}
 		}
 	}
+
+	if (MouseControlSystem::createTrigger)
+	{
+		if (ImGui::MenuItem("Open Trigger Map", "Ctrl+O"))
+		{
+			LevelLoader load;
+			fileName = dialog.OpenFile();
+
+			std::string extension = std::filesystem::path(fileName).extension().string();
+			std::string stem = std::filesystem::path(fileName).stem().string();
+			Logger::Log("Extension: " + extension);
+
+			loader.SetFileName(fileName);
+
+			// Check to see if the String is Empty!!
+			if (!fileName.empty() && extension == ".lua")
+			{
+				load.LoadTriggers(game.GetLuaState(), stem);
+				fileLoaded = true;
+			}
+		}
+	}
+
+
 	if (ImGui::MenuItem("Save", "Ctrl+S"))
 	{
 		std::string extension = std::filesystem::path(fileName).extension().string();
@@ -509,16 +533,22 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		static std::string entityFileName{ "no_file" };
 		static std::string triggerFile{ "no_file" };
 
+		static std::string spriteAssetID = "";
+
 		static int spriteWidth = 0;
 		static int spriteHeight = 0;
 		static int spriteSrcX = 0;
 		static int spriteSrcY = 0;
 
+		static int newSpriteWidth = 0;
+		static int newSpriteHeight = 0;
+		static int newSpriteSrcX = 0;
+		static int newSpriteSrcY = 0;
 		static std::string locationID { "" };
 		static std::string newSpriteAssetID { "" };
 		static std::string new_trigger { "" };
 
-		const std::string triggers[] = { "NO_TRIGGER", "SECRET_AREA",  "BURN_BUSHES", "PUSH_ROCKS", "BOMB_SECRET", "HIDDEN_SWITCH", "HIDDEN_OBJECT" };
+		const std::string triggers[] = { "NO_TRIGGER", "SECRET_AREA",  "TRANSPORT", "BURN_BUSHES", "PUSH_ROCKS", "BOMB_SECRET", "HIDDEN_SWITCH", "HIDDEN_OBJECT" };
 		static std::string current_item = "";
 
 		ComboLoop("Trigger Types", current_item, triggers, sizeof(triggers) / sizeof(triggers[0]));
@@ -528,6 +558,8 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			MouseControlSystem::triggerType = NO_TRIGGER;
 		else if (current_item == "SECRET_AREA")
 			MouseControlSystem::triggerType = SECRET_AREA;
+		else if (current_item == "TRANSPORT")
+			MouseControlSystem::triggerType = TRANSPORT;
 		else if (current_item == "BURN_BUSHES")
 			MouseControlSystem::triggerType = BURN_BUSHES;
 		else if (current_item == "PUSH_ROCKS")
@@ -542,7 +574,13 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			MouseControlSystem::triggerType = HIDDEN_OBJECT;
 		else
 			MouseControlSystem::triggerType = NO_TRIGGER;
-
+		
+		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+		if (ImGui::InputFloat("Transport Offset X", &MouseControlSystem::transportOffset.x, 1, 100));
+		if (ImGui::InputFloat("Transport Offset Y", &MouseControlSystem::transportOffset.y, 1, 100));
+		if (ImGui::InputFloat("Camera Offset X", &MouseControlSystem::cameraOffset.x, 1, 100));
+		if (ImGui::InputFloat("Camera Offset Y", &MouseControlSystem::cameraOffset.y, 1, 100));
+		
 		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Set the music to the song ID or \"stop\"");
 		ImFuncs::MyInputText("Level Music", &levelMusic);
 		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Put in the file name or leave as \"no_file\"");
@@ -560,7 +598,14 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 		ShowMenuTile();
+		ImGui::Checkbox("Sprite Component", &MouseControlSystem::spriteSelected);
+		if (MouseControlSystem::spriteSelected)
+		{
+			ImFuncs::MyInputText("Sprite Asset ID", &spriteAssetID);
 
+			ImGui::InputInt("Sprite Width", &spriteWidth, 8, 8);
+			ImGui::InputInt("Sprite Height", &spriteHeight, 8, 8);
+		}
 		ImGui::Checkbox("Secret", &MouseControlSystem::secretSelected);
 		
 		if (MouseControlSystem::secretSelected)
@@ -575,32 +620,32 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			ImFuncs::MyInputText("Location ID", &locationID);
 			ImFuncs::MyInputText("Sprite Asset ID", &newSpriteAssetID);
 
-			if (ImGui::InputInt("New Sprite Width", &spriteWidth, 16, 16))
+			if (ImGui::InputInt("New Sprite Width", &newSpriteWidth, 16, 16))
 			{
-				spriteWidth = (spriteWidth/ 16) * 16;
-				if (spriteWidth <= 0)
-					spriteWidth = 0;
+				newSpriteWidth = (newSpriteWidth / 16) * 16;
+				if (newSpriteWidth <= 0)
+					newSpriteWidth = 0;
 			}
 			
-			if (ImGui::InputInt("New Sprite Height", &spriteHeight, 16, 16))
+			if (ImGui::InputInt("New Sprite Height", &newSpriteHeight, 16, 16))
 			{
-				spriteHeight = (spriteHeight / 16) * 16;
-				if (spriteHeight <= 0)
-					spriteHeight = 0;
+				newSpriteHeight = (newSpriteHeight / 16) * 16;
+				if (newSpriteHeight <= 0)
+					newSpriteHeight = 0;
 			}
 
-			if (ImGui::InputInt("New Sprite Src X", &spriteSrcX, 16, 16))
+			if (ImGui::InputInt("New Sprite Src X", &newSpriteSrcX, 16, 16))
 			{
-				spriteSrcX = (spriteSrcX / 16) * 16;
-				if (spriteSrcX <= 0)
-					spriteSrcX = 0;
+				newSpriteSrcX = (newSpriteSrcX / 16) * 16;
+				if (newSpriteSrcX <= 0)
+					newSpriteSrcX = 0;
 			}
 
-			if (ImGui::InputInt("New Sprite Src Y", &spriteSrcY, 16, 16))
+			if (ImGui::InputInt("New Sprite Src Y", &newSpriteSrcY, 16, 16))
 			{
-				spriteSrcY = (spriteSrcY / 16) * 16;
-				if (spriteSrcY <= 0)
-					spriteSrcY = 0;
+				newSpriteSrcY = (newSpriteSrcY / 16) * 16;
+				if (newSpriteSrcY <= 0)
+					newSpriteSrcY = 0;
 			}
 
 			// Set Trigger Types
@@ -647,11 +692,11 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			// Set Secret Attributes
 			if (MouseControlSystem::secretSelected)
 			{
-				MouseControlSystem::newSpriteWidth = spriteWidth;
-				MouseControlSystem::newSpriteHeight = spriteHeight;
+				MouseControlSystem::newSpriteWidth = newSpriteWidth;
+				MouseControlSystem::newSpriteHeight = newSpriteHeight;
 
-				MouseControlSystem::imageSrcX = spriteSrcX;
-				MouseControlSystem::imageSrcY = spriteSrcY;
+				MouseControlSystem::imageSrcX = newSpriteSrcX;
+				MouseControlSystem::imageSrcY = newSpriteSrcY;
 			}
 		}
 

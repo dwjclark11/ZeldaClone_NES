@@ -46,11 +46,13 @@ int MouseControlSystem::projectileRepeatFrequency = 0;
 int MouseControlSystem::projectileDuration = 1000;
 int MouseControlSystem::projectileHitPercentDamage = 10;
 bool MouseControlSystem::projectileIsFriendly = false;
-bool MouseControlSystem::secretSelected = false;
+
 // Rigid Body
 bool MouseControlSystem::rigidBody = false;
 glm::vec2 MouseControlSystem::rigidBodyVelocity = glm::vec2(10, 10);
 
+bool MouseControlSystem::secretSelected = false;
+bool MouseControlSystem::spriteSelected = false;
 
 std::string MouseControlSystem::imageID = "";
 
@@ -307,18 +309,19 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 
 			if (secretSelected)
 			{
+				auto& startPos = newTrigger.GetComponent<TransformComponent>().position;
 				newTrigger.Group("secret");
 				newTrigger.AddComponent<SecretComponent>(
 					locationID, newTriggerType, 
 					newSpriteAssetID, newSpriteWidth, 
 					newSpriteHeight, newSpriteSrcX, 
-					newSpriteSrcY);
+					newSpriteSrcY, startPos);
 			}
 			else
 			{
 				newTrigger.Group("trigger");
 			}
-	
+			
 			Logger::Log("CREATED Trigger");
 			leftPressed = true;
 

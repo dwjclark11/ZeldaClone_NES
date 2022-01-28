@@ -39,6 +39,7 @@ public:
 
 
 	void LoadEnemiesAttributes(sol::state& lua, std::string& fileName, std::string& enemy_name);
+	
 	void CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy);
 	// Converters
 	TriggerType ConvertToTriggerType(int triggerType);

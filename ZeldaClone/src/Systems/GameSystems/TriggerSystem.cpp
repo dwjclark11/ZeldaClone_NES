@@ -116,10 +116,11 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	if (!secret.found && !startup)
 	{
 		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
-		Logger::Log("Not Found!!");
+		
 		auto secretArea = Registry::Instance()->CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
+	
 		secretArea.AddComponent<TriggerBoxComponent>(trigType,
 			secretTrigger.transportOffset, secretTrigger.cameraOffset,
 			secretTrigger.levelMusic, secretTrigger.assetFile,
@@ -131,19 +132,16 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
 		secretArea.AddComponent<GameComponent>();
 
-		//if (!startup)
-		//{
-			Logger::Log("Blasted open " + secret.locationID + " Secret!");
-			secret.found = true;
-			game.SetSecretFound(secret.locationID, true);
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+		Logger::Log("Blasted open " + secret.locationID + " Secret!");
+		secret.found = true;
+		game.SetSecretFound(secret.locationID, true);
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
 
-			loader.SaveSecrets();
-		//}
+		loader.SaveSecrets();
+	
 	}
 	else if (secret.found && startup)
 	{
-		Logger::Log("Found!!");
 		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 
 		auto secretArea = Registry::Instance()->CreateEntity();
@@ -182,12 +180,12 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	Entity& b = event.b;
 
 	// Check to see if the player has activated a trigger
-	if (a.BelongsToGroup("trigger") && b.HasTag("player"))
+	if (a.HasComponent<TriggerBoxComponent>() && b.HasTag("player"))
 	{
 		OnEnterTrigger(b, a);
 	}
 
-	if (b.BelongsToGroup("trigger") && a.HasTag("player"))
+	if (b.HasComponent<TriggerBoxComponent>() && a.HasTag("player"))
 	{
 		OnEnterTrigger(a, b);
 	}
@@ -242,7 +240,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	const auto& camPosX = trig.cameraOffset.x;
 	const auto& camPosY = trig.cameraOffset.y;
 
-
+	auto& playerTransform = player.GetComponent<TransformComponent>();
 	Timer loadTimer;
 	switch (trig.triggerType)
 	{
@@ -345,6 +343,24 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 
 		break;
 	}
+	case TRANSPORT:
+		
+		if (game.GetFadeAlpha() > 0)
+		{
+			game.StartFadeOut() = true;
+		}
+		else
+		{
+			playerTransform.position = trig.transportOffset;
+			game.GetCamera().x = trig.cameraOffset.x;
+			game.GetCamera().y = trig.cameraOffset.y;
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
+			// Finish the fade screen 
+			game.StartFadeOut() = false;
+			game.StartFadeIn() = true;
+		}
+		break;
+	
 	case BURN_BUSHES:
 		if (trigger.HasComponent<SecretComponent>())
 		{
@@ -355,7 +371,28 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		break;
 
 	case PUSH_ROCKS:
-		// TODO: 
+	{
+		auto& playerRigidBody = player.GetComponent<RigidBodyComponent>();
+		auto& rockTransform = trigger.GetComponent<TransformComponent>();
+		auto& secret = trigger.GetComponent<SecretComponent>();
+
+		if (!trig.active)
+		{
+			if (playerRigidBody.up)
+			{
+				trig.active = true;
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+				secret.moveUp = true;
+			}
+			else if (playerRigidBody.down)
+			{
+				trig.active = true;
+				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+				secret.moveDown = true;
+			}
+		}
+
+	}
 		break;
 
 	case COLLECT_ITEM:
@@ -421,5 +458,37 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		break;
 	default:
 		break;
+	}
+}
+
+void TriggerSystem::Update()
+{
+	for (const auto& entity : GetSystemEntities())
+	{
+		if (entity.HasComponent<TriggerBoxComponent>() && entity.HasComponent<SecretComponent>() && entity.HasComponent<SpriteComponent>())
+		{
+			auto& transform = entity.GetComponent<TransformComponent>();
+			auto& secret = entity.GetComponent<SecretComponent>();
+			auto& sprite = entity.GetComponent<SpriteComponent>();
+			auto& trig = entity.GetComponent<TriggerBoxComponent>();
+				
+			if (trig.active && !secret.found)
+			{
+				if (transform.position.y > secret.startPos.y - sprite.width * Game::gameScale && secret.moveUp)
+				{
+					transform.position.y--;
+				}
+				else if (transform.position.y < secret.startPos.y + sprite.width * Game::gameScale && secret.moveDown)
+				{
+					transform.position.y++;
+				}
+				else
+				{
+					secret.found = true;
+				}
+			}
+		}
+		else
+			continue;
 	}
 }

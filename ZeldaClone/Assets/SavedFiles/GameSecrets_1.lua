@@ -5,7 +5,7 @@
 secrets = {
     [1] = {
         location = "Burn_Bush_Area",
-        found = false
+        found = true
     },
     [2] = {
         location = "Sword_cave_Area",
