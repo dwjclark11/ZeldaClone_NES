@@ -20,19 +20,19 @@ bool KeyboardControlSystem::keyDown = false;
 
 void KeyboardControlSystem::UpdatePlayer()
 {
-	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto player = Registry::Instance().GetEntityByTag("player");
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 	auto& playerCollider = player.GetComponent<BoxColliderComponent>();
 	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 	auto& playerSprite = player.GetComponent<SpriteComponent>();
 	auto& playerControl = player.GetComponent<KeyboardControlComponent>();
 
-	auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+	auto shield = Registry::Instance().GetEntityByTag("the_shield");
 	auto& shieldTransform = shield.GetComponent<TransformComponent>();
 	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
 	auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
 
-	auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+	auto sword = Registry::Instance().GetEntityByTag("the_sword");
 	auto& swordTransform = sword.GetComponent<TransformComponent>();
 	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
@@ -100,19 +100,19 @@ void KeyboardControlSystem::Update()
 {
 	if (game.GetFadeAlpha() == 255)
 	{
-		auto player = Registry::Instance()->GetEntityByTag("player");
+		auto player = Registry::Instance().GetEntityByTag("player");
 		auto& playerTransform = player.GetComponent<TransformComponent>();
 		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
 		auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 		auto& playerSprite = player.GetComponent<SpriteComponent>();
 		auto& playerControl = player.GetComponent<KeyboardControlComponent>();
 
-		auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+		auto shield = Registry::Instance().GetEntityByTag("the_shield");
 		auto& shieldTransform = shield.GetComponent<TransformComponent>();
 		auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
 		auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
 
-		auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+		auto sword = Registry::Instance().GetEntityByTag("the_sword");
 		auto& swordTransform = sword.GetComponent<TransformComponent>();
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
@@ -216,7 +216,7 @@ void KeyboardControlSystem::Update()
 }
 
 KeyboardControlSystem::KeyboardControlSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<RigidBodyComponent>();
 	RequiredComponent<KeyboardControlComponent>();
@@ -235,19 +235,19 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 {
 	if (game.GetFadeAlpha() == 255)
 	{
-		auto player = Registry::Instance()->GetEntityByTag("player");
+		auto player = Registry::Instance().GetEntityByTag("player");
 		auto& playerTransform = player.GetComponent<TransformComponent>();
 		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
 		auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 		auto& playerSprite = player.GetComponent<SpriteComponent>();
 		auto& playerControl = player.GetComponent<KeyboardControlComponent>();
 
-		auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+		auto shield = Registry::Instance().GetEntityByTag("the_shield");
 		auto& shieldTransform = shield.GetComponent<TransformComponent>();
 		auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
 		auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
 
-		auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+		auto sword = Registry::Instance().GetEntityByTag("the_sword");
 		auto& swordTransform = sword.GetComponent<TransformComponent>();
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();

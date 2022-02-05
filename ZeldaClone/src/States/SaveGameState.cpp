@@ -9,7 +9,7 @@
 const std::string SaveGameState::saveID = "SAVE";
 
 SaveGameState::SaveGameState()
-	: game(*Game::Instance()), reg(*Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
 {
 }
 

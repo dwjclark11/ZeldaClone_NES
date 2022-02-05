@@ -34,7 +34,7 @@
 #include <SDL.h>
 
 LevelLoader::LevelLoader()
-	: game(*Game::Instance()), reg(*Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
 {
 }
 
@@ -1304,7 +1304,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 		i++;
 	}
 
-	for (auto& entity : Registry::Instance()->GetEntitiesByGroup("secret"))
+	for (auto& entity : Registry::Instance().GetEntitiesByGroup("secret"))
 	{
 		auto& secret = entity.GetComponent<SecretComponent>();
 		if (game.IsSecretFound(secret.locationID))

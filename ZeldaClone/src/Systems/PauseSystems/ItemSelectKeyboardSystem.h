@@ -42,7 +42,7 @@ public:
 	static ItemType itemType;
 
 	ItemSelectKeyboardControlSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();

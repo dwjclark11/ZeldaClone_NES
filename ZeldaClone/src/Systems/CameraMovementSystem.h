@@ -33,7 +33,7 @@ public:
 	int scrollTimer;
 
 	CameraMovementSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<CameraFollowComponent>();
 		RequiredComponent<TransformComponent>();

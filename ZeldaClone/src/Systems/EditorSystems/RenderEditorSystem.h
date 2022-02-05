@@ -33,7 +33,7 @@ struct RenderEditorSystem : public System
 		std::vector<RenderableEntity> renderableEntities;
 
 		// Loop through all of the system entities
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
 
 			RenderableEntity renderableEntity;
@@ -69,7 +69,7 @@ struct RenderEditorSystem : public System
 			});
 
 		// Loop all entities that the system is interested in
-		for (auto entity : renderableEntities)
+		for (const auto& entity : renderableEntities)
 		{
 			const auto transform = entity.transformComponent;
 			const auto sprite = entity.spriteComponent;
@@ -84,6 +84,7 @@ struct RenderEditorSystem : public System
 				(sprite.width * transform.scale.x),
 				(sprite.height * transform.scale.y)
 			};
+			
 
 			SDL_RenderCopyEx(
 				renderer,

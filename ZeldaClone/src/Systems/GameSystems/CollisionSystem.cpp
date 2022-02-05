@@ -34,7 +34,7 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 		int checkAY = aTransform.position.y / 672;
 
 		// Check to see if the collider is in the same panel as the player, if not skip the check
-		if (checkAX != Game::Instance()->GetPlayerPos().x && checkAY != Game::Instance()->GetPlayerPos().y)
+		if (checkAX != Game::Instance().GetPlayerPos().x && checkAY != Game::Instance().GetPlayerPos().y)
 			continue;
 		
 		// Loop all entities that still need to be checked 
@@ -69,7 +69,7 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 			int checkBY = bTransform.position.y / 672;
 
 			// Check to see if the collider is in the same panel as the player, if not skip the check
-			if (checkBX != Game::Instance()->GetPlayerPos().x && checkBY != Game::Instance()->GetPlayerPos().y)
+			if (checkBX != Game::Instance().GetPlayerPos().x && checkBY != Game::Instance().GetPlayerPos().y)
 				continue;
 			// Perform the AABB collision check between entities a and b
 			bool collisionHappened = CheckAABBCollision(

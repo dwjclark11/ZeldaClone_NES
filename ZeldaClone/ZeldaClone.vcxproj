@@ -164,9 +164,9 @@
     <ClCompile Include="libs\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Components\AIComponent.cpp" />
-    <ClCompile Include="src\StateMachines\EnemyStateMachine.cpp" />
-    <ClCompile Include="src\StateMachines\EnemyStates.cpp" />
-    <ClCompile Include="src\StateMachines\PlayerStateMachine.cpp" />
+    <ClCompile Include="src\StateMachines\NewEnemyStates.cpp" />
+    <ClCompile Include="src\StateMachines\NewPlayerStates.cpp" />
+    <ClCompile Include="src\StateMachines\NewStateMachine.cpp" />
     <ClCompile Include="src\AssetManager\AssetManager.cpp" />
     <ClCompile Include="src\ECS\ECS.cpp" />
     <ClCompile Include="src\Editor\EditorFileLoader.cpp" />
@@ -174,7 +174,6 @@
     <ClCompile Include="src\Game\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\StateMachines\PlayerStates.cpp" />
     <ClCompile Include="src\States\EditorState.cpp" />
     <ClCompile Include="src\States\GameOverState.cpp" />
     <ClCompile Include="src\States\GameState.cpp" />
@@ -467,9 +466,10 @@
     <ClInclude Include="src\Components\EnemyComponent.h" />
     <ClInclude Include="src\Components\PlayerComponent.h" />
     <ClInclude Include="src\Components\SecretComponent.h" />
-    <ClInclude Include="src\StateMachines\EnemyStateMachine.h" />
-    <ClInclude Include="src\StateMachines\EnemyStates.h" />
-    <ClInclude Include="src\StateMachines\PlayerStateMachine.h" />
+    <ClInclude Include="src\StateMachines\NewEnemyStates.h" />
+    <ClInclude Include="src\StateMachines\NewPlayerStates.h" />
+    <ClInclude Include="src\StateMachines\NewState.h" />
+    <ClInclude Include="src\StateMachines\NewStateMachine.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="src\AssetManager\AssetManager.h" />
     <ClInclude Include="src\Components\AnimationComponent.h" />
@@ -509,9 +509,6 @@
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Game\LevelLoader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
-    <ClInclude Include="src\StateMachines\PlayerStates.h" />
-    <ClInclude Include="src\StateMachines\TState.h" />
-    <ClInclude Include="src\StateMachines\TStateMachine.h" />
     <ClInclude Include="src\States\EditorState.h" />
     <ClInclude Include="src\States\GameOverState.h" />
     <ClInclude Include="src\States\GameState.h" />

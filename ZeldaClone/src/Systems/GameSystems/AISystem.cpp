@@ -5,6 +5,7 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/AIComponent.h"
 #include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/HealthComponent.h"
 #include "../../Logger/Logger.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
@@ -12,7 +13,7 @@
 #include <SDL.h>
 
 AISystem::AISystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<AIComponent>();
 }
@@ -25,8 +26,12 @@ void AISystem::Update()
 		auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
 
 		// If the AI state machine is nullptr, create one!
-		if (!stateMachine.StateMachineCreated())
+		if (!stateMachine.StateMachineCreated() && !stateMachine.IsCreated())
+		{
 			stateMachine.CreateStateMachine();
+			stateMachine.GetEnemyStateMachine().ChangeState(entity);
+		}
+			
 
 		// If the AI state machine has been created, update the entity AI
 		if (stateMachine.StateMachineCreated())
@@ -34,7 +39,7 @@ void AISystem::Update()
 			// If the enemy is in the same screen panel as the player --> Update 
 			if (stateMachine.GetEnemyPos() == game.GetPlayerPos())
 			{
-				stateMachine.GetEnemyStateMachine().Update(entity);
+				stateMachine.GetEnemyStateMachine().GetCurrentState()->Update(entity);
 			}
 			else
 			{

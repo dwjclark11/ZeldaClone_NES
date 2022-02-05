@@ -39,11 +39,11 @@ struct RenderPauseSystem : public System
 				static_cast<int>(sprite.width * transform.scale.x),
 				static_cast<int>(sprite.height * transform.scale.y)
 			};
-			Game::Instance()->FadeScreen();
+			Game::Instance().FadeScreen();
 
 			SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
+			SDL_SetTextureAlphaMod(tex, Game::Instance().GetFadeAlpha());
 
 			SDL_RenderCopyEx(
 				renderer,

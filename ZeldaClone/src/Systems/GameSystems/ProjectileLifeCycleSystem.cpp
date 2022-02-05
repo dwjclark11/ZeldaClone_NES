@@ -9,7 +9,7 @@
 #include "../SoundFXSystem.h"
 
 ProjectileLifeCycleSystem::ProjectileLifeCycleSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<ProjectileComponent>();
 }

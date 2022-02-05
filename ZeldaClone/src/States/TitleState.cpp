@@ -10,7 +10,7 @@
 const std::string TitleState::titleID = "TITLESTATE";
 
 TitleState::TitleState()
-	: game(*Game::Instance()), reg(*Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
 {
 }
 

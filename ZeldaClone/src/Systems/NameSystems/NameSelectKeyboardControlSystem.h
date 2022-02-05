@@ -30,7 +30,7 @@ public:
 	unsigned int slot;
 	
 	NameSelectKeyboardControlSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 		, row(0)
 		, col(0)
 	{

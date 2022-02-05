@@ -154,7 +154,7 @@ private:
 	{
 		if (projectileAttributeMap.size() == 0)
 		{
-			LoadMapAttributes(Game::Instance()->GetLuaState());
+			LoadMapAttributes(Game::Instance().GetLuaState());
 			Logger::Log("Item Map Reloaded!");
 		}
 		else
@@ -172,6 +172,6 @@ public:
 	}
 
 	void OnKeyPressed(KeyPressedEvent& event);
-	void Update(Registry* registry);
+	void Update(Registry& registry);
 
 };

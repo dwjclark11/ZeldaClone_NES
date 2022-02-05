@@ -4,7 +4,7 @@
 #include "../Utilities/Timer.h"
 #include <glm/glm.hpp>
 #include "PauseState.h"
-#include "../StateMachines/PlayerStateMachine.h"
+//#include "../StateMachines/PlayerStateMachine.h"
 
 
 class GameState : public State

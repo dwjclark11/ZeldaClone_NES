@@ -20,7 +20,7 @@
 #include "../Systems/EditorSystems/MouseControlSystem.h"
 #include <filesystem>
 EditorFileLoader::EditorFileLoader()
-	: reg(*Registry::Instance())
+	: reg(Registry::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();

@@ -3,8 +3,8 @@
 
 // Initialize Statics
 int BaseComponent::nextID = 0;
-Registry* Registry::instance = nullptr;
-
+//Registry* Registry::instance = nullptr;
+std::unique_ptr<Registry> Registry::instance = nullptr;
 
 int Entity::GetID() const
 {
@@ -282,18 +282,29 @@ void Registry::RemoveEntityGroup(Entity entity)
 	}
 }
 
-Registry* Registry::Instance()
+Registry& Registry::Instance()
+{
+	if (instance == nullptr)
+	{
+		Logger::Log("Creating new Registry Instance!\n");
+		instance.reset(new Registry());
+	}
+	return *instance;
+}
+
+
+/* Registry* Registry::Instance()
 {
 	if (instance == nullptr)
 		instance = new Registry();
 
 	return instance;
-}
+} */
 
-void Registry::ReleaseInstance()
+/* void Registry::ReleaseInstance()
 {
 	delete instance;
 	instance = nullptr;
 }
-
+ */
 // Remeber that in maps the key is ->first and the value is ->second

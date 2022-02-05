@@ -13,7 +13,7 @@ const std::string NameState::nameID = "NAME";
 std::string NameState::name = "";
 
 NameState::NameState()
-	: editor(false), keyDown(false), game(*Game::Instance()), reg(*Registry::Instance())
+	: editor(false), keyDown(false), game(Game::Instance()), reg(Registry::Instance())
 {
 }
 

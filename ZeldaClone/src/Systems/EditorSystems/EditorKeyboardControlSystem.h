@@ -19,7 +19,7 @@ private:
 	class Game& game;
 public:
 	EditorKeyboardControlSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		// These are magic numbers That should not be used!
 		levelWidth = MouseControlSystem::CanvasWidth;

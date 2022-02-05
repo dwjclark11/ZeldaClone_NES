@@ -82,11 +82,11 @@ void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>&
 			static_cast<int>(sprite.height * transform.scale.y)
 		};
 		
-		Game::Instance()->FadeScreen();
+		Game::Instance().FadeScreen();
 
 		SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
+		SDL_SetTextureAlphaMod(tex, Game::Instance().GetFadeAlpha());
 
 		SDL_RenderCopyEx(
 			renderer,
@@ -116,10 +116,10 @@ void RenderSystem::OnExit()
 		
 		if (!entity.HasComponent<PlayerComponent>()/*HasTag("player") && !entity.HasTag("the_sword") && !entity.HasTag("the_shield")*/)
 		{
-			entity.Kill();
-
 			if (entity.HasComponent<AIComponent>())
 				entity.GetComponent<AIComponent>().GarbageCollect();
+			
+			entity.Kill();
 		}
 	}
 }

@@ -1,4 +1,6 @@
-#include "EnemyStates.h"
+#include "NewEnemyStates.h"
+#include "../ECS/ECS.h"
+
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
@@ -16,11 +18,11 @@ void ItemDrop(Entity& enemy)
 	int chance = rand();
 	const auto& enemyTransform = enemy.GetComponent<TransformComponent>();
 	glm::vec2 pos = enemyTransform.position;
-	
+
 	//Logger::Log("Chance: " + std::to_string(chance));
 	if (chance % 7 == 0)
 	{
-		Entity item = Registry::Instance()->CreateEntity();
+		Entity item = Registry::Instance().CreateEntity();
 		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
 		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
@@ -30,7 +32,7 @@ void ItemDrop(Entity& enemy)
 	}
 	else if (chance % 5 == 0)
 	{
-		Entity item = Registry::Instance()->CreateEntity();
+		Entity item = Registry::Instance().CreateEntity();
 		item.Group("money");
 		//item.AddComponent<ItemComponent>();
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
@@ -42,7 +44,7 @@ void ItemDrop(Entity& enemy)
 	}
 	else if (chance % 3 == 0)
 	{
-		Entity item = Registry::Instance()->CreateEntity();
+		Entity item = Registry::Instance().CreateEntity();
 		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemCollectType::HEARTS);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
@@ -53,7 +55,7 @@ void ItemDrop(Entity& enemy)
 	}
 	else if (chance % 2 == 0)
 	{
-		Entity item = Registry::Instance()->CreateEntity();
+		Entity item = Registry::Instance().CreateEntity();
 		item.Group("money");
 		//item.AddComponent<ItemComponent>();
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
@@ -66,7 +68,7 @@ void ItemDrop(Entity& enemy)
 }
 
 // IdleState
-void EnemyIdleState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyIdleState::OnEnter(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 
@@ -80,23 +82,24 @@ void EnemyIdleState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	{
 		ai.leeverTimer.Start();
 	}
-	
+
 }
-void EnemyIdleState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyIdleState::OnExit(Entity& entity)
 {
 	//Logger::Log("Leaving Idle State");
 }
-void EnemyIdleState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyIdleState::Update(Entity& entity)
 {
-	auto& rigid			= entity.GetComponent<RigidBodyComponent>();
-	auto& ai			= entity.GetComponent<AIComponent>();
-	auto& sprite		= entity.GetComponent<SpriteComponent>();
-	auto& animation		= entity.GetComponent<AnimationComponent>();
-	
+	auto& rigid = entity.GetComponent<RigidBodyComponent>();
+	auto& ai = entity.GetComponent<AIComponent>();
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& animation = entity.GetComponent<AnimationComponent>();
+	auto& esm = ai.GetEnemyStateMachine();
+
 	if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
 	{
 		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-		
+
 		if (projEmitter.timer.GetTicks() > 1000)
 		{
 			projEmitter.shotTriggered = false;
@@ -108,7 +111,7 @@ void EnemyIdleState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		{
 			if (rigid.down)
 				rigid.velocity = glm::vec2(0, 50);
-			
+
 			if (rigid.up)
 				rigid.velocity = glm::vec2(0, -50);
 
@@ -120,7 +123,8 @@ void EnemyIdleState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		}
 		if (rigid.velocity != glm::vec2(0, 0))
 		{
-			pOwner->ChangeState(pOwner->patrolState, entity);
+			esm.AddState(std::make_unique<PatrolState>());
+			esm.ChangeState(entity);
 		}
 	}
 	else
@@ -131,7 +135,7 @@ void EnemyIdleState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		{
 			sprite.srcRect.y = 16;
 		}
-		
+
 		if (ai.leeverTimer.GetTicks() > 2000 && ai.leeverTimer.GetTicks() < 2100)
 		{
 			sprite.srcRect.y = 32;
@@ -148,53 +152,56 @@ void EnemyIdleState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 			animation.frameSpeedRate = 12;
 			animation.frameOffset = 64;
 			rigid.velocity = glm::vec2(50, 0);
-			pOwner->ChangeState(pOwner->patrolState, entity);
+			esm.AddState(std::make_unique<PatrolState>());
+			esm.ChangeState(entity);
 		}
 	}
 }
 
 // AttackState
-void EnemyAttackState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyAttackState::OnEnter(Entity& entity)
 {
 	//Logger::Err("entering Attack State");
 }
 
-void EnemyAttackState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyAttackState::Update(Entity& entity)
 {
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
 	auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-	
+
 }
 
-void EnemyAttackState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyAttackState::OnExit(Entity& entity)
 {
 	//Logger::Err("Exiting Attack State");
 }
 
 // PatrolState
-void PatrolState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+void PatrolState::OnEnter(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 	ai.aiTimer.Start();
 }
-void PatrolState::OnExit(EnemyStateMachine* pOwner, Entity& entity) 
+void PatrolState::OnExit(Entity& entity)
 {
 	//auto& ai = entity.GetComponent<AIComponent>();
 	//if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
 	//	ai.leeverTimer.Stop();
 }
 
-void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+void PatrolState::Update(Entity& entity)
 {
-	auto player				= Registry::Instance()->GetEntityByTag("player");
-	auto& playerTransform	= player.GetComponent<TransformComponent>();
+	auto player = Registry::Instance().GetEntityByTag("player");
+	auto& playerTransform = player.GetComponent<TransformComponent>();
 
-	auto& transform			= entity.GetComponent<TransformComponent>();
-	auto& rigid				= entity.GetComponent<RigidBodyComponent>();
-	auto& ai				= entity.GetComponent<AIComponent>();
-	auto& enemyHealth		= entity.GetComponent<HealthComponent>();
-	auto& sprite			= entity.GetComponent<SpriteComponent>();
-	auto& animation			= entity.GetComponent<AnimationComponent>();
+	auto& transform = entity.GetComponent<TransformComponent>();
+	auto& rigid = entity.GetComponent<RigidBodyComponent>();
+	auto& ai = entity.GetComponent<AIComponent>();
+	auto& enemyHealth = entity.GetComponent<HealthComponent>();
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& animation = entity.GetComponent<AnimationComponent>();
+	auto& esm = ai.GetEnemyStateMachine();
+
 	int sign = 1;
 
 	if (entity.HasComponent<ProjectileEmitterComponent>())
@@ -241,15 +248,16 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 
 		if (projectileEmitter.shootDown || projectileEmitter.shootUp || projectileEmitter.shootLeft || projectileEmitter.shootRight)
 		{
-			pOwner->ChangeState(pOwner->idleState, entity);
+			esm.AddState(std::make_unique<EnemyIdleState>());
+			esm.ChangeState(entity);
 		}
 	}
-		
+
 	if (ai.aiTimer.GetTicks() > 2000)
 	{
 		srand(time(NULL));
 		int num = rand() % 2 + 1;
-		
+
 
 		// Set the direction of the enemy randomly
 		if (num > 1)
@@ -290,14 +298,25 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 	{
 		ai.aiTimer.Start();
 	}
-		
+
 	if (enemyHealth.isHurt)
-		pOwner->ChangeState(pOwner->hurtState, entity);
+	{
+		esm.AddState(std::make_unique<HurtState>());
+		esm.ChangeState(entity);
+	}
 	else if (rigid.velocity == glm::vec2(0) && ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-		pOwner->ChangeState(pOwner->idleState, entity);
+	{
+		esm.AddState(std::make_unique<EnemyIdleState>());
+		esm.ChangeState(entity);
+	}
+	
 
 	if (ai.GetStunned())
-		pOwner->ChangeState(pOwner->stunState, entity);
+	{
+		esm.AddState(std::make_unique<EnemyStunnedState>());
+		esm.ChangeState(entity);
+	}
+		
 
 
 	if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
@@ -319,19 +338,21 @@ void PatrolState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		if (ai.leeverTimer.GetTicks() > 11500 && ai.leeverTimer.GetTicks() < 11600)
 		{
 			sprite.srcRect.y = 0;
-			
+
 			animation.numFrames = 1;
 			animation.frameSpeedRate = 1;
 			animation.frameOffset = 0;
 
 			ai.leeverTimer.Stop();
-			pOwner->ChangeState(pOwner->idleState, entity);
+
+			esm.AddState(std::make_unique<EnemyIdleState>());
+			esm.ChangeState(entity);
 		}
 	}
 }
 
 // HurtState
-void HurtState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+void HurtState::OnEnter(Entity& entity)
 {
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
@@ -339,17 +360,17 @@ void HurtState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 
 	// Start hurt invinciblity timer
 	enemyHealth.hurtTimer.Start();
-	
+
 	rigid.velocity = glm::vec2(0);
 	animation.numFrames = 3;
 	animation.frameOffset = 32;
 	animation.frameSpeedRate = 20;
 }
-void HurtState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+void HurtState::Update(Entity& entity)
 {
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
-
+	auto& esm = ai.GetEnemyStateMachine();
 
 	if (enemyHealth.hurtTimer.GetTicks() > 1000 && enemyHealth.healthPercentage > 0)
 	{
@@ -357,19 +378,27 @@ void HurtState::Execute(EnemyStateMachine* pOwner, Entity& entity)
 		enemyHealth.hurtTimer.Stop();
 
 		if (!ai.stunTimer.isStarted())
-			pOwner->ChangeState(pOwner->idleState, entity);
+		{
+			esm.AddState(std::make_unique<EnemyIdleState>());
+			esm.ChangeState(entity);
+		}
 		else
-			pOwner->ChangeState(pOwner->stunState, entity);
+		{
+			esm.AddState(std::make_unique<EnemyStunnedState>());
+			esm.ChangeState(entity);
+		}
+			
 	}
 	// If the enemy's heath is <= 0, call death state!
 	else if (enemyHealth.healthPercentage <= 0)
 	{
 		// Call the EnemyDeathState
-		 pOwner->ChangeState(pOwner->deathState, entity);
+		esm.AddState(std::make_unique<EnemyDeathState>());
+		esm.ChangeState(entity);
 	}
 }
 
-void HurtState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+void HurtState::OnExit(Entity& entity)
 {
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	animation.numFrames = 2;
@@ -379,23 +408,23 @@ void HurtState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
 
 
 // Death State
-void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyDeathState::OnEnter(Entity& entity)
 {
-	auto& ai		= entity.GetComponent<AIComponent>();
+	auto& ai = entity.GetComponent<AIComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& sprite	= entity.GetComponent<SpriteComponent>();
-	
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+
 	//entity.RemoveComponent<BoxColliderComponent>();
 	sprite.assetID = "enemy_death";
 	sprite.height = 16;
 	sprite.width = 16;
 	sprite.srcRect.x = 0;
 	sprite.srcRect.y = 0;
-		
+
 	ai.deathTimer.Start();
-	animation.frameOffset = 0; 
-	animation.numFrames = 8; 
-	animation.frameSpeedRate = 20; 
+	animation.frameOffset = 0;
+	animation.numFrames = 8;
+	animation.frameSpeedRate = 20;
 	animation.isLooped = false;
 	animation.vertical = false;
 	Timer time;
@@ -407,49 +436,58 @@ void EnemyDeathState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
 	{
 		ItemDrop(entity);
 	}
-	
+
 }
-void EnemyDeathState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyDeathState::Update(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
-		
+
 	if (ai.deathTimer.GetTicks() > 500)
 	{
-		
+
 		entity.Kill();
 		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
 	}
 }
 
-void EnemyDeathState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyDeathState::OnExit(Entity& entity)
 {
 	// Animation does not have to return to regular because the entity is destroyed!
 }
 
 
-void EnemyStunnedState::OnEnter(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyStunnedState::OnEnter(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 	ai.stunTimer.Start();
 }
 
-void EnemyStunnedState::OnExit(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyStunnedState::OnExit(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 	ai.SetStunned(false);
 }
 
-void EnemyStunnedState::Execute(EnemyStateMachine* pOwner, Entity& entity)
+void EnemyStunnedState::Update(Entity& entity)
 {
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
+	auto& esm = ai.GetEnemyStateMachine();
 
 	if (ai.stunTimer.GetTicks() > 3000)
 	{
 		ai.stunTimer.Stop();
-		pOwner->ChangeState(pOwner->idleState, entity);
+		//pOwner->ChangeState(pOwner->idleState, entity);
+		esm.AddState(std::make_unique<EnemyIdleState>());
+		esm.ChangeState(entity);
+		
 	}
 
 	if (enemyHealth.isHurt)
-		pOwner->ChangeState(pOwner->hurtState, entity);
+	{
+		//pOwner->ChangeState(pOwner->hurtState, entity);
+		esm.AddState(std::make_unique<HurtState>());
+		esm.ChangeState(entity);
+	}
+		
 }

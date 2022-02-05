@@ -78,7 +78,7 @@ void ConvertNumberParser(std::string group, int num, int power)
 			}
 			
 			// Create a variable entity and have it equal the given tag
-			auto entity = Registry::Instance()->GetEntityByTag(group);
+			auto entity = Registry::Instance().GetEntityByTag(group);
 			if (temp_num >= 0 && temp_num <= 9)
 			{
 				entity.GetComponent<SpriteComponent>().srcRect.x = 8 * temp_num;

@@ -14,7 +14,7 @@ const std::string PauseState::pauseID = "PAUSE";
 bool PauseState::firstEnter = false;
 
 PauseState::PauseState()
-	: bombs(false), game(*Game::Instance()), reg(*Registry::Instance())
+	: bombs(false), game(Game::Instance()), reg(Registry::Instance())
 {
 }
 

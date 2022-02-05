@@ -17,8 +17,7 @@
 #include "../Systems/MusicPlayerSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
-#include "../StateMachines/EnemyStateMachine.h"
-#include "../StateMachines/PlayerStateMachine.h"
+#include "../StateMachines/NewStateMachine.h"
 
 // Forward Declarations
 class AssetManager;
@@ -27,54 +26,50 @@ class AssetManager;
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
 
-struct GameItems
-{
-	bool woodSword;
-	bool steelSword;
-	bool magicSword;
-	bool woodBoomerang;
-	bool magicBoomerang;
-	bool magicRod;
-	bool bombs;
-	bool flute;
-	bool food;
-	bool raft;
-	bool ladder;
-	bool blueRing;
-	bool redRing;
-	bool bow;
-	bool magicBow;
-	bool shield;
-	bool magicShield;
-	bool map;
-	bool powerBraclet;
-	bool masterKey;
-	bool bluePotion;
-	bool redPotion;
-	bool candle;
-};
+
 
 class Game
 {
+	struct GameItems
+	{
+		bool woodSword;
+		bool steelSword;
+		bool magicSword;
+		bool woodBoomerang;
+		bool magicBoomerang;
+		bool magicRod;
+		bool bombs;
+		bool flute;
+		bool food;
+		bool raft;
+		bool ladder;
+		bool blueRing;
+		bool redRing;
+		bool bow;
+		bool magicBow;
+		bool shield;
+		bool magicShield;
+		bool map;
+		bool powerBraclet;
+		bool masterKey;
+		bool bluePotion;
+		bool redPotion;
+		bool candle;
+	};
+
 public:
 	static int gameScale;
 	static int tilePixels;
 	static int windowWidth;
 	static int windowHeight;
 	static bool isDebug;
+
 	~Game();
 
 	
 	// Creation of the singleton Game
-	static Game* Instance()
-	{
-		if (pInstance == nullptr)
-		{
-			pInstance = new Game();
-		}
-		return pInstance;
-	}
-	
+	static Game& Instance();
+
 	// Function Declarations
 	void Initialize();
 	void Update();
@@ -94,14 +89,7 @@ public:
 	SDL_Rect& GetMouseBox();
 	SDL_Event& GetEvent();
 	
-	const bool HasSword() 
-	{ 
-		if (mGameItems.woodSword || mGameItems.steelSword || mGameItems.magicSword)
-			return true;
-		
-		return false;
-	}
-	
+	const bool HasSword();
 	bool PlayerHold();
 	
 	bool& GetAttack();
@@ -116,12 +104,13 @@ public:
 
 	inline int& GetLevelWidth() { return mLevelWidth; }
 	inline int& GetLevelHeight() { return mLevelHeight; }
-	inline GameStateMachine* GetStateMachine() { return gameStateMachine; }
 	
 	void FadeScreen();
 
 	inline std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; }
 	inline std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
+	inline std::unique_ptr<GameStateMachine>& GetStateMachine() { return gameStateMachine; }
+	
 	
 	inline GameItems& GetGameItems() { return mGameItems; }
 	unsigned& GetPlayerNum();
@@ -148,10 +137,8 @@ public:
 	template<typename TSystem> TSystem& GetSystem();
 
 	int milliSecondsPreviousFrame;
-
-	EnemyStateMachine& GetEnemyStateMachine() { return esm; }
-	PlayerStateMachine& GetPlayerStateMachine() { return psm; }
-
+	
+	StateMachine& GetPlayerStateMachine() { return psm; }
 private:
 	int milliSecondsPerFrame;
 	bool mIsRunning;
@@ -173,35 +160,38 @@ private:
 	
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
-	GameStateMachine* gameStateMachine;
-	static Game* pInstance;
 	double deltaTime;
 
 	SDL_Rect camera;
 	SDL_Rect mouseBox;
 	SDL_Event sdlEvent;
 	Uint8 fadeAlpha;
+	
+	std::unique_ptr<GameStateMachine> gameStateMachine;
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
+	
+	static std::unique_ptr<Game> mInstance;
+	
+	
 	GameItems mGameItems;
 	
 	glm::vec2 mPlayerPos;
 	int mLevelWidth;
 	int mLevelHeight;
 
-	EnemyStateMachine esm;
-	PlayerStateMachine psm;
-
+	StateMachine psm;
 	sol::state lua;
 
-	// Constructor / Destructor
+	// Constructor
 	Game();
+
 	std::map<std::string, bool> gameSecrets;
 };
 
-
+// Why is this needed?
 template<typename TSystem>
 TSystem& Game::GetSystem()
 {
-	return Registry::Instance()->GetSystem<TSystem>();
+	return Registry::Instance().GetSystem<TSystem>();
 }

@@ -599,26 +599,17 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 
 		ShowMenuTile();
 		ImGui::Checkbox("Sprite Component", &MouseControlSystem::spriteSelected);
-		if (MouseControlSystem::spriteSelected)
-		{
-			ImFuncs::MyInputText("Sprite Asset ID", &spriteAssetID);
+		if (MouseControlSystem::spriteSelected) ImageBox(assetManager, renderer);
 
-			ImGui::InputInt("Sprite Width", &spriteWidth, 8, 8);
-			ImGui::InputInt("Sprite Height", &spriteHeight, 8, 8);
-		}
+
 		ImGui::Checkbox("Secret", &MouseControlSystem::secretSelected);
 		
 		if (MouseControlSystem::secretSelected)
 		{
-			ImGui::Checkbox("Show New Sprite TileSet", &showImageBox);
-
-			if(showImageBox)
-				ImageBox(assetManager, renderer);
-
 			ComboLoop("New Secret Trigger", new_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
 
 			ImFuncs::MyInputText("Location ID", &locationID);
-			ImFuncs::MyInputText("Sprite Asset ID", &newSpriteAssetID);
+			ImFuncs::MyInputText("New Sprite Asset ID", &newSpriteAssetID);
 
 			if (ImGui::InputInt("New Sprite Width", &newSpriteWidth, 16, 16))
 			{
@@ -697,6 +688,17 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 
 				MouseControlSystem::imageSrcX = newSpriteSrcX;
 				MouseControlSystem::imageSrcY = newSpriteSrcY;
+			}
+
+			if (MouseControlSystem::spriteSelected)
+			{
+				MouseControlSystem::spriteComponent.assetID = MouseControlSystem::imageID;
+				MouseControlSystem::spriteComponent.width = MouseControlSystem::mouseRectX;
+				MouseControlSystem::spriteComponent.height = MouseControlSystem::mouseRectY;
+				MouseControlSystem::spriteComponent.layer = MouseControlSystem::layer;
+				MouseControlSystem::spriteComponent.isFixed = false;
+				MouseControlSystem::spriteComponent.srcRect.x = MouseControlSystem::imageSrcX;
+				MouseControlSystem::spriteComponent.srcRect.y = MouseControlSystem::imageSrcY;
 			}
 		}
 
@@ -909,7 +911,7 @@ bool RenderEditorGUISystem::LoadEntireMapSprite(const std::unique_ptr<AssetManag
 	}
 
 	// If the image has been loaded successfully, Create a new map entity
-	auto newMap = Registry::Instance()->CreateEntity();
+	auto newMap = Registry::Instance().CreateEntity();
 	newMap.Group("map");
 	newMap.AddComponent<TransformComponent>(glm::vec2(0), glm::vec2(scaleX, scaleY), 0);
 	newMap.AddComponent<SpriteComponent>(mapAssetID, mapWidth, mapHeight, 0, false, 0, 0);

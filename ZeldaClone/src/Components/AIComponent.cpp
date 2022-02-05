@@ -1,4 +1,7 @@
 #include "AIComponent.h"
+#include "../StateMachines/NewStateMachine.h"
+#include "../StateMachines/NewEnemyStates.h"
+#include "../Logger/Logger.h"
 
 AIComponent::AIComponent(glm::vec2 enemyPos, EnemyType enemyType)
 {
@@ -7,6 +10,7 @@ AIComponent::AIComponent(glm::vec2 enemyPos, EnemyType enemyType)
 	this->enemyType = enemyType;
 }
 
+
 const bool AIComponent::StateMachineCreated() 
 {
 	return esm;
@@ -14,5 +18,7 @@ const bool AIComponent::StateMachineCreated()
 
 void AIComponent::CreateStateMachine()
 {
-	esm = new EnemyStateMachine;
+	esm = new StateMachine();
+	esm->AddState(std::make_unique<EnemyIdleState>());
+	created = true;
 }

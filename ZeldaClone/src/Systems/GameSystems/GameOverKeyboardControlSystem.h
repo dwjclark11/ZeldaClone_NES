@@ -25,7 +25,7 @@ private:
 public:
 
 	GameOverKeyboardControlSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();

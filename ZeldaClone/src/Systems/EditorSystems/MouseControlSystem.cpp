@@ -7,13 +7,11 @@ int MouseControlSystem::imageSrcX = 0;
 int MouseControlSystem::imageSrcY = 0;
 int MouseControlSystem::mouseRectX = 0;
 int MouseControlSystem::mouseRectY = 0;
-//int MouseControlSystem::ScaleX = 0;
-//int MouseControlSystem::ScaleY = 0;
+
 int MouseControlSystem::gridSize = 64;
 int MouseControlSystem::boxColliderWidth = 0;
 int MouseControlSystem::boxColliderHeight = 0;
-//int MouseControlSystem::boxColliderOffsetX = 0;
-//int MouseControlSystem::boxColliderOffsetY = 0;
+
 int MouseControlSystem::layer = 0;
 
  glm::vec2 MouseControlSystem::boxColliderOffset = glm::vec2(0);
@@ -89,9 +87,10 @@ int MouseControlSystem::imageHeight = 0;
 int MouseControlSystem::CanvasWidth = 6144;
 int MouseControlSystem::CanvasHeight = 4224;
 
+//static SpriteComponent sprite;
 
 bool MouseControlSystem::OverImGuiWindow = false;
-
+SpriteComponent MouseControlSystem::spriteComponent = SpriteComponent();
 
 AIComponent::EnemyType MouseControlSystem::enemyType = AIComponent::EnemyType::OCTOROK;
 
@@ -129,8 +128,8 @@ void MouseControlSystem::CreateTile(const std::unique_ptr<AssetManager>& assetMa
 	MouseBox(assetManager, renderer, mouseBox, camera);
 
 	// This is a test
-	int posX = static_cast<int>(Game::Instance()->GetMouseBox().x + Game::Instance()->GetCamera().x) / MouseControlSystem::gridSize;
-	int posY = static_cast<int>(Game::Instance()->GetMouseBox().y + Game::Instance()->GetCamera().y) / MouseControlSystem::gridSize;
+	int posX = static_cast<int>(Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().x) / MouseControlSystem::gridSize;
+	int posY = static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().y) / MouseControlSystem::gridSize;
 
 
 	if (event.type == SDL_MOUSEBUTTONDOWN || leftPressed)
@@ -143,7 +142,7 @@ void MouseControlSystem::CreateTile(const std::unique_ptr<AssetManager>& assetMa
 			//Logger::Log("pos x: " + std::to_string(posX) + "pos y: " + std::to_string(posY));
 			//Logger::Log("prev x: " + std::to_string(prevMouseX) + "pos y: " + std::to_string(prevMouseY));
 
-			Entity tile = Registry::Instance()->CreateEntity();
+			Entity tile = Registry::Instance().CreateEntity();
 			tile.Group("tiles");
 			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 				glm::vec2(Scale.x, Scale.y), 0.0);
@@ -191,7 +190,7 @@ void MouseControlSystem::CreateObstacles(const std::unique_ptr<AssetManager>& as
 	{
 		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
 		{
-			Entity tile = Registry::Instance()->CreateEntity();
+			Entity tile = Registry::Instance().CreateEntity();
 			tile.Group("tiles"); // Why tiles?
 			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 				glm::vec2(Scale.x, Scale.y), 0.0);
@@ -238,7 +237,7 @@ void MouseControlSystem::CreateBoxCollider(const std::unique_ptr<AssetManager>& 
 	{
 		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
 		{
-			Entity tile = Registry::Instance()->CreateEntity();
+			Entity tile = Registry::Instance().CreateEntity();
 			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y), glm::vec2(Scale.x, Scale.y), 0.0);
 
 			if (isCollision)
@@ -283,13 +282,13 @@ void MouseControlSystem::CreateBoxCollider(const std::unique_ptr<AssetManager>& 
 void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera)
 {
 	// This shows the green Trigger box on the mouse pointer
-	MouseBox(assetManager, renderer, mouseBox, camera, true, true);
+	MouseBox(assetManager, renderer, mouseBox, camera, false, true);
 
 	if (event.type == SDL_MOUSEBUTTONDOWN && !leftPressed)
 	{
 		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
 		{
-			Entity newTrigger = Registry::Instance()->CreateEntity();
+			Entity newTrigger = Registry::Instance().CreateEntity();
 			newTrigger.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 				glm::vec2(Scale.x, Scale.y), 0.0);
 			newTrigger.AddComponent<EditorComponent>();
@@ -320,6 +319,15 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 			else
 			{
 				newTrigger.Group("trigger");
+			}
+			
+			if (spriteSelected)
+			{
+				newTrigger.AddComponent<SpriteComponent>(spriteComponent.assetID, spriteComponent.width,
+					spriteComponent.height, spriteComponent.layer, spriteComponent.isFixed, spriteComponent.srcRect.x, spriteComponent.srcRect.y);
+
+				Logger::Log("Sprite Asset ID: " + spriteComponent.assetID + "Sprite Width: " + std::to_string(spriteComponent.width));
+				Logger::Log("Sprite Asset ID: " + newTrigger.GetComponent<SpriteComponent>().assetID + "Sprite Width: " + std::to_string(newTrigger.GetComponent<SpriteComponent>().width));
 			}
 			
 			Logger::Log("CREATED Trigger");
@@ -358,13 +366,13 @@ void MouseControlSystem::CreateEnemy(const std::unique_ptr<AssetManager>& assetM
 	{
 		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
 		{
-			Entity enemy = Registry::Instance()->CreateEntity();
+			Entity enemy = Registry::Instance().CreateEntity();
 			enemy.Group("enemies");
 			enemy.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
 				glm::vec2(Scale.x, Scale.y), 0.0);
 			enemy.AddComponent<EditorComponent>();
 
-			editor_loader.CreateNewEnemy(Game::Instance()->GetLuaState(), enemyFile, enemy_Type, enemy);
+			editor_loader.CreateNewEnemy(Game::Instance().GetLuaState(), enemyFile, enemy_Type, enemy);
 
 			Logger::Log("CREATED Enemy");
 			leftPressed = true;
@@ -442,7 +450,7 @@ void MouseControlSystem::SetEnemyImage()
 	}
 
 	// Call the load Enemy Attributes --> These attributes are kept in a lua table
-	editor_loader.LoadEnemiesAttributes(Game::Instance()->GetLuaState(), enemyFile, enemy_Type);
+	editor_loader.LoadEnemiesAttributes(Game::Instance().GetLuaState(), enemyFile, enemy_Type);
 }
 
 void MouseControlSystem::MouseBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Rect& camera, bool collider, bool trigger)

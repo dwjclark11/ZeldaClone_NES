@@ -1,6 +1,5 @@
 #pragma once
-#include "../StateMachines/EnemyStateMachine.h"
-#include "../StateMachines/PlayerStateMachine.h"
+#include "../StateMachines/NewStateMachine.h"
 #include "../Utilities/Timer.h"
 #include <glm/glm.hpp>
 #include <memory>
@@ -27,7 +26,7 @@ public:
 	};
 
 private:
-	EnemyStateMachine* esm;
+	StateMachine* esm;
 	glm::vec2 enemyPos;
 	EnemyType enemyType;
 
@@ -44,13 +43,14 @@ public:
 	
 	AIComponent(glm::vec2 enemyPos = glm::vec2(0, 0), EnemyType enemyType = OCTOROK);
 
-	inline EnemyStateMachine& GetEnemyStateMachine() { return *esm; }
 	inline void GarbageCollect() { delete esm; esm = nullptr; }
+	inline StateMachine& GetEnemyStateMachine() { return *esm;  }
 	inline glm::vec2& GetEnemyPos() { return enemyPos; }
 	inline void SetStunned(bool stun) { stunned = stun; }
 	inline const bool GetStunned() { return stunned; }
 	inline const EnemyType GetEnemyType() const { return enemyType; }
-
+	inline void SetCreated(bool create) { created = create; }
+	inline const bool IsCreated() const { return created; }
 	const bool StateMachineCreated();
 	void CreateStateMachine();
 };

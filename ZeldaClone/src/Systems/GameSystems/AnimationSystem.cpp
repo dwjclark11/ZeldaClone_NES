@@ -38,7 +38,7 @@ void AnimationSystem::Update()
 		// Check for AI component
 		if (entity.HasComponent<AIComponent>())
 		{
-			ai = entity.GetComponent<AIComponent>();
+			//ai = entity.GetComponent<AIComponent>();
 
 			if (rigidbody.velocity != glm::vec2(0))
 			{

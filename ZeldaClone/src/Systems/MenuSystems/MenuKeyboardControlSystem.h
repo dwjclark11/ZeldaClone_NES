@@ -23,7 +23,7 @@ private:
 	bool eliminate;
 public:
 	MenuKeyboardControlSystem()
-		: game(*Game::Instance()), eliminate(false)
+		: game(Game::Instance()), eliminate(false)
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();

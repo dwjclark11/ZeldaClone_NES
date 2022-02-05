@@ -14,7 +14,7 @@
 const std::string EditorState::editorID = "EDITOR";
 
 EditorState::EditorState()
-	: editor(false), keyDown(false), game(*Game::Instance()), reg(*Registry::Instance())
+	: editor(false), keyDown(false), game(Game::Instance()), reg(Registry::Instance())
 {
 
 }

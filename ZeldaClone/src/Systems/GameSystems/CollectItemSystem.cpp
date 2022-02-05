@@ -15,7 +15,7 @@
 #include "../../States/GameState.h"
 
 CollectItemSystem::CollectItemSystem()
-	: game(*Game::Instance()), reg(*Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
 {
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<TriggerBoxComponent>();

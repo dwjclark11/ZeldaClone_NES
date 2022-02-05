@@ -22,7 +22,7 @@ private:
 	class Game& game;
 public:
 	MovementSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<RigidBodyComponent>();
@@ -63,9 +63,9 @@ public:
 				}
 
 				// Stop the Sword and shield from moving ahead while transitioning from different screens
-				auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+				auto sword = Registry::Instance().GetEntityByTag("the_sword");
 				auto& swordTransform = sword.GetComponent<TransformComponent>();
-				auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+				auto shield = Registry::Instance().GetEntityByTag("the_shield");
 				auto& shieldTransform = shield.GetComponent<TransformComponent>();
 
 				if (rigidBody.velocity.x == 0 && rigidBody.velocity.y == 0)

@@ -15,7 +15,7 @@
 #include "../GameSystems/KeyboardControlSystem.h"
 
 DamageSystem::DamageSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<HealthComponent>();

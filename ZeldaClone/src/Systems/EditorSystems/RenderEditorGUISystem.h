@@ -49,7 +49,7 @@ public:
 
 	// Setup the IMGUI Style in the Constructor --> Change to it's own style function?
 	RenderEditorGUISystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		ImGuiSetup();
 		ImGuiStyle& style = ImGui::GetStyle();

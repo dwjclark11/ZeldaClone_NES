@@ -265,8 +265,8 @@ private:
 	std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
 	std::unordered_map<int, std::string> groupPerEntity;;
 
-	static Registry* instance;
-
+	//static Registry* instance;
+	static std::unique_ptr<Registry> instance;
 public:
 	// Management of entities, systems, and components
 	Registry() : entityID(1)
@@ -302,8 +302,13 @@ public:
 	bool DoesGroupExist(const std::string& group) const;
 	void RemoveEntityGroup(Entity entity);
 	std::set<Entity> GetEntitiesToBeKilled() const { return entitiesToBeKilled; }
-	static Registry* Instance();
-	static void ReleaseInstance();
+	
+	//static Registry* Instance();
+	static Registry& Instance();
+	//static void ReleaseInstance();
+	
+	
+	
 	// Component Management Functions
 	// Function template to add a componenet of type T to a given entity
 	template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);

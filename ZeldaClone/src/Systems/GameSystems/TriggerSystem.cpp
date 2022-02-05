@@ -54,7 +54,7 @@ bool TriggerSystem::CheckInventory(SpecialItemType& item)
 
 void TriggerSystem::SetInventory(SpecialItemType& item)
 {
-	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto player = Registry::Instance().GetEntityByTag("player");
 
 	auto& playerHealth = player.GetComponent<HealthComponent>();
 
@@ -117,7 +117,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	{
 		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 		
-		auto secretArea = Registry::Instance()->CreateEntity();
+		auto secretArea = Registry::Instance().CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 	
@@ -144,7 +144,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	{
 		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 
-		auto secretArea = Registry::Instance()->CreateEntity();
+		auto secretArea = Registry::Instance().CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 		secretArea.AddComponent<TriggerBoxComponent>(trigType,
@@ -162,7 +162,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 }
 
 TriggerSystem::TriggerSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
@@ -252,7 +252,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	{
 		if (game.GetStairsFinished())
 		{
-			auto _player = Registry::Instance()->GetEntityByTag("player");
+			auto _player = Registry::Instance().GetEntityByTag("player");
 
 			auto& rigidbody = _player.GetComponent<RigidBodyComponent>();
 			auto& sprite = _player.GetComponent<SpriteComponent>();
@@ -275,7 +275,8 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				game.GetSystem<RenderSystem>().OnExit();
 				game.GetSystem<RenderTileSystem>().OnExit();
 				game.GetSystem<RenderCollisionSystem>().OnExit();
-
+				
+		
 				// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
 				if (assetFile != "no_file")
 					loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
@@ -334,6 +335,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				game.SetStairsFinished(false);
 				// Set player sprite back to start
 				sprite.srcRect.y = 0;
+
 			}
 		}
 		else

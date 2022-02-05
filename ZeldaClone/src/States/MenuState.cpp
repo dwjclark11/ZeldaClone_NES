@@ -20,7 +20,7 @@ std::string MenuState::player3Name = "";
 bool MenuState::slotsFull = false;
 
 MenuState::MenuState()
-	: full(false), slot1(1), slot2(2), slot3(3), game(*Game::Instance()), reg(*Registry::Instance())
+	: full(false), slot1(1), slot2(2), slot3(3), game(Game::Instance()), reg(Registry::Instance())
 {
 }
 

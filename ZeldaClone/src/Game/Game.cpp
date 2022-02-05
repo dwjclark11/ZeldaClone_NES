@@ -8,7 +8,7 @@
 #include "../Events/KeyPressedEvent.h"
 
 // Initialize all static variables
-Game* Game::pInstance = nullptr;
+std::unique_ptr<Game> Game::mInstance = nullptr;
 int Game::gameScale = 4;
 int Game::tilePixels = 16;
 int Game::windowWidth = 256 * Game::gameScale;
@@ -31,15 +31,23 @@ Game::Game()
 	, mLevelWidth(16)
 	, mLevelHeight(8)
 {
-	//Logger::Log("Game Constructor called");
 	assetManager = std::make_unique<AssetManager>();
 	eventManager = std::make_unique<EventManager>();
 }
 // Destructor
 Game::~Game()
 {
-	delete gameStateMachine;
-	// Logger::Log("Game Destructor called");
+
+}
+
+Game& Game::Instance()
+{
+	if (mInstance == nullptr)
+	{
+		Logger::Log("Creating new Game instance!\n");
+		mInstance.reset(new Game());
+	}
+	return *mInstance;
 }
 
 // Initialize SDL/IMGUI and variables
@@ -103,10 +111,10 @@ void Game::Initialize()
 
 
 	// Add the required systems that are needed at the beginning
-	Registry::Instance()->AddSystem<RenderSystem>();
-	Registry::Instance()->AddSystem<RenderTitleSystem>();
-	Registry::Instance()->AddSystem<RenderCollisionSystem>();
-	Registry::Instance()->AddSystem<AnimationSystem>();
+	Registry::Instance().AddSystem<RenderSystem>();
+	Registry::Instance().AddSystem<RenderTitleSystem>();
+	Registry::Instance().AddSystem<RenderCollisionSystem>();
+	Registry::Instance().AddSystem<AnimationSystem>();
 	
 	// Initialize Camera
 	camera.x = 7168;
@@ -129,13 +137,13 @@ void Game::Initialize()
 	startFadeOut = false;
 
 	// Create the finite Game State Machine
-	gameStateMachine = new GameStateMachine();
+	gameStateMachine = std::make_unique<GameStateMachine>();
 	
 	// Push the title screen
-	//gameStateMachine->PushState(new TitleState());
+	gameStateMachine->PushState(new TitleState());
 
 	// Change to the state you want to work on
-	gameStateMachine->PushState(new EditorState());
+	//gameStateMachine->PushState(new EditorState());
 
 }
 
@@ -176,8 +184,8 @@ void Game::ProcessEvents()
 		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		
-		//Logger::Err("X: " + std::to_string(io.MousePos.x) + ",Y: " + std::to_string(io.MousePos.y));
 		gameStateMachine->ProcessEvents(sdlEvent);
+		
 		// Handle Core SDL Events
 		switch (sdlEvent.type)
 		{
@@ -225,8 +233,6 @@ void Game::Draw()
 	gameStateMachine->Render();
 
 	SDL_RenderPresent(mRenderer);
-
-
 }
 
 void Game::Shutdown()
@@ -234,6 +240,7 @@ void Game::Shutdown()
 	// Shutdown ImGui
 	ImGuiSDL::Deinitialize();
 	ImGui::DestroyContext();
+
 	// Shutdown SDL
 	SDL_DestroyRenderer(mRenderer);
 	SDL_DestroyWindow(mWindow);
@@ -262,13 +269,11 @@ SDL_Rect& Game::GetCamera()
 
 void Game::SetCameraY(int change)
 {
-	Logger::Log(std::to_string(change));
 	this->camera.y += change;
 }
 
 void Game::SetCameraX(int change)
 {
-	Logger::Log(std::to_string(change));
 	this->camera.x += change;
 }
 
@@ -280,6 +285,14 @@ SDL_Rect& Game::GetMouseBox()
 SDL_Event& Game::GetEvent()
 {
 	return sdlEvent;
+}
+
+const bool Game::HasSword()
+{
+	if (mGameItems.woodSword || mGameItems.steelSword || mGameItems.magicSword)
+		return true;
+
+	return false;
 }
 
 bool Game::PlayerHold()

@@ -39,6 +39,7 @@
 #include "../Game/LevelLoader.h"
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Utilities/Utility.h"
+#include "../StateMachines/NewPlayerStates.h"
 
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
@@ -54,7 +55,7 @@ int GameState::totalKeys = 0;
 int GameState::totalPrevKeys = 0;
 
 GameState::GameState()
-	: game(*Game::Instance()), reg(*Registry::Instance()), cameraOffset(glm::vec2(0)), index(0)
+	: game(Game::Instance()), reg(Registry::Instance()), cameraOffset(glm::vec2(0)), index(0)
 {
 }
 
@@ -112,7 +113,8 @@ void GameState::Update(const double& deltaTime)
 
 	// Update all Game systems
 	auto player = reg.GetEntityByTag("player");
-	game.GetPlayerStateMachine().Update(player);
+	
+	game.GetPlayerStateMachine().GetCurrentState()->Update(player);
 
 	reg.GetSystem<CollectItemSystem>().Update();
 	reg.GetSystem<AnimationSystem>().Update();
@@ -179,7 +181,6 @@ void GameState::Render()
 	{
 		game.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
 	}
-
 }
 
 bool GameState::OnEnter()
@@ -244,7 +245,7 @@ bool GameState::OnEnter()
 		// Load the player file based on the selected slot
 		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()));
 
-		auto player = Registry::Instance()->GetEntityByTag("player");
+		auto player = Registry::Instance().GetEntityByTag("player");
 		// Reset the player health after pressing continue [Game Over]
 		auto& playerHealth = player.GetComponent<HealthComponent>();
 		if (playerHealth.healthPercentage <= 0)
@@ -253,6 +254,13 @@ bool GameState::OnEnter()
 		}
 		ConvertHUDNumbers();
 		game.GetplayerCreated() = true;
+
+
+		{	//auto player = reg.GetEntityByTag("player");
+			game.GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
+			game.GetPlayerStateMachine().ChangeState(player);
+			Logger::Err("Player State Machine Created!!");
+		}
 	}
 
 	// Test Read in all secrets!!

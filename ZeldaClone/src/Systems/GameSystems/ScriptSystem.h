@@ -41,7 +41,7 @@ std::tuple<double, double> GetEntityVelocity(Entity entity)
 
 std::tuple<double, double> GetPlayerPosition()
 {
-	const auto& entity = Registry::Instance()->GetEntityByTag("player");
+	const auto& entity = Registry::Instance().GetEntityByTag("player");
 	const auto& transform = entity.GetComponent<TransformComponent>();
 	return std::make_tuple(transform.position.x, transform.position.y);
 }

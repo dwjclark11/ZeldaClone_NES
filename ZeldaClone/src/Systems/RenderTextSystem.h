@@ -13,7 +13,7 @@ private:
 	class Game& game;
 public: 
 	RenderTextSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<TextLabelComponent>();
 	}

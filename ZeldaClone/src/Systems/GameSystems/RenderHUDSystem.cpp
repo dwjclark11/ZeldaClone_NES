@@ -10,7 +10,7 @@
 #include <vector>
 
 RenderHUDSystem::RenderHUDSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	// All Systems need a required component to help separate what entities need to 
 	// use that system
@@ -125,7 +125,7 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 
 			SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
+			SDL_SetTextureAlphaMod(tex, Game::Instance().GetFadeAlpha());
 
 			SDL_RenderCopyEx(
 				renderer,

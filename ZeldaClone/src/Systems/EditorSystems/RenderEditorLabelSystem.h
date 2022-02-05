@@ -15,7 +15,7 @@ private:
 	Game& game;
 public:
 	RenderEditorLabelSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<SpriteComponent>();
 		RequiredComponent<TransformComponent>();

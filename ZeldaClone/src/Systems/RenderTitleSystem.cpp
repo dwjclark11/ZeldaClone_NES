@@ -14,7 +14,7 @@ void RenderTitleSystem::OnExit()
 	{
 		Entity& entity = *i;
 
-		Registry::Instance()->RemoveEntityFromSystems(*i);
+		Registry::Instance().RemoveEntityFromSystems(*i);
 	}
 
 	titleTimer = 0;

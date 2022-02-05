@@ -19,7 +19,7 @@ Entity& CaptionSystem::AddCaption(const Entity& entity, int& spaceX, int& spaceY
 {
 	auto& caption = entity.GetComponent<CaptionComponent>();
 
-	Entity newCaption = Registry::Instance()->CreateEntity();
+	Entity newCaption = Registry::Instance().CreateEntity();
 	newCaption.Group("caption");
 	newCaption.AddComponent<TransformComponent>(glm::vec2(caption.xPos + spaceX, caption.yPos + spaceY), glm::vec2(2, 2), 0);
 	newCaption.AddComponent<SpriteComponent>("caption_letters", 16, 16, 5, false, 0, 0);
@@ -32,7 +32,7 @@ Entity& CaptionSystem::AddNumberCaption(const Entity& entity, int spaceX, int sp
 {
 	auto& caption = entity.GetComponent<CaptionComponent>();
 
-	Entity newCaption = Registry::Instance()->CreateEntity();
+	Entity newCaption = Registry::Instance().CreateEntity();
 	newCaption.Group("caption");
 	newCaption.AddComponent<TransformComponent>(glm::vec2(caption.xPos + spaceX, caption.yPos + spaceY), glm::vec2(4, 4), 0);
 	newCaption.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
@@ -52,7 +52,7 @@ void CaptionSystem::Update()
 		if (caption.finished)
 			continue;
 				
-		if (xPos == Game::Instance()->GetPlayerPos().x && yPos == Game::Instance()->GetPlayerPos().y)
+		if (xPos == Game::Instance().GetPlayerPos().x && yPos == Game::Instance().GetPlayerPos().y)
 		{
 			if (caption.scrollable)
 			{
@@ -104,7 +104,7 @@ void CaptionSystem::Update()
 
 					// play the text scroll sound
 					Mix_Volume(6, 10);
-					Game::Instance()->GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance()->GetAssetManager(), "text_slow", 1, 6);
+					Game::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "text_slow", 1, 6);
 
 					// Check completion
 					if (caption.currentFrame == caption.caption.length())

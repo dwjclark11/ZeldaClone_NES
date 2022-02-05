@@ -12,7 +12,7 @@ unsigned int HealthSystem::numHearts = 3;
 int HealthSystem::loadedHearts = 0;
 
 HealthSystem::HealthSystem()
-	: game(*Game::Instance()), reg(*Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
 {
 	RequiredComponent<HealthComponent>();
 	RequiredComponent<SpriteComponent>();
@@ -61,7 +61,7 @@ void HealthSystem::Update()
 				// Set the tag to the next heart!
 				tag += std::to_string(numHearts);
 				// Create a new player Heart
-				Entity newHeart = Registry::Instance()->CreateEntity();
+				Entity newHeart = Registry::Instance().CreateEntity();
 				newHeart.AddComponent<SpriteComponent>("hud_hearts", 16, 16, 5, true, 0, 0);
 				newHeart.AddComponent<TransformComponent>(glm::vec2(xPos, yPos), glm::vec2(4, 4), 0.0);
 				newHeart.AddComponent<HealthComponent>(0);

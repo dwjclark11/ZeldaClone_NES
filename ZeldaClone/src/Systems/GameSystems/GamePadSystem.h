@@ -33,7 +33,7 @@ public:
 	static bool buttonDirDown;
 	static bool paused;
 
-	GamePadSystem() : gameController(nullptr), game(*Game::Instance())
+	GamePadSystem() : gameController(nullptr), game(Game::Instance())
 	{
 		RequiredComponent<KeyboardControlComponent>();
 	}

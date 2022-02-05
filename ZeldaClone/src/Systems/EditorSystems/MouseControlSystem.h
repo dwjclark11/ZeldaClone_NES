@@ -23,6 +23,7 @@ class MouseControlSystem : public System
 public:
 
 	static AIComponent::EnemyType enemyType;
+	static SpriteComponent spriteComponent;
 
 	// Common Properties
 	static int imageSrcX;

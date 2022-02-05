@@ -11,7 +11,7 @@
 #include <vector>
 
 RenderTileSystem::RenderTileSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
@@ -92,7 +92,7 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 			SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(tex, Game::Instance()->GetFadeAlpha());
+			SDL_SetTextureAlphaMod(tex, Game::Instance().GetFadeAlpha());
 
 			SDL_RenderCopyEx(
 				renderer,

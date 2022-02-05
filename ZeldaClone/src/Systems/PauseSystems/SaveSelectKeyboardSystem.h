@@ -16,7 +16,7 @@ private:
 public:
 	
 	SaveSelectKeyboardSystem()
-		: game(*Game::Instance())
+		: game(Game::Instance())
 	{
 		RequiredComponent<SpriteComponent>();
 		RequiredComponent<TransformComponent>();
@@ -67,7 +67,7 @@ public:
 							loader.SavePlayerDataToLuaTable("3");
 						}
 
-						//Entity saving = Registry::Instance()->CreateEntity();
+						//Entity saving = Registry::Instance().CreateEntity();
 						//saving.AddComponent<SpriteComponent>("save_gui", 96, 16, 1, true, 0, 0);
 						//saving.AddComponent<TransformComponent>(glm::vec2(400, 100), glm::vec2(2, 2), 0.0);
 						//saving.AddComponent<AnimationComponent>(2, 5);

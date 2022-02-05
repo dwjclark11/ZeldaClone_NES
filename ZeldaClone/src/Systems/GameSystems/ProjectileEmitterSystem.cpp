@@ -20,7 +20,7 @@
 #include <map>
 
 ProjectileEmitterSystem::ProjectileEmitterSystem()
-	: game(*Game::Instance())
+	: game(Game::Instance())
 {
 	RequiredComponent<ProjectileEmitterComponent>();
 	RequiredComponent<TransformComponent>();
@@ -35,7 +35,7 @@ ProjectileEmitterSystem::ProjectileEmitterSystem()
 
 void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 {
-	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto player = Registry::Instance().GetEntityByTag("player");
 
 	auto& projectileEmitter = player.GetComponent<ProjectileEmitterComponent>();
 	const auto& transform = player.GetComponent<TransformComponent>();
@@ -167,15 +167,15 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 
 void ProjectileEmitterSystem::UseSword()
 {
-	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto player = Registry::Instance().GetEntityByTag("player");
 	auto& playerSprite = player.GetComponent<SpriteComponent>();
 	auto& playerCollider = player.GetComponent<BoxColliderComponent>();
 	const auto& playerHealth = player.GetComponent<HealthComponent>();
 
-	auto sword = Registry::Instance()->GetEntityByTag("the_sword");
+	auto sword = Registry::Instance().GetEntityByTag("the_sword");
 	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 
-	auto shield = Registry::Instance()->GetEntityByTag("the_shield");
+	auto shield = Registry::Instance().GetEntityByTag("the_shield");
 	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
 
 	if (KeyboardControlSystem::dir == UP)
@@ -237,7 +237,7 @@ void ProjectileEmitterSystem::UseSword()
 
 void ProjectileEmitterSystem::UseMagicWand()
 {
-	auto player = Registry::Instance()->GetEntityByTag("player");
+	auto player = Registry::Instance().GetEntityByTag("player");
 
 	const auto& health = player.GetComponent<HealthComponent>();
 	auto& sprite = player.GetComponent<SpriteComponent>();
@@ -456,7 +456,7 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 	}
 }
 
-void ProjectileEmitterSystem::Update(Registry* registry)
+void ProjectileEmitterSystem::Update(Registry& registry)
 {
 	for (auto& entity : GetSystemEntities())
 	{
@@ -464,7 +464,7 @@ void ProjectileEmitterSystem::Update(Registry* registry)
 		if (entity.BelongsToGroup("boomerang"))
 		{
 			// Player variables
-			auto player = Registry::Instance()->GetEntityByTag("player");
+			auto player = Registry::Instance().GetEntityByTag("player");
 			auto& playerPos = player.GetComponent<TransformComponent>();
 
 			// Boomerang variables
