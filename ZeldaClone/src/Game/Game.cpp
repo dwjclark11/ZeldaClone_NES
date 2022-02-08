@@ -53,6 +53,8 @@ Game& Game::Instance()
 // Initialize SDL/IMGUI and variables
 void Game::Initialize()
 {
+	SDL_SetMainReady();
+
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
 	{
 		Logger::Err("Failed to initialize: " + *SDL_GetError());
@@ -140,10 +142,10 @@ void Game::Initialize()
 	gameStateMachine = std::make_unique<GameStateMachine>();
 	
 	// Push the title screen
-	//gameStateMachine->PushState(new TitleState());
+	gameStateMachine->PushState(new TitleState());
 
 	// Change to the state you want to work on
-	gameStateMachine->PushState(new EditorState());
+	//gameStateMachine->PushState(new EditorState());
 }
 
 void Game::Update()

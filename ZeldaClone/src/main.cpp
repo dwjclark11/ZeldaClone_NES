@@ -1,8 +1,11 @@
+#define SDL_MAIN_HANDLED
+#define main SDL_main
+
 #include "Game/Game.h"
 #include "Systems/CameraMovementSystem.h"
 #include "Systems/NameSystems/NameSelectKeyboardControlSystem.h"
 
-int main()
+int main(int argc, char* argv[])
 {
 	if (!Registry::Instance().HasSystem<SoundFXSystem>()) 
 		Registry::Instance().AddSystem<SoundFXSystem>();
@@ -21,5 +24,5 @@ int main()
 	// Run the game Instance--> There is a loop inside this
 	Game::Instance().Run();
 	Game::Instance().Shutdown();
-
+	return 0;
 }	

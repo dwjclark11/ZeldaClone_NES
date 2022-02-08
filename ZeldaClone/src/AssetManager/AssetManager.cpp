@@ -19,7 +19,7 @@ void AssetManager::AddTextures(SDL_Renderer* renderer, const std::string& assetI
 	if (!HasTexture(assetID))
 	{
 		SDL_Surface* surface = IMG_Load(filePath.c_str());
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(std::move(renderer), std::move(surface));
 		
 		
 		if (!texture)
@@ -31,7 +31,7 @@ void AssetManager::AddTextures(SDL_Renderer* renderer, const std::string& assetI
 		SDL_FreeSurface(surface);
 
 		// Add the Textures to the map
-		textures.emplace(assetID, texture);
+		textures.emplace(assetID, std::move(texture));
 	}
 	//else
 	//{
