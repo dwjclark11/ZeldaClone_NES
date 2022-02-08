@@ -1,5 +1,6 @@
 #pragma once
 #include "State.h"
+#include "../Editor/EditorFileLoader.h"
 
 class EditorState : public State
 {
@@ -24,4 +25,5 @@ private:
 	static const std::string editorID;
 	class Game& game;
 	class Registry& reg;
+	EditorFileLoader loader;
 };

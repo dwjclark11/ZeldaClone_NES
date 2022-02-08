@@ -143,7 +143,6 @@ void GameState::Update(const double& deltaTime)
 
 void GameState::Render()
 {
-	//SDL_SetRenderDrawBlendMode(game.GetRenderer(), SDL_BLENDMODE_MUL);
 	auto player = reg.GetEntityByTag("player");
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 	// Create the HUD rect --> black rectangle that all the HUD items are on
@@ -156,15 +155,6 @@ void GameState::Render()
 	// Update all other render systems
 	game.GetSystem<RenderSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 	
-	//SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-	//SDL_RenderFillRect(game.GetRenderer(), &greyRect);
-	//SDL_RenderDrawRect(game.GetRenderer(), &greyRect);
-	//
-	//SDL_SetRenderDrawColor(game.GetRenderer(), 255, 255, 255, 255);
-	//SDL_RenderFillRect(game.GetRenderer(), &whiteRect);
-	//SDL_RenderDrawRect(game.GetRenderer(), &whiteRect);
-	//
-
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 	SDL_RenderFillRect(game.GetRenderer(), &hudRect);
@@ -248,6 +238,7 @@ bool GameState::OnEnter()
 		auto player = Registry::Instance().GetEntityByTag("player");
 		// Reset the player health after pressing continue [Game Over]
 		auto& playerHealth = player.GetComponent<HealthComponent>();
+
 		if (playerHealth.healthPercentage <= 0)
 		{
 			playerHealth.healthPercentage = 2 * playerHealth.maxHearts;
@@ -256,10 +247,9 @@ bool GameState::OnEnter()
 		game.GetplayerCreated() = true;
 
 
-		{	//auto player = reg.GetEntityByTag("player");
+		{
 			game.GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
 			game.GetPlayerStateMachine().ChangeState(player);
-			Logger::Err("Player State Machine Created!!");
 		}
 	}
 
@@ -300,14 +290,6 @@ void GameState::OnKeyDown(SDL_Event* event)
 	{
 		Game::isDebug = !Game::isDebug;
 	}
-
-	/*auto player = reg.GetEntityByTag("player");
-	auto& health = player.GetComponent<HealthComponent>();*/
-
-	//if (event->key.keysym.sym == SDLK_p)
-	//{
-	//	health.addHeart = true;
-	//}
 }
 
 void GameState::OnKeyUp(SDL_Event* event)

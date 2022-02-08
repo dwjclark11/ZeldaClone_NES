@@ -8,6 +8,7 @@
 #include "../../Components/RupeeTypeComponent.h"
 #include "../../Components/ItemComponent.h"
 #include "../../Components/SpriteComponent.h"
+#include "../../Components/RigidBodyComponent.h"
 #include "../../Events/EventManager.h"
 #include "../../Events/CollisionEvent.h"
 #include "../../Game/Game.h"
@@ -34,51 +35,55 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 	Entity a = event.a;
 	Entity b = event.b;
 
-	if ((a.BelongsToGroup("money") || a.BelongsToGroup("items") && b.HasTag("player"))) OnPlayerGetsItem(a, b);
-	if ((b.BelongsToGroup("money") || b.BelongsToGroup("items") && a.HasTag("player"))) OnPlayerGetsItem(b, a);
+	if (a.BelongsToGroup("items") && b.HasTag("player")) OnPlayerGetsItem(a, b);
+	if (b.BelongsToGroup("items") && a.HasTag("player")) OnPlayerGetsItem(b, a);
+	
+	// Test for boomerang retrieving items
+	if (a.BelongsToGroup("items") && b.BelongsToGroup("boomerang")) OnBoomerangGetsItem(a, b);
+	if (b.BelongsToGroup("items") && a.BelongsToGroup("boomerang")) OnBoomerangGetsItem(b, a);
 }
 
 void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 {
-	if (item.BelongsToGroup("money") && player.HasTag("player"))
+	auto& type = item.GetComponent<ItemComponent>().type;
+
+	if (type == YELLOW_RUPEE)
 	{
-		auto& type = item.GetComponent<RupeeTypeComponent>();
-
-		if (type.type == YELLOW)
-		{
-			GameState::scrollRupees += 1;
-			item.Kill();
-		}
-		if (type.type == BLUE)
-		{
-			GameState::scrollRupees += 5;
-			item.Kill();
-		}
+		GameState::scrollRupees += 1;
+		item.Kill();
 	}
-	else if (item.BelongsToGroup("items"))
+	else if (type == BLUE_RUPEE)
 	{
-
-		auto& type = item.GetComponent<ItemComponent>();
-
-		if (type.type == BOMBS)
-		{
-			GameState::totalBombs += 3;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
-			item.Kill();
-		}
-		else if (type.type == HEARTS)
-		{
-			auto& health = player.GetComponent<HealthComponent>();
-			health.healthPercentage += 2;
-
-			// Clamp health to the maxHealth --> Create Variable?
-			if (health.healthPercentage >= health.maxHearts * 2)
-				health.healthPercentage = health.maxHearts * 2;
-
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
-			item.Kill();
-		}
+		GameState::scrollRupees += 5;
+		item.Kill();
 	}
+	else if (type == BOMBS)
+	{
+		GameState::totalBombs += 3;
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		item.Kill();
+	}
+	else if (type == HEARTS)
+	{
+		auto& health = player.GetComponent<HealthComponent>();
+		health.healthPercentage += 2;
+
+		// Clamp health to the maxHealth --> Create Variable?
+		if (health.healthPercentage >= health.maxHearts * 2)
+			health.healthPercentage = health.maxHearts * 2;
+
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		item.Kill();
+	}
+}
+
+void CollectItemSystem::OnBoomerangGetsItem(Entity& item, Entity& boomerang)
+{
+	auto& itemTransform = item.GetComponent<TransformComponent>();
+	auto& boomerangTransform = boomerang.GetComponent<TransformComponent>();
+	auto& boomerangRigid = boomerang.GetComponent<RigidBodyComponent>();
+	
+	itemTransform.position = boomerangTransform.position;
 }
 
 void CollectItemSystem::Update()
@@ -88,7 +93,6 @@ void CollectItemSystem::Update()
 		auto& trigger = entity.GetComponent<TriggerBoxComponent>();
 		if (trigger.collected && trigger.collectedTimer.GetTicks() > 2000)
 		{
-			Logger::Log("Killed");
 			entity.Kill();
 		}
 		else

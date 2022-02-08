@@ -24,18 +24,14 @@ public:
 
 	static AIComponent::EnemyType enemyType;
 	static SpriteComponent spriteComponent;
+	static ProjectileEmitterComponent projectileEmitter;
+	static AnimationComponent animationComponent;
+	static TriggerBoxComponent triggerBox;
+	static TransformComponent transformComponent;
+	static BoxColliderComponent boxColliderComponent;
 
-	// Common Properties
-	static int imageSrcX;
-	static int imageSrcY;
 	static int mouseRectX;
 	static int mouseRectY;
-
-	static int boxColliderWidth;
-	static int boxColliderHeight;
-	static glm::vec2 boxColliderOffset;
-	static glm::vec2 Scale;
-
 	static int gridSize;
 
 	static bool isCollision;
@@ -52,60 +48,24 @@ public:
 
 	// Animation  attributes
 	static bool animation;
-	static bool animationLooped;
-	static bool animationVerticalScroll;
-	static int animationFrameRateSpeed;
-	static int animationNumFrames;
-	static int animationFrameOffset;
-
+	
 	// Projectile Emitter
 	static bool projectile;
-	static glm::vec2 projectileVelocity;
-	static int projectileRepeatFrequency;
-	static int projectileDuration;
-	static int projectileHitPercentDamage;
-	static bool projectileIsFriendly;
+
 
 	// Rigid Body
 	static bool rigidBody;
 	static glm::vec2 rigidBodyVelocity;
 
 	static bool gridSnap;
-	static std::string imageID;
-	static int layer;
-
-	
-	static TriggerType triggerType;	
-
-	static std::string levelMusic;
-	static std::string assetFile;
-	static std::string enemyNewFile;
-	static std::string colliderFile;
-	static std::string TileMapName;
-	static std::string TileMapImageName;
-	static std::string entityFileName;
-	static std::string triggerFile;
-
-	static glm::vec2 transportOffset;
-	static glm::vec2 cameraOffset;
 	static int imageWidth;
 	static int imageHeight;
-	static bool triggerCollider;
-
+	
 	// Secret Attributes
-	static int newSpriteWidth;
-	static int newSpriteHeight;
-	static std::string locationID;
-	static std::string newTriggerType;
-	static std::string newSpriteAssetID;
-
-	static int newSpriteSrcX;
-	static int newSpriteSrcY;
-
+	static SecretComponent secretComponent;
 
 	static int CanvasWidth;
 	static int CanvasHeight;
-
 	static bool OverImGuiWindow;
 
 	MouseControlSystem();
@@ -113,9 +73,7 @@ public:
 
 	void Update(const std::unique_ptr<AssetManager>& assets, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 
-	// Are we creating Tiles?
 	void CreateTile(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
-	// Are we creating obstacles --> Tables/Box cases etc
 	void CreateObstacles(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	void CreateBoxCollider(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	void CreateTrigger(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
@@ -128,7 +86,7 @@ public:
 	inline void SetImageName(std::string imageName) { this->imageName = imageName; }
 	inline std::string& GetImageName() { return imageName; }
 	void SetImageID(std::string& imageID) { this->imageIDs.push_back(imageID); }
-	std::string& GetImageID() { return imageID; }
+	std::string& GetImageID() { return spriteComponent.assetID; }
 	
 private:
 	int mousePosX, mousePosY;

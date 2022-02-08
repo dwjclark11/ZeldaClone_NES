@@ -4,66 +4,64 @@
 class Timer;
 class Entity;
 
-class EnemyIdleState : public States
+class BossIdleState : public States
 {
 public:
-	virtual ~EnemyIdleState() {};
+	virtual ~BossIdleState() {};
 	void OnEnter(Entity& entity) override;
 	void OnExit(Entity& entity) override;
 	void Update(Entity& entity) override;
 };
 
-class EnemyAttackState : public States
+class BossAttackState : public States
 {
 public:
-	virtual ~EnemyAttackState() {};
+	virtual ~BossAttackState() {};
 	void OnEnter(class Entity& entity) override;
 	void OnExit (class Entity& entity) override;
 	void Update (class Entity& entity) override;
 };
 
-class PatrolState : public States
+class BossPatrolState : public States
 {
 public:
-	virtual ~PatrolState() {};
+	virtual ~BossPatrolState() {};
 	void OnEnter(class Entity& entity) override;
 	void OnExit (class Entity& entity) override;
 	void Update (class Entity& entity) override;
 };
 
-class HurtState : public States
+class BossHurtState : public States
 {
 private:
 	// Add private variables as needed
 
 public:
-	virtual ~HurtState() {};
+	virtual ~BossHurtState() {};
 	void OnEnter(class Entity& entity) override;
 	void OnExit (class Entity& entity) override;
 	void Update(class Entity& entity) override;
 };
 
-class EnemyDeathState : public States
+class BossDeathState : public States
 {
 private:
 	// Add private variables as needed
 
 public:
-	virtual ~EnemyDeathState() {};
+	virtual ~BossDeathState() {};
 	void OnEnter(class Entity& entity) override;
 	void OnExit	(class Entity& entity) override;
 	void Update (class Entity& entity) override;
-	void ItemDrop(Entity& enemy);
-
 };
 
-class EnemyStunnedState : public States
+class BossStunnedState : public States
 {
 private:
 	// Add private variables as needed
 
 public:
-	virtual ~EnemyStunnedState() {};
+	virtual ~BossStunnedState() {};
 	void OnEnter(class Entity& entity) override;
 	void OnExit(class Entity& entity) override;
 	void Update(class Entity& entity) override;

@@ -13,7 +13,7 @@ public:
 	static bool slotsFull;
 
 	MenuState();
-	~MenuState() {};
+	virtual ~MenuState() { Logger::Err(GetStateID() + " was Destroyed!"); };
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();

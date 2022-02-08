@@ -4,7 +4,9 @@ enum ItemCollectType
 {
 	BOMBS = 0,
 	HEARTS,
-	DEFAULT
+	DEFAULT,
+	YELLOW_RUPEE,
+	BLUE_RUPEE,
 };
 
 enum SpecialItemType

@@ -587,19 +587,21 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 	m_writer.WriteDeclareTable("triggers", file);
 
 	// If there are Enemies in the registry, save them to a lua file, using the LuaTableWriter
-	if (reg.DoesGroupExist("trigger"))
+	if (reg.DoesGroupExist("triggers"))
 	{
 		// Write All of the triggers
-		for (const auto& entity : reg.GetEntitiesByGroup("trigger"))
+		for (const auto& entity : reg.GetEntitiesByGroup("triggers"))
 		{
 
 			const auto&	transform = entity.GetComponent<TransformComponent>();
 			const auto&	boxCollider = entity.GetComponent<BoxColliderComponent>();
 			const auto& triggerBox = entity.GetComponent<TriggerBoxComponent>();
+			auto spriteComp = SpriteComponent();
+
 
 			// Convert trigger Type to string
 			std::string trigger_type = ConvertToString(triggerBox.triggerType);
-
+			Logger::Log("trig_type: " + trigger_type);
 			// Start the Components/Group Tables
 			m_writer.WriteStartTable(i, false, file);
 			m_writer.WriteKeyAndQuotedValue("group", "triggers", file);
@@ -609,6 +611,12 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 
 			// Write Triggers
 			WriteTriggerBoxComponent(m_writer, triggerBox, file, trigger_type, false);
+
+			if (entity.HasComponent<SpriteComponent>())
+			{
+				spriteComp = entity.GetComponent<SpriteComponent>();
+				WriteSpriteComponent(m_writer, spriteComp, file, false);
+			}
 
 			m_writer.WriteEndTable(false, file);
 			m_writer.WriteEndTableWithSeparator(false, file);
@@ -626,6 +634,8 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 			const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
 			const auto& triggerBox = entity.GetComponent<TriggerBoxComponent>();
 			const auto& secret = entity.GetComponent<SecretComponent>();
+			auto spriteComp = SpriteComponent();
+
 			// Convert trigger Type to string
 			std::string trigger_type = ConvertToString(triggerBox.triggerType);
 
@@ -639,6 +649,12 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 			WriteTriggerBoxComponent(m_writer, triggerBox, file, trigger_type, false);
 			WriteSecretComponent(m_writer, secret, file, false);
 
+
+			if (entity.HasComponent<SpriteComponent>())
+			{
+				spriteComp = entity.GetComponent<SpriteComponent>();
+				WriteSpriteComponent(m_writer, spriteComp, file, false);
+			}
 			m_writer.WriteEndTable(false, file);
 			m_writer.WriteEndTableWithSeparator(false, file);
 
@@ -702,9 +718,9 @@ void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& fileN
 		sol::optional<sol::table> sprite = enemy["components"]["sprite"];
 		if (sprite != sol::nullopt)
 		{
-			MouseControlSystem::imageID = enemy["components"]["sprite"]["asset_id"];
-			MouseControlSystem::imageSrcX = enemy["components"]["sprite"]["src_rect_x"].get_or(0);
-			MouseControlSystem::imageSrcY = enemy["components"]["sprite"]["src_rect_y"].get_or(0);
+			MouseControlSystem::spriteComponent.assetID = enemy["components"]["sprite"]["asset_id"];
+			MouseControlSystem::spriteComponent.srcRect.x = enemy["components"]["sprite"]["src_rect_x"].get_or(0);
+			MouseControlSystem::spriteComponent.srcRect.y = enemy["components"]["sprite"]["src_rect_y"].get_or(0);
 		}
 	}
 }
@@ -815,21 +831,6 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, st
 	}
 }
 
-//TriggerType EditorFileLoader::ConvertToTriggerType(int triggerType)
-//{
-//	switch (triggerType)
-//	{
-//	case 0: return NO_TRIGGER; break;
-//	case 1: return SECRET_AREA; break;
-//	case 2: return ENTER_DUNGEON; break;
-//	case 3: return BURN_BUSHES; break;
-//	case 4: return PUSH_ROCKS; break;
-//	case 5: return COLLECT_ITEM; break;
-//	case 6: return BOMB_SECRET; break;
-//	case 7: return HIDDEN_SWITCH; break;
-//	case 8: return HIDDEN_OBJECT; break;
-//	}
-//}
 
 std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 {
@@ -842,7 +843,7 @@ std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 		case PUSH_ROCKS: return "push_rocks"; break;
 		case COLLECT_ITEM: return "collect_item"; break;
 		case BOMB_SECRET: return "bomb_secret"; break;
-		case HIDDEN_SWITCH: return "hidden_switch"; break;
+		case LOCKED_DOOR: return "locked_door"; break;
 		case HIDDEN_OBJECT: return "hidden_object"; break;
 	}
 }
@@ -937,6 +938,30 @@ void EditorFileLoader::WriteSecretComponent(LuaTableWriter& writer, const class 
 	writer.WriteKeyAndUnquotedValue("sprite_height", secretComp.spriteHeight, file);
 	writer.WriteKeyAndUnquotedValue("sprite_src_x", secretComp.spriteSrcX, file);
 	writer.WriteKeyAndUnquotedValue("sprite_src_y", secretComp.spriteSrcY, file);
+	writer.WriteEndTable(false, file);
+
+	if (last)
+		writer.WriteEndTable(false, file);
+}
+
+void EditorFileLoader::WriteSpriteComponent(LuaTableWriter& writer, const SpriteComponent& sprite, std::fstream& file, bool last)
+{
+	std::string fixed = "false";
+	if (sprite.isFixed)
+		fixed = "true";
+
+	writer.WriteDeclareTable("sprite", file);
+	writer.WriteKeyAndQuotedValue("asset_id", sprite.assetID, file);
+	writer.WriteKeyAndUnquotedValue("width", sprite.width, file);
+	writer.WriteKeyAndUnquotedValue("height", sprite.height, file);
+	writer.WriteKeyAndUnquotedValue("z_index", sprite.layer, file);
+	writer.WriteKeyAndUnquotedValue("is_fixed", fixed, file);
+	writer.WriteKeyAndUnquotedValue("src_rect_x", sprite.srcRect.x, file);
+	writer.WriteKeyAndUnquotedValue("src_rect_y", sprite.srcRect.y, file);
+	writer.WriteDeclareTable("offset", file);
+	writer.WriteKeyAndUnquotedValue("x", sprite.offset.x, file, true);
+	writer.WriteKeyAndUnquotedValue("y", sprite.offset.y, file, true, true);
+	writer.WriteEndTable(true, file);
 	writer.WriteEndTable(false, file);
 
 	if (last)

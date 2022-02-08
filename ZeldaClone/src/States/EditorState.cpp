@@ -65,10 +65,16 @@ bool EditorState::OnEnter()
 	LevelLoader loader;
 	// Stop any music that my be playing
 	Mix_HaltMusic();
+	
 	// Set the desired window size/position for the editor
 	SDL_SetWindowSize(game.GetWindow(), 1920, 1080);
 	SDL_SetWindowPosition(game.GetWindow(), 0, 0);
-
+	
+	// Change the title to the Editor Title
+	SDL_SetWindowTitle(game.GetWindow(), "Zelda Quest Editor");
+	// We want the editor to be resizable!
+	SDL_SetWindowResizable(game.GetWindow(), SDL_TRUE);
+	
 	// Set the Camera Position
 	game.GetCamera().x = 0;
 	game.GetCamera().y = 0;
@@ -104,7 +110,11 @@ bool EditorState::OnExit()
 	// Set the Window Size/Position to the desired Game Window Size and position
 	SDL_SetWindowSize(game.GetWindow(), 256 * 4, 240 * 4);
 	SDL_SetWindowPosition(game.GetWindow(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-
+	// Change the title to the Game Title
+	SDL_SetWindowTitle(game.GetWindow(), "Zelda Clone");
+	// We do not want the Game to be resizable!
+	SDL_SetWindowResizable(game.GetWindow(), SDL_FALSE);
+	
 	// Remove any sytems that are only used inside the editor
 	reg.RemoveSystem<RenderEditorGUISystem>();
 	reg.RemoveSystem<RenderEditorSystem>();
@@ -122,13 +132,10 @@ void EditorState::ProcessEvents(SDL_Event& event)
 
 void EditorState::OnKeyDown(SDL_Event* event)
 {
-	EditorFileLoader loader;
-
 	if (game.GetEvent().type == SDL_KEYDOWN && !keyDown)
 	{
 		const Uint8* state = SDL_GetKeyboardState(NULL);
 		
-
 		if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_O])
 		{
 			if (!RenderEditorGUISystem::imageName.empty())

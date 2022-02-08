@@ -302,7 +302,7 @@ void LevelLoader::EliminatePlayerToDefault(int slotNum, std::string& name)
 	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "Eliminate", 0, 1);
 }
 
-void LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
+bool LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
 {
 	sol::optional<sol::table> sprite = table["components"]["sprite"];
 	if (sprite != sol::nullopt)
@@ -318,7 +318,9 @@ void LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
 			glm::vec2(
 				table["components"]["sprite"]["offset"]["x"].get_or(0),
 				table["components"]["sprite"]["offset"]["y"].get_or(0)));
+		return true;
 	}
+	return false;
 }
 void LevelLoader::ReadBoxColliderComponent(sol::table& table, Entity& entity)
 {
@@ -585,8 +587,8 @@ TriggerType LevelLoader::ConvertStringToTriggerType(std::string type)
 		return TriggerType::COLLECT_ITEM;
 	else if (type == "bomb_secret")
 		return TriggerType::BOMB_SECRET;
-	else if (type == "hidden_switch")
-		return TriggerType::HIDDEN_SWITCH;
+	else if (type == "locked_door")
+		return TriggerType::LOCKED_DOOR;
 	else if (type == "hidden_object")
 		return TriggerType::HIDDEN_OBJECT;
 	else if (type == "shop_item")
@@ -672,6 +674,7 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 		{
 			newTrigger.Group(trigger["group"]);
 		}
+
 		// Components
 		sol::optional<sol::table> hasComponents = trigger["components"];
 		if (hasComponents != sol::nullopt)
@@ -725,6 +728,15 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 					trigger["components"]["secret"]["sprite_src_x"].get_or(0),
 					trigger["components"]["secret"]["sprite_src_y"].get_or(0)
 					);
+
+
+				newTrigger.GetComponent<SecretComponent>().startPos = newTrigger.GetComponent<TransformComponent>().position;
+			}
+
+			// Is there a sprite Component
+			if (ReadSpriteComponent(trigger, newTrigger))
+			{
+				newTrigger.AddComponent<GameComponent>();
 			}
 		}
 		i++;

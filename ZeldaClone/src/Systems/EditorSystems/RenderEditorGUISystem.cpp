@@ -1,6 +1,7 @@
 #include "RenderEditorGUISystem.h"
 #include "RenderEditorSystem.h"
 #include "../../Components/TransformComponent.h"
+#include "../../Components/SecretComponent.h"
 
 #include "../../Utilities/FileManagerUtils.h"
 #include "../../States/MenuState.h"
@@ -146,15 +147,17 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 		if (ImGui::Begin("Tile Properties", &MouseControlSystem::createTile))
 		{
 			ShowMenuTile();
+
 			if (ImGui::Button("Set Tile Attributes"))
 			{
-				MouseControlSystem::layer = zIndex;
-				MouseControlSystem::Scale.x = scaleX;
-				MouseControlSystem::Scale.y = scaleY;
-				MouseControlSystem::boxColliderWidth = boxColliderWidth;
-				MouseControlSystem::boxColliderHeight = boxColliderHeight;
-				MouseControlSystem::boxColliderOffset.x = boxColliderOffsetX;
-				MouseControlSystem::boxColliderOffset.y = boxColliderOffsetY;
+				MouseControlSystem::spriteComponent.layer = zIndex;
+				MouseControlSystem::transformComponent.scale.x = scaleX;
+				MouseControlSystem::transformComponent.scale.y = scaleY;
+				MouseControlSystem::boxColliderComponent.width = boxColliderWidth;
+				MouseControlSystem::boxColliderComponent.height = boxColliderHeight;
+				MouseControlSystem::boxColliderComponent.offset.x = boxColliderOffsetX;
+				MouseControlSystem::boxColliderComponent.offset.y = boxColliderOffsetY;
+
 				MouseControlSystem::mouseRectX = mouseRectX;
 				MouseControlSystem::mouseRectY = mouseRectY;
 			}
@@ -173,7 +176,7 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 	if (MouseControlSystem::createTrigger)
 		TriggerProperties(assetManager, renderer);
 	if (MouseControlSystem::createBoxCollider)
-		ColliderProperties(assetManager, renderer);
+		ColliderProperties();
 
 	ImGui::Render();
 	ImGuiSDL::Render(ImGui::GetDrawData());
@@ -210,7 +213,7 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 		imageName = dialog.OpenImage();
 		choices.SetImageName(imageName);
 		loader.SetImageName(imageName);
-		//MouseControlSystem::imageID = loader.SetName(imageName);
+
 		// Check to see if the String is Empty!!
 		if (!imageName.empty())
 		{
@@ -226,7 +229,7 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 
 	if (ImGui::MenuItem("Load Tileset"))
 	{
-		LoadNewImage(assetManager, renderer, MouseControlSystem::imageID, imageWidth, imageHeight);
+		LoadNewImage(assetManager, renderer, MouseControlSystem::spriteComponent.assetID, imageWidth, imageHeight);
 		mouseImageLoaded = true;
 	}
 
@@ -304,7 +307,6 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 
 			std::string extension = std::filesystem::path(fileName).extension().string();
 			std::string stem = std::filesystem::path(fileName).stem().string();
-			Logger::Log("Extension: " + extension);
 
 			loader.SetFileName(fileName);
 
@@ -316,7 +318,6 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 			}
 		}
 	}
-
 
 	if (ImGui::MenuItem("Save", "Ctrl+S"))
 	{
@@ -461,16 +462,16 @@ void RenderEditorGUISystem::ShowMenuTile()
 		if (mouseRectY <= 0)
 			mouseRectY = 0;
 	}
-	ImGui::TextColored(ImVec4(255, 255, 0, 255), "Current Src Rect [X: %d, Y: %d]", MouseControlSystem::imageSrcX, MouseControlSystem::imageSrcY);
+	ImGui::TextColored(ImVec4(255, 255, 0, 255), "Current Src Rect [X: %d, Y: %d]", MouseControlSystem::spriteComponent.srcRect.x, MouseControlSystem::spriteComponent.srcRect.y);
 	// There is no need for the layer if not a tile or enemy
 	if (!MouseControlSystem::createBoxCollider && !MouseControlSystem::createTrigger)
 	{
 		ImGui::Spacing();
 		ImGui::Text("Set the layer of the tile");
-		ImGui::SliderInt("Z-Index", &MouseControlSystem::layer, 0, 10);
+		ImGui::SliderInt("Z-Index", &zIndex, 0, 10);
 
-		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
-		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;
+		if (zIndex < 0) zIndex = 0;
+		if (zIndex > 10) zIndex = 10;
 	}
 	ImGui::Spacing(); ImGui::Spacing();
 }
@@ -488,7 +489,7 @@ void RenderEditorGUISystem::EnemyProperties(const std::unique_ptr<AssetManager>&
 		
 		MouseControlSystem::enemyType = loader.ConvertStringToEnemyType(std::string(current_enemy));
 
-		Logger::Log(std::string(current_enemy) + ": " + std::to_string(MouseControlSystem::enemyType));
+		//Logger::Log(std::string(current_enemy) + ": " + std::to_string(MouseControlSystem::enemyType));
 
 		ImGui::Checkbox("Animation", &MouseControlSystem::animation);
 
@@ -496,13 +497,13 @@ void RenderEditorGUISystem::EnemyProperties(const std::unique_ptr<AssetManager>&
 		{
 			if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				if (ImGui::InputInt("Frame Rate Speed", &MouseControlSystem::animationFrameRateSpeed, 0, 1));
-				if (ImGui::InputInt("Number of Frames", &MouseControlSystem::animationNumFrames, 0, 1));
-				if (ImGui::InputInt("Frame Offset", &MouseControlSystem::animationFrameOffset, 0, 1));
+				if (ImGui::InputInt("Frame Rate Speed", &MouseControlSystem::animationComponent.frameSpeedRate, 0, 1));
+				if (ImGui::InputInt("Number of Frames", &MouseControlSystem::animationComponent.numFrames, 0, 1));
+				if (ImGui::InputInt("Frame Offset", &MouseControlSystem::animationComponent.frameOffset, 0, 1));
 
-				ImGui::Checkbox("Vertical", &MouseControlSystem::animationVerticalScroll);
+				ImGui::Checkbox("Vertical", &MouseControlSystem::animationComponent.vertical);
 				ImGui::SameLine();
-				ImGui::Checkbox("Looped", &MouseControlSystem::animationLooped);
+				ImGui::Checkbox("Looped", &MouseControlSystem::animationComponent.isLooped);
 			}
 		}
 
@@ -512,8 +513,8 @@ void RenderEditorGUISystem::EnemyProperties(const std::unique_ptr<AssetManager>&
 
 		if (ImGui::Button("Set Tile Attributes"))
 		{
-			MouseControlSystem::Scale.x = scaleX;
-			MouseControlSystem::Scale.y = scaleY;
+			MouseControlSystem::transformComponent.scale.x = scaleX;
+			MouseControlSystem::transformComponent.scale.y = scaleY;
 			MouseControlSystem::mouseRectX = mouseRectX;
 			MouseControlSystem::mouseRectY = mouseRectY;
 		}
@@ -539,6 +540,7 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		static int spriteHeight = 0;
 		static int spriteSrcX = 0;
 		static int spriteSrcY = 0;
+		static int spriteLayer = 0;
 
 		static int newSpriteWidth = 0;
 		static int newSpriteHeight = 0;
@@ -548,42 +550,21 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		static std::string newSpriteAssetID { "" };
 		static std::string new_trigger { "" };
 
-		const std::string triggers[] = { "NO_TRIGGER", "SECRET_AREA",  "TRANSPORT", "BURN_BUSHES", "PUSH_ROCKS", "BOMB_SECRET", "HIDDEN_SWITCH", "HIDDEN_OBJECT" };
-		static std::string current_item = "";
+		const std::string triggers[] = { "no_trigger", "secret_area",  "transport", "burn_bushes", "push_rocks", "bomb_secret", "locked_door", "hidden_object" };
+		static std::string current_trigger = "";
 
-		ComboLoop("Trigger Types", current_item, triggers, sizeof(triggers) / sizeof(triggers[0]));
-		
-		// Set Trigger Types
-		if (current_item == "NO_TRIGGER")
-			MouseControlSystem::triggerType = NO_TRIGGER;
-		else if (current_item == "SECRET_AREA")
-			MouseControlSystem::triggerType = SECRET_AREA;
-		else if (current_item == "TRANSPORT")
-			MouseControlSystem::triggerType = TRANSPORT;
-		else if (current_item == "BURN_BUSHES")
-			MouseControlSystem::triggerType = BURN_BUSHES;
-		else if (current_item == "PUSH_ROCKS")
-			MouseControlSystem::triggerType = PUSH_ROCKS;
-		else if (current_item == "COLLECT_ITEM")
-			MouseControlSystem::triggerType = COLLECT_ITEM;
-		else if (current_item == "BOMB_SECRET")
-			MouseControlSystem::triggerType = BOMB_SECRET;
-		else if (current_item == "HIDDEN_SWITCH")
-			MouseControlSystem::triggerType = HIDDEN_SWITCH;
-		else if (current_item == "HIDDEN_OBJECT")
-			MouseControlSystem::triggerType = HIDDEN_OBJECT;
-		else
-			MouseControlSystem::triggerType = NO_TRIGGER;
+		ComboLoop("Trigger Types", current_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
 		
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-		if (ImGui::InputFloat("Transport Offset X", &MouseControlSystem::transportOffset.x, 1, 100));
-		if (ImGui::InputFloat("Transport Offset Y", &MouseControlSystem::transportOffset.y, 1, 100));
-		if (ImGui::InputFloat("Camera Offset X", &MouseControlSystem::cameraOffset.x, 1, 100));
-		if (ImGui::InputFloat("Camera Offset Y", &MouseControlSystem::cameraOffset.y, 1, 100));
+		if (ImGui::InputFloat("Transport Offset X", &MouseControlSystem::triggerBox.transportOffset.x, 1, 100));
+		if (ImGui::InputFloat("Transport Offset Y", &MouseControlSystem::triggerBox.transportOffset.y, 1, 100));
+		if (ImGui::InputFloat("Camera Offset X", &MouseControlSystem::triggerBox.cameraOffset.x, 1, 100));
+		if (ImGui::InputFloat("Camera Offset Y", &MouseControlSystem::triggerBox.cameraOffset.y, 1, 100));
 		
 		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Set the music to the song ID or \"stop\"");
 		ImFuncs::MyInputText("Level Music", &levelMusic);
 		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Put in the file name or leave as \"no_file\"");
+
 		ImFuncs::MyInputText("Asset File", &assetFile);
 		ImFuncs::MyInputText("Enemy File", &enemyFile);
 		ImFuncs::MyInputText("Collider File", &colliderFile);
@@ -594,13 +575,22 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Is the trigger also a collider?");
-		ImGui::Checkbox("Collider", &MouseControlSystem::triggerCollider);
+		ImGui::Checkbox("Collider", &MouseControlSystem::triggerBox.collider);
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 		ShowMenuTile();
+		
 		ImGui::Checkbox("Sprite Component", &MouseControlSystem::spriteSelected);
-		if (MouseControlSystem::spriteSelected) ImageBox(assetManager, renderer);
-
+		if (MouseControlSystem::spriteSelected)
+		{
+			ImageBox(assetManager, renderer);
+			
+			if (ImGui::InputInt("Sprite Layer", &spriteLayer, 1, 1))
+			{
+				if (spriteLayer >= 10) spriteLayer = 10;
+				if (spriteLayer <= 0) spriteLayer = 0;
+			}
+		}
 
 		ImGui::Checkbox("Secret", &MouseControlSystem::secretSelected);
 		
@@ -609,7 +599,28 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			ComboLoop("New Secret Trigger", new_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
 
 			ImFuncs::MyInputText("Location ID", &locationID);
-			ImFuncs::MyInputText("New Sprite Asset ID", &newSpriteAssetID);
+			
+			//ImFuncs::MyInputText("New Sprite Asset ID", &newSpriteAssetID);
+			
+			if (ImGui::BeginCombo("New Sprite Asset ID", newSpriteAssetID.c_str()))
+			{
+				std::vector<std::string> mapKey;
+				for (auto& spriteID : assetManager->GetTextureMap())
+				{
+					mapKey.push_back(spriteID.first);
+				}
+
+				for (int i = 0; i < mapKey.size(); i++)
+				{
+					bool isSelectable = (newSpriteAssetID == mapKey[i]);
+					if (ImGui::Selectable(mapKey[i].c_str(), isSelectable))
+						newSpriteAssetID = mapKey[i];
+					if (isSelectable)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
+			}
 
 			if (ImGui::InputInt("New Sprite Width", &newSpriteWidth, 16, 16))
 			{
@@ -638,74 +649,81 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 				if (newSpriteSrcY <= 0)
 					newSpriteSrcY = 0;
 			}
-
-			// Set Trigger Types
-			if (new_trigger == "NO_TRIGGER")
-				MouseControlSystem::newTriggerType = "no_trigger";
-			else if (new_trigger == "SECRET_AREA")
-				MouseControlSystem::newTriggerType = "secret_area";
-			else if (new_trigger == "BURN_BUSHES")
-				MouseControlSystem::newTriggerType = "burn_bushes";
-			else if (new_trigger == "PUSH_ROCKS")
-				MouseControlSystem::newTriggerType = "push_rocks";
-			else if (new_trigger == "COLLECT_ITEM")
-				MouseControlSystem::newTriggerType = "collect_item";
-			else if (new_trigger == "BOMB_SECRET")
-				MouseControlSystem::newTriggerType = "bomb_secret";
-			else if (new_trigger == "HIDDEN_SWITCH")
-				MouseControlSystem::newTriggerType = "hidder_switch";
-			else if (new_trigger == "HIDDEN_OBJECT")
-				MouseControlSystem::newTriggerType = "hidden_object";
-			else
-				MouseControlSystem::newTriggerType = "no_trigger";
 		}
 
 		if (ImGui::Button("Set Trigger Attributes"))
 		{
-			MouseControlSystem::Scale.x = scaleX;
-			MouseControlSystem::Scale.y = scaleY;
-			MouseControlSystem::boxColliderHeight = boxColliderHeight;
-			MouseControlSystem::boxColliderWidth = boxColliderWidth;
-			MouseControlSystem::boxColliderOffset.x = boxColliderOffsetX;
-			MouseControlSystem::boxColliderOffset.y = boxColliderOffsetY;
+			MouseControlSystem::transformComponent.scale.x = scaleX;
+			MouseControlSystem::transformComponent.scale.y = scaleY;
+			MouseControlSystem::boxColliderComponent.height = boxColliderHeight;
+			MouseControlSystem::boxColliderComponent.width = boxColliderWidth;
+			MouseControlSystem::boxColliderComponent.offset.x = boxColliderOffsetX;
+			MouseControlSystem::boxColliderComponent.offset.y = boxColliderOffsetY;
 			MouseControlSystem::mouseRectX = mouseRectX;
 			MouseControlSystem::mouseRectY = mouseRectY;
 
-			MouseControlSystem::levelMusic = levelMusic;
-			MouseControlSystem::assetFile = assetFile;
-			MouseControlSystem::enemyNewFile = enemyFile;
-			MouseControlSystem::colliderFile = colliderFile;
-			MouseControlSystem::TileMapName = tileMapName;
-			MouseControlSystem::TileMapImageName = tileMapImageName;
-			MouseControlSystem::entityFileName = entityFileName;
-			MouseControlSystem::triggerFile = triggerFile;
+			MouseControlSystem::triggerBox.levelMusic = levelMusic;
+			MouseControlSystem::triggerBox.assetFile = assetFile;
+			MouseControlSystem::triggerBox.enemyFile = enemyFile;
+			MouseControlSystem::triggerBox.colliderFile = colliderFile;
+			MouseControlSystem::triggerBox.tileMapName= tileMapName;
+			MouseControlSystem::triggerBox.tileImageName = tileMapImageName;
+			MouseControlSystem::triggerBox.entityFileName = entityFileName;
+			MouseControlSystem::triggerBox.triggerFile = triggerFile;
 
 			// Set Secret Attributes
 			if (MouseControlSystem::secretSelected)
 			{
-				MouseControlSystem::newSpriteWidth = newSpriteWidth;
-				MouseControlSystem::newSpriteHeight = newSpriteHeight;
+				MouseControlSystem::secretComponent.spriteWidth = newSpriteWidth;
+				MouseControlSystem::secretComponent.spriteHeight = newSpriteHeight;
+				MouseControlSystem::secretComponent.newSpriteAssetID = newSpriteAssetID; // Change this to the loaded Images
 
-				MouseControlSystem::imageSrcX = newSpriteSrcX;
-				MouseControlSystem::imageSrcY = newSpriteSrcY;
+				MouseControlSystem::secretComponent.spriteSrcX = newSpriteSrcX;
+				MouseControlSystem::secretComponent.spriteSrcY = newSpriteSrcY;
+
+				// Set Trigger Types
+				MouseControlSystem::secretComponent.newTrigger = new_trigger;
+
 			}
 
 			if (MouseControlSystem::spriteSelected)
 			{
-				MouseControlSystem::spriteComponent.assetID = MouseControlSystem::imageID;
+				//MouseControlSystem::spriteComponent.assetID = spriteAssetID;
 				MouseControlSystem::spriteComponent.width = MouseControlSystem::mouseRectX;
-				MouseControlSystem::spriteComponent.height = MouseControlSystem::mouseRectY;
-				MouseControlSystem::spriteComponent.layer = MouseControlSystem::layer;
+				MouseControlSystem::spriteComponent.height	= MouseControlSystem::mouseRectY;
+				MouseControlSystem::spriteComponent.layer	= 1;
 				MouseControlSystem::spriteComponent.isFixed = false;
-				MouseControlSystem::spriteComponent.srcRect.x = MouseControlSystem::imageSrcX;
-				MouseControlSystem::spriteComponent.srcRect.y = MouseControlSystem::imageSrcY;
+				//MouseControlSystem::spriteComponent.srcRect.x = spriteSrcX;
+				//MouseControlSystem::spriteComponent.srcRect.y = spriteSrcY;
 			}
+
+			// Set Trigger Types
+			if (current_trigger == "no_trigger")
+				MouseControlSystem::triggerBox.triggerType = NO_TRIGGER;
+			else if (current_trigger == "secret_area")
+				MouseControlSystem::triggerBox.triggerType = SECRET_AREA;
+			else if (current_trigger == "transport")
+				MouseControlSystem::triggerBox.triggerType = TRANSPORT;
+			else if (current_trigger == "burn_bushes")
+				MouseControlSystem::triggerBox.triggerType = BURN_BUSHES;
+			else if (current_trigger == "push_rocks")
+				MouseControlSystem::triggerBox.triggerType = PUSH_ROCKS;
+			else if (current_trigger == "collect_item")
+				MouseControlSystem::triggerBox.triggerType = COLLECT_ITEM;
+			else if (current_trigger == "bomb_secret")
+				MouseControlSystem::triggerBox.triggerType = BOMB_SECRET;
+			else if (current_trigger == "locked_door")
+				MouseControlSystem::triggerBox.triggerType = LOCKED_DOOR;
+			else if (current_trigger == "hidden_object")
+				MouseControlSystem::triggerBox.triggerType = HIDDEN_OBJECT;
+			else
+				MouseControlSystem::triggerBox.triggerType = NO_TRIGGER;
 		}
 
 		ImGui::End();
 	}
 }
-void RenderEditorGUISystem::ColliderProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::ColliderProperties()
 {
 	if (ImGui::Begin("Collider Properties", &MouseControlSystem::createBoxCollider))
 	{
@@ -713,12 +731,12 @@ void RenderEditorGUISystem::ColliderProperties(const std::unique_ptr<AssetManage
 
 		if (ImGui::Button("Set Collider Attributes"))
 		{
-			MouseControlSystem::Scale.x = scaleX;
-			MouseControlSystem::Scale.y = scaleY;
-			MouseControlSystem::boxColliderWidth = boxColliderWidth;
-			MouseControlSystem::boxColliderHeight = boxColliderHeight;
-			MouseControlSystem::boxColliderOffset.x = boxColliderOffsetX;
-			MouseControlSystem::boxColliderOffset.y = boxColliderOffsetY;
+			MouseControlSystem::transformComponent.scale.x = scaleX;
+			MouseControlSystem::transformComponent.scale.y = scaleY;
+			MouseControlSystem::boxColliderComponent.width = boxColliderWidth;
+			MouseControlSystem::boxColliderComponent.height = boxColliderHeight;
+			MouseControlSystem::boxColliderComponent.offset.x = boxColliderOffsetX;
+			MouseControlSystem::boxColliderComponent.offset.y = boxColliderOffsetY;
 			
 			MouseControlSystem::mouseRectX = mouseRectX;
 			MouseControlSystem::mouseRectY = mouseRectY;
@@ -734,7 +752,7 @@ void RenderEditorGUISystem::ImageBox(const std::unique_ptr<AssetManager>& assetM
 		int my_image_width = imageWidth * 2;
 		int my_image_height = imageHeight * 2;
 
-		ImGui::Image(assetManager->GetTexture(MouseControlSystem::imageID), ImVec2(my_image_width, my_image_height));
+		ImGui::Image(assetManager->GetTexture(MouseControlSystem::spriteComponent.assetID), ImVec2(my_image_width, my_image_height));
 
 		// This is for the mouse Offset for the image --> Still needs to be refined --> Currently Hackish
 		//Logger::Log("x: " + std::to_string(ImGui::GetMousePos().x) + "y: " + std::to_string(ImGui::GetMousePos().y));
@@ -753,20 +771,18 @@ void RenderEditorGUISystem::ImageBox(const std::unique_ptr<AssetManager>& assetM
 				{
 					auto draw_list = ImGui::GetWindowDrawList();
 					// Check to see if we are in the area of the desired 2D tile/object
-					if (mouseposX >= (my_image_width / col) * i && mouseposX <= (my_image_width / col) + ((my_image_width / col) * i))
+					if ((mouseposX >= (my_image_width / col) * i && mouseposX <= (my_image_width / col) + ((my_image_width / col) * i)) && 
+						(mouseposY >= (my_image_height / rows) * j && mouseposY <= (my_image_height / rows) + ((my_image_height / rows) * j)))
 					{
-						if (mouseposY >= (my_image_height / rows) * j && mouseposY <= (my_image_height / rows) + ((my_image_height / rows) * j))
+						if (ImGui::IsItemHovered())
 						{
-							if (ImGui::IsItemHovered())
+							if (ImGui::IsMouseClicked(0))
 							{
-								if (ImGui::IsMouseClicked(0))
-								{
-									//Logger::Log("X: " + std::to_string(i) + ", Y : " + std::to_string(j));
-									MouseControlSystem::imageSrcX = i * MouseControlSystem::mouseRectX; 
-									MouseControlSystem::imageSrcY = j * MouseControlSystem::mouseRectY;
-								}
+								//Logger::Log("X: " + std::to_string(i) + ", Y : " + std::to_string(j));
+								MouseControlSystem::spriteComponent.srcRect.x = i * MouseControlSystem::mouseRectX; 
+								MouseControlSystem::spriteComponent.srcRect.y = j * MouseControlSystem::mouseRectY;
 							}
-						}
+						}	
 					}
 				}
 			}

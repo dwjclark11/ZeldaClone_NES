@@ -33,7 +33,7 @@ private:
 	ItemCollectType ConvertLuaStringToItem(std::string& type);
 	bool CheckForItemInInventory(SpecialItemType& type);
 	void ConvertName(std::string name, int x, int y);
-	void ReadSpriteComponent(sol::table& table, Entity& entity);
+	bool ReadSpriteComponent(sol::table& table, Entity& entity);
 	void ReadBoxColliderComponent(sol::table& table, Entity& entity);
 	void ReadAnimationComponent(sol::table& table, Entity& entity);
 	void ReadHealthComponent(sol::table& table, Entity& entity);

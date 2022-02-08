@@ -13,59 +13,6 @@
 #include "../Components/RupeeTypeComponent.h"
 #include "../Components/GameComponent.h"
 
-void ItemDrop(Entity& enemy)
-{
-	int chance = rand();
-	const auto& enemyTransform = enemy.GetComponent<TransformComponent>();
-	glm::vec2 pos = enemyTransform.position;
-
-	//Logger::Log("Chance: " + std::to_string(chance));
-	if (chance % 7 == 0)
-	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("items");
-		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
-		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
-	}
-	else if (chance % 5 == 0)
-	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("money");
-		//item.AddComponent<ItemComponent>();
-		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
-		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
-		item.AddComponent<RupeeTypeComponent>(RupeeType::BLUE);
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
-	}
-	else if (chance % 3 == 0)
-	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("items");
-		item.AddComponent<ItemComponent>(ItemCollectType::HEARTS);
-		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
-		item.AddComponent<AnimationComponent>(2, 10, false, true, 0);
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
-	}
-	else if (chance % 2 == 0)
-	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("money");
-		//item.AddComponent<ItemComponent>();
-		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
-		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
-		item.AddComponent<RupeeTypeComponent>(RupeeType::YELLOW);
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
-	}
-}
 
 // IdleState
 void EnemyIdleState::OnEnter(Entity& entity)
@@ -88,6 +35,7 @@ void EnemyIdleState::OnExit(Entity& entity)
 {
 	//Logger::Log("Leaving Idle State");
 }
+
 void EnemyIdleState::Update(Entity& entity)
 {
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
@@ -184,9 +132,7 @@ void PatrolState::OnEnter(Entity& entity)
 }
 void PatrolState::OnExit(Entity& entity)
 {
-	//auto& ai = entity.GetComponent<AIComponent>();
-	//if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
-	//	ai.leeverTimer.Stop();
+
 }
 
 void PatrolState::Update(Entity& entity)
@@ -310,20 +256,14 @@ void PatrolState::Update(Entity& entity)
 		esm.ChangeState(entity);
 	}
 	
-
 	if (ai.GetStunned())
 	{
 		esm.AddState(std::make_unique<EnemyStunnedState>());
 		esm.ChangeState(entity);
 	}
 		
-
-
 	if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
 	{
-		/*Logger::Log("Animation Rate: " + std::to_string(animation.frameSpeedRate));
-		Logger::Log("Animation NUM: " + std::to_string(animation.numFrames));*/
-
 		if (ai.leeverTimer.GetTicks() > 10000 && ai.leeverTimer.GetTicks() < 10100)
 		{
 			rigid.velocity = glm::vec2(0);
@@ -406,7 +346,6 @@ void HurtState::OnExit(Entity& entity)
 	animation.frameSpeedRate = 10;
 }
 
-
 // Death State
 void EnemyDeathState::OnEnter(Entity& entity)
 {
@@ -414,7 +353,6 @@ void EnemyDeathState::OnEnter(Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 
-	//entity.RemoveComponent<BoxColliderComponent>();
 	sprite.assetID = "enemy_death";
 	sprite.height = 16;
 	sprite.width = 16;
@@ -477,7 +415,6 @@ void EnemyStunnedState::Update(Entity& entity)
 	if (ai.stunTimer.GetTicks() > 3000)
 	{
 		ai.stunTimer.Stop();
-		//pOwner->ChangeState(pOwner->idleState, entity);
 		esm.AddState(std::make_unique<EnemyIdleState>());
 		esm.ChangeState(entity);
 		
@@ -485,9 +422,61 @@ void EnemyStunnedState::Update(Entity& entity)
 
 	if (enemyHealth.isHurt)
 	{
-		//pOwner->ChangeState(pOwner->hurtState, entity);
 		esm.AddState(std::make_unique<HurtState>());
 		esm.ChangeState(entity);
 	}
 		
+}
+
+void EnemyDeathState::ItemDrop(Entity& enemy)
+{
+	const auto& enemyTransform = enemy.GetComponent<TransformComponent>();
+	auto& pos = enemyTransform.position;
+	int chance = rand();
+	
+	if (chance % 7 == 0)
+	{
+		Entity item = Registry::Instance().CreateEntity();
+		item.Group("items");
+		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
+		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+	else if (chance % 5 == 0)
+	{
+		Entity item = Registry::Instance().CreateEntity();
+		item.Group("items");
+		item.AddComponent<ItemComponent>(ItemCollectType::BLUE_RUPEE);
+		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
+		//item.AddComponent<RupeeTypeComponent>(RupeeType::BLUE);
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+	else if (chance % 3 == 0)
+	{
+		Entity item = Registry::Instance().CreateEntity();
+		item.Group("items");
+		item.AddComponent<ItemComponent>(ItemCollectType::HEARTS);
+		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<AnimationComponent>(2, 10, false, true, 0);
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
+	else if (chance % 2 == 0)
+	{
+		Entity item = Registry::Instance().CreateEntity();
+		item.Group("items");
+		item.AddComponent<ItemComponent>(ItemCollectType::YELLOW_RUPEE);
+		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
+		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
+		//item.AddComponent<RupeeTypeComponent>(RupeeType::YELLOW);
+		item.AddComponent<BoxColliderComponent>(16, 16);
+		item.AddComponent<GameComponent>();
+	}
 }

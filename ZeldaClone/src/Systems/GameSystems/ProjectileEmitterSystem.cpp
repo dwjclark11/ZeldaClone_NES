@@ -477,8 +477,8 @@ void ProjectileEmitterSystem::Update(Registry& registry)
 
 			if (proj.boomTimer.GetTicks() > 300) // TODO: Change the time based on type of boomerang-->wood/magic
 			{
-				rigidbody.velocity.x = direction.x * 300;
-				rigidbody.velocity.y = direction.y * 300;
+				rigidbody.velocity.x = direction.x * 500; // Changed from 300
+				rigidbody.velocity.y = direction.y * 500; // Changed from 300
 				boomerangReturned = true;
 			}
 			if (boomerangReturned)

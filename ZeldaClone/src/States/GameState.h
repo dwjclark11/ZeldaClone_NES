@@ -21,9 +21,11 @@ public:
 	static bool firstEntered;
 	static bool unpause;
 	static bool buyItem;
+
 	// Constructor
 	GameState();
 	~GameState();
+
 	GameState(glm::vec2 cameraOffset);
 	
 	virtual void Update(const double& deltaTime);

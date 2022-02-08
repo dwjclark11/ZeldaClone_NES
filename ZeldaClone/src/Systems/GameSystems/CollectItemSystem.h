@@ -23,11 +23,9 @@ public:
 	CollectItemSystem();
 
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager);
-
 	void OnCollision(CollisionEvent& event);
-
 	void OnPlayerGetsItem(Entity& item, Entity& player);
-
+	void OnBoomerangGetsItem(Entity& item, Entity& boomerang);
 	void Update();
 
 };

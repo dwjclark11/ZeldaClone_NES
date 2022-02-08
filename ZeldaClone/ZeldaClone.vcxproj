@@ -164,6 +164,7 @@
     <ClCompile Include="libs\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Components\AIComponent.cpp" />
+    <ClCompile Include="src\StateMachines\BossStates.cpp" />
     <ClCompile Include="src\StateMachines\NewEnemyStates.cpp" />
     <ClCompile Include="src\StateMachines\NewPlayerStates.cpp" />
     <ClCompile Include="src\StateMachines\NewStateMachine.cpp" />
@@ -466,6 +467,7 @@
     <ClInclude Include="src\Components\EnemyComponent.h" />
     <ClInclude Include="src\Components\PlayerComponent.h" />
     <ClInclude Include="src\Components\SecretComponent.h" />
+    <ClInclude Include="src\StateMachines\BossStates.h" />
     <ClInclude Include="src\StateMachines\NewEnemyStates.h" />
     <ClInclude Include="src\StateMachines\NewPlayerStates.h" />
     <ClInclude Include="src\StateMachines\NewState.h" />
@@ -567,14 +569,6 @@
     <ClInclude Include="src\Utilities\Utility.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Levels\testState.lua" />
-    <None Include="Assets\LuaFiles\editor_assets.lua" />
-    <None Include="Assets\LuaFiles\game_state_assets.lua" />
-    <None Include="Assets\LuaFiles\hud.lua" />
-    <None Include="Assets\LuaFiles\menu_state_assets.lua" />
-    <None Include="Assets\LuaFiles\menu_state_load.lua" />
-    <None Include="Assets\LuaFiles\new_player_create.lua" />
-    <None Include="Assets\Levels\StateMachine.lua" />
     <None Include="libs\glm\detail\func_common.inl" />
     <None Include="libs\glm\detail\func_common_simd.inl" />
     <None Include="libs\glm\detail\func_exponential.inl" />

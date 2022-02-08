@@ -7,6 +7,7 @@
 class State
 {
 public:
+	virtual ~State() { Logger::Err("State Destroyed!!"); }
 	static bool exitToMain;
 
 	virtual void Update(const double& deltaTime) = 0;

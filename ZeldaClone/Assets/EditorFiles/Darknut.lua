@@ -1,11 +1,11 @@
 -------------------------------------------------------------
---  Moblin Attributes
+--  Red Darknut Attributes
 -------------------------------------------------------------
 
 moblin = {
     components = {
         sprite = {
-            asset_id    = "moblin",
+            asset_id    = "darknut",
             width       = 16,
             height      = 16,
             layer       = 1,
@@ -15,8 +15,8 @@ moblin = {
             src_offset  = { x = 0, y = 0 }
         },
         box_collider = {
-            width       = 32,
-            height      = 32,
+            width       = 16,
+            height      = 16,
             offset      = { x = 0, y = 0 }
         },
         health = {
@@ -24,7 +24,7 @@ moblin = {
             max_hearts = 3
         },
         rigid_body = {
-            velocity = { x = 50, y = 0}
+            velocity = { x = 75, y = 0}
         },
         animation = {
             num_frames = 2,
@@ -34,11 +34,11 @@ moblin = {
             frame_offset = 0
         }, 
         projectile_emitter = {
-    
+			
         },
         ai_component = {
                 enemy_pos = { x = 0,  y = 0},
-                enemy_type = "moblin",
+                enemy_type = "darknut",
         }
     }
 }

@@ -80,7 +80,7 @@ void Game::Initialize()
 		SDL_WINDOWPOS_CENTERED,
 		windowWidth,
 		windowHeight,
-		SDL_WINDOW_OPENGL // | SDL_WINDOW_RESIZABLE
+		SDL_WINDOW_OPENGL // | SDL_WINDOW_RESIZABLE // We don't want resizable in game
 	);
 	
 	// Check to see if the window creation worked correctly
@@ -140,11 +140,10 @@ void Game::Initialize()
 	gameStateMachine = std::make_unique<GameStateMachine>();
 	
 	// Push the title screen
-	gameStateMachine->PushState(new TitleState());
+	//gameStateMachine->PushState(new TitleState());
 
 	// Change to the state you want to work on
-	//gameStateMachine->PushState(new EditorState());
-
+	gameStateMachine->PushState(new EditorState());
 }
 
 void Game::Update()

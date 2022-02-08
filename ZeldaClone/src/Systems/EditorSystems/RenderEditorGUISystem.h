@@ -116,7 +116,7 @@ public:
 	void EnemyProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void TileProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void TriggerProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
-	void ColliderProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
+	void ColliderProperties();
 	void ShowMapLoaderWindow(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer);
 	void CanvasSize();
 	

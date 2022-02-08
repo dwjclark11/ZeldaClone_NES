@@ -49,6 +49,8 @@ void GameStateMachine::PopState()
 	{
 		if (states.back()->OnExit())
 		{
+			//delete states.back();
+			//states.back() = nullptr;
 			states.erase(states.end() - 1);
 		}
 	}

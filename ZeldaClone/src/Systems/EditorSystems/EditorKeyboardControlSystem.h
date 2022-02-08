@@ -89,8 +89,8 @@ public:
 		if (game.GetCamera().x > (levelWidth - game.GetCamera().w ) + 1000) game.GetCamera().x = (levelWidth - game.GetCamera().w) + 1000;
 		if (game.GetCamera().y > (levelHeight - game.GetCamera().h) + 1000) game.GetCamera().y = (levelHeight - game.GetCamera().h) + 1000;
 
-		if (MouseControlSystem::layer < 0) MouseControlSystem::layer = 0;
-		if (MouseControlSystem::layer > 10) MouseControlSystem::layer = 10;
+		if (MouseControlSystem::spriteComponent.layer < 0) MouseControlSystem::spriteComponent.layer = 0;
+		if (MouseControlSystem::spriteComponent.layer > 10) MouseControlSystem::spriteComponent.layer = 10;
 	}
 
 	void Update()

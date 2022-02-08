@@ -1,5 +1,4 @@
 #include "NameState.h"
-
 #include "../ECS/ECS.h"
 #include "../Systems/GameSystems/RenderSystem.h"
 #include "../Systems/NameSystems/RenderNameStateTextSystem.h"
@@ -28,7 +27,7 @@ void NameState::Update(const double& deltaTime)
 void NameState::Render()
 {
 	reg.GetSystem<RenderNameSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	reg.GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	//reg.GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 }
 
 bool NameState::OnEnter()
@@ -50,22 +49,16 @@ bool NameState::OnEnter()
 	box.AddComponent<RegisterNameComponent>();
 	box.Tag("box");
 
-	//Entity menuLabel1 = reg.CreateEntity();
-	//menuLabel1.AddComponent<TextLabelComponent>(glm::vec2(260, 50), " - ENTER NAME - ", "charriot-font-60", SDL_Color{ 255,255,255,255 }, true);
-
 	Entity player1Name = reg.CreateEntity();
 	player1Name.AddComponent<TextLabelComponent>(glm::vec2(320, 800), "", "charriot-font-40", SDL_Color{ 255,255,255,255 }, true);
 	player1Name.Tag("slot1");
-
+	Logger::Log("Entered NameState!");
 	return true;
 }
 
 bool NameState::OnExit()
 {
-	//game.GetAssetManager()->ClearAssets();
 	reg.GetSystem<RenderNameStateTextSystem>().OnExit();
-	//reg.GetSystem<RenderSystem>().OnExit();
-	//Logger::Err("Exiting Name state");
 	return true;
 }
 

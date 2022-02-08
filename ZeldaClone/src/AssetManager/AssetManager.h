@@ -22,6 +22,7 @@ public:
 	void AddTextures(SDL_Renderer* renderer, const std::string& assetID, const std::string& filePath);
 	SDL_Texture* GetTexture(const std::string& assetID);
 	bool HasTexture(const std::string& assetID);
+	std::map<std::string, SDL_Texture*> GetTextureMap() { return textures; }
 
 	// Fonts
 	void AddFonts(const std::string& assetID, const std::string filePath, int fontSize);

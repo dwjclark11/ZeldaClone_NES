@@ -364,6 +364,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		break;
 	
 	case BURN_BUSHES:
+
 		if (trigger.HasComponent<SecretComponent>())
 		{
 			SecretTrigger(trigger);

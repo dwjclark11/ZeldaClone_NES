@@ -41,8 +41,8 @@ public:
 	void LoadEnemiesAttributes(sol::state& lua, std::string& fileName, std::string& enemy_name);
 	
 	void CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy);
+	
 	// Converters
-	TriggerType ConvertToTriggerType(int triggerType);
 	std::string ConvertToString(TriggerType triggerType);
 	std::string ConvertAIEnemyToString(AIComponent::EnemyType type);
 private:
@@ -53,6 +53,8 @@ private:
 
 	void WriteTransformComponent(LuaTableWriter& writer, const class TransformComponent& transform, std::fstream& file, bool last);
 	void WriteBoxColliderComponent(LuaTableWriter& writer, const class BoxColliderComponent& collision, std::fstream& file, bool last);
-	void WriteTriggerBoxComponent(LuaTableWriter& writer, const class TriggerBoxComponent& collision, std::fstream& file, std::string& trigger_type, bool last);
-	void WriteSecretComponent(LuaTableWriter& writer, const class SecretComponent& collision, std::fstream& file, bool last);
+	void WriteTriggerBoxComponent(LuaTableWriter& writer, const class TriggerBoxComponent& trigger, std::fstream& file, std::string& trigger_type, bool last);
+	void WriteSecretComponent(LuaTableWriter& writer, const class SecretComponent& secret, std::fstream& file, bool last);
+	void WriteSpriteComponent(LuaTableWriter& writer, const class SpriteComponent& sprite, std::fstream& file, bool last);
+
 };

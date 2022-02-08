@@ -5,7 +5,7 @@ class TitleState : public State
 {
 public:
 	TitleState();
-	~TitleState() {};
+	~TitleState() { Logger::Err(GetStateID() + " was Destroyed!"); };
 
 	virtual void Update(const double& deltaTime);
 	virtual void Render();
