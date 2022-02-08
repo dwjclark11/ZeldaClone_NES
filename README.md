@@ -32,6 +32,9 @@ This project is created with:
 | RShift | Sword Attack |
 | SpaceBar | Special Item |
 * I want to make the controls changable in the future. Currently Hard Coded
+## User Experience
+* This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
+https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
 
 ## Tilemap Editor Controls
        * Under Construction!!
