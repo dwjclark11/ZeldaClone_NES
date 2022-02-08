@@ -56,6 +56,8 @@ This game/engine includes the following:
 
 ## How to Build
        * Under Construction --> Premake file to come soon!
+## Don't Forget to Star the Repository if you like what you see and where this is going. Thanks!
+## Dustin 
 
 ## Desired Additions/Changes
 Some of the desired changes are:
