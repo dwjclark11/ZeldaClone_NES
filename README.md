@@ -8,9 +8,10 @@
 
 ## Introduction
 This game was created for educational purposes and to help develop my skills with C++, Lua, and understanding
-of data management. It uses the Pikuma Game Engine from the course "Create a 2D Game Engine with C++ and Lua". 
-This was a great course and I recommend it to anyone wanting to start learning more on Game Engines. 
-I have made a lot of changes regarding game flow, state machines, etc; however, the core of the engine remains the same.
+of data management. It uses the Pikuma Game Engine from the course https://courses.pikuma.com/courses/2dgameengine. 
+This was a great course and I recommend it to anyone wanting to start learning more on creating Game Engines. 
+I have taken what I learned from that course and applied it to creating this Zelda Clone and Tilemap/Quest Editor. 
+I am still working on the functionality and this is a beautiful step into my journey to become a Software Developer!
 
 ## Technologies
 This project is created with:
@@ -28,10 +29,12 @@ This project is created with:
 |  A  | Move Left   |
 |  Q  | Pause Menu  |
 | ESC | Quit Game   | 
-| BackSpace | Leave Pause |
 | RShift | Sword Attack |
 | SpaceBar | Special Item |
 * I want to make the controls changable in the future. Currently Hard Coded
+## User Experience
+* This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
+https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
 
 ## Tilemap Editor Controls
        * Under Construction!!
@@ -46,7 +49,8 @@ This game/engine includes the following:
         * The tilemap editor still has some bugs; however, it does work
         
 
-![Clone_Editor](https://user-images.githubusercontent.com/63356975/130303677-08d6fdc8-6f66-490b-ba8a-df98e0a7192a.png)
+![Editor_Image](https://user-images.githubusercontent.com/63356975/153037159-f5e464fb-9853-49f6-97a1-916651dd8f92.png)
+
 
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
 
@@ -69,4 +73,7 @@ Some of the bugs are as follows:
 * ~~When changing scenes, there are issues removing mass entities.~~ Fixed.
 * ~~Game is really slow in Debug mode. Release mode runs pretty good.~~ Fixed
 * ~~Game does not really work properly. You can kill enemies and collect items; however, the removal of entities when changing scenes is having undesired results.~~ Fixed.
+
+## Don't Forget to Star the Repository if you like what you see and where this is going. Thanks!
+## Dustin 
 
