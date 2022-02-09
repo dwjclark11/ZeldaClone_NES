@@ -1,6 +1,8 @@
 #include "HealthSystem.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/SpriteComponent.h"
+#include "../../Components/BoxColliderComponent.h"
+#include "../../Components/TransformComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../Components/HUDComponent.h"
 #include "../../Game/Game.h"

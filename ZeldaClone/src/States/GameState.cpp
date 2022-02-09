@@ -1,6 +1,6 @@
 #include "GameState.h"
 #include "../Game/Game.h"
-//#include "PauseState.h"
+#include "MenuState.h"
 #include "GameOverState.h"
 #include "../Systems/GameSystems/CollisionSystem.h"
 #include "../AssetManager/AssetManager.h"

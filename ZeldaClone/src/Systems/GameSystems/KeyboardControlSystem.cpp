@@ -6,6 +6,7 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/BoxColliderComponent.h"
 #include "../../Logger/Logger.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../States/GameState.h"
@@ -252,15 +253,10 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
-		if (!game.PlayerHold() && event.symbol != SDLK_RSHIFT)
+		if (!game.PlayerHold() || event.symbol != game.GetKeyBindings().at(Game::Action::ATTACK))
 		{
-			/*switch (event.symbol)
+			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_UP))
 			{
-			case SDLK_w:*/
-			if (event.symbol == SDLK_w)
-			{
-
-
 				playerRigidbody.velocity = playerControl.upVelocity;
 				playerSprite.srcRect.x = playerSprite.width * 2;
 
@@ -278,10 +274,8 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 
 				dir = UP;
 			}
-			//break;
 
-		/*case SDLK_d:*/
-			if (event.symbol == SDLK_d)
+			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_RIGHT))
 			{
 				playerSprite.srcRect.x = playerSprite.width * 3;
 				playerRigidbody.velocity = playerControl.rightVelocity;
@@ -300,10 +294,7 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 
 				dir = RIGHT;
 			}
-			//break;
-
-		/*case SDLK_s:*/
-			if (event.symbol == SDLK_s)
+			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_DOWN))
 			{
 				playerRigidbody.velocity = playerControl.downVelocity;
 				playerSprite.srcRect.x = playerSprite.width * 0;
@@ -322,10 +313,7 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 
 				dir = DOWN;
 			}
-			//break;
-
-		/*case SDLK_a:*/
-			if (event.symbol == SDLK_a)
+			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_LEFT))
 			{
 				playerRigidbody.velocity = playerControl.leftVelocity;
 				playerSprite.srcRect.x = playerSprite.width * 1;
@@ -344,8 +332,6 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 
 				dir = LEFT;
 			}
-			//break;
-		//}
 		}
 	}
 }

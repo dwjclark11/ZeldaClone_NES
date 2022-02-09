@@ -376,7 +376,7 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 			ReloadItemMap();
 		}
 
-		if (event.symbol == SDLK_SPACE && !KeyboardControlSystem::keyDown)
+		if (event.symbol == game.GetKeyBindings().at(Game::Action::USE_ITEM) && !KeyboardControlSystem::keyDown)
 		{
 			if (ItemSelectKeyboardControlSystem::itemType == WOOD_BOW || ItemSelectKeyboardControlSystem::itemType == MAGIC_BOW)
 			{
@@ -431,7 +431,7 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 				KeyboardControlSystem::keyDown = true;
 			}
 		}
-		else if (event.symbol == SDLK_RSHIFT && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
+		else if (event.symbol == game.GetKeyBindings().at(Game::Action::ATTACK) && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
 		{
 			// Do not use the sword if we do not have a sword
 			if (game.HasSword())

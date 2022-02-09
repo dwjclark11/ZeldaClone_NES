@@ -6,6 +6,7 @@
 #include "../Systems/SoundFXSystem.h"
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include "../Systems/GameSystems/RenderHUDSystem.h"
+#include "../Components/TransformComponent.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/HealthComponent.h"

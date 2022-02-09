@@ -185,6 +185,7 @@
     <ClCompile Include="src\States\SaveGameState.cpp" />
     <ClCompile Include="src\States\State.cpp" />
     <ClCompile Include="src\States\TitleState.cpp" />
+    <ClCompile Include="src\Systems\CameraMovementSystem.cpp" />
     <ClCompile Include="src\Systems\EditorSystems\MouseControlSystem.cpp" />
     <ClCompile Include="src\Systems\EditorSystems\RenderEditorGUISystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\AISystem.cpp" />
@@ -196,6 +197,7 @@
     <ClCompile Include="src\Systems\GameSystems\GamePadSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\HealthSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\KeyboardControlSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\MovementSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\ProjectileEmitterSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\ProjectileLifeCycleSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderHealthSystem.cpp" />
@@ -203,7 +205,9 @@
     <ClCompile Include="src\Systems\GameSystems\RenderSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderTileSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\TriggerSystem.cpp" />
+    <ClCompile Include="src\Systems\MusicPlayerSystem.cpp" />
     <ClCompile Include="src\Systems\PauseSystems\ItemSelectKeyboardSystem.cpp" />
+    <ClCompile Include="src\Systems\RenderCollisionSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTitleSystem.cpp" />
     <ClCompile Include="src\Utilities\FileManagerUtils.cpp" />
     <ClCompile Include="src\Utilities\LuaTableWriter.cpp" />

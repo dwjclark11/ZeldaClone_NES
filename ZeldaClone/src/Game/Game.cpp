@@ -137,6 +137,7 @@ void Game::Initialize()
 	fadeFinished = true;
 	startFadeIn = false;
 	startFadeOut = false;
+	CreateDefaultKeyBindings();
 
 	// Create the finite Game State Machine
 	gameStateMachine = std::make_unique<GameStateMachine>();

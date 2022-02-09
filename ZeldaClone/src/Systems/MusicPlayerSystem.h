@@ -1,43 +1,18 @@
 #pragma once
-
-#include "../AssetManager/AssetManager.h"
 #include "../ECS/ECS.h"
 #include <memory>
+
+class AssetManager;
 
 class MusicPlayerSystem : public System
 {
 public:
+	MusicPlayerSystem();	
+	~MusicPlayerSystem();
 
-	MusicPlayerSystem()
-	{
-		if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
-		{
-			Logger::Err("Unable to open the Music Mixer!");
-		}
-	}
+	void PlayMusic(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops);
+	void PauseMusic();
+	void ResumeMusic();
+	void StopMusic();
 	
-	~MusicPlayerSystem()
-	{
-		Mix_Quit();
-	}
-	
-	void PlayMusic(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops)
-	{
-		Mix_PlayMusic(assetManager->GetMusic(assetID), loops);
-	}
-
-	void PauseMusic()
-	{
-		Mix_PauseMusic();
-	}
-	
-	void ResumeMusic()
-	{
-		Mix_ResumeMusic();
-	}
-
-	void StopMusic()
-	{
-		Mix_HaltMusic();
-	}
 };

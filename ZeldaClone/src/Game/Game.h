@@ -54,7 +54,23 @@ class Game
 		bool candle;
 	};
 
+
+
+	
+
 public:
+	
+	enum class Action
+	{
+		MOVE_UP = 0,
+		MOVE_DOWN,
+		MOVE_LEFT,
+		MOVE_RIGHT,
+		ATTACK,
+		USE_ITEM,
+		PAUSE,
+	};
+
 	static int gameScale;
 	static int tilePixels;
 	static int windowWidth;
@@ -136,7 +152,39 @@ public:
 	int milliSecondsPreviousFrame;
 	
 	StateMachine& GetPlayerStateMachine() { return psm; }
+
+
+	void AddKeyToMap(Action action, SDL_Keycode key)
+	{
+		if (mMappedKeys.find(action) == mMappedKeys.end())
+		{
+			mMappedKeys.emplace(action, key);
+		}
+	}
+
+	void CreateDefaultKeyBindings()
+	{
+		AddKeyToMap(Action::MOVE_UP, SDLK_w);
+		AddKeyToMap(Action::MOVE_RIGHT, SDLK_d);
+		AddKeyToMap(Action::MOVE_DOWN, SDLK_s);
+		AddKeyToMap(Action::MOVE_LEFT, SDLK_a);
+		AddKeyToMap(Action::ATTACK, SDLK_RSHIFT);
+		AddKeyToMap(Action::USE_ITEM, SDLK_SPACE);
+		AddKeyToMap(Action::PAUSE, SDLK_q);
+	}
+
+	void ChangeKeyBinding(Action action, SDL_Keycode key)
+	{
+		if (mMappedKeys.find(action) != mMappedKeys.end())
+			mMappedKeys[action] = key;
+	}
+
+	std::map<Action, SDL_Keycode>& GetKeyBindings() { return mMappedKeys; }
+
 private:
+
+	std::map<Action, SDL_Keycode> mMappedKeys;
+	
 	int milliSecondsPerFrame;
 	bool mIsRunning;
 	bool attack;
