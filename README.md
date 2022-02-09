@@ -74,6 +74,5 @@ Some of the bugs are as follows:
 * ~~Game is really slow in Debug mode. Release mode runs pretty good.~~ Fixed
 * ~~Game does not really work properly. You can kill enemies and collect items; however, the removal of entities when changing scenes is having undesired results.~~ Fixed.
 
-## Don't Forget to Star the Repository if you like what you see and where this is going. Thanks!
 ## Dustin 
 
