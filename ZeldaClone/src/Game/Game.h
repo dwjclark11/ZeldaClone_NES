@@ -1,5 +1,4 @@
 #pragma once
-#define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <SDL_image.h>
 #include <imgui/imgui.h>
@@ -25,8 +24,6 @@ class AssetManager;
 // Define constants
 const int FPS = 60;
 const int MILLISECONDS_PER_FRAME = 1000 / FPS;
-
-
 
 class Game
 {

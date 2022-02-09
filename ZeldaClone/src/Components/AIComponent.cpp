@@ -11,7 +11,8 @@ AIComponent::AIComponent(glm::vec2 enemyPos, EnemyType enemyType, EnemyBossType 
 	this->enemyType = enemyType;
 	this->bossType = bossType;
 	this->boss = boss;
-	
+	this->created = false;
+	this->stunned = false;
 }
 
 
