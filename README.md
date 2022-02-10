@@ -58,14 +58,14 @@ This game/engine includes the following:
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
 
 ## How to Build
-This project currently uses Visual Studio 2019 Community and has not been tested on different systems/IDEs.
-       * Step 1
-            * Clone the repo
-       * Step 2
-            * Run the GenerateSolution.bat file.
-            * This should run the premake5.lua file and create a visual studio .sln
-       * Step 3
-            * Open the solution and build and run. It should work from there.
+This project currently uses Visual Studio 2019 Community and has not been tested on different systems/IDEs:
+* Step 1
+      ** Clone the repo
+* Step 2
+      ** Run the GenerateSolution.bat file.
+            *** This should run the premake5.lua file and create a visual studio .sln
+* Step 3
+      ** Open the solution and build and run. It should work from there.
                
 
 ## Desired Additions/Changes
