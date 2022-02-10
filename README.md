@@ -59,7 +59,7 @@ This game/engine includes the following:
 
 ## How to Build
 This project currently uses Visual Studio 2019 Community and has not been tested on different systems/IDEs.
-Step 1:
+*Step 1:
       * Clone the repo
 Step 2:
       * Run the GenerateSolution.bat file
