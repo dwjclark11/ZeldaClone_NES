@@ -24,7 +24,7 @@ This project is created with:
 | Key |  Button  |   Function  |  
 | --- |  ------- | ----------- | 
 |  W  |  DPAD UP | Move Up  | 
-|  D  |  DPAD RIGHT |Move Right  | 
+|  D  |  DPAD RIGHT |Move Right  | ![xbox_controller](https://user-images.githubusercontent.com/63356975/153439752-0862e46e-48c1-461a-a79b-481d6e00307c.png)
 |  S  |  DPAD DOWN |Move Down   | 
 |  A  |  DPAD LEFT |Move Left   |
 |  Q  |  START |Pause Menu  |
