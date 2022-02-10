@@ -45,11 +45,11 @@ https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-
 This game/engine includes the following:
 * An ECS (Entity Component System) to help manage entities, components, and systems that are in the game.
 * #### A functioning Tilemap Editor that can create:
-        * Tilemaps 
-        * colliders
-        * triggers (transport/secret areas/ traps/ etc.)
-        * Uses Dear ImGui as the user interface
-        * The tilemap editor still has some bugs; however, it does work
+    * Tilemaps 
+    * colliders
+    * triggers (transport/secret areas/ traps/ etc.)
+    * Uses Dear ImGui as the user interface
+    * The tilemap editor still has some bugs; however, it does work
         
 
 ![Editor_Image](https://user-images.githubusercontent.com/63356975/153037159-f5e464fb-9853-49f6-97a1-916651dd8f92.png)
