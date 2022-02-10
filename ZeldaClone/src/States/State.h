@@ -8,7 +8,7 @@ class State
 {
 public:
 	virtual ~State() { Logger::Err("State Destroyed!!"); }
-	static bool exitToMain;
+	
 
 	virtual void Update(const double& deltaTime) = 0;
 	virtual void Render() = 0;
@@ -20,9 +20,10 @@ public:
 
 	virtual void OnKeyDown(SDL_Event* event) = 0;
 	virtual void OnKeyUp(SDL_Event* event) = 0;
+	virtual void OnBtnDown(SDL_Event* event) = 0;
+	virtual void OnBtnUp(SDL_Event* event) = 0;
 
 	virtual std::string GetStateID() const = 0;
-private:
-	void NoFunction();
+
 };
 

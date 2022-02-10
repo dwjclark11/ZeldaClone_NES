@@ -141,6 +141,7 @@ private:
 	void LoadMapAttributes(sol::state& lua, const std::string& fileName = "ProjectileAttributes");
 	
 
+
 	// Testing Functions --> Use these to quickly reload Lua Table Attributes for adjusting positions
 	void ClearItemMap() 
 	{
@@ -166,12 +167,17 @@ public:
 	//GamePadSystem controller;
 
 	ProjectileEmitterSystem();
-	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
+	void SubscribeKeyToEvents(std::unique_ptr<EventManager>& eventManager)
 	{
 		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &ProjectileEmitterSystem::OnKeyPressed);
 	}
+	void SubscribeBtnToEvents(std::unique_ptr<EventManager>& eventManager)
+	{
+		eventManager->SubscribeToEvent<GamePadButtonPressedEvent>(this, &ProjectileEmitterSystem::OnBtnPressed);
+	}
 
 	void OnKeyPressed(KeyPressedEvent& event);
+	void OnBtnPressed(GamePadButtonPressedEvent& event);
 	void Update(Registry& registry);
 
 };

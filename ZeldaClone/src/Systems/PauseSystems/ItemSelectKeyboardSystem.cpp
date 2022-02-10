@@ -1,9 +1,7 @@
 #include "ItemSelectKeyboardSystem.h"
 #include "../GameSystems/GamePadSystem.h"
 
-ItemType ItemSelectKeyboardControlSystem::itemType = EMPTY;
-
-void ItemSelectKeyboardControlSystem::Update()
+void ItemSelectKeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 {
 	for (const auto& entity : GetSystemEntities())
 	{
@@ -12,55 +10,50 @@ void ItemSelectKeyboardControlSystem::Update()
 
 		if (entity.HasTag("pauseSelector"))
 		{
-			if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
+			switch (event.symbol)
 			{
+			case SDLK_UP:
 				transform.position.y -= ((sprite.height * transform.scale.y) + 6);
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.y < 190) transform.position.y = 260;
-				GamePadSystem::buttonDirDown = true;
-			}
+				break;
 
-			if (GamePadSystem::downPressed && !GamePadSystem::buttonDirDown)
-			{
+			case SDLK_DOWN:
 				transform.position.y += ((sprite.height * transform.scale.y) + 6);
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.y > 260) transform.position.y = 190;
-				GamePadSystem::buttonDirDown = true;
-			}
+				break;
 
-			if (GamePadSystem::rightPressed && !GamePadSystem::buttonDirDown)
-			{
+			case SDLK_RIGHT:
 				transform.position.x += 100;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.x > 686) transform.position.x = 386;
-				GamePadSystem::buttonDirDown = true;
-			}
+				break;
 
-			if (GamePadSystem::leftPressed && !GamePadSystem::buttonDirDown)
-			{
+			case SDLK_LEFT:
 				transform.position.x -= 100;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.x < 386) transform.position.x = 686;
-				GamePadSystem::buttonDirDown = true;
-			}
 
-			if (GamePadSystem::aPressed && !GamePadSystem::buttonDown)
-			{
+				break;
+
+			case SDLK_SPACE:
+
 				if (transform.position.x == 386 && transform.position.y == 190 && game.GetGameItems().woodBoomerang)
 				{
-					itemType = BOOMERANG;
+					Game::mSelectedItem = Game::ItemType::BOOMERANG;
 				}
 				else if ((transform.position.x == 486 && transform.position.y == 190) && GameState::totalBombs > 0 && game.GetGameItems().bombs)
 				{
-					itemType = BOMB;
+					Game::mSelectedItem = Game::ItemType::BOMB;
 				}
 				else if (transform.position.x == 586 && transform.position.y == 190 && game.GetGameItems().bow)
 				{
-					itemType = WOOD_BOW;
+					Game::mSelectedItem = Game::ItemType::WOOD_BOW;
 				}
 				else if (transform.position.x == 686 && transform.position.y == 190 && game.GetGameItems().candle)
 				{
-					itemType = CANDLE;
+					Game::mSelectedItem = Game::ItemType::CANDLE;
 				}
 				else if (transform.position.x == 386 && transform.position.y == 260)
 				{
@@ -68,70 +61,70 @@ void ItemSelectKeyboardControlSystem::Update()
 				}
 				else if (transform.position.x == 486 && transform.position.y == 260 && game.GetGameItems().food)
 				{
-					itemType = FOOD;
+					Game::mSelectedItem = Game::ItemType::FOOD;
 				}
 				else if (transform.position.x == 586 && transform.position.y == 260 && game.GetGameItems().redPotion)
 				{
-					itemType = POTION_RED;
+					Game::mSelectedItem = Game::ItemType::POTION_RED;
 				}
 				else if (transform.position.x == 686 && transform.position.y == 260 && game.GetGameItems().magicRod)
 				{
-					itemType = MAGIC_ROD;
+					Game::mSelectedItem = Game::ItemType::MAGIC_ROD;
 				}
+				break;
 			}
 		}
 
 		if (entity.HasTag("selectedItem") || entity.HasTag("hudItem"))
 		{
-			switch (itemType)
+			switch (Game::mSelectedItem)
 			{
-			case BOOMERANG:
+			case Game::ItemType::BOOMERANG:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.x += sprite.width * 0;
 				sprite.srcRect.y += sprite.height * 7;
 				break;
-			case BOMB:
+			case Game::ItemType::BOMB:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.x += sprite.width * 4;
 				sprite.srcRect.y += sprite.height * 7;
 				break;
 
-			case WOOD_BOW:
+			case Game::ItemType::WOOD_BOW:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.x += sprite.width * 4;
 				break;
 
-			case CANDLE:
+			case Game::ItemType::CANDLE:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.y += sprite.height * 3;
 				break;
 
-			case FOOD:
+			case Game::ItemType::FOOD:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.x += sprite.width * 7;
 				sprite.srcRect.y += sprite.height * 1;
 				break;
 
-			case POTION_RED:
+			case Game::ItemType::POTION_RED:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.x += sprite.width * 2;
 				sprite.srcRect.y += sprite.height * 2;
 				break;
 
-			case MAGIC_ROD:
+			case Game::ItemType::MAGIC_ROD:
 				sprite.srcRect.x = 0;
 				sprite.srcRect.y = 0;
 				sprite.srcRect.x += sprite.width * 4;
 				sprite.srcRect.y += sprite.height * 5;
 				break;
 			}
-
 		}
 	}
 }

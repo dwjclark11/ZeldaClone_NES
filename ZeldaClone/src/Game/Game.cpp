@@ -9,6 +9,9 @@
 
 // Initialize all static variables
 std::unique_ptr<Game> Game::mInstance = nullptr;
+
+Game::ItemType Game::mSelectedItem = Game::ItemType::EMPTY;
+
 int Game::gameScale = 4;
 int Game::tilePixels = 16;
 int Game::windowWidth = 256 * Game::gameScale;
@@ -137,7 +140,9 @@ void Game::Initialize()
 	fadeFinished = true;
 	startFadeIn = false;
 	startFadeOut = false;
+
 	CreateDefaultKeyBindings();
+	CreateDefaultBtnBindings();
 
 	// Create the finite Game State Machine
 	gameStateMachine = std::make_unique<GameStateMachine>();
@@ -219,7 +224,15 @@ void Game::ProcessEvents()
 			}
 			case SDL_CONTROLLERBUTTONDOWN:
 			{
-				//eventManager->EmitEvent<GamePadButtonPressedEvent>(sdlEvent.cbutton.button);
+				eventManager->EmitEvent<GamePadButtonPressedEvent>(sdlEvent.cbutton.button);
+				gameStateMachine->OnBtnDown(&sdlEvent);
+				break;
+			}
+			
+			case SDL_CONTROLLERBUTTONUP:
+			{
+				gameStateMachine->OnBtnUp(&sdlEvent);
+				break;
 			}
 		default:
 			break;

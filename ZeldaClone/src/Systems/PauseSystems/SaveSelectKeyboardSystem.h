@@ -77,7 +77,7 @@ public:
 					}
 					else if (transform.position.y == 385)
 					{
-						State::exitToMain = true;
+						//State::exitToMain = true;
 						//game.GetStateMachine()->ClearStates();
 						//game.GetStateMachine()->PushState(new MenuState());
 					}

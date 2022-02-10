@@ -101,7 +101,7 @@ public:
 
 			if (entity.HasTag("gameOverSelector"))
 			{
-				if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
+				/*if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
 				{
 					transform.position.y -= 100;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
@@ -139,7 +139,7 @@ public:
 						game.GetStateMachine()->PushState(new MenuState());
 					}
 					GamePadSystem::buttonDown = true;
-				}
+				}*/
 			}
 		}
 	}

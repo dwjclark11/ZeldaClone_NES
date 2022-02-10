@@ -22,8 +22,9 @@ void PauseState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	reg.GetSystem<ItemSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	reg.GetSystem<ItemSelectKeyboardControlSystem>().Update();
+	//reg.GetSystem<ItemSelectKeyboardControlSystem>().Update();
 
 	if (GameState::totalBombs > 0 && !game.GetGameItems().bombs)
 	{
@@ -47,7 +48,7 @@ void PauseState::Update(const double& deltaTime)
 	}
 
 	if (GameState::totalBombs == 0 && game.GetGameItems().bombs) game.GetGameItems().bombs = false;
-	if (State::exitToMain) game.GetStateMachine()->PopState();
+	//if (State::exitToMain) game.GetStateMachine()->PopState();
 }
 
 void PauseState::Render()
@@ -195,7 +196,7 @@ bool PauseState::OnExit()
 
 void PauseState::ProcessEvents(SDL_Event& event)
 {
-	reg.GetSystem<GamePadSystem>().Update(event);
+	
 }
 
 void PauseState::OnKeyDown(SDL_Event* event)
@@ -211,6 +212,20 @@ void PauseState::OnKeyDown(SDL_Event* event)
 void PauseState::OnKeyUp(SDL_Event* event)
 {
 	if (event->key.keysym.sym == SDLK_q)
+	{
+		game.FadeFinished() = false;
+		game.StartFadeOut() = true;
+	}
+}
+
+void PauseState::OnBtnDown(SDL_Event* event)
+{
+
+}
+
+void PauseState::OnBtnUp(SDL_Event* event)
+{
+	if (event->cbutton.button == game.GetBtnBindings().at(Game::Action::PAUSE))
 	{
 		game.FadeFinished() = false;
 		game.StartFadeOut() = true;

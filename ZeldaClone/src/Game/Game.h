@@ -69,7 +69,26 @@ public:
 		ATTACK,
 		USE_ITEM,
 		PAUSE,
+		SELECT,
 	};
+
+	enum class ItemType
+	{
+		EMPTY = 0,
+		BOOMERANG,
+		BOMB,
+		POTION_BLUE,
+		POTION_RED,
+		CANDLE,
+		MAGIC_CANDLE,
+		WOOD_BOW,
+		MAGIC_BOW,
+		FOOD,
+		WHISTLE,
+		MAGIC_ROD
+	};
+
+	static ItemType mSelectedItem;
 
 	static int gameScale;
 	static int tilePixels;
@@ -179,11 +198,40 @@ public:
 			mMappedKeys[action] = key;
 	}
 
-	std::map<Action, SDL_Keycode>& GetKeyBindings() { return mMappedKeys; }
+	const std::map<Action, SDL_Keycode>& GetKeyBindings() const { return mMappedKeys; }
+
+	void AddBtnToMap(Action action, SDL_GameControllerButton button)
+	{
+		if (mMappedButtons.find(action) == mMappedButtons.end())
+		{
+			mMappedButtons.emplace(action, button);
+		}
+	}
+
+	void CreateDefaultBtnBindings()
+	{
+		AddBtnToMap(Action::MOVE_UP, SDL_CONTROLLER_BUTTON_DPAD_UP);
+		AddBtnToMap(Action::MOVE_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+		AddBtnToMap(Action::MOVE_DOWN, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+		AddBtnToMap(Action::MOVE_LEFT, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+		AddBtnToMap(Action::ATTACK, SDL_CONTROLLER_BUTTON_A);
+		AddBtnToMap(Action::USE_ITEM, SDL_CONTROLLER_BUTTON_X);
+		AddBtnToMap(Action::PAUSE, SDL_CONTROLLER_BUTTON_START);
+		AddBtnToMap(Action::SELECT, SDL_CONTROLLER_BUTTON_A);
+	}
+
+	void ChangeBtnBinding(Action action, SDL_GameControllerButton button)
+	{
+		if (mMappedButtons.find(action) != mMappedButtons.end())
+			mMappedButtons[action] = button;
+	}
+
+	const std::map<Action, SDL_GameControllerButton>& GetBtnBindings() const { return mMappedButtons; }
 
 private:
 
 	std::map<Action, SDL_Keycode> mMappedKeys;
+	std::map<Action, SDL_GameControllerButton> mMappedButtons;
 	
 	int milliSecondsPerFrame;
 	bool mIsRunning;

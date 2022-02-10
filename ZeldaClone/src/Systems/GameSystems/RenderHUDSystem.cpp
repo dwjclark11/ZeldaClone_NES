@@ -55,49 +55,49 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 
 			if (entity.HasTag("hudItem"))
 			{
-				switch (ItemSelectKeyboardControlSystem::itemType)
+				switch (Game::mSelectedItem)
 				{
-				case BOOMERANG:
+				case Game::ItemType::BOOMERANG:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.x += sprite.width * 0;
 					sprite.srcRect.y += sprite.height * 7;
 
 					break;
-				case BOMB:
+				case Game::ItemType::BOMB:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.x += sprite.width * 4;
 					sprite.srcRect.y += sprite.height * 7;
 					break;
 
-				case WOOD_BOW:
+				case Game::ItemType::WOOD_BOW:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.x += sprite.width * 4;
 					break;
 
-				case CANDLE:
+				case Game::ItemType::CANDLE:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.y += sprite.height * 3;
 					break;
 
-				case FOOD:
+				case Game::ItemType::FOOD:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.x += sprite.width * 7;
 					sprite.srcRect.y += sprite.height * 1;
 					break;
 
-				case POTION_RED:
+				case Game::ItemType::POTION_RED:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.x += sprite.width * 2;
 					sprite.srcRect.y += sprite.height * 2;
 					break;
 
-				case MAGIC_ROD:
+				case Game::ItemType::MAGIC_ROD:
 					sprite.srcRect.x = 0;
 					sprite.srcRect.y = 0;
 					sprite.srcRect.x += sprite.width * 4;

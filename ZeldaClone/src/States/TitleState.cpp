@@ -109,7 +109,7 @@ bool TitleState::OnExit()
 
 void TitleState::ProcessEvents(SDL_Event& event)
 {
-	game.GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	
 }
 
 void TitleState::OnKeyDown(SDL_Event* event)
@@ -126,3 +126,16 @@ void TitleState::OnKeyUp(SDL_Event* event)
 
 }
 
+void TitleState::OnBtnDown(SDL_Event* event)
+{
+	if (event->cbutton.button == SDL_CONTROLLER_BUTTON_START)
+	{
+		game.GetStateMachine()->PopState();
+		game.GetStateMachine()->PushState(new MenuState());
+	}
+}
+
+void TitleState::OnBtnUp(SDL_Event* event)
+{
+
+}

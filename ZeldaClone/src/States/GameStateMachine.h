@@ -25,8 +25,9 @@ public:
 	void ProcessEvents(SDL_Event& event);
 	void OnKeyDown(SDL_Event* event);
 	void OnKeyUp(SDL_Event* event);
-
-
+	void OnBtnDown(SDL_Event* event);
+	void OnBtnUp(SDL_Event* event);
+	
 private:
 	std::vector<State*> states;
 };

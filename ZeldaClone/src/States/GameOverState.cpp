@@ -84,7 +84,7 @@ bool GameOverState::OnExit()
 
 void GameOverState::ProcessEvents(SDL_Event& event)
 {
-	game.GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	//game.GetSystem<GamePadSystem>().UpdateOtherStates(event);
 }
 
 void GameOverState::OnKeyDown(SDL_Event* event)
@@ -95,4 +95,12 @@ void GameOverState::OnKeyDown(SDL_Event* event)
 void GameOverState::OnKeyUp(SDL_Event* event)
 {
 
+}
+
+void GameOverState::OnBtnDown(SDL_Event* event)
+{
+}
+
+void GameOverState::OnBtnUp(SDL_Event* event)
+{
 }

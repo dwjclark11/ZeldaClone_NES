@@ -20,7 +20,7 @@ void SaveGameState::Update(const double& deltaTime)
 	reg.Update();
 	reg.GetSystem<AnimationSystem>().Update();
 
-	if (State::exitToMain) game.GetStateMachine()->PopState();
+	//if (State::exitToMain) game.GetStateMachine()->PopState();
 }
 
 void SaveGameState::Render()
@@ -92,4 +92,13 @@ void SaveGameState::OnKeyDown(SDL_Event* event)
 void SaveGameState::OnKeyUp(SDL_Event* event)
 {
 	
+}
+
+void SaveGameState::OnBtnDown(SDL_Event* event)
+{
+
+}
+
+void SaveGameState::OnBtnUp(SDL_Event* event)
+{
 }

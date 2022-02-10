@@ -4,6 +4,7 @@
 #include "../Systems/NameSystems/RenderNameStateTextSystem.h"
 #include "../Systems/NameSystems/RenderNameSystem.h"
 #include "../Systems/NameSystems/NameSelectKeyboardControlSystem.h"
+#include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Components/RegisterNameComponent.h"
 #include "../States/MenuState.h"
 #include "../Game/Game.h"
@@ -20,8 +21,9 @@ void NameState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	reg.GetSystem<NameSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	reg.GetSystem<NameSelectKeyboardControlSystem>().Update();
+	//reg.GetSystem<NameSelectKeyboardControlSystem>().Update();
 }
 
 void NameState::Render()
@@ -75,6 +77,15 @@ void NameState::OnKeyDown(SDL_Event* event)
 void NameState::OnKeyUp(SDL_Event* event)
 {
 
+}
+
+void NameState::OnBtnDown(SDL_Event* event)
+{
+
+}
+
+void NameState::OnBtnUp(SDL_Event* event)
+{
 }
 
 

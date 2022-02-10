@@ -28,6 +28,7 @@ void MenuState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	reg.GetSystem<MenuKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	
 
 	reg.Update();
@@ -90,6 +91,16 @@ void MenuState::OnKeyDown(SDL_Event* event)
 
 void MenuState::OnKeyUp(SDL_Event* event)
 {
+}
+
+void MenuState::OnBtnDown(SDL_Event* event)
+{
+
+}
+
+void MenuState::OnBtnUp(SDL_Event* event)
+{
+
 }
 
 
