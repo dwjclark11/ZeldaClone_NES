@@ -21,16 +21,16 @@ This project is created with:
 * ImGui
 
 ## Game Controls
-| Key | | Button  |   Function  |  
-| --- | | ------- | ----------- | 
-|  W  | | DPAD UP | Move Up  | 
-|  D  | | DPAD RIGHT |Move Right  | 
-|  S  | | DPAD DOWN |Move Down   | 
-|  A  | | DPAD LEFT |Move Left   |
-|  Q  | | START |Pause Menu  |
-| ESC | | N/A |Quit Game   | 
-| RShift || A BTN | Sword Attack |
-| SpaceBar | | X BTN | Special Item |
+| Key |  Button  |   Function  |  
+| --- |  ------- | ----------- | 
+|  W  |  DPAD UP | Move Up  | 
+|  D  |  DPAD RIGHT |Move Right  | 
+|  S  |  DPAD DOWN |Move Down   | 
+|  A  |  DPAD LEFT |Move Left   |
+|  Q  |  START |Pause Menu  |
+| ESC |  N/A |Quit Game   | 
+| RShift | A BTN | Sword Attack |
+| SpaceBar |  X BTN | Special Item |
 
 * GamePad Buttons are based on the SDL_GameControllerButtons == X BOX Style Gamepad.
 
