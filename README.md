@@ -44,12 +44,13 @@ https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-
 ## Game/Engine
 This game/engine includes the following:
 * An ECS (Entity Component System) to help manage entities, components, and systems that are in the game.
-* #### A functioning Tilemap Editor that can create:
+* #### A functioning Tilemap/Quest Editor that can create:
     * Tilemaps 
     * colliders
     * triggers (transport/secret areas/ traps/ etc.)
     * Uses Dear ImGui as the user interface
-    * The tilemap editor still has some bugs; however, it does work
+    * The Tilemap/Quest Editor still has some bugs; however, it does work
+  
         
 
 ![Editor_Image](https://user-images.githubusercontent.com/63356975/153037159-f5e464fb-9853-49f6-97a1-916651dd8f92.png)
@@ -76,6 +77,8 @@ Some of the desired changes are:
 * Add a functional AI state machine with for entities/enemies done in lua
     *  Currently this is done in C++, Not easy to make small changes!
 * Ability for user to change keys/gamepad controls (Currently Hard Coded)
+* Remove a lot of static variables 
+* Figure out how to remove the Game Singleton and create a loose coupling amongst concrete classes.
 
 
 ## There are still a lot of bugs that must be fixed to have a properly working demo
