@@ -89,13 +89,12 @@ void CheckItem(ItemCollectType type)
 // Player Idle State definitions
 void IdleState::OnEnter(Entity& entity)
 {
-	Logger::Log("Enter Idle State");
 	game.GetPlayerItem() = false;
 }
 
 void IdleState::OnExit(Entity& entity)
 {
-	//Logger::Log("Exit Idle State");
+	
 }
 
 void IdleState::Update(Entity& entity)
@@ -128,12 +127,12 @@ void IdleState::Update(Entity& entity)
 
 void AttackState::OnEnter(Entity& entity)
 {
-	//Logger::Log("Enter Attack State");
+	
 }
 
 void AttackState::OnExit(Entity& entity)
 {
-	//Logger::Log("Enter Exit State");
+	
 }
 
 void AttackState::Update(Entity& entity)
@@ -148,7 +147,7 @@ void MoveState::OnEnter(Entity& entity)
 
 void MoveState::OnExit(Entity& entity)
 {
-	Logger::Log("Exit Move State");
+	
 }
 
 void MoveState::Update(Entity& entity)
@@ -295,7 +294,6 @@ void PlayerHurtState::OnEnter(Entity& entity)
 	animation.numFrames = 3;
 	animation.frameOffset = 64;
 	animation.frameSpeedRate = 20;
-	Logger::Log("Entering HURT STate");
 }
 
 void PlayerHurtState::Update(Entity& entity)
@@ -334,7 +332,6 @@ void PlayerHurtState::OnExit(Entity& entity)
 	animation.frameOffset = 0;
 	animation.frameSpeedRate = 10;
 	sprite.srcRect.y = 0;
-	Logger::Log("Exiting HURT STate");
 }
 
 // Death State

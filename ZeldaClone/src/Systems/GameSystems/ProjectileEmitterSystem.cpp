@@ -398,8 +398,6 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 			{
 				if (GameState::totalBombs > 0)
 				{
-					std::cout << projectileAttributeMap.at("bomb").ToString() << std::endl;
-
 					UseItem(projectileAttributeMap.at("bomb"));
 					GameState::totalBombs--;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
@@ -408,7 +406,6 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 			}
 			else if (Game::mSelectedItem == Game::ItemType::CANDLE)
 			{
-				std::cout << projectileAttributeMap.at("candle").ToString() << std::endl;
 				UseItem(projectileAttributeMap.at("candle"));
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
 				KeyboardControlSystem::keyDown = true;
@@ -417,7 +414,6 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 			{
 				if (!boomerangReturned)
 				{
-					std::cout << projectileAttributeMap.at("boomerang").ToString() << std::endl;
 					UseItem(projectileAttributeMap.at("boomerang"));
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					KeyboardControlSystem::keyDown = true;
@@ -426,7 +422,7 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 			else if (Game::mSelectedItem == Game::ItemType::MAGIC_ROD)
 			{
 				UseMagicWand();
-				std::cout << projectileAttributeMap.at("magic_rod").ToString() << std::endl;
+				
 				UseItem(projectileAttributeMap.at("magic_rod"));
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
 				KeyboardControlSystem::keyDown = true;
@@ -442,7 +438,6 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 				if (fullLife)
 				{
 					// Create Sword beam projectile
-					std::cout << projectileAttributeMap.at("beam").ToString() << std::endl;
 					UseItem(projectileAttributeMap.at("beam"));
 
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
@@ -475,7 +470,6 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 				// Bow uses rupees, must be greater than zero!
 				if (GameState::totalRupees > 0)
 				{
-					std::cout << projectileAttributeMap.at("bow").ToString() << std::endl;
 					UseItem(projectileAttributeMap.at("bow"));
 
 					// Play the arrow sound!
@@ -489,8 +483,6 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 			{
 				if (GameState::totalBombs > 0)
 				{
-					std::cout << projectileAttributeMap.at("bomb").ToString() << std::endl;
-
 					UseItem(projectileAttributeMap.at("bomb"));
 					GameState::totalBombs--;
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
@@ -499,7 +491,6 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 			}
 			else if (Game::mSelectedItem == Game::ItemType::CANDLE)
 			{
-				std::cout << projectileAttributeMap.at("candle").ToString() << std::endl;
 				UseItem(projectileAttributeMap.at("candle"));
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
 				KeyboardControlSystem::keyDown = true;
@@ -508,7 +499,6 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 			{
 				if (!boomerangReturned)
 				{
-					std::cout << projectileAttributeMap.at("boomerang").ToString() << std::endl;
 					UseItem(projectileAttributeMap.at("boomerang"));
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					KeyboardControlSystem::keyDown = true;
@@ -517,7 +507,6 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 			else if (Game::mSelectedItem == Game::ItemType::MAGIC_ROD)
 			{
 				UseMagicWand();
-				std::cout << projectileAttributeMap.at("magic_rod").ToString() << std::endl;
 				UseItem(projectileAttributeMap.at("magic_rod"));
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
 				KeyboardControlSystem::keyDown = true;
@@ -533,7 +522,6 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 				if (fullLife)
 				{
 					// Create Sword beam projectile
-					std::cout << projectileAttributeMap.at("beam").ToString() << std::endl;
 					UseItem(projectileAttributeMap.at("beam"));
 
 					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
