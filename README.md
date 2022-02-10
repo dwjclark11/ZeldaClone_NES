@@ -60,12 +60,12 @@ This game/engine includes the following:
 ## How to Build
 This project currently uses Visual Studio 2019 Community and has not been tested on different systems/IDEs.
 * Step 1)
-      *  Clone the repo
+    *  Clone the repo
 * Step 2)
-      *  Run the GenerateSolution.bat file
-            *  This should run the premake5.lua file and create a visual studio .sln
+    * Run the GenerateSolution.bat file
+    * This should run the premake5.lua file and create a visual studio .sln
 * Step 3)
-      *  Open the solution and build and run. It should work from there.
+    *  Open the solution and build and run. It should work from there.
                
 
 ## Desired Additions/Changes
@@ -74,7 +74,7 @@ Some of the desired changes are:
 * Add an animation editor to the tilemap editor that allows the ability to load sprites and change animation speeds on the spot
 * Add enemies to any maps using the editor
 * Add a functional AI state machine with for entities/enemies done in lua
-       *  Currently this is done in C++, Not easy to make small changes!
+    *  Currently this is done in C++, Not easy to make small changes!
 * Ability for user to change keys/gamepad controls (Currently Hard Coded)
 
 
