@@ -24,7 +24,7 @@ This project is created with:
 | Key |  Button  |   Function  |  
 | --- |  ------- | ----------- | 
 |  W  |  DPAD UP | Move Up  | 
-|  D  |  DPAD RIGHT |Move Right  | ![xbox_controller](https://user-images.githubusercontent.com/63356975/153439752-0862e46e-48c1-461a-a79b-481d6e00307c.png)
+|  D  |  DPAD RIGHT |Move Right  | 
 |  S  |  DPAD DOWN |Move Down   | 
 |  A  |  DPAD LEFT |Move Left   |
 |  Q  |  START |Pause Menu  |
@@ -33,7 +33,7 @@ This project is created with:
 | SpaceBar |  X BTN | Special Item |
 
 * GamePad Buttons are based on the SDL_GameControllerButtons == X BOX Style Gamepad.
-
+![xbox_controller](https://user-images.githubusercontent.com/63356975/153439752-0862e46e-48c1-461a-a79b-481d6e00307c.png)
 ## User Experience
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
 https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
