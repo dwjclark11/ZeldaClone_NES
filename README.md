@@ -21,17 +21,19 @@ This project is created with:
 * ImGui
 
 ## Game Controls
-| Key |   Function  |
-| --- | ----------- |
-|  W  | Move Up     | 
-|  D  | Move Right  | 
-|  S  | Move Down   | 
-|  A  | Move Left   |
-|  Q  | Pause Menu  |
-| ESC | Quit Game   | 
-| RShift | Sword Attack |
-| SpaceBar | Special Item |
-* I want to make the controls changable in the future. Currently Hard Coded
+| Key | | Button  |   Function  |  
+| --- | | ------- | ----------- | 
+|  W  | | DPAD UP | Move Up  | 
+|  D  | | DPAD RIGHT |Move Right  | 
+|  S  | | DPAD DOWN |Move Down   | 
+|  A  | | DPAD LEFT |Move Left   |
+|  Q  | | START |Pause Menu  |
+| ESC | | N/A |Quit Game   | 
+| RShift || A BTN | Sword Attack |
+| SpaceBar | | X BTN | Special Item |
+
+* GamePad Buttons are based on the SDL_GameControllerButtons == X BOX Style Gamepad.
+
 ## User Experience
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
 https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
