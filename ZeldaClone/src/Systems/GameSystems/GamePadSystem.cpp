@@ -8,7 +8,7 @@
 #include "../../Systems/PauseSystems/ItemSelectKeyboardSystem.h"
 #include "../SoundFXSystem.h"
 #include "KeyboardControlSystem.h"
-
+#include <filesystem>
 #include "../../States/PauseState.h"
 #include "../../States/MenuState.h"
 #include "../../States/GameState.h"
@@ -153,148 +153,196 @@ void GamePadSystem::GameStateBtns(GamePadButtonPressedEvent& event)
 
 void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 {
-	for (auto& entity : GetSystemEntities())
+	auto entity = Registry::Instance().GetEntityByTag("selector");
+
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& transform = entity.GetComponent<TransformComponent>();
+
+	if (!Game::isDebug)
 	{
-		auto& sprite = entity.GetComponent<SpriteComponent>();
-		auto& transform = entity.GetComponent<TransformComponent>();
-
-		if (entity.HasTag("selector"))
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 		{
-			if (!Game::isDebug)
-			{
-				if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
-				{
-					transform.position.y -= sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.y < 200) transform.position.y = 584;
+			transform.position.y -= sprite.height * 6;
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			if (transform.position.y < 200) transform.position.y = 584;
 					
-				}
+		}
 
-				if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
-				{
-					transform.position.y += sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.y > 584) transform.position.y = 200;
-					//GamePadSystem::buttonDirDown = true;
-				}
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
+		{
+			transform.position.y += sprite.height * 6;
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			if (transform.position.y > 584) transform.position.y = 200;
+			//GamePadSystem::buttonDirDown = true;
+		}
 
-				if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))
-				{
-					if (transform.position.y == 200)
-					{
-						if (MenuState::player1Name.size() != 0)
-						{
-							game.GetPlayerNum() = 1;
-							game.GetStateMachine()->PopState();
-							game.GetStateMachine()->PushState(new GameState());
-						}
-
-					}
-					else if (transform.position.y == 296)
-					{
-						if (MenuState::player2Name.size() != 0)
-						{
-							game.GetPlayerNum() = 2;
-							game.GetStateMachine()->PopState();
-							game.GetStateMachine()->PushState(new GameState());
-						}
-
-					}
-					else if (transform.position.y == 392)
-					{
-						if (MenuState::player1Name.size() != 0)
-						{
-							game.GetPlayerNum() = 3;
-							game.GetStateMachine()->PopState();
-							game.GetStateMachine()->PushState(new GameState());
-						}
-					}
-					else if (transform.position.y == 488)
-					{
-						if (MenuState::player1Name.size() != 0 && MenuState::player2Name.size() != 0 && MenuState::player3Name.size() != 0)
-						{
-							MenuState::slotsFull = true;
-							break;
-						}
-						game.GetStateMachine()->PopState();
-						game.GetStateMachine()->PushState(new NameState());
-					}
-					else if (transform.position.y == 584)
-					{
-
-					}
-				}
-			}
-			else
+		if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))
+		{
+			if (transform.position.y == 200)
 			{
-				if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
+				if (MenuState::player1Name.size() != 0)
 				{
-					transform.position.y -= sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.y < 200) transform.position.y = 680;
-					//GamePadSystem::buttonDirDown = true;
+					game.GetPlayerNum() = 1;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
 				}
 
-				if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
+			}
+			else if (transform.position.y == 296)
+			{
+				if (MenuState::player2Name.size() != 0)
 				{
-					transform.position.y += sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-					if (transform.position.y > 680) transform.position.y = 200;
-					//GamePadSystem::buttonDirDown = true;
+					game.GetPlayerNum() = 2;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
 				}
 
-				if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))
+			}
+			else if (transform.position.y == 392)
+			{
+				if (MenuState::player1Name.size() != 0)
 				{
-					if (transform.position.y == 200)
-					{
-						if (MenuState::player1Name.size() != 0)
-						{
-							game.GetPlayerNum() = 1;
-							game.GetStateMachine()->PopState();
-							game.GetStateMachine()->PushState(new GameState());
-						}
-					}
-					else if (transform.position.y == 296)
-					{
-						if (MenuState::player2Name.size() != 0)
-						{
-							game.GetPlayerNum() = 2;
-							game.GetStateMachine()->PopState();
-							game.GetStateMachine()->PushState(new GameState());
-						}
-
-					}
-					else if (transform.position.y == 392)
-					{
-						if (MenuState::player1Name.size() != 0)
-						{
-							game.GetPlayerNum() = 3;
-							game.GetStateMachine()->PopState();
-							game.GetStateMachine()->PushState(new GameState());
-						}
-					}
-					else if (transform.position.y == 488)
-					{
-						if (MenuState::player1Name.size() != 0 && MenuState::player2Name.size() != 0 && MenuState::player3Name.size() != 0)
-						{
-							MenuState::slotsFull = true;
-							break;
-						}
-						game.GetStateMachine()->PopState();
-						game.GetStateMachine()->PushState(new NameState());
-					}
-					else if (transform.position.y == 584)
-					{
-
-					}
-					else if (transform.position.y == 680)
-					{
-						game.GetStateMachine()->PopState();
-						game.GetStateMachine()->PushState(new EditorState());
-					}
-					//GamePadSystem::buttonDown = true;
+					game.GetPlayerNum() = 3;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
 				}
 			}
+			else if (transform.position.y == 488)
+			{
+				if (MenuState::player1Name.size() != 0 && MenuState::player2Name.size() != 0 && MenuState::player3Name.size() != 0)
+				{
+					MenuState::slotsFull = true;
+				}
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new NameState());
+			}
+			else if (transform.position.y == 584)
+			{
+
+			}
+		}
+	}
+	else
+	{
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
+		{
+			transform.position.y -= sprite.height * 6;
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			if (transform.position.y < 200) transform.position.y = 680;
+			//GamePadSystem::buttonDirDown = true;
+		}
+
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
+		{
+			transform.position.y += sprite.height * 6;
+			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			if (transform.position.y > 680) transform.position.y = 200;
+			//GamePadSystem::buttonDirDown = true;
+		}
+
+		if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))
+		{
+			if (transform.position.y == 200)
+			{
+				if (MenuState::player1Name.size() != 0 &&!MenuState::eliminate)
+				{
+					game.GetPlayerNum() = 1;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
+				}
+				else if (MenuState::player1Name.size() != 0 && MenuState::eliminate)
+				{
+					// Remove file from Saved files
+					const std::string save1File = "./Assets/SavedFiles/save1.lua";
+					if (std::filesystem::remove(save1File))
+					{
+						Logger::Log("Player: " + MenuState::player1Name + " was eliminated");
+						LevelLoader loader;
+						loader.EliminatePlayerToDefault(1, MenuState::player1Name);
+						MenuState::player1Name = "";
+						MenuState::eliminate = false;
+					}
+					else
+						Logger::Err("Error, File could not be deleted");
+				}
+			}
+			else if (transform.position.y == 296)
+			{
+				if (MenuState::player2Name.size() != 0 && !MenuState::eliminate)
+				{
+					game.GetPlayerNum() = 2;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
+				}
+				else if (MenuState::player2Name.size() != 0 && MenuState::eliminate)
+				{
+					// Remove file from Saved files
+					const std::string save2File = "./Assets/SavedFiles/save2.lua";
+					if (std::filesystem::remove(save2File))
+					{
+						Logger::Log("Player: " + MenuState::player2Name + " was eliminated");
+						LevelLoader loader;
+						loader.EliminatePlayerToDefault(2, MenuState::player2Name);
+						MenuState::player2Name = "";
+						MenuState::eliminate = false;
+					}
+					else
+						Logger::Err("Error, File could not be deleted");
+				}
+
+			}
+			else if (transform.position.y == 392)
+			{
+				if (MenuState::player3Name.size() != 0 && !MenuState::eliminate)
+				{
+					game.GetPlayerNum() = 3;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
+				}
+				else if (MenuState::player3Name.size() != 0 && MenuState::eliminate)
+				{
+					// Remove file from Saved files
+					const std::string save3File = "./Assets/SavedFiles/save3.lua";
+					if (std::filesystem::remove(save3File))
+					{
+						Logger::Log("Player: " + MenuState::player3Name + " was eliminated");
+						LevelLoader loader;
+						loader.EliminatePlayerToDefault(3, MenuState::player3Name);
+						MenuState::player3Name = "";
+						MenuState::eliminate = false;
+					}
+					else
+						Logger::Err("Error, File could not be deleted");
+				}
+			}
+			else if (transform.position.y == 488)
+			{
+				if (MenuState::player1Name.size() != 0 && MenuState::player2Name.size() != 0 && MenuState::player3Name.size() != 0)
+				{
+					MenuState::slotsFull = true;
+				}
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new NameState());
+			}
+			else if (transform.position.y == 584)
+			{
+				Logger::Log("Eliminate");
+				if (MenuState::player1Name.size() != 0 || MenuState::player2Name.size() != 0 || MenuState::player3Name.size() != 0)
+				{
+					MenuState::eliminate = !MenuState::eliminate;
+					transform.position.y = 200;
+				}
+			}
+			else if (transform.position.y == 680)
+			{
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new EditorState());
+			}
+		}
+		else if (event.button == game.GetBtnBindings().at(Game::Action::CANCEL))
+		{
+			if (MenuState::eliminate)
+				MenuState::eliminate = false;
 		}
 	}
 }

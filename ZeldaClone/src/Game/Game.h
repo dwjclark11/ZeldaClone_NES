@@ -70,6 +70,7 @@ public:
 		USE_ITEM,
 		PAUSE,
 		SELECT,
+		CANCEL,
 	};
 
 	enum class ItemType
@@ -218,6 +219,7 @@ public:
 		AddBtnToMap(Action::USE_ITEM, SDL_CONTROLLER_BUTTON_X);
 		AddBtnToMap(Action::PAUSE, SDL_CONTROLLER_BUTTON_START);
 		AddBtnToMap(Action::SELECT, SDL_CONTROLLER_BUTTON_A);
+		AddBtnToMap(Action::CANCEL, SDL_CONTROLLER_BUTTON_B);
 	}
 
 	void ChangeBtnBinding(Action action, SDL_GameControllerButton button)

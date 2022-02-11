@@ -20,10 +20,10 @@ class MenuKeyboardControlSystem : public System
 {
 private:
 	class Game& game;
-	bool eliminate;
+
 public:
 	MenuKeyboardControlSystem()
-		: game(Game::Instance()), eliminate(false)
+		: game(Game::Instance())
 	{
 		RequiredComponent<TransformComponent>();
 		RequiredComponent<SpriteComponent>();
@@ -119,7 +119,7 @@ public:
 						transform.position.y -= sprite.height * 6;
 						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						
-						if (!eliminate)
+						if (!MenuState::eliminate)
 						{
 							if (transform.position.y < 200)
 								transform.position.y = 680;
@@ -136,7 +136,7 @@ public:
 						transform.position.y += sprite.height * 6;
 						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 						
-						if (!eliminate)
+						if (!MenuState::eliminate)
 						{
 							if (transform.position.y > 680) 
 								transform.position.y = 200;
@@ -153,13 +153,13 @@ public:
 					{
 						if (transform.position.y == 200)
 						{
-							if (MenuState::player1Name.size() != 0 && !eliminate)
+							if (MenuState::player1Name.size() != 0 && !MenuState::eliminate)
 							{
 								game.GetPlayerNum() = 1;
 								game.GetStateMachine()->PopState();
 								game.GetStateMachine()->PushState(new GameState());
 							}
-							else if (MenuState::player1Name.size() != 0 && eliminate)
+							else if (MenuState::player1Name.size() != 0 && MenuState::eliminate)
 							{
 								// Remove file from Saved files
 								const std::string save1File = "./Assets/SavedFiles/save1.lua";
@@ -169,7 +169,7 @@ public:
 									LevelLoader loader;
 									loader.EliminatePlayerToDefault(1, MenuState::player1Name);
 									MenuState::player1Name = "";
-									eliminate = false;
+									MenuState::eliminate = false;
 								}
 								else
 									Logger::Err("Error, File could not be deleted");
@@ -177,13 +177,13 @@ public:
 						}
 						else if (transform.position.y == 296)
 						{
-							if (MenuState::player2Name.size() != 0 && !eliminate)
+							if (MenuState::player2Name.size() != 0 && !MenuState::eliminate)
 							{
 								game.GetPlayerNum() = 2;
 								game.GetStateMachine()->PopState();
 								game.GetStateMachine()->PushState(new GameState());
 							}
-							else if (MenuState::player2Name.size() != 0 && eliminate)
+							else if (MenuState::player2Name.size() != 0 && MenuState::eliminate)
 							{
 								// Remove file from Saved files
 								const std::string save2File = "./Assets/SavedFiles/save2.lua";
@@ -193,7 +193,7 @@ public:
 									LevelLoader loader;
 									loader.EliminatePlayerToDefault(2, MenuState::player2Name);
 									MenuState::player2Name = "";
-									eliminate = false;
+									MenuState::eliminate = false;
 								}
 								else
 									Logger::Err("Error, File could not be deleted");
@@ -202,13 +202,13 @@ public:
 						}
 						else if (transform.position.y == 392)
 						{
-							if (MenuState::player3Name.size() != 0 && !eliminate)
+							if (MenuState::player3Name.size() != 0 && !MenuState::eliminate)
 							{
 								game.GetPlayerNum() = 3;
 								game.GetStateMachine()->PopState();
 								game.GetStateMachine()->PushState(new GameState());
 							}
-							else if (MenuState::player3Name.size() != 0 && eliminate)
+							else if (MenuState::player3Name.size() != 0 && MenuState::eliminate)
 							{
 								// Remove file from Saved files
 								const std::string save3File = "./Assets/SavedFiles/save3.lua";
@@ -218,7 +218,7 @@ public:
 									LevelLoader loader;
 									loader.EliminatePlayerToDefault(3, MenuState::player3Name);
 									MenuState::player3Name = "";
-									eliminate = false;
+									MenuState::eliminate = false;
 								}
 								else
 									Logger::Err("Error, File could not be deleted");
@@ -239,7 +239,7 @@ public:
 							Logger::Log("Eliminate");
 							if (MenuState::player1Name.size() != 0 || MenuState::player2Name.size() != 0 || MenuState::player3Name.size() != 0)
 							{
-								eliminate = !eliminate;
+								MenuState::eliminate = !MenuState::eliminate;
 								transform.position.y = 200;
 							}
 						}
@@ -252,8 +252,9 @@ public:
 					}
 					case SDLK_BACKSPACE:
 					{
-						if (eliminate)
-							eliminate = false;
+						if (MenuState::eliminate)
+							MenuState::eliminate = false;
+						break;
 					}
 
 					default:
