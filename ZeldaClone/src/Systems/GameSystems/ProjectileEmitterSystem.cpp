@@ -5,14 +5,15 @@
 #include "../../Components/HealthComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/SpriteComponent.h"
+#include "../../Components/AnimationComponent.h"
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/ProjectileComponent.h"
 #include "../../Components/ProjectileEmitterComponent.h"
 #include "../../Components/GameComponent.h"
+#include "../../Components/AIComponent.h"
 #include "../GameSystems/KeyboardControlSystem.h"
 #include "../GameSystems/ProjectileLifeCycleSystem.h"
-#include "../PauseSystems/ItemSelectKeyboardSystem.h"
 #include "../../States/GameState.h"
 #include <SDL.h>
 #include "../../Systems/SoundFXSystem.h"
@@ -698,4 +699,33 @@ void ProjectileEmitterSystem::Update(Registry& registry)
 			}
 		}
 	}
+}
+
+std::string ProjectileEmitterSystem::ProjectileAttrib::ToString()
+{
+	std::stringstream ss;
+	ss << "Group: " << group << "\n"
+		<< "Sprite Name: " << sprite_name << "\n"
+		<< "Sprite width: " << width << "\n"
+		<< "Sprite height: " << height << "\n"
+		<< "Num Frames: " << numFrames << "\n"
+		<< "Src Rect: [X: " << srcRectX << ", Y: " << srcRectY << "]" << "\n"
+		<< "Scale: [X: " << scale.x << ", Y: " << scale.y << "]" << "\n"
+		<< "Tran Offset Up: [X: " << transOffsetUp.x << ", Y: " << transOffsetUp.y << "]" << "\n"
+		<< "Tran Offset Down: [X: " << transOffsetDown.x << ", Y: " << transOffsetDown.y << "]" << "\n"
+		<< "Tran Offset Left: [X: " << transOffsetLeft.x << ", Y: " << transOffsetLeft.y << "]" << "\n"
+		<< "Tran Offset Right: [X: " << transOffsetRight.x << ", Y: " << transOffsetRight.y << "]" << "\n"
+		<< "Box Size Up: [X: " << boxSizeUp.x << ", Y: " << boxSizeUp.y << "]" << "\n"
+		<< "Box Size Down: [X: " << boxSizeDown.x << ", Y: " << boxSizeDown.y << "]" << "\n"
+		<< "Box Size Right: [X: " << boxSizeRight.x << ", Y: " << boxSizeRight.y << "]" << "\n"
+		<< "Box Size Left: [X: " << boxSizeLeft.x << ", Y: " << boxSizeLeft.y << "]" << "\n"
+		<< "Box offset Up: [X: " << upOffset.x << ", Y: " << upOffset.y << "]" << "\n"
+		<< "Box offset Down: [X: " << downOffset.x << ", Y: " << downOffset.y << "]" << "\n"
+		<< "Box offset Right: [X: " << rightOffset.x << ", Y: " << rightOffset.y << "]" << "\n"
+		<< "Box offset Left: [X: " << leftOffset.x << ", Y: " << leftOffset.y << "]" << "\n"
+		<< "Duration: " << duration << "\n"
+		<< "Animation: " << animation << "\n"
+		<< "Vertical: " << vertical << "\n";
+
+	return ss.str();
 }

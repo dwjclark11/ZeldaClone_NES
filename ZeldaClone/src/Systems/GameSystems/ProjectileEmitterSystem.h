@@ -99,34 +99,8 @@ private:
 		}
 
 		// This is also for testing to see what the current projectile attributes are
-		std::string ToString()
-		{
-			std::stringstream ss;
-			ss << "Group: " << group << "\n"
-				<< "Sprite Name: " << sprite_name << "\n"
-				<< "Sprite width: " << width << "\n"
-				<< "Sprite height: " << height << "\n"
-				<< "Num Frames: " << numFrames << "\n"
-				<< "Src Rect: [X: " << srcRectX << ", Y: " << srcRectY << "]" << "\n"
-				<< "Scale: [X: " << scale.x << ", Y: " << scale.y << "]" << "\n"
-				<< "Tran Offset Up: [X: " << transOffsetUp.x << ", Y: " << transOffsetUp.y << "]" << "\n"
-				<< "Tran Offset Down: [X: " << transOffsetDown.x << ", Y: " << transOffsetDown.y << "]" << "\n"
-				<< "Tran Offset Left: [X: " << transOffsetLeft.x << ", Y: " << transOffsetLeft.y << "]" << "\n"
-				<< "Tran Offset Right: [X: " << transOffsetRight.x << ", Y: " << transOffsetRight.y << "]" << "\n"
-				<< "Box Size Up: [X: " << boxSizeUp.x << ", Y: " << boxSizeUp.y << "]" << "\n"
-				<< "Box Size Down: [X: " << boxSizeDown.x << ", Y: " << boxSizeDown.y << "]" << "\n"
-				<< "Box Size Right: [X: " << boxSizeRight.x << ", Y: " << boxSizeRight.y << "]" << "\n"
-				<< "Box Size Left: [X: " << boxSizeLeft.x << ", Y: " << boxSizeLeft.y << "]" << "\n"
-				<< "Box offset Up: [X: " << upOffset.x << ", Y: " << upOffset.y << "]" << "\n"
-				<< "Box offset Down: [X: " << downOffset.x << ", Y: " << downOffset.y << "]" << "\n"
-				<< "Box offset Right: [X: " << rightOffset.x << ", Y: " << rightOffset.y << "]" << "\n"
-				<< "Box offset Left: [X: " << leftOffset.x << ", Y: " << leftOffset.y << "]" << "\n"
-				<< "Duration: " << duration << "\n"
-				<< "Animation: " << animation << "\n"
-				<< "Vertical: " << vertical << "\n";
+		std::string ToString();
 
-			return ss.str();
-		}
 	};
 
 	bool magicBeam;
@@ -140,8 +114,6 @@ private:
 	void UseMagicWand();
 	void LoadMapAttributes(sol::state& lua, const std::string& fileName = "ProjectileAttributes");
 	
-
-
 	// Testing Functions --> Use these to quickly reload Lua Table Attributes for adjusting positions
 	void ClearItemMap() 
 	{

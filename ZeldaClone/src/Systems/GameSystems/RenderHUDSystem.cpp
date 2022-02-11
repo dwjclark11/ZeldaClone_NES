@@ -1,6 +1,5 @@
 #include "RenderHUDSystem.h"
 #include "../../Game/Game.h"
-#include "../PauseSystems/ItemSelectKeyboardSystem.h"
 #include "../../Components/HUDComponent.h"
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"

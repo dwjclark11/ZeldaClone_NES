@@ -13,4 +13,5 @@ Assets =
 	{type = "texture",	id = "main_menu_gui", 	file = "./Assets/HUDSprites/menu_state_GUI.png"}, 
 	{type = "music",	id = "Main_Menu", 		file = "./Assets/Music/Menu_Theme.mp3"}, 
 	{type = "soundFX",	id = "Eliminate", 		file = "./Assets/sounds/Eliminate.wav"}, 
+	{type = "soundFX",	id = "text_slow", 		file = "./Assets/sounds/Text_Slow.wav"}, 
 }

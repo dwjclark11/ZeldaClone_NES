@@ -12,8 +12,8 @@ class RenderNameStateTextSystem : public System
 public:
 	RenderNameStateTextSystem()
 	{
-		//RequiredComponent<TextLabelComponent>();
-		RequiredComponent<RegisterNameComponent>();
+		RequiredComponent<TextLabelComponent>();
+		//RequiredComponent<RegisterNameComponent>();
 	}
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const SDL_Rect& camera)

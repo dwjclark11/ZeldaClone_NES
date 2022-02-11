@@ -17,6 +17,7 @@
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
 #include "../StateMachines/NewStateMachine.h"
+#include <glm/glm.hpp>
 
 // Forward Declarations
 class AssetManager;

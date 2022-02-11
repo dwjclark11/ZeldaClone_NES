@@ -24,7 +24,5 @@ public:
 	void SubscribeToEvents(std::unique_ptr<class EventManager>& eventManager);
 
 private:
-	int row;
-	int col;
-	int slot;
+
 };

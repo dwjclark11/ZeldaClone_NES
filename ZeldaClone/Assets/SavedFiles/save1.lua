@@ -15,12 +15,12 @@ player_data = {
                 position = { x = 7615, y = 5060}}
         },
         items = {
-            boomerang = false,
+            boomerang = true,
             magic_boomerang = false,
             wood_sword = false,
             steel_sword = false,
             magic_sword = false,
-            magic_rod = false,
+            magic_rod = true,
             bombs = false,
             food = false,
             flute = false,

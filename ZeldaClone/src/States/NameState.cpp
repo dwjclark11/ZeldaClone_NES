@@ -3,14 +3,21 @@
 #include "../Systems/GameSystems/RenderSystem.h"
 #include "../Systems/NameSystems/RenderNameStateTextSystem.h"
 #include "../Systems/NameSystems/RenderNameSystem.h"
-#include "../Systems/NameSystems/NameSelectKeyboardControlSystem.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Components/RegisterNameComponent.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/SpriteComponent.h"
+#include "../Components/KeyboardControlComponent.h"
 #include "../States/MenuState.h"
 #include "../Game/Game.h"
 
 const std::string NameState::nameID = "NAME";
 std::string NameState::name = "";
+
+int NameState::slot = 0;
+int NameState::row = 0;
+int NameState::col = 0;
 
 NameState::NameState()
 	: editor(false), keyDown(false), game(Game::Instance()), reg(Registry::Instance())
@@ -20,7 +27,8 @@ NameState::NameState()
 void NameState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	reg.GetSystem<NameSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	//reg.GetSystem<NameSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
 	//reg.GetSystem<NameSelectKeyboardControlSystem>().Update();
@@ -29,7 +37,7 @@ void NameState::Update(const double& deltaTime)
 void NameState::Render()
 {
 	reg.GetSystem<RenderNameSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	//reg.GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	reg.GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 }
 
 bool NameState::OnEnter()
@@ -39,6 +47,7 @@ bool NameState::OnEnter()
 
 	game.GetAssetManager()->AddTextures(game.GetRenderer(), "name-letters", "./Assets/HUDSprites/Name_Letters.png");
 	game.GetAssetManager()->AddTextures(game.GetRenderer(), "box", "./Assets/HUDSprites/box.png");
+	game.GetAssetManager()->AddFonts("charriot-font-120", "./Assets/Fonts/charriot.ttf", 120);
 
 	Entity letters = reg.CreateEntity();
 	letters.AddComponent<SpriteComponent>("name-letters", 128, 112, 0, true);
@@ -49,12 +58,10 @@ bool NameState::OnEnter()
 	box.AddComponent<SpriteComponent>("box", 16, 16, 0, true);
 	box.AddComponent<TransformComponent>(glm::vec2(260, 200), glm::vec2(4, 4), 0);
 	box.AddComponent<RegisterNameComponent>();
+	box.AddComponent<KeyboardControlComponent>();
+	box.AddComponent<TextLabelComponent>(glm::vec2(300, 800), "", "charriot-font-120", SDL_Color{ 255,255,255,255 }, true);
 	box.Tag("box");
 
-	Entity player1Name = reg.CreateEntity();
-	player1Name.AddComponent<TextLabelComponent>(glm::vec2(320, 800), "", "charriot-font-40", SDL_Color{ 255,255,255,255 }, true);
-	player1Name.Tag("slot1");
-	Logger::Log("Entered NameState!");
 	return true;
 }
 

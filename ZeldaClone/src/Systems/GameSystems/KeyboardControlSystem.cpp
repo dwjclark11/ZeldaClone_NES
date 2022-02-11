@@ -1,17 +1,25 @@
 #include "KeyboardControlSystem.h"
 #include "../../Game/Game.h"
+#include "../../Game/LevelLoader.h"
 #include "../../Events/EventManager.h"
 #include "../../Events/KeyPressedEvent.h"
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/TextLabelComponent.h"
+#include "../../Components/MenuComponent.h"
+#include "../../Components/PauseComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Logger/Logger.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../States/GameState.h"
-
+#include "../../States/MenuState.h"
+#include "../../States/NameState.h"
+#include "../../States/EditorState.h"
+#include "../SoundFXSystem.h"
 #include <string>
+#include <filesystem>
 #include <SDL.h>
 #include "../../Utilities/Timer.h"
 
@@ -216,23 +224,490 @@ void KeyboardControlSystem::Update()
 	}
 }
 
-KeyboardControlSystem::KeyboardControlSystem()
-	: game(Game::Instance())
+void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 {
-	RequiredComponent<RigidBodyComponent>();
-	RequiredComponent<KeyboardControlComponent>();
-	attack = false;
-}
-
-void KeyboardControlSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
-{
-	if (!game.GetCameraMoving() && !game.GetPlayerItem() && !game.GetPlayerDead())
+	for (const auto& entity : GetSystemEntities())
 	{
-		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardControlSystem::OnKeyPressed); // Callback Function
+		if (entity.HasTag("selector") && entity.HasComponent<MenuComponent>())
+		{
+			auto& sprite = entity.GetComponent<SpriteComponent>();
+			auto& transform = entity.GetComponent<TransformComponent>();
+
+			if (!Game::isDebug)
+			{
+				switch (event.symbol)
+				{
+				case SDLK_UP:
+					transform.position.y -= sprite.height * 6;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					if (transform.position.y < 200) transform.position.y = 584;
+					break;
+
+				case SDLK_DOWN:
+					transform.position.y += sprite.height * 6;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					if (transform.position.y > 584) transform.position.y = 200;
+					break;
+
+				case SDLK_SPACE:
+				{
+					if (transform.position.y == 200)
+					{
+						if (MenuState::player1Name.size() != 0)
+						{
+							game.GetPlayerNum() = 1;
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
+						}
+
+					}
+					else if (transform.position.y == 296)
+					{
+						if (MenuState::player2Name.size() != 0)
+						{
+							game.GetPlayerNum() = 2;
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new GameState());
+						}
+
+					}
+					else if (transform.position.y == 392)
+					{
+						if (MenuState::player3Name.size() != 0)
+						{
+							game.GetPlayerNum() = 3;
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new GameState());
+						}
+					}
+					else if (transform.position.y == 488)
+					{
+						if (MenuState::player1Name.size() != 0 && MenuState::player2Name.size() != 0 && MenuState::player3Name.size() != 0)
+						{
+							MenuState::slotsFull = true;
+							break;
+						}
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new NameState());
+					}
+					else if (transform.position.y == 584)
+					{
+
+					}
+					break;
+				}
+				default:
+					break;
+				}
+			}
+			else
+			{
+				switch (event.symbol)
+				{
+				case SDLK_UP:
+					transform.position.y -= sprite.height * 6;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+
+					if (!MenuState::eliminate)
+					{
+						if (transform.position.y < 200)
+							transform.position.y = 680;
+					}
+					else
+					{
+						if (transform.position.y < 200)
+							transform.position.y = 392;
+					}
+
+					break;
+
+				case SDLK_DOWN:
+					transform.position.y += sprite.height * 6;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+
+					if (!MenuState::eliminate)
+					{
+						if (transform.position.y > 680)
+							transform.position.y = 200;
+					}
+					else
+					{
+						if (transform.position.y > 392)
+							transform.position.y = 200;
+					}
+
+					break;
+
+				case SDLK_SPACE:
+				{
+					if (transform.position.y == 200)
+					{
+						if (MenuState::player1Name.size() != 0 && !MenuState::eliminate)
+						{
+							game.GetPlayerNum() = 1;
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new GameState());
+						}
+						else if (MenuState::player1Name.size() != 0 && MenuState::eliminate)
+						{
+							// Remove file from Saved files
+							const std::string save1File = "./Assets/SavedFiles/save1.lua";
+							if (std::filesystem::remove(save1File))
+							{
+								Logger::Log("Player: " + MenuState::player1Name + " was eliminated");
+								LevelLoader loader;
+								loader.EliminatePlayerToDefault(1, MenuState::player1Name);
+								MenuState::player1Name = "";
+								MenuState::eliminate = false;
+							}
+							else
+								Logger::Err("Error, File could not be deleted");
+						}
+					}
+					else if (transform.position.y == 296)
+					{
+						if (MenuState::player2Name.size() != 0 && !MenuState::eliminate)
+						{
+							game.GetPlayerNum() = 2;
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new GameState());
+						}
+						else if (MenuState::player2Name.size() != 0 && MenuState::eliminate)
+						{
+							// Remove file from Saved files
+							const std::string save2File = "./Assets/SavedFiles/save2.lua";
+							if (std::filesystem::remove(save2File))
+							{
+								Logger::Log("Player: " + MenuState::player2Name + " was eliminated");
+								LevelLoader loader;
+								loader.EliminatePlayerToDefault(2, MenuState::player2Name);
+								MenuState::player2Name = "";
+								MenuState::eliminate = false;
+							}
+							else
+								Logger::Err("Error, File could not be deleted");
+						}
+
+					}
+					else if (transform.position.y == 392)
+					{
+						if (MenuState::player3Name.size() != 0 && !MenuState::eliminate)
+						{
+							game.GetPlayerNum() = 3;
+							game.GetStateMachine()->PopState();
+							game.GetStateMachine()->PushState(new GameState());
+						}
+						else if (MenuState::player3Name.size() != 0 && MenuState::eliminate)
+						{
+							// Remove file from Saved files
+							const std::string save3File = "./Assets/SavedFiles/save3.lua";
+							if (std::filesystem::remove(save3File))
+							{
+								Logger::Log("Player: " + MenuState::player3Name + " was eliminated");
+								LevelLoader loader;
+								loader.EliminatePlayerToDefault(3, MenuState::player3Name);
+								MenuState::player3Name = "";
+								MenuState::eliminate = false;
+							}
+							else
+								Logger::Err("Error, File could not be deleted");
+						}
+					}
+					else if (transform.position.y == 488)
+					{
+						if (MenuState::player1Name.size() != 0 && MenuState::player2Name.size() != 0 && MenuState::player3Name.size() != 0)
+						{
+							MenuState::slotsFull = true;
+							break;
+						}
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new NameState());
+					}
+					else if (transform.position.y == 584)
+					{
+						Logger::Log("Eliminate");
+						if (MenuState::player1Name.size() != 0 || MenuState::player2Name.size() != 0 || MenuState::player3Name.size() != 0)
+						{
+							MenuState::eliminate = !MenuState::eliminate;
+							transform.position.y = 200;
+						}
+					}
+					else if (transform.position.y == 680)
+					{
+						game.GetStateMachine()->PopState();
+						game.GetStateMachine()->PushState(new EditorState());
+					}
+					break;
+				}
+				case SDLK_BACKSPACE:
+				{
+					if (MenuState::eliminate)
+						MenuState::eliminate = false;
+					break;
+				}
+
+				default:
+					break;
+				}
+			}
+		}
+		else 
+			continue;
 	}
 }
 
-void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
+void KeyboardControlSystem::PauseStateKeys(KeyPressedEvent& event)
+{
+	for (const auto& entity : GetSystemEntities())
+	{
+		if (entity.HasComponent<PauseComponent>())
+		{
+			auto& sprite = entity.GetComponent<SpriteComponent>();
+			auto& transform = entity.GetComponent<TransformComponent>();
+
+			if (entity.HasTag("pauseSelector"))
+			{
+				switch (event.symbol)
+				{
+				case SDLK_UP:
+					transform.position.y -= ((sprite.height * transform.scale.y) + 6);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					if (transform.position.y < 190) transform.position.y = 260;
+					break;
+
+				case SDLK_DOWN:
+					transform.position.y += ((sprite.height * transform.scale.y) + 6);
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					if (transform.position.y > 260) transform.position.y = 190;
+					break;
+
+				case SDLK_RIGHT:
+					transform.position.x += 100;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					if (transform.position.x > 686) transform.position.x = 386;
+					break;
+
+				case SDLK_LEFT:
+					transform.position.x -= 100;
+					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					if (transform.position.x < 386) transform.position.x = 686;
+
+					break;
+
+				case SDLK_SPACE:
+
+					if (transform.position.x == 386 && transform.position.y == 190 && game.GetGameItems().woodBoomerang)
+					{
+						Game::mSelectedItem = Game::ItemType::BOOMERANG;
+					}
+					else if ((transform.position.x == 486 && transform.position.y == 190) && GameState::totalBombs > 0 && game.GetGameItems().bombs)
+					{
+						Game::mSelectedItem = Game::ItemType::BOMB;
+					}
+					else if (transform.position.x == 586 && transform.position.y == 190 && game.GetGameItems().bow)
+					{
+						Game::mSelectedItem = Game::ItemType::WOOD_BOW;
+					}
+					else if (transform.position.x == 686 && transform.position.y == 190 && game.GetGameItems().candle)
+					{
+						Game::mSelectedItem = Game::ItemType::CANDLE;
+					}
+					else if (transform.position.x == 386 && transform.position.y == 260)
+					{
+
+					}
+					else if (transform.position.x == 486 && transform.position.y == 260 && game.GetGameItems().food)
+					{
+						Game::mSelectedItem = Game::ItemType::FOOD;
+					}
+					else if (transform.position.x == 586 && transform.position.y == 260 && game.GetGameItems().redPotion)
+					{
+						Game::mSelectedItem = Game::ItemType::POTION_RED;
+					}
+					else if (transform.position.x == 686 && transform.position.y == 260 && game.GetGameItems().magicRod)
+					{
+						Game::mSelectedItem = Game::ItemType::MAGIC_ROD;
+					}
+					break;
+				}
+			}
+
+
+			if (entity.HasTag("selectedItem"))
+			{
+				switch (Game::mSelectedItem)
+				{
+				case Game::ItemType::BOOMERANG:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.x += sprite.width * 0;
+					sprite.srcRect.y += sprite.height * 7;
+					break;
+				case Game::ItemType::BOMB:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.x += sprite.width * 4;
+					sprite.srcRect.y += sprite.height * 7;
+					break;
+
+				case Game::ItemType::WOOD_BOW:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.x += sprite.width * 4;
+					break;
+
+				case Game::ItemType::CANDLE:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.y += sprite.height * 3;
+					break;
+
+				case Game::ItemType::FOOD:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.x += sprite.width * 7;
+					sprite.srcRect.y += sprite.height * 1;
+					break;
+
+				case Game::ItemType::POTION_RED:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.x += sprite.width * 2;
+					sprite.srcRect.y += sprite.height * 2;
+					break;
+
+				case Game::ItemType::MAGIC_ROD:
+					sprite.srcRect.x = 0;
+					sprite.srcRect.y = 0;
+					sprite.srcRect.x += sprite.width * 4;
+					sprite.srcRect.y += sprite.height * 5;
+					break;
+				}
+			}
+		}
+		else 
+			continue;
+	}
+}
+
+void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
+{
+	if (MenuState::player1Name.size() == 0)
+		NameState::slot = 1;
+	else if (MenuState::player2Name.size() == 0)
+		NameState::slot = 2;
+	else if (MenuState::player3Name.size() == 0)
+		NameState::slot = 3;
+
+	auto entity = Registry::Instance().GetEntityByTag("box");
+
+	const auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& transform = entity.GetComponent<TransformComponent>();
+	auto& text = entity.GetComponent<TextLabelComponent>();
+
+	switch (event.symbol)
+	{
+	case SDLK_UP:
+		transform.position.y -= sprite.height * transform.scale.y * 2;
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		NameState::row--;
+		if (transform.position.y < 200)
+		{
+			transform.position.y = 584;
+			NameState::row = 3;
+		}
+
+		break;
+
+	case SDLK_DOWN:
+		transform.position.y += sprite.height * transform.scale.y * 2;
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		NameState::row++;
+		if (transform.position.y > 584)
+		{
+			transform.position.y = 200;
+			NameState::row = 0;
+		}
+
+		break;
+
+	case SDLK_RIGHT:
+		transform.position.x += sprite.width * transform.scale.x;
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		NameState::col++;
+		if (transform.position.x > 708)
+		{
+			transform.position.x = 260;
+			NameState::col = 0;
+		}
+
+		break;
+
+	case SDLK_LEFT:
+		transform.position.x -= sprite.width * transform.scale.x;
+		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		NameState::col--;
+		if (transform.position.x < 260)
+		{
+			transform.position.x = 708;
+			NameState::col = 7;
+		}
+
+		break;
+	default:
+		break;
+	}
+
+	switch (event.symbol)
+	{
+
+	case SDLK_SPACE:
+
+		if (text.text.size() < 6)
+		{
+			bool valid = true;
+			// Make sure that the row and col have a valid letter based on the 
+			// name-letters sprite
+			if (NameState::row == 3 && NameState::col > 1)
+			{
+				valid = false;
+			}
+
+			// Create a new char based on ASCII Upper characters and the letter position
+			// on the sprite
+			char newChar = (NameState::row * 8) + NameState::col + 65; // 65 is 'A'
+
+			if (valid)
+				text.text += newChar;
+
+		}
+
+		if (transform.position.x == 452 && transform.position.y == 584)
+		{
+			if (text.text.size() > 0)
+				text.text.erase(text.text.size() - 1);
+		}
+
+		if (transform.position.x == 580 && transform.position.y == 584)
+		{
+			LevelLoader loader;
+			NameState::name = text.text.c_str();
+
+			// Reset the column and the row after name is entered
+			NameState::row = 0;
+			NameState::col = 0;
+			loader.SavePlayerNameToLuaTable(std::to_string(NameState::slot), NameState::name);
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new MenuState());
+		}
+
+		break;
+	default:
+		break;
+	}
+}
+
+void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 {
 	if (game.GetFadeAlpha() == 255)
 	{
@@ -333,6 +808,44 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 				dir = LEFT;
 			}
 		}
+	}
+}
+
+KeyboardControlSystem::KeyboardControlSystem()
+	: game(Game::Instance())
+{
+	//RequiredComponent<RigidBodyComponent>();
+	RequiredComponent<KeyboardControlComponent>();
+	attack = false;
+}
+
+void KeyboardControlSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
+{
+	if (!game.GetCameraMoving() && !game.GetPlayerItem() && !game.GetPlayerDead())
+	{
+		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardControlSystem::OnKeyPressed); // Callback Function
+	}
+}
+
+void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
+{
+	const auto& currentState = game.GetStateMachine()->GetCurrentState();
+
+	if (currentState == "GAMESTATE")
+	{
+		GameStateKeys(event);
+	}
+	else if (currentState == "MENU")
+	{
+		MenuStateKeys(event); 
+	}
+	else if (currentState == "PAUSE")
+	{
+		PauseStateKeys(event);
+	}
+	else if (currentState == "NAME")
+	{
+		NameStateKeys(event);
 	}
 }
 

@@ -6,6 +6,7 @@
 #include "../../Components/GameComponent.h"
 #include "../../Components/PlayerComponent.h"
 #include "../../Components/PauseComponent.h"
+#include "../../Components/AnimationComponent.h"
 #include "../../Components/AIComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
@@ -99,6 +100,7 @@ void RenderSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>&
 		);
 	}
 }
+
 
 void RenderSystem::OnExit()
 {

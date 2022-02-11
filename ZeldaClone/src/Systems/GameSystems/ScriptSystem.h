@@ -6,6 +6,8 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/RigidBodyComponent.h"
+#include "../../Components/HealthComponent.h"
+#include "../../Components/BoxColliderComponent.h"
 #include "../../Components/ProjectileEmitterComponent.h"
 #include <tuple>
 

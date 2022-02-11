@@ -1,5 +1,17 @@
 #include "MovementSystem.h"
 #include "../../Components/TriggerBoxComponent.h"
+#include "../../Components/TransformComponent.h"
+#include "../../Components/SpriteComponent.h"
+#include "../../Components/HealthComponent.h"
+#include "../../Components/RigidBodyComponent.h"
+#include "../../Components/BoxColliderComponent.h"
+#include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/AIComponent.h"
+#include "../../Systems/SoundFXSystem.h"
+#include "../../Events/EventManager.h"
+#include "../../Events/CollisionEvent.h"
+#include "KeyboardControlSystem.h"
+#include "../../Game/Game.h"
 
 MovementSystem::MovementSystem()
 	: game(Game::Instance())
@@ -23,6 +35,8 @@ void MovementSystem::Update(const double& deltaTime)
 			transform.position.x += rigidBody.velocity.x * deltaTime;
 			transform.position.y += rigidBody.velocity.y * deltaTime;
 		}
+		
+		auto& playerPos = game.GetPlayerPos();
 
 		// Update the player position for the location map in the HUD!
 		if (entity.HasTag("player"))
@@ -35,8 +49,8 @@ void MovementSystem::Update(const double& deltaTime)
 					{
 						if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
 						{
-							game.GetPlayerPos().x = i;
-							game.GetPlayerPos().y = j;
+							playerPos.x = i;
+							playerPos.y = j;
 						}
 					}
 				}
@@ -141,6 +155,7 @@ void MovementSystem::Update(const double& deltaTime)
 				//Logger::Log("Left");
 			}
 
+			auto& enemyPos = ai.GetEnemyPos();
 
 			for (int i = 0; i < MAX_WORLD_WIDTH; i++)
 			{
@@ -150,8 +165,8 @@ void MovementSystem::Update(const double& deltaTime)
 					{
 						if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
 						{
-							ai.GetEnemyPos().x = i;
-							ai.GetEnemyPos().y = j;
+							enemyPos.x = i;
+							enemyPos.y = j;
 						}
 					}
 				}

@@ -3,7 +3,7 @@
 
 #include "Game/Game.h"
 #include "Systems/CameraMovementSystem.h"
-#include "Systems/NameSystems/NameSelectKeyboardControlSystem.h"
+#include "Systems/SoundFXSystem.h"
 
 int main(int argc, char* argv[])
 {
@@ -13,11 +13,7 @@ int main(int argc, char* argv[])
 		Registry::Instance().AddSystem<MusicPlayerSystem>();
 	if (!Registry::Instance().HasSystem<CameraMovementSystem>()) 
 		Registry::Instance().AddSystem<CameraMovementSystem>();
-	
-	// Is this needed here?
-	if (!Registry::Instance().HasSystem<NameSelectKeyboardControlSystem>())
-		Registry::Instance().AddSystem<NameSelectKeyboardControlSystem>();
-	
+
 	// Turn music volume down
 	Mix_VolumeMusic(10);
 

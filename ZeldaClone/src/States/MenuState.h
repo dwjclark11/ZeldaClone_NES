@@ -13,6 +13,8 @@ public:
 	static bool slotsFull;
 	static bool eliminate;
 
+
+
 	MenuState();
 	virtual ~MenuState() { Logger::Err(GetStateID() + " was Destroyed!"); };
 

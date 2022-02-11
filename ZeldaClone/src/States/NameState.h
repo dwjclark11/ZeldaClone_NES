@@ -1,11 +1,13 @@
 #pragma once
-
 #include "State.h"
 
 class NameState : public State
 {
 public:
 	static std::string name;
+	static int slot;
+	static int row;
+	static int col;
 
 	NameState();
 	~NameState() {}

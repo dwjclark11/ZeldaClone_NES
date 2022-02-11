@@ -1,5 +1,7 @@
 #include "ProjectileLifeCycleSystem.h"
 #include "../../Components/SpriteComponent.h"
+#include "../../Components/ProjectileComponent.h"
+
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/RigidBodyComponent.h"

@@ -25,8 +25,10 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Components/BoxColliderComponent.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/ProjectileComponent.h"
+#include "../Components/HealthComponent.h"
 #include "../Components/RupeeTypeComponent.h"
 #include "../Components/SecretComponent.h"
 #include "../Components/GameComponent.h"
@@ -40,6 +42,8 @@
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Utilities/Utility.h"
 #include "../StateMachines/NewPlayerStates.h"
+#include "../Systems/SoundFXSystem.h"
+
 
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
@@ -214,7 +218,7 @@ bool GameState::OnEnter()
 		if (!reg.HasSystem<MovementSystem>())			reg.AddSystem<MovementSystem>();
 		if (!reg.HasSystem<TriggerSystem>())			reg.AddSystem<TriggerSystem>();
 		if (!reg.HasSystem<CollectItemSystem>())		reg.AddSystem<CollectItemSystem>();
-		if (!reg.HasSystem<KeyboardControlSystem>()) 	reg.AddSystem<KeyboardControlSystem>();
+	
 		if (!reg.HasSystem<RenderTextSystem>())			reg.AddSystem<RenderTextSystem>();
 		if (!reg.HasSystem<GamePadSystem>()) 			reg.AddSystem<GamePadSystem>();
 		if (!reg.HasSystem<ScriptSystem>()) 			reg.AddSystem<ScriptSystem>();

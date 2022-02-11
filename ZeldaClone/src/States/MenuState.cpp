@@ -6,10 +6,12 @@
 #include "../Game/LevelLoader.h"
 #include "../Components/TextLabelComponent.h"
 #include "../Components/MenuComponent.h"
+#include "../Components/KeyboardControlComponent.h"
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Systems/MenuSystems/RenderMainMenuSystem.h"
-#include "../Systems/MenuSystems/MenuKeyboardControlSystem.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
+
 
 // Define all static variables
 const std::string MenuState::menuID = "MENU";
@@ -28,12 +30,11 @@ MenuState::MenuState()
 void MenuState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	reg.GetSystem<MenuKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	
 
 	reg.Update();
-	reg.GetSystem<MenuKeyboardControlSystem>().Update();
 
 	if (slotsFull && !full)
 	{
@@ -54,7 +55,7 @@ bool MenuState::OnEnter()
 	LevelLoader loader;
 	full = false;
 
-	if (!reg.HasSystem<MenuKeyboardControlSystem>()) reg.AddSystem<MenuKeyboardControlSystem>();
+	//if (!reg.HasSystem<MenuKeyboardControlSystem>()) reg.AddSystem<MenuKeyboardControlSystem>();
 	//if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
 	if (!reg.HasSystem<RenderMainMenuSystem>()) reg.AddSystem<RenderMainMenuSystem>();
 
@@ -67,6 +68,11 @@ bool MenuState::OnEnter()
 	loader.LoadMenuScreenFromLuaTable(lua, "save2");
 	loader.LoadMenuScreenFromLuaTable(lua, "save3");
 	
+	auto selector = reg.GetEntityByTag("selector");
+	
+	if (!selector.HasComponent<KeyboardControlComponent>())
+		selector.AddComponent<KeyboardControlComponent>();
+
 	return true;
 }
 

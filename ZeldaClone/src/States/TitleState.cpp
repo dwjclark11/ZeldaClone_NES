@@ -4,9 +4,14 @@
 #include "../ECS/ECS.h"
 #include "../Components/AnimationComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/SpriteComponent.h"
+#include "../Components/BackgroundImageComponent.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
+#include "../Systems/SoundFXSystem.h"
+
 const std::string TitleState::titleID = "TITLESTATE";
 
 TitleState::TitleState()
@@ -66,6 +71,13 @@ bool TitleState::OnEnter()
 	timer = 0;
 	
 	if (!reg.HasSystem<GamePadSystem>()) 	reg.AddSystem<GamePadSystem>();
+	if (!reg.HasSystem<KeyboardControlSystem>()) 	reg.AddSystem<KeyboardControlSystem>();
+
+
+	// Turn music volume down
+	Mix_VolumeMusic(10);
+
+
 	reg.GetSystem<GamePadSystem>().Init();
 
 	// Add Assets to the Asset Manager

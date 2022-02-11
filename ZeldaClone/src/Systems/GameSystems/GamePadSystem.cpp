@@ -5,7 +5,6 @@
 #include "../../Components/TransformComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/TextLabelComponent.h"
-#include "../../Systems/PauseSystems/ItemSelectKeyboardSystem.h"
 #include "../SoundFXSystem.h"
 #include "KeyboardControlSystem.h"
 #include <filesystem>
@@ -22,9 +21,7 @@ bool GamePadSystem::paused = false;
 GamePadSystem::GamePadSystem()
 	: gameController(nullptr)
 	, game(Game::Instance())
-	, row(0)
-	, col(0)
-	, slot(0)
+
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
@@ -350,13 +347,12 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 {
 	if (MenuState::player1Name.size() == 0)
-		slot = 1;
+		NameState::slot = 1;
 	else if (MenuState::player2Name.size() == 0)
-		slot = 2;
+		NameState::slot = 2;
 	else if (MenuState::player3Name.size() == 0)
-		slot = 3;
+		NameState::slot = 3;
 	
-
 	for (auto& entity : GetSystemEntities())
 	{
 		auto& sprite = entity.GetComponent<SpriteComponent>();
@@ -369,52 +365,52 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 			{
 				transform.position.y -= sprite.height * transform.scale.y * 2;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-				row--;
+				NameState::row--;
 				if (transform.position.y < 200)
 				{
 					transform.position.y = 584;
-					row = 3;
+					NameState::row = 3;
 				}
-				Logger::Log("row: " + std::to_string(row));
+				Logger::Log("row: " + std::to_string(NameState::row));
 				break;
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
 			{
 				transform.position.y += sprite.height * transform.scale.y * 2;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-				row++;
+				NameState::row++;
 				if (transform.position.y > 584)
 				{
 					transform.position.y = 200;
-					row = 0;
+					NameState::row = 0;
 				}
-				Logger::Log("row: " + std::to_string(row));
+				Logger::Log("row: " + std::to_string(NameState::row));
 				break;
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_RIGHT))
 			{
 				transform.position.x += sprite.width * transform.scale.x;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-				col++;
+				NameState::col++;
 				if (transform.position.x > 708)
 				{
 					transform.position.x = 260;
-					col = 0;
+					NameState::col = 0;
 				}
-				Logger::Log("col: " + std::to_string(col));
+				Logger::Log("col: " + std::to_string(NameState::col));
 				break;
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_LEFT))
 			{
 				transform.position.x -= sprite.width * transform.scale.x;
 				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-				col--;
+				NameState::col--;
 				if (transform.position.x < 260)
 				{
 					transform.position.x = 708;
-					col = 7;
+					NameState::col = 7;
 				}
-				Logger::Log("col: " + std::to_string(col));
+				Logger::Log("col: " + std::to_string(NameState::col));
 			}
 
 			if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))
@@ -424,14 +420,14 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 					bool valid = true;
 					// Make sure that the row and col have a valid letter based on the 
 					// name-letters sprite
-					if (row == 3 && col > 1)
+					if (NameState::row == 3 && NameState::col > 1)
 					{
 						valid = false;
 					}
 
 					// Create a new char based on ASCII Upper characters and the letter position
 					// on the sprite
-					char newChar = (row * 8) + col + 65; // 65 is 'A'
+					char newChar = (NameState::row * 8) + NameState::col + 65; // 65 is 'A'
 
 					if (valid)
 						text.text += newChar;
@@ -448,9 +444,9 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 					NameState::name = text.text.c_str();
 
 					// Reset the column and the row after name is entered
-					row = 0;
-					col = 0;
-					loader.SavePlayerNameToLuaTable(std::to_string(slot), NameState::name);
+					NameState::row = 0;
+					NameState::col = 0;
+					loader.SavePlayerNameToLuaTable(std::to_string(NameState::slot), NameState::name);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new MenuState());
 				}

@@ -9,6 +9,8 @@
 #include "../Components/TransformComponent.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/AnimationComponent.h"
+#include "../Components/SpriteComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/ItemComponent.h"
 

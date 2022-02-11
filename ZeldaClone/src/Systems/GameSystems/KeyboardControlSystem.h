@@ -7,6 +7,12 @@ class KeyboardControlSystem : public System
 {
 private:
 	class Game& game;
+
+	void MenuStateKeys(class KeyPressedEvent& event);
+	void PauseStateKeys(class KeyPressedEvent& event);
+	void NameStateKeys(class KeyPressedEvent& event);
+	void GameStateKeys(class KeyPressedEvent& event);
+
 public:
 	static directionE dir;
 	static bool keyDown;
