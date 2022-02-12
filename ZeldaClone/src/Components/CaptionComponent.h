@@ -2,8 +2,9 @@
 
 #include "../Utilities/Timer.h"
 #include <string>
-struct CaptionComponent
+class CaptionComponent
 {
+public:
 	std::string caption;
 	bool scrollable;
 	bool started;

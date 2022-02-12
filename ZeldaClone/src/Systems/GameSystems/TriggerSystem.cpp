@@ -18,28 +18,28 @@
 #include "../../States/GameState.h"
 
 
-bool TriggerSystem::CheckInventory(SpecialItemType& item)
+bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
 {
 	// Check to see the item is in the inventory
 	switch (item)
 	{
-	case SpecialItemType::WOOD_SWORD:
+	case ItemComponent::SpecialItemType::WOOD_SWORD:
 		if (game.GetGameItems().woodSword)
 			return true;
 		break;
-	case SpecialItemType::STEEL_SWORD:
+	case ItemComponent::SpecialItemType::STEEL_SWORD:
 		if (game.GetGameItems().steelSword)
 			return true;
 		break;
-	case SpecialItemType::MAGIC_SWORD:
+	case ItemComponent::SpecialItemType::MAGIC_SWORD:
 		if (game.GetGameItems().magicSword)
 			return true;
 		break;
-	case SpecialItemType::RED_CANDLE:
+	case ItemComponent::SpecialItemType::RED_CANDLE:
 		if (game.GetGameItems().candle)
 			return true;
 		break;
-	case SpecialItemType::ARROWS:
+	case ItemComponent::SpecialItemType::ARROWS:
 		if (game.GetGameItems().bow)
 			return true;
 		break;
@@ -52,7 +52,7 @@ bool TriggerSystem::CheckInventory(SpecialItemType& item)
 	return false;
 }
 
-void TriggerSystem::SetInventory(SpecialItemType& item)
+void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 {
 	auto player = Registry::Instance().GetEntityByTag("player");
 
@@ -60,45 +60,45 @@ void TriggerSystem::SetInventory(SpecialItemType& item)
 
 	switch (item)
 	{
-	case NOT_SPECIAL:
+	case ItemComponent::SpecialItemType::NOT_SPECIAL:
 		break;
 
-	case WOOD_SWORD:
+	case ItemComponent::SpecialItemType::WOOD_SWORD:
 		game.GetGameItems().woodSword = true;
 		break;
 
-	case STEEL_SWORD:
+	case ItemComponent::SpecialItemType::STEEL_SWORD:
 		game.GetGameItems().steelSword = true;
 		break;
 
-	case MAGIC_SWORD:
+	case ItemComponent::SpecialItemType::MAGIC_SWORD:
 		game.GetGameItems().magicSword = true;
 		break;
 
-	case FULL_HEART:
+	case ItemComponent::SpecialItemType::FULL_HEART:
 	{
 		playerHealth.addHeart = true;
 		break;
 	}
-	case RAFT:
+	case ItemComponent::SpecialItemType::RAFT:
 		game.GetGameItems().raft = true;
 		break;
-	case POWER_BRACLET:
+	case ItemComponent::SpecialItemType::POWER_BRACLET:
 		game.GetGameItems().powerBraclet = true;
 		break;
-	case RED_CANDLE:
+	case ItemComponent::SpecialItemType::RED_CANDLE:
 		game.GetGameItems().candle = true;
 		break;
-	case WOOD_BOOMERANG:
+	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
 		game.GetGameItems().woodBoomerang = true;
 		break;
-	case MAGIC_BOOMERANG:
+	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
 		game.GetGameItems().magicBoomerang = true;
 		break;
-	case LADDER:
+	case ItemComponent::SpecialItemType::LADDER:
 		game.GetGameItems().ladder = true;
 		break;
-	case ARROWS:
+	case ItemComponent::SpecialItemType::ARROWS:
 		game.GetGameItems().bow = true;
 		break;
 	default:
@@ -115,7 +115,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 
 	if (!secret.found && !startup)
 	{
-		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
+		TriggerBoxComponent::TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 		
 		auto secretArea = Registry::Instance().CreateEntity();
 		secretArea.Group("trigger");
@@ -142,7 +142,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	}
 	else if (secret.found && startup)
 	{
-		TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
+		TriggerBoxComponent::TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 
 		auto secretArea = Registry::Instance().CreateEntity();
 		secretArea.Group("trigger");
@@ -195,22 +195,22 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	{
 
 		auto& trig = b.GetComponent<TriggerBoxComponent>();
-		if (trig.triggerType == BOMB_SECRET && a.BelongsToGroup("explode"))
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::BOMB_SECRET && a.BelongsToGroup("explode"))
 			OnEnterTrigger(a, b);
-		if (trig.triggerType == BURN_BUSHES && a.BelongsToGroup("fire"))
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::BURN_BUSHES && a.BelongsToGroup("fire"))
 			OnEnterTrigger(a, b);
-		if (trig.triggerType == PUSH_ROCKS && a.HasTag("player"))
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS && a.HasTag("player"))
 			OnEnterTrigger(a, b);
 	}
 
 	if (a.HasComponent<SecretComponent>())
 	{
 		auto& trig = a.GetComponent<TriggerBoxComponent>();
-		if (trig.triggerType == BOMB_SECRET && b.BelongsToGroup("explode"))
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::BOMB_SECRET && b.BelongsToGroup("explode"))
 			OnEnterTrigger(b, a);
-		if (trig.triggerType == BURN_BUSHES && b.BelongsToGroup("fire"))
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::BURN_BUSHES && b.BelongsToGroup("fire"))
 			OnEnterTrigger(b, a);
-		if (trig.triggerType == PUSH_ROCKS && b.HasTag("player"))
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS && b.HasTag("player"))
 			OnEnterTrigger(b, a);
 	}
 }
@@ -244,11 +244,11 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	Timer loadTimer;
 	switch (trig.triggerType)
 	{
-	case NO_TRIGGER:
+	case TriggerBoxComponent::TriggerType::NO_TRIGGER:
 		Logger::Err("TRIGGER_SYSTEM: __LINE: 174 - There is not trigger set for this entity");
 		break;
 
-	case SECRET_AREA: // Change this to scene transition TriggerType::CHANGE_SCENE?
+	case TriggerBoxComponent::TriggerType::SECRET_AREA: // Change this to scene transition TriggerType::CHANGE_SCENE?
 	{
 		if (game.GetStairsFinished())
 		{
@@ -345,7 +345,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 
 		break;
 	}
-	case TRANSPORT:
+	case TriggerBoxComponent::TriggerType::TRANSPORT:
 		
 		if (game.GetFadeAlpha() > 0)
 		{
@@ -363,7 +363,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 		break;
 	
-	case BURN_BUSHES:
+	case TriggerBoxComponent::TriggerType::BURN_BUSHES:
 
 		if (trigger.HasComponent<SecretComponent>())
 		{
@@ -373,7 +373,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 		break;
 
-	case PUSH_ROCKS:
+	case TriggerBoxComponent::TriggerType::PUSH_ROCKS:
 	{
 		auto& playerRigidBody = player.GetComponent<RigidBodyComponent>();
 		auto& rockTransform = trigger.GetComponent<TransformComponent>();
@@ -398,7 +398,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	}
 		break;
 
-	case COLLECT_ITEM:
+	case TriggerBoxComponent::TriggerType::COLLECT_ITEM:
 	{
 		if (!trig.active)
 		{
@@ -408,7 +408,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 		break;
 	}
-	case BOMB_SECRET:
+	case TriggerBoxComponent::TriggerType::BOMB_SECRET:
 		if (trigger.HasComponent<SecretComponent>())
 		{
 			SecretTrigger(trigger);
@@ -418,7 +418,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 
 		break;
-	case SHOP_ITEM:
+	case TriggerBoxComponent::TriggerType::SHOP_ITEM:
 		// Check to see if the trigger has an Item Components
 		if (trigger.HasComponent<ItemComponent>() && GameState::scrollRupees == 0)
 		{
@@ -432,7 +432,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			}
 
 			// Check to see if key item and if it is already in the inventory
-			if (shopItem.special != SpecialItemType::NOT_SPECIAL)
+			if (shopItem.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
 			{
 				// Check to see if the item is in the inventory
 				if (CheckInventory(shopItem.special))

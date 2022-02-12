@@ -1,8 +1,9 @@
 #pragma once
 #include <sol/sol.hpp>
 
-struct ScriptComponent
+class ScriptComponent
 {
+public:
 	sol::function func;
 
 	ScriptComponent(sol::function func = sol::lua_nil)

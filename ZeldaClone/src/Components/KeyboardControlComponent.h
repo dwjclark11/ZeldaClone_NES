@@ -2,8 +2,9 @@
 
 #include <glm/glm.hpp>
 
-struct KeyboardControlComponent
+class KeyboardControlComponent
 {
+public:
 	glm::vec2 upVelocity;
 	glm::vec2 rightVelocity;
 	glm::vec2 downVelocity;

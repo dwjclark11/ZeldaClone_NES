@@ -3,8 +3,9 @@
 #include <string>
 #include <glm/glm.hpp>
 
-struct SpriteComponent
+class SpriteComponent
 {
+public:
 	// Component Variables
 	std::string assetID;
 	int width;

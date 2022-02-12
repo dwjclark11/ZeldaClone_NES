@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 
-struct SecretComponent
+class SecretComponent
 {
+public:
 	std::string locationID;
 	std::string newTrigger;
 	std::string newSpriteAssetID;

@@ -572,28 +572,28 @@ void LevelLoader::LoadColliders(const std::string& filename)
 	mapFile.close();
 }
 
-TriggerType LevelLoader::ConvertStringToTriggerType(std::string type)
+TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::string type)
 {
 	if (type == "no_trigger")
-		return TriggerType::NO_TRIGGER;
+		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
 	else if (type == "secret_area")
-		return TriggerType::SECRET_AREA;
+		return TriggerBoxComponent::TriggerType::SECRET_AREA;
 	else if (type == "burn_bush")
-		return TriggerType::BURN_BUSHES;
+		return TriggerBoxComponent::TriggerType::BURN_BUSHES;
 	else if (type == "transport")
-		return TriggerType::TRANSPORT;
+		return TriggerBoxComponent::TriggerType::TRANSPORT;
 	else if (type == "push_rocks")
-		return TriggerType::PUSH_ROCKS;
+		return TriggerBoxComponent::TriggerType::PUSH_ROCKS;
 	else if (type == "collect_item")
-		return TriggerType::COLLECT_ITEM;
+		return TriggerBoxComponent::TriggerType::COLLECT_ITEM;
 	else if (type == "bomb_secret")
-		return TriggerType::BOMB_SECRET;
+		return TriggerBoxComponent::TriggerType::BOMB_SECRET;
 	else if (type == "locked_door")
-		return TriggerType::LOCKED_DOOR;
+		return TriggerBoxComponent::TriggerType::LOCKED_DOOR;
 	else if (type == "hidden_object")
-		return TriggerType::HIDDEN_OBJECT;
+		return TriggerBoxComponent::TriggerType::HIDDEN_OBJECT;
 	else if (type == "shop_item")
-		return TriggerType::SHOP_ITEM;
+		return TriggerBoxComponent::TriggerType::SHOP_ITEM;
 }
 
 AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
@@ -690,7 +690,7 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 			{
 				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
 				Logger::Log(trigger["components"]["trigger_box"]["trigger_file"]);
-				TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
+				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
 
 				newTrigger.AddComponent<TriggerBoxComponent>(
 					triggerType,
@@ -1465,76 +1465,76 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
 		i++;
 	}
 }
-ItemCollectType LevelLoader::ConvertLuaStringToItem(std::string& type)
+ItemComponent::ItemCollectType LevelLoader::ConvertLuaStringToItem(std::string& type)
 {
 	if (type == "default")
-		return ItemCollectType::DEFAULT;
+		return ItemComponent::ItemCollectType::DEFAULT;
 	else if (type == "bombs")
-		return ItemCollectType::BOMBS;
+		return ItemComponent::ItemCollectType::BOMBS;
 	else if (type == "heart")
-		return ItemCollectType::HEARTS;
+		return ItemComponent::ItemCollectType::HEARTS;
 	else
-		return ItemCollectType::DEFAULT;
+		return ItemComponent::ItemCollectType::DEFAULT;
 }
-SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
+ItemComponent::SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
 {
 	if (special == "none")
-		return SpecialItemType::NOT_SPECIAL;
+		return ItemComponent::SpecialItemType::NOT_SPECIAL;
 	else if (special == "wood_sword")
-		return SpecialItemType::WOOD_SWORD;
+		return ItemComponent::SpecialItemType::WOOD_SWORD;
 	else if (special == "steel_sword")
-		return SpecialItemType::STEEL_SWORD;
+		return ItemComponent::SpecialItemType::STEEL_SWORD;
 	else if (special == "magic_sword")
-		return SpecialItemType::MAGIC_SWORD;
+		return ItemComponent::SpecialItemType::MAGIC_SWORD;
 	else if (special == "full_heart")
-		return SpecialItemType::FULL_HEART;
+		return ItemComponent::SpecialItemType::FULL_HEART;
 	else if (special == "raft")
-		return SpecialItemType::RAFT;
+		return ItemComponent::SpecialItemType::RAFT;
 	else if (special == "power_braclet")
-		return SpecialItemType::POWER_BRACLET;
+		return ItemComponent::SpecialItemType::POWER_BRACLET;
 	else if (special == "red_candle")
-		return SpecialItemType::RED_CANDLE;
+		return ItemComponent::SpecialItemType::RED_CANDLE;
 	else if (special == "wood_boomerang")
-		return SpecialItemType::WOOD_BOOMERANG;
+		return ItemComponent::SpecialItemType::WOOD_BOOMERANG;
 	else if (special == "magic_boomerang")
-		return SpecialItemType::MAGIC_BOOMERANG;
+		return ItemComponent::SpecialItemType::MAGIC_BOOMERANG;
 	else if (special == "ladder")
-		return SpecialItemType::LADDER;
+		return ItemComponent::SpecialItemType::LADDER;
 	else if (special == "arrows")
-		return SpecialItemType::ARROWS;
+		return ItemComponent::SpecialItemType::ARROWS;
 	else
-		return SpecialItemType::NOT_SPECIAL;
+		return ItemComponent::SpecialItemType::NOT_SPECIAL;
 }
 
-bool LevelLoader::CheckForItemInInventory(SpecialItemType& type)
+bool LevelLoader::CheckForItemInInventory(ItemComponent::SpecialItemType& type)
 {
 	switch (type)
 	{
-	case SpecialItemType::WOOD_SWORD:
+	case ItemComponent::SpecialItemType::WOOD_SWORD:
 		if (game.GetGameItems().woodSword)
 			return true;
 		else
 			return false;
 		break;
-	case SpecialItemType::LADDER:
+	case ItemComponent::SpecialItemType::LADDER:
 		if (game.GetGameItems().ladder)
 			return true;
 		else
 			return false;
 		break;
-	case SpecialItemType::WOOD_BOOMERANG:
+	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
 		if (game.GetGameItems().woodBoomerang)
 			return true;
 		else
 			return false;
 		break;
-	case SpecialItemType::MAGIC_BOOMERANG:
+	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
 		if (game.GetGameItems().magicBoomerang)
 			return true;
 		else
 			return false;
 		break;
-	case SpecialItemType::STEEL_SWORD:
+	case ItemComponent::SpecialItemType::STEEL_SWORD:
 		if (game.GetGameItems().steelSword)
 			return true;
 		else
@@ -1582,7 +1582,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		if (level_item != sol::nullopt)
 		{
 			std::string item = lvlData["level_item"];
-			SpecialItemType spec = ConvertLuaStringToSpecial(item);
+			ItemComponent::SpecialItemType spec = ConvertLuaStringToSpecial(item);
 
 			if (CheckForItemInInventory(spec))
 			{
@@ -1626,7 +1626,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 			{
 				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
 				Logger::Log(lvlData["components"]["trigger_box"]["trigger_file"]);
-				TriggerType triggerType = ConvertStringToTriggerType(lvlData["components"]["trigger_box"]["trigger_type"]);
+				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(lvlData["components"]["trigger_box"]["trigger_type"]);
 
 				newLvlObject.AddComponent<TriggerBoxComponent>(
 					triggerType,

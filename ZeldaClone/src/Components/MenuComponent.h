@@ -1,7 +1,8 @@
 #pragma once
 
-struct MenuComponent
+class MenuComponent
 {
+public:
 	int slotPos;
 	MenuComponent(int slotPos = 0) 
 	{

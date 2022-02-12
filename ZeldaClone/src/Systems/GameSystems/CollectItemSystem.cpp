@@ -47,23 +47,23 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 {
 	auto& type = item.GetComponent<ItemComponent>().type;
 
-	if (type == YELLOW_RUPEE)
+	if (type == ItemComponent::ItemCollectType::YELLOW_RUPEE)
 	{
 		GameState::scrollRupees += 1;
 		item.Kill();
 	}
-	else if (type == BLUE_RUPEE)
+	else if (type == ItemComponent::ItemCollectType::BLUE_RUPEE)
 	{
 		GameState::scrollRupees += 5;
 		item.Kill();
 	}
-	else if (type == BOMBS)
+	else if (type == ItemComponent::ItemCollectType::BOMBS)
 	{
 		GameState::totalBombs += 3;
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
 		item.Kill();
 	}
-	else if (type == HEARTS)
+	else if (type == ItemComponent::ItemCollectType::HEARTS)
 	{
 		auto& health = player.GetComponent<HealthComponent>();
 		health.healthPercentage += 2;

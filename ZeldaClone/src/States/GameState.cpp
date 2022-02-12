@@ -123,24 +123,13 @@ void GameState::Update(const double& deltaTime)
 	game.GetPlayerStateMachine().GetCurrentState()->Update(player);
 
 	Registry::Instance().GetSystem<CollectItemSystem>().Update();
-	
-	auto start = std::chrono::high_resolution_clock::now();
 	Registry::Instance().GetSystem<AnimationSystem>().Update();
-
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-
-	std::cout << "Duration: " << static_cast<float>(duration.count()) / 1000.0f << "ms" << std::endl;
-	//system("pause");
 
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 	
-	//Registry::Instance().GetSystem<KeyboardControlSystem>().Update();
 	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<MovementSystem>().Update(deltaTime);
 	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
-
-
 
 	Registry::Instance().GetSystem<ProjectileLifeCycleSystem>().Update();
 	Registry::Instance().GetSystem<CollisionSystem>().Update(game.GetEventManager());

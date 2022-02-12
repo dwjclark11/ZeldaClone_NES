@@ -1,12 +1,14 @@
 #pragma once
 
-enum RupeeType {YELLOW = 0, BLUE};
 
-struct RupeeTypeComponent
+
+class RupeeTypeComponent
 {
+public:
+	enum class RupeeType { YELLOW = 0, BLUE };
 	RupeeType type;
 
-	RupeeTypeComponent(RupeeType type = YELLOW)
+	RupeeTypeComponent(RupeeType type = RupeeType::YELLOW)
 	{
 		this->type = type;
 	}

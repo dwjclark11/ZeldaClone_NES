@@ -1,5 +1,6 @@
 #pragma once
-struct PauseComponent
+class PauseComponent
 {
+public:
 	PauseComponent() {}
 };

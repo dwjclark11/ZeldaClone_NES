@@ -3,8 +3,9 @@
 #include <SDL.h>
 #include "../Utilities/Timer.h"
 
-struct ProjectileEmitterComponent
+class ProjectileEmitterComponent
 {
+public:
 	// Component Variables
 	glm::vec2 projectileVelocity;
 	int repeatFrequency;

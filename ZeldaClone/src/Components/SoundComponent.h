@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 
-struct SoundComponent
+class SoundComponent
 {
+public:
 	std::string attackSound;
 	std::string hitSound;
 	std::string deathSound;

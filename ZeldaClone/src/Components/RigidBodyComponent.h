@@ -1,8 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 
-struct RigidBodyComponent
+class RigidBodyComponent
 {
+public:
 	// Component Variables
 	glm::vec2 velocity;
 	bool up;

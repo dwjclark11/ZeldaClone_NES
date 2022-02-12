@@ -10,8 +10,8 @@ private:
 	LevelLoader loader;
 	class Game& game;
 
-	bool CheckInventory(SpecialItemType& item);
-	void SetInventory(SpecialItemType& item);
+	bool CheckInventory(ItemComponent::SpecialItemType& item);
+	void SetInventory(ItemComponent::SpecialItemType& item);
 
 public:
 

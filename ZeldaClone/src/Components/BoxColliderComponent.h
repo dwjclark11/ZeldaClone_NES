@@ -1,8 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 
-struct BoxColliderComponent
+class BoxColliderComponent
 {
+public:
 	int width;
 	int height;
 	glm::vec2 offset;

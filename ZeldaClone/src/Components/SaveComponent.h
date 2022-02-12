@@ -1,6 +1,7 @@
 #pragma once
 
-struct SaveComponent
+class SaveComponent
 {
+public:
 	SaveComponent() {}
 };

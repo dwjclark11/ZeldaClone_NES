@@ -3,8 +3,9 @@
 #include <glm/glm.hpp>
 #include <SDL.h>
 
-struct TextLabelComponent
+class TextLabelComponent
 {
+public:
 	glm::vec2 position;
 	std::string text; 
 	std::string assetID;

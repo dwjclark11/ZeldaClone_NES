@@ -1,5 +1,6 @@
 #pragma once
-struct TileComponent
+class TileComponent
 {
+public:
 	TileComponent() {}
  };

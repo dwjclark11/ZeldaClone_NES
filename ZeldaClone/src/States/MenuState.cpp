@@ -85,6 +85,9 @@ bool MenuState::OnEnter()
 	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<RenderEditorSystem>();
 	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<MouseControlSystem>();
 
+	// Remove the Render Title System since we are not using it!
+	if (reg.HasSystem<RenderTitleSystem>()) reg.RemoveSystem<RenderTitleSystem>();
+
 	return true;
 }
 
@@ -92,11 +95,12 @@ bool MenuState::OnExit()
 {
 	Registry::Instance().GetSystem<RenderMainMenuSystem>().OnExit();
 
-	
+	// Remove Unsued Textures
 	game.GetAssetManager()->RemoveTexture("menu_box");
 	game.GetAssetManager()->RemoveTexture("main_menu_gui");
 	// Remove Unused Music
 	game.GetAssetManager()->RemoveMusic("Main_Menu");
+	// Remove Unused SoundFXs
 	game.GetAssetManager()->RemoveSoundFX("Eliminate");
 	return true;
 }

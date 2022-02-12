@@ -1,8 +1,9 @@
 #pragma once
 #include <SDL.h>
 
-struct AnimationComponent
+class AnimationComponent
 {
+public:
 	int numFrames;
 	int currentFrame;
 	int frameSpeedRate;

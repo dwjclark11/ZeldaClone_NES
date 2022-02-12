@@ -28,10 +28,10 @@ private:
 	
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 	AssetType ConvertToAssetType(std::string& type);
-	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
+	ItemComponent::SpecialItemType ConvertLuaStringToSpecial(std::string& special);
 	
-	ItemCollectType ConvertLuaStringToItem(std::string& type);
-	bool CheckForItemInInventory(SpecialItemType& type);
+	ItemComponent::ItemCollectType ConvertLuaStringToItem(std::string& type);
+	bool CheckForItemInInventory(ItemComponent::SpecialItemType& type);
 	void ConvertName(std::string name, int x, int y);
 	bool ReadSpriteComponent(sol::table& table, Entity& entity);
 	void ReadBoxColliderComponent(sol::table& table, Entity& entity);
@@ -71,7 +71,7 @@ public:
 	void SaveSecrets();
 	void ReadInSecrets(sol::state& lua);
 
-	TriggerType ConvertStringToTriggerType(std::string type);
+	TriggerBoxComponent::TriggerType ConvertStringToTriggerType(std::string type);
 	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
 
 };

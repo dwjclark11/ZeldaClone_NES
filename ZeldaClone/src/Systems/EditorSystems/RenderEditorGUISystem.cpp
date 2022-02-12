@@ -701,25 +701,25 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 
 			// Set Trigger Types
 			if (current_trigger == "no_trigger")
-				MouseControlSystem::triggerBox.triggerType = NO_TRIGGER;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::NO_TRIGGER;
 			else if (current_trigger == "secret_area")
-				MouseControlSystem::triggerBox.triggerType = SECRET_AREA;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::SECRET_AREA;
 			else if (current_trigger == "transport")
-				MouseControlSystem::triggerBox.triggerType = TRANSPORT;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::TRANSPORT;
 			else if (current_trigger == "burn_bushes")
-				MouseControlSystem::triggerBox.triggerType = BURN_BUSHES;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::BURN_BUSHES;
 			else if (current_trigger == "push_rocks")
-				MouseControlSystem::triggerBox.triggerType = PUSH_ROCKS;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::PUSH_ROCKS;
 			else if (current_trigger == "collect_item")
-				MouseControlSystem::triggerBox.triggerType = COLLECT_ITEM;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::COLLECT_ITEM;
 			else if (current_trigger == "bomb_secret")
-				MouseControlSystem::triggerBox.triggerType = BOMB_SECRET;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::BOMB_SECRET;
 			else if (current_trigger == "locked_door")
-				MouseControlSystem::triggerBox.triggerType = LOCKED_DOOR;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::LOCKED_DOOR;
 			else if (current_trigger == "hidden_object")
-				MouseControlSystem::triggerBox.triggerType = HIDDEN_OBJECT;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::HIDDEN_OBJECT;
 			else
-				MouseControlSystem::triggerBox.triggerType = NO_TRIGGER;
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::NO_TRIGGER;
 		}
 
 		ImGui::End();

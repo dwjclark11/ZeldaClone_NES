@@ -1,6 +1,7 @@
 #pragma once
 
-struct CameraFollowComponent
+class CameraFollowComponent
 {
+public:
 	CameraFollowComponent() = default;
 };

@@ -67,6 +67,7 @@ bool NameState::OnEnter()
 bool NameState::OnExit()
 {
 	Registry::Instance().GetSystem<RenderNameStateTextSystem>().OnExit();
+
 	return true;
 }
 

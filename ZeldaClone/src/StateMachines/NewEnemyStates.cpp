@@ -438,7 +438,7 @@ void EnemyDeathState::ItemDrop(Entity& enemy)
 	{
 		Entity item = Registry::Instance().CreateEntity();
 		item.Group("items");
-		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
+		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::BOMBS);
 		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
 		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<BoxColliderComponent>(16, 16);
@@ -448,7 +448,7 @@ void EnemyDeathState::ItemDrop(Entity& enemy)
 	{
 		Entity item = Registry::Instance().CreateEntity();
 		item.Group("items");
-		item.AddComponent<ItemComponent>(ItemCollectType::BLUE_RUPEE);
+		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::BLUE_RUPEE);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
 		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
@@ -460,7 +460,7 @@ void EnemyDeathState::ItemDrop(Entity& enemy)
 	{
 		Entity item = Registry::Instance().CreateEntity();
 		item.Group("items");
-		item.AddComponent<ItemComponent>(ItemCollectType::HEARTS);
+		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::HEARTS);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
 		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<AnimationComponent>(2, 10, false, true, 0);
@@ -471,7 +471,7 @@ void EnemyDeathState::ItemDrop(Entity& enemy)
 	{
 		Entity item = Registry::Instance().CreateEntity();
 		item.Group("items");
-		item.AddComponent<ItemComponent>(ItemCollectType::YELLOW_RUPEE);
+		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::YELLOW_RUPEE);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
 		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);

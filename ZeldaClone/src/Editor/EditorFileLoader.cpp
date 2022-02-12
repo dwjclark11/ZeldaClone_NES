@@ -832,19 +832,19 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, st
 }
 
 
-std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
+std::string EditorFileLoader::ConvertToString(TriggerBoxComponent::TriggerType triggerType)
 {
 	switch (triggerType)
 	{
-		case NO_TRIGGER: return "no_trigger"; break;
-		case SECRET_AREA: return "secret_area"; break;
-		case TRANSPORT: return "transport"; break;
-		case BURN_BUSHES: return "burn_bushes"; break;
-		case PUSH_ROCKS: return "push_rocks"; break;
-		case COLLECT_ITEM: return "collect_item"; break;
-		case BOMB_SECRET: return "bomb_secret"; break;
-		case LOCKED_DOOR: return "locked_door"; break;
-		case HIDDEN_OBJECT: return "hidden_object"; break;
+		case TriggerBoxComponent::TriggerType::NO_TRIGGER: return "no_trigger"; break;
+		case TriggerBoxComponent::TriggerType::SECRET_AREA: return "secret_area"; break;
+		case TriggerBoxComponent::TriggerType::TRANSPORT: return "transport"; break;
+		case TriggerBoxComponent::TriggerType::BURN_BUSHES: return "burn_bushes"; break;
+		case TriggerBoxComponent::TriggerType::PUSH_ROCKS: return "push_rocks"; break;
+		case TriggerBoxComponent::TriggerType::COLLECT_ITEM: return "collect_item"; break;
+		case TriggerBoxComponent::TriggerType::BOMB_SECRET: return "bomb_secret"; break;
+		case TriggerBoxComponent::TriggerType::LOCKED_DOOR: return "locked_door"; break;
+		case TriggerBoxComponent::TriggerType::HIDDEN_OBJECT: return "hidden_object"; break;
 	}
 }
 

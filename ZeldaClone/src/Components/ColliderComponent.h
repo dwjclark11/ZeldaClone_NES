@@ -1,5 +1,6 @@
 #pragma once
-struct ColliderComponent
+class ColliderComponent
 {
+public:
 	ColliderComponent() = default;
 };

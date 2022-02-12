@@ -124,8 +124,7 @@ bool TitleState::OnExit()
 	// Remove Unused Music
 	game.GetAssetManager()->RemoveMusic("Title");
 
-	// Remove the Render Title System If we are not using it!
-	reg.RemoveSystem<RenderTitleSystem>();
+
 	return true;
 }
 

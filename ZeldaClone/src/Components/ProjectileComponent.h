@@ -2,8 +2,9 @@
 #include <SDL.h>
 #include "../Utilities/Timer.h"
 
-struct ProjectileComponent
+class ProjectileComponent
 {
+public:
 	// Component Variables
 	bool isFriendly;
 	int hitPercentDamage;

@@ -21,51 +21,51 @@
 Timer timer;
 Game& game = Game::Instance();
 
-void SetSpecialItem(SpecialItemType special, Entity& player)
+void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 {
 	auto& health = player.GetComponent<HealthComponent>();
 
 	switch (special)
 	{
-	case NOT_SPECIAL:
+	case ItemComponent::SpecialItemType::NOT_SPECIAL:
 		break;
 
-	case WOOD_SWORD:
+	case ItemComponent::SpecialItemType::WOOD_SWORD:
 		game.GetGameItems().woodSword = true;
 		break;
 
-	case STEEL_SWORD:
+	case ItemComponent::SpecialItemType::STEEL_SWORD:
 		game.GetGameItems().steelSword = true;
 		break;
 
-	case MAGIC_SWORD:
+	case ItemComponent::SpecialItemType::MAGIC_SWORD:
 		game.GetGameItems().magicSword = true;
 		break;
 
-	case FULL_HEART:
+	case ItemComponent::SpecialItemType::FULL_HEART:
 	{
 		health.addHeart = true;
 		break;
 	}
-	case RAFT:
+	case ItemComponent::SpecialItemType::RAFT:
 		game.GetGameItems().raft = true;
 		break;
-	case POWER_BRACLET:
+	case ItemComponent::SpecialItemType::POWER_BRACLET:
 		game.GetGameItems().powerBraclet = true;
 		break;
-	case RED_CANDLE:
+	case ItemComponent::SpecialItemType::RED_CANDLE:
 		game.GetGameItems().candle = true;
 		break;
-	case WOOD_BOOMERANG:
+	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
 		game.GetGameItems().woodBoomerang = true;
 		break;
-	case MAGIC_BOOMERANG:
+	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
 		game.GetGameItems().magicBoomerang = true;
 		break;
-	case LADDER:
+	case ItemComponent::SpecialItemType::LADDER:
 		game.GetGameItems().ladder = true;
 		break;
-	case ARROWS:
+	case ItemComponent::SpecialItemType::ARROWS:
 		game.GetGameItems().bow = true;
 		break;
 	default:
@@ -73,17 +73,17 @@ void SetSpecialItem(SpecialItemType special, Entity& player)
 	}
 }
 
-void SetItemCollect(ItemCollectType type)
+void SetItemCollect(ItemComponent::ItemCollectType type)
 {
 	switch (type)
 	{
-	case ItemCollectType::BOMBS:
+	case ItemComponent::ItemCollectType::BOMBS:
 		GameState::totalBombs += 4;
 		break;
 	}
 }
 
-void CheckItem(ItemCollectType type)
+void CheckItem(ItemComponent::ItemCollectType type)
 {
 
 }
@@ -250,10 +250,10 @@ void CollectItemState::Update(Entity& entity)
 			{
 				const auto& special = trigger.GetComponent<ItemComponent>();
 
-				if (special.special != SpecialItemType::NOT_SPECIAL)
+				if (special.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
 					SetSpecialItem(special.special, entity);
 
-				if (special.type != ItemCollectType::DEFAULT)
+				if (special.type != ItemComponent::ItemCollectType::DEFAULT)
 					SetItemCollect(special.type);
 
 				auto& transform = trigger.GetComponent<TransformComponent>();

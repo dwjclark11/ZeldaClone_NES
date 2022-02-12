@@ -1,8 +1,9 @@
 #pragma once
 #include "../Utilities/Timer.h"
 
-struct HealthComponent
+class HealthComponent
 {
+public:
 	int healthPercentage;
 	int maxHearts;
 	bool isHurt;

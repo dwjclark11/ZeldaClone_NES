@@ -1,5 +1,6 @@
 #pragma once
-struct EnemyComponent
+class EnemyComponent
 {
+public:
 	EnemyComponent() = default;
 };
