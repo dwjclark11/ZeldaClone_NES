@@ -20,7 +20,7 @@ RenderMainMenuSystem::RenderMainMenuSystem()
 void RenderMainMenuSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
 {
 	// Loop all entities that the system is interested in
-	for (auto entity : GetSystemEntities())
+	for (const auto& entity : GetSystemEntities())
 	{
 		// Do not draw the link avatar if there is no save file associated with it
 		if (entity.HasTag("first_menu_slot") && MenuState::player1Name.size() == 0)
@@ -29,7 +29,7 @@ void RenderMainMenuSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetM
 			continue;
 		if (entity.HasTag("third_menu_slot") && MenuState::player3Name.size() == 0)
 			continue;
-
+		
 		const auto& transform = entity.GetComponent<TransformComponent>();
 		const auto& sprite = entity.GetComponent<SpriteComponent>();
 

@@ -174,6 +174,10 @@ menu =
 				src_rect_x = 0,
 				src_rect_y = 80
 			}, 
+			menu = 
+			{
+				slot_pos = 0
+			}
 		}
 	},
 	[9] = -- First Player Slot
@@ -197,6 +201,10 @@ menu =
 				src_rect_x = 0,
 				src_rect_y = 0
 			}, 
+			menu = 
+			{
+				slot_pos = 1
+			}
 		}
 	},
 	[10] = -- Second Player slot
@@ -220,6 +228,10 @@ menu =
 				src_rect_x = 0,
 				src_rect_y = 0
 			}, 
+			menu = 
+			{
+				slot_pos = 2
+			}
 		}
 	},
 	[11] = -- third player slot
@@ -243,6 +255,10 @@ menu =
 				src_rect_x = 0,
 				src_rect_y = 0
 			}, 
+			menu = 
+			{
+				slot_pos = 3
+			}
 		}
 	},
 }

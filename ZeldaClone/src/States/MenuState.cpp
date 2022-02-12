@@ -11,7 +11,12 @@
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Systems/MenuSystems/RenderMainMenuSystem.h"
 #include "../Systems/GameSystems/KeyboardControlSystem.h"
+#include "../Systems/EditorSystems/MouseControlSystem.h"
+#include "../Systems/EditorSystems/RenderEditorGUISystem.h"
+#include "../Systems/EditorSystems/RenderEditorSystem.h"
+#include <filesystem>
 
+namespace fs = std::filesystem;
 
 // Define all static variables
 const std::string MenuState::menuID = "MENU";
@@ -30,18 +35,12 @@ MenuState::MenuState()
 void MenuState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
+	
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	
 
 	reg.Update();
-
-	if (slotsFull && !full)
-	{
-		Entity slotsFull = reg.CreateEntity();
-		//slotsFull.AddComponent<TextLabelComponent>(glm::vec2(300, 900), " REGISTERS ARE FULL! ", "charriot-font-40", SDL_Color{ 255,0,0,0 }, true);
-		full = true;
-	}
 }
 
 void MenuState::Render()
@@ -52,26 +51,39 @@ void MenuState::Render()
 
 bool MenuState::OnEnter()
 {
+	reg.Update();
 	LevelLoader loader;
 	full = false;
+	Logger::Err("Enter Menu State");
 
-	//if (!reg.HasSystem<MenuKeyboardControlSystem>()) reg.AddSystem<MenuKeyboardControlSystem>();
-	//if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
+	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
 	if (!reg.HasSystem<RenderMainMenuSystem>()) reg.AddSystem<RenderMainMenuSystem>();
 
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
-
+	game.GetAssetManager()->AddFonts("charriot-font-40", "./Assets/Fonts/charriot.ttf", 40);
 	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 
-	loader.LoadMenuScreenFromLuaTable(lua, "save1");
-	loader.LoadMenuScreenFromLuaTable(lua, "save2");
-	loader.LoadMenuScreenFromLuaTable(lua, "save3");
+	// Check to see if the save file exists, if it does call the loader function
+	fs::path saves("./Assets/SavedFiles/save1.lua");
+	if (fs::status_known(fs::file_status{}) ? fs::exists(fs::file_status{}) : fs::exists(saves))
+		loader.LoadMenuScreenFromLuaTable(lua, "save1");
+	saves = "./Assets/SavedFiles/save2.lua";
+	if (fs::status_known(fs::file_status{}) ? fs::exists(fs::file_status{}) : fs::exists(saves))
+		loader.LoadMenuScreenFromLuaTable(lua, "save2");
+	saves = "./Assets/SavedFiles/save3.lua";
+	if (fs::status_known(fs::file_status{}) ? fs::exists(fs::file_status{}) : fs::exists(saves))
+		loader.LoadMenuScreenFromLuaTable(lua, "save3");
 	
 	auto selector = reg.GetEntityByTag("selector");
 	
 	if (!selector.HasComponent<KeyboardControlComponent>())
 		selector.AddComponent<KeyboardControlComponent>();
+
+	// If we were in the editor system remove these for they are only needed there!
+	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<RenderEditorGUISystem>();
+	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<RenderEditorSystem>();
+	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<MouseControlSystem>();
 
 	return true;
 }
@@ -79,16 +91,19 @@ bool MenuState::OnEnter()
 bool MenuState::OnExit()
 {
 	Registry::Instance().GetSystem<RenderMainMenuSystem>().OnExit();
-	//Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 
-	//reg.RemoveSystem<RenderMainMenuSystem>();
-	//reg.RemoveSystem<MenuKeyboardControlSystem>();
+	
+	game.GetAssetManager()->RemoveTexture("menu_box");
+	game.GetAssetManager()->RemoveTexture("main_menu_gui");
+	// Remove Unused Music
+	game.GetAssetManager()->RemoveMusic("Main_Menu");
+	game.GetAssetManager()->RemoveSoundFX("Eliminate");
 	return true;
 }
 
 void MenuState::ProcessEvents(SDL_Event& event)
 {
-	//Registry::Instance().GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	
 }
 
 void MenuState::OnKeyDown(SDL_Event* event)

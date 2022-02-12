@@ -127,14 +127,16 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 		if (MouseControlSystem::createEnemy) ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING ENEMIES!");
 		if (MouseControlSystem::createTrigger) ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING TRIGGERS!");
 
+		
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid X: %d", static_cast<int>(game.GetMouseBox().x + game.GetCamera().x) / MouseControlSystem::gridSize);
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid Y : %d", static_cast<int>(game.GetMouseBox().y + game.GetCamera().y) / MouseControlSystem::gridSize);
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid X: %d", static_cast<int>(Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().x) / MouseControlSystem::gridSize);
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid Y : %d", static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().y) / MouseControlSystem::gridSize);
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "[Mouse X: %d", static_cast<int>(game.GetMouseBox().x + game.GetCamera().x));
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Mouse Y : %d]", static_cast<int>(game.GetMouseBox().y + game.GetCamera().y));
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "[Mouse X: %d", static_cast<int>(Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().x));
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Mouse Y : %d]", static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().y));
+		
 
 		// Put Above this
 		ImGui::EndMainMenuBar();

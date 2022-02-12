@@ -183,6 +183,7 @@
     <ClCompile Include="src\States\NameState.cpp" />
     <ClCompile Include="src\States\PauseState.cpp" />
     <ClCompile Include="src\States\SaveGameState.cpp" />
+    <ClCompile Include="src\States\SettingsState.cpp" />
     <ClCompile Include="src\States\State.cpp" />
     <ClCompile Include="src\States\TitleState.cpp" />
     <ClCompile Include="src\Systems\CameraMovementSystem.cpp" />
@@ -526,13 +527,12 @@
     <ClInclude Include="src\States\NameState.h" />
     <ClInclude Include="src\States\PauseState.h" />
     <ClInclude Include="src\States\SaveGameState.h" />
+    <ClInclude Include="src\States\SettingsState.h" />
     <ClInclude Include="src\States\State.h" />
     <ClInclude Include="src\States\TitleState.h" />
     <ClInclude Include="src\Systems\CameraMovementSystem.h" />
-    <ClInclude Include="src\Systems\EditorSystems\EditorKeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\MouseControlSystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorGUISystem.h" />
-    <ClInclude Include="src\Systems\EditorSystems\RenderEditorLabelSystem.h" />
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\AISystem.h" />
     <ClInclude Include="src\Systems\GameSystems\AnimationSystem.h" />

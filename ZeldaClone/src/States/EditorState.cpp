@@ -2,11 +2,10 @@
 #include "../ECS/ECS.h"
 #include "../Systems/EditorSystems/RenderEditorGUISystem.h"
 #include "../Systems/EditorSystems/RenderEditorSystem.h"
-#include "../Systems/EditorSystems/EditorKeyboardControlSystem.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
-#include "../Systems/EditorSystems/RenderEditorLabelSystem.h"
 #include "../Game/Game.h"
 #include "../Game/LevelLoader.h"
 #include "../Systems/EditorSystems/MouseControlSystem.h"
@@ -22,7 +21,7 @@ EditorState::EditorState()
 void EditorState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	Registry::Instance().GetSystem<EditorKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 
 	reg.Update();
 	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
@@ -90,7 +89,7 @@ bool EditorState::OnEnter()
 	if (!reg.HasSystem<RenderEditorGUISystem>()) reg.AddSystem<RenderEditorGUISystem>();
 	if (!reg.HasSystem<RenderEditorSystem>()) 	reg.AddSystem<RenderEditorSystem>();
 	if (!reg.HasSystem<MouseControlSystem>()) 	reg.AddSystem<MouseControlSystem>();
-	if (!reg.HasSystem<EditorKeyboardControlSystem>()) reg.AddSystem<EditorKeyboardControlSystem>();
+	//if (!reg.HasSystem<EditorKeyboardControlSystem>()) reg.AddSystem<EditorKeyboardControlSystem>();
 
 	loader.LoadAssetsFromLuaTable(game.GetLuaState(), "editor_assets");
 	// Assign values to varialbes
@@ -115,12 +114,6 @@ bool EditorState::OnExit()
 	// We do not want the Game to be resizable!
 	SDL_SetWindowResizable(game.GetWindow(), SDL_FALSE);
 	
-	// Remove any sytems that are only used inside the editor
-	reg.RemoveSystem<RenderEditorGUISystem>();
-	reg.RemoveSystem<RenderEditorSystem>();
-	reg.RemoveSystem<MouseControlSystem>();
-	reg.RemoveSystem<EditorKeyboardControlSystem>();
-
 	if (!Game::isDebug) Game::isDebug = true;
 	return true;
 }
@@ -132,56 +125,56 @@ void EditorState::ProcessEvents(SDL_Event& event)
 
 void EditorState::OnKeyDown(SDL_Event* event)
 {
-	if (game.GetEvent().type == SDL_KEYDOWN && !keyDown)
-	{
-		const Uint8* state = SDL_GetKeyboardState(NULL);
-		
-		if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_O])
-		{
-			if (!RenderEditorGUISystem::imageName.empty())
-			{
-				FileDialogs dialog;
-				RenderEditorGUISystem::fileName = dialog.OpenFile();
+	//if (game.GetEvent().type == SDL_KEYDOWN && !keyDown)
+	//{
+	//	const Uint8* state = SDL_GetKeyboardState(NULL);
+	//	
+	//	if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_O])
+	//	{
+	//		if (!RenderEditorGUISystem::imageName.empty())
+	//		{
+	//			//FileDialogs dialog;
+	//			RenderEditorGUISystem::fileName = dialog.OpenFile();
 
-				loader.SetFileName(RenderEditorGUISystem::fileName);
+	//			loader.SetFileName(RenderEditorGUISystem::fileName);
 
-				// Check to see if the String is Empty!!
-				if (!RenderEditorGUISystem::fileName.empty())
-				{
-					loader.LoadTilemap(game.GetAssetManager(), game.GetRenderer());
-					RenderEditorGUISystem::fileLoaded = true;
-				}
-			}
-		}
+	//			// Check to see if the String is Empty!!
+	//			if (!RenderEditorGUISystem::fileName.empty())
+	//			{
+	//				loader.LoadTilemap(game.GetAssetManager(), game.GetRenderer());
+	//				RenderEditorGUISystem::fileLoaded = true;
+	//			}
+	//		}
+	//	}
 
-		if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
-		{
-			if (MouseControlSystem::createTile)
-			{
-				if (!RenderEditorGUISystem::fileName.empty())
-				{
-					loader.SaveTilemap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
-					RenderEditorGUISystem::fileLoaded = true;
-				}
-			}
+	//	if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
+	//	{
+	//		if (MouseControlSystem::createTile)
+	//		{
+	//			if (!RenderEditorGUISystem::fileName.empty())
+	//			{
+	//				loader.SaveTilemap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
+	//				RenderEditorGUISystem::fileLoaded = true;
+	//			}
+	//		}
 
-			if (MouseControlSystem::createObstacles)
-			{
-				if (!RenderEditorGUISystem::fileName.empty())
-				{
-					loader.SaveObjectMap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
-					RenderEditorGUISystem::fileLoaded = true;
-				}
-			}
-		}
+	//		if (MouseControlSystem::createObstacles)
+	//		{
+	//			if (!RenderEditorGUISystem::fileName.empty())
+	//			{
+	//				loader.SaveObjectMap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
+	//				RenderEditorGUISystem::fileLoaded = true;
+	//			}
+	//		}
+	//	}
 
-		if (event->key.keysym.sym == SDLK_SPACE)
-		{
-			game.GetCamera().x = 0;
-			game.GetCamera().y = 0;
-		}
-		keyDown = true;
-	}
+	//	if (event->key.keysym.sym == SDLK_SPACE)
+	//	{
+	//		game.GetCamera().x = 0;
+	//		game.GetCamera().y = 0;
+	//	}
+	//	keyDown = true;
+	//}
 }
 
 void EditorState::OnKeyUp(SDL_Event* event)

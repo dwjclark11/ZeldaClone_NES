@@ -21,6 +21,7 @@
 #include "../Systems/GameSystems/ProjectileLifeCycleSystem.h"
 #include "../Systems/GameSystems/AISystem.h"
 #include "../Systems/GameSystems/ScriptSystem.h"
+#include "../Systems/MenuSystems/RenderMainMenuSystem.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
@@ -273,16 +274,9 @@ bool GameState::OnEnter()
 	// Test Read in all secrets!!
 	loader.ReadInSecrets(game.GetLuaState());
 
-	// Create New Trigger Test
-	auto newTrigger = reg.CreateEntity();
-	newTrigger.AddComponent<TriggerBoxComponent>(TriggerType::PUSH_ROCKS);
-	newTrigger.AddComponent<TransformComponent>(glm::vec2(7424, 4900), glm::vec2(4, 4), 0);
-	newTrigger.AddComponent<BoxColliderComponent>(16, 16);
-	newTrigger.AddComponent<SpriteComponent>("Overworld_Tiles", 16, 16, 2, false, 16, 0);
-	newTrigger.GetComponent<TriggerBoxComponent>().collider = true;
-	newTrigger.AddComponent<SecretComponent>();
-	newTrigger.GetComponent<SecretComponent>().startPos = newTrigger.GetComponent<TransformComponent>().position;
-	newTrigger.AddComponent<GameComponent>();
+	
+	if (reg.HasSystem<RenderMainMenuSystem>()) reg.RemoveSystem<RenderMainMenuSystem>();
+
 	return true;
 }
 

@@ -9,6 +9,7 @@ private:
 	class Game& game;
 
 	void MenuStateKeys(class KeyPressedEvent& event);
+	void EditorStateKeys(class KeyPressedEvent& event);
 	void PauseStateKeys(class KeyPressedEvent& event);
 	void NameStateKeys(class KeyPressedEvent& event);
 	void GameStateKeys(class KeyPressedEvent& event);

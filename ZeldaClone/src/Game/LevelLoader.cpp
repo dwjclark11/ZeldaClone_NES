@@ -481,6 +481,7 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 		entity.AddComponent<MenuComponent>();
 		i++;
 	}
+	Logger::Log("Loading Menu assets!!");
 }
 
 

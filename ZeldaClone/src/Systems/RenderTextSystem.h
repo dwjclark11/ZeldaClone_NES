@@ -3,6 +3,7 @@
 #include "../Components/TextLabelComponent.h"
 #include "../AssetManager/AssetManager.h"
 #include "../States/GameState.h"
+//#include "../States/MenuState.h"
 #include "../Game/Game.h"
 #include "../Utilities/Utility.h"
 #include <SDL.h>
@@ -20,9 +21,8 @@ public:
 
 	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const SDL_Rect& camera)
 	{
-		for (auto entity : GetSystemEntities())
+		for (const auto& entity : GetSystemEntities())
 		{
-			
 			auto& textLabel = entity.GetComponent<TextLabelComponent>();
 			
 			if (entity.HasTag("rupees"))
@@ -52,7 +52,7 @@ public:
 				if (entity.HasTag("bombs")) textLabel.position.y = 104;
 				if (entity.HasTag("lifeText")) textLabel.position.y = 50;
 			}
-
+			
 			SDL_SetRenderDrawColor(renderer, textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
 
 			SDL_Surface* surface = TTF_RenderText_Blended(

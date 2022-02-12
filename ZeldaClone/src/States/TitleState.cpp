@@ -71,14 +71,15 @@ bool TitleState::OnEnter()
 	scroll = false;
 	timer = 0;
 	
-	if (!reg.HasSystem<GamePadSystem>()) 	reg.AddSystem<GamePadSystem>();
-	if (!reg.HasSystem<KeyboardControlSystem>()) 	reg.AddSystem<KeyboardControlSystem>();
-
+	if (!reg.HasSystem<GamePadSystem>()) 	
+		reg.AddSystem<GamePadSystem>();
+	if (!reg.HasSystem<KeyboardControlSystem>()) 	
+		reg.AddSystem<KeyboardControlSystem>();
 
 	// Turn music volume down
 	Mix_VolumeMusic(10);
 
-
+	// Initialize the Game Pad
 	Registry::Instance().GetSystem<GamePadSystem>().Init();
 
 	// Add Assets to the Asset Manager
@@ -116,6 +117,13 @@ bool TitleState::OnExit()
 	Registry::Instance().GetSystem<RenderTitleSystem>().OnExit();
 	Registry::Instance().GetSystem<CameraMovementSystem>().OnExit();
 	
+	// Remove Unused Textures
+	game.GetAssetManager()->RemoveTexture("TitleScreen");
+	game.GetAssetManager()->RemoveTexture("title_scroll");
+	game.GetAssetManager()->RemoveTexture("waterfall");
+	// Remove Unused Music
+	game.GetAssetManager()->RemoveMusic("Title");
+
 	// Remove the Render Title System If we are not using it!
 	reg.RemoveSystem<RenderTitleSystem>();
 	return true;

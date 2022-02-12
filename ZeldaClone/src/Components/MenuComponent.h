@@ -2,5 +2,9 @@
 
 struct MenuComponent
 {
-	MenuComponent() {}
+	int slotPos;
+	MenuComponent(int slotPos = 0) 
+	{
+		this->slotPos = slotPos;
+	}
 };

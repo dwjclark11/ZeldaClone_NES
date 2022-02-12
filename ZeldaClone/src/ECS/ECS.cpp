@@ -205,7 +205,7 @@ bool Registry::EntityHasTag(Entity entity, const std::string& tag) const
 	{
 		return false;
 	}
-
+	
 	return entityPerTag.find(tag)->second == entity;
 }
 

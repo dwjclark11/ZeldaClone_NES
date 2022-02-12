@@ -198,6 +198,9 @@
     <ClCompile Include="src\Systems\GameSystems\RenderGameOverSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\States\SettingsState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\Game.h">
@@ -1079,16 +1082,10 @@
     <ClInclude Include="src\Components\MenuComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Systems\EditorSystems\EditorKeyboardControlSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Systems\EditorSystems\MouseControlSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorGUISystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Systems\EditorSystems\RenderEditorLabelSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Systems\EditorSystems\RenderEditorSystem.h">
@@ -1257,6 +1254,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\StateMachines\BossStates.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\States\SettingsState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

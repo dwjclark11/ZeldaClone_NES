@@ -27,11 +27,10 @@ NameState::NameState()
 void NameState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	//Registry::Instance().GetSystem<NameSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	//Registry::Instance().GetSystem<NameSelectKeyboardControlSystem>().Update();
 }
 
 void NameState::Render()
