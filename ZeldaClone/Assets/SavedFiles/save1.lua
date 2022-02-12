@@ -36,7 +36,6 @@ player_data = {
         inventory = {
             num_rupees = 0,
             num_bombs = 0,
-            num_arrows = 0,
             num_keys = 0
         }
     }

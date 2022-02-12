@@ -211,7 +211,9 @@
     <ClCompile Include="src\Systems\MusicPlayerSystem.cpp" />
     <ClCompile Include="src\Systems\NameSystems\RenderNameSystem.cpp" />
     <ClCompile Include="src\Systems\PauseSystems\RenderPauseSystem.cpp" />
+    <ClCompile Include="src\Systems\PauseSystems\RenderSaveStateSystem.cpp" />
     <ClCompile Include="src\Systems\RenderCollisionSystem.cpp" />
+    <ClCompile Include="src\Systems\RenderTextSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTitleSystem.cpp" />
     <ClCompile Include="src\Utilities\FileManagerUtils.cpp" />
     <ClCompile Include="src\Utilities\LuaTableWriter.cpp" />
@@ -562,7 +564,6 @@
     <ClInclude Include="src\Systems\NameSystems\RenderNameSystem.h" />
     <ClInclude Include="src\Systems\PauseSystems\RenderPauseSystem.h" />
     <ClInclude Include="src\Systems\PauseSystems\RenderSaveStateSystem.h" />
-    <ClInclude Include="src\Systems\PauseSystems\SaveSelectKeyboardSystem.h" />
     <ClInclude Include="src\Systems\RenderCollisionSystem.h" />
     <ClInclude Include="src\Systems\RenderTextSystem.h" />
     <ClInclude Include="src\Systems\RenderTitleSystem.h" />

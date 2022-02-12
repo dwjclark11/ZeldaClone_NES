@@ -366,3 +366,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# VTune and GPU Cache
+GPUCache/
+VTune Profiler Results/
+*.log

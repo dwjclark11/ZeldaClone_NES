@@ -50,14 +50,6 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 			if (a == b)
 				continue;
 
-			auto& bTransform = b.GetComponent<TransformComponent>();
-			const int checkBX = bTransform.position.x / 1024;
-			const int checkBY = bTransform.position.y / 672;
-
-			// Check to see if the collider is in the same panel as the player, if not skip the check
-			if (checkBX != playerPos.x || checkBY != playerPos.y)
-				continue;
-
 			if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
 				continue;
 
@@ -74,6 +66,14 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 				if (!a.GetComponent<TriggerBoxComponent>().collider)
 					continue;
 			}
+
+			auto& bTransform = b.GetComponent<TransformComponent>();
+			const int checkBX = bTransform.position.x / 1024;
+			const int checkBY = bTransform.position.y / 672;
+
+			// Check to see if the collider is in the same panel as the player, if not skip the check
+			if (checkBX != playerPos.x || checkBY != playerPos.y)
+				continue;
 
 			const auto& aCollider = a.GetComponent<BoxColliderComponent>();
 			const auto& bCollider = b.GetComponent<BoxColliderComponent>();

@@ -8,6 +8,7 @@
 #include "../../Components/TransformComponent.h"
 #include "../../Components/KeyboardControlComponent.h"
 #include "../../Components/TextLabelComponent.h"
+#include "../../Components/SaveComponent.h"
 #include "../../Components/MenuComponent.h"
 #include "../../Components/PauseComponent.h"
 #include "../../Components/BoxColliderComponent.h"
@@ -877,6 +878,77 @@ void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 	}
 }
 
+void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)
+{
+	for (const auto& entity : GetSystemEntities())
+	{
+		if (entity.HasComponent<SaveComponent>())
+		{
+			if (entity.HasTag("save_selector"))
+			{
+				auto& transform = entity.GetComponent<TransformComponent>();
+
+				switch (event.symbol)
+				{
+				case SDLK_UP:
+					transform.position.y -= 200;
+					if (transform.position.y < 185) transform.position.y = 585;
+					break;
+
+				case SDLK_DOWN:
+					transform.position.y += 200;
+					if (transform.position.y > 585) transform.position.y = 185;
+					break;
+
+				case SDLK_RETURN:
+				{
+					if (transform.position.y == 185)
+					{
+						LevelLoader loader;
+
+						if (game.GetPlayerNum() == 1)
+						{
+							loader.SavePlayerDataToLuaTable("1");
+						}
+						else if (game.GetPlayerNum() == 2)
+						{
+							loader.SavePlayerDataToLuaTable("2");
+						}
+						else if (game.GetPlayerNum() == 3)
+						{
+							loader.SavePlayerDataToLuaTable("3");
+						}
+
+						//Entity saving = Registry::Instance().CreateEntity();
+						//saving.AddComponent<SpriteComponent>("save_gui", 96, 16, 1, true, 0, 0);
+						//saving.AddComponent<TransformComponent>(glm::vec2(400, 100), glm::vec2(2, 2), 0.0);
+						//saving.AddComponent<AnimationComponent>(2, 5);
+						//saving.AddComponent<SaveComponent>();
+						//Sleep(1000);
+						game.GetStateMachine()->PopState();
+					}
+					else if (transform.position.y == 385)
+					{
+						//State::exitToMain = true;
+						//game.GetStateMachine()->ClearStates();
+						//game.GetStateMachine()->PushState(new MenuState());
+					}
+					else if (transform.position.y == 585)
+					{
+						game.GetGameRunning() = false;
+					}
+					break;
+				}
+				default:
+					break;
+				}
+			}
+		}
+		else
+			continue;
+	}
+}
+
 KeyboardControlSystem::KeyboardControlSystem()
 	: game(Game::Instance())
 {
@@ -916,6 +988,10 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 	else if (currentState == "EDITOR")
 	{
 		EditorStateKeys(event);
+	}
+	else if (currentState == "SAVE")
+	{
+		SaveStateKeys(event);
 	}
 }
 

@@ -1,9 +1,14 @@
 #include "SaveGameState.h"
 #include "../ECS/ECS.h"
 #include "../Game/Game.h"
+#include "../AssetManager/AssetManager.h"
 #include "../Components/TextLabelComponent.h"
+#include "../Components/TransformComponent.h"
+#include "../Components/SpriteComponent.h"
+#include "../Components/KeyboardControlComponent.h"
+#include "../Components/SaveComponent.h"
 #include "../Systems/PauseSystems/RenderSaveStateSystem.h"
-#include "../Systems/PauseSystems/SaveSelectKeyboardSystem.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
 
 const std::string SaveGameState::saveID = "SAVE";
@@ -16,7 +21,7 @@ SaveGameState::SaveGameState()
 void SaveGameState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	Registry::Instance().GetSystem<SaveSelectKeyboardSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
 	Registry::Instance().GetSystem<AnimationSystem>().Update();
 
@@ -30,21 +35,10 @@ void SaveGameState::Render()
 
 bool SaveGameState::OnEnter()
 {	
-
-	/*
-		Create some assets/Textures to replace the SDL_TTF components --> There are glitches with the SDL_TTF and some times 
-		when in release mode the words do not show up on the screen.
-		
-		Also TODO:
-			- Create a SaveComponent
-			- Create a SaveKeyboardControlSystem
-				- Also have it allow the game controller to work with it.
-			
-	*/
 	
 	reg.AddSystem<RenderSaveStateSystem>();
-	reg.AddSystem<SaveSelectKeyboardSystem>();
-	game.GetAssetManager()->AddTextures(game.GetRenderer(), "save_gui", "./Assets/Backgrounds/save_state_GUI.png");
+
+	game.GetAssetManager()->AddTextures(game.GetRenderer(), "save_gui", "./Assets/HUDSprites/save_state_GUI.png");
 
 
 	Entity saveText = reg.CreateEntity();
@@ -65,6 +59,7 @@ bool SaveGameState::OnEnter()
 	Entity selector = reg.CreateEntity();
 	selector.AddComponent<SpriteComponent>("hud_hearts", 16, 16, 5, true, 0, 0);
 	selector.AddComponent<TransformComponent>(glm::vec2(100, 185), glm::vec2(6, 6), 0.0);
+	selector.AddComponent<KeyboardControlComponent>();
 	selector.AddComponent<SaveComponent>();
 	selector.Tag("save_selector");
 	return true;

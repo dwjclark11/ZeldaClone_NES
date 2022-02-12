@@ -201,6 +201,12 @@
     <ClCompile Include="src\States\SettingsState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Systems\RenderTextSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Systems\PauseSystems\RenderSaveStateSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\Game.h">
@@ -1200,9 +1206,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\States\SaveGameState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Systems\PauseSystems\SaveSelectKeyboardSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Components\SaveComponent.h">

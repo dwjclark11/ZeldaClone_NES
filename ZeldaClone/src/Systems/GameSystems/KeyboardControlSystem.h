@@ -13,6 +13,7 @@ private:
 	void PauseStateKeys(class KeyPressedEvent& event);
 	void NameStateKeys(class KeyPressedEvent& event);
 	void GameStateKeys(class KeyPressedEvent& event);
+	void SaveStateKeys(class KeyPressedEvent& event);
 
 public:
 	static directionE dir;

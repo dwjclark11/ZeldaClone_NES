@@ -1,7 +1,6 @@
 #pragma once
 #include "../../ECS/ECS.h"
 
-
 class RenderPauseSystem : public System
 {
 public:

@@ -3,6 +3,7 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/TransformComponent.h"
+#include "../../Components/PlayerComponent.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../Components/HUDComponent.h"
 #include "../../Game/Game.h"
@@ -24,7 +25,7 @@ void HealthSystem::Update()
 {
 	for (auto& entity : GetSystemEntities())
 	{
-		if (entity.HasTag("player"))
+		if (entity.HasComponent<PlayerComponent>())
 		{
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& collider = entity.GetComponent<BoxColliderComponent>();
@@ -75,30 +76,23 @@ void HealthSystem::Update()
 				health.healthPercentage = health.maxHearts * 2;
 
 			}
-			// If the Player is Dead --> Remove the Enemies from the screen
-			if (entity.BelongsToGroup("enemies") && game.GetPlayerDead())
-				entity.Kill();
+			currentHealth = health.healthPercentage;
+			maxHearts = health.maxHearts;
 
-			if (entity.HasTag("player"))
+			// Start Low health sound timer
+			if (currentHealth <= 2 && !lowHealth)
 			{
-				auto& health = entity.GetComponent<HealthComponent>();
-				currentHealth = health.healthPercentage;
-				maxHearts = health.maxHearts;
-
-				// Start Low health sound timer
-				if (currentHealth <= 2 && !lowHealth)
-				{
-					health.lowHeathTimer.Start();
-					lowHealth = true;
-				}
-				// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
-				if (currentHealth <= 2 && currentHealth > 0 && health.lowHeathTimer.GetTicks() > 250)
-				{
-					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "low_health", 0, 5);
-					health.lowHeathTimer.Stop();
-					lowHealth = false;
-				}
+				health.lowHeathTimer.Start();
+				lowHealth = true;
 			}
+			// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
+			if (currentHealth <= 2 && currentHealth > 0 && health.lowHeathTimer.GetTicks() > 250)
+			{
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "low_health", 0, 5);
+				health.lowHeathTimer.Stop();
+				lowHealth = false;
+			}
+
 			// Change the heart sprite based on the current health
 			for (int i = 1; i <= maxHearts; i++)
 			{
@@ -114,6 +108,12 @@ void HealthSystem::Update()
 				else if (currentHealth <= i * 2 - 2)
 					sprite.srcRect.x = 32;
 			}
+		}
+		else
+		{
+			// If the Player is Dead --> Remove the Enemies from the screen
+			if (entity.BelongsToGroup("enemies") && game.GetPlayerDead())
+				entity.Kill();
 		}
 	}
 }
