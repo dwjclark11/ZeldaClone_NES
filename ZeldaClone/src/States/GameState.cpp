@@ -103,14 +103,14 @@ void GameState::Update(const double& deltaTime)
 	// Reset the event manager queue
 	game.GetEventManager()->Reset();
 
-	reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
 	
-	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
-	reg.GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
 
 
 	// Update the registry values
@@ -121,22 +121,33 @@ void GameState::Update(const double& deltaTime)
 	
 	game.GetPlayerStateMachine().GetCurrentState()->Update(player);
 
-	reg.GetSystem<CollectItemSystem>().Update();
-	reg.GetSystem<AnimationSystem>().Update();
-	reg.GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
+	Registry::Instance().GetSystem<CollectItemSystem>().Update();
 	
-	//reg.GetSystem<KeyboardControlSystem>().Update();
-	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
+	auto start = std::chrono::high_resolution_clock::now();
+	Registry::Instance().GetSystem<AnimationSystem>().Update();
 
-	reg.GetSystem<MovementSystem>().Update(deltaTime);
-	reg.GetSystem<CameraMovementSystem>().Update(game.GetCamera());
-	reg.GetSystem<ProjectileLifeCycleSystem>().Update();
-	reg.GetSystem<CollisionSystem>().Update(game.GetEventManager());
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
-	reg.GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
-	reg.GetSystem<AISystem>().Update();
-	reg.GetSystem<CaptionSystem>().Update();
-	reg.GetSystem<TriggerSystem>().Update();
+	std::cout << "Duration: " << static_cast<float>(duration.count()) / 1000.0f << "ms" << std::endl;
+	//system("pause");
+
+	Registry::Instance().GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
+	
+	//Registry::Instance().GetSystem<KeyboardControlSystem>().Update();
+	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<MovementSystem>().Update(deltaTime);
+	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+
+
+
+	Registry::Instance().GetSystem<ProjectileLifeCycleSystem>().Update();
+	Registry::Instance().GetSystem<CollisionSystem>().Update(game.GetEventManager());
+
+	Registry::Instance().GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
+	Registry::Instance().GetSystem<AISystem>().Update();
+	Registry::Instance().GetSystem<CaptionSystem>().Update();
+	Registry::Instance().GetSystem<TriggerSystem>().Update();
 
 	// Update the rupeeScroll 
 	if (scrollRupees > 0)
@@ -156,10 +167,10 @@ void GameState::Render()
 	SDL_Rect greyRect = { 0, 0, game.windowWidth, game.windowHeight };
 	SDL_Rect whiteRect = { playerTransform.position.x, playerTransform.position.y, 64, 64};
 
-	game.GetSystem<RenderTileSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderTileSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 
 	// Update all other render systems
-	game.GetSystem<RenderSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 	
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
@@ -167,15 +178,15 @@ void GameState::Render()
 	SDL_RenderDrawRect(game.GetRenderer(), &hudRect);
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 
-	game.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 
-	reg.GetSystem<HealthSystem>().Update();
-	game.GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
+	Registry::Instance().GetSystem<HealthSystem>().Update();
+	Registry::Instance().GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
 
 	// If the game is in debug mode, render the collision system
 	if (Game::isDebug)
 	{
-		game.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
+		Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
 	}
 }
 
@@ -226,13 +237,13 @@ bool GameState::OnEnter()
 		if (!reg.HasSystem<CaptionSystem>()) 			reg.AddSystem<CaptionSystem>();
 		// =============================================================================================================================
 
-		game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
+		Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
 
 		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
 
 		firstEntered = true;
-		reg.GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
+		Registry::Instance().GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
 	}
 
 	if (!game.GetplayerCreated())
@@ -277,9 +288,9 @@ bool GameState::OnEnter()
 
 bool GameState::OnExit()
 {
-	game.GetSystem<RenderCollisionSystem>().OnExit();
-	game.GetSystem<RenderSystem>().OnExit();
-	game.GetSystem<RenderTileSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderTileSystem>().OnExit();
 	firstEntered = false;
 	return true;
 }
@@ -309,7 +320,7 @@ void GameState::OnKeyUp(SDL_Event* event)
 		GamePadSystem::paused = true;
 	}
 
-	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
+	Registry::Instance().GetSystem<KeyboardControlSystem>().UpdatePlayer();
 	KeyboardControlSystem::keyDown = false;
 }
 
@@ -329,7 +340,7 @@ void GameState::OnBtnUp(SDL_Event* event)
 	}
 
 	KeyboardControlSystem::keyDown = false;
-	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
+	Registry::Instance().GetSystem<KeyboardControlSystem>().UpdatePlayer();
 }
 
 
@@ -380,7 +391,7 @@ void GameState::RupeeScroll()
 		}
 		// Play the collect rupee sound
 		Mix_Volume(8, 10);
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 8);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 8);
 		scrollRupees--;
 
 		// Check for money scroll completion

@@ -60,7 +60,7 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 	else if (type == BOMBS)
 	{
 		GameState::totalBombs += 3;
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
 		item.Kill();
 	}
 	else if (type == HEARTS)
@@ -72,7 +72,7 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 		if (health.healthPercentage >= health.maxHearts * 2)
 			health.healthPercentage = health.maxHearts * 2;
 
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
 		item.Kill();
 	}
 }

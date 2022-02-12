@@ -50,13 +50,13 @@ public:
 				{
 				case SDLK_UP:
 					transform.position.y -= 100;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 475) transform.position.y = 675;
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += 100;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 675) transform.position.y = 475;
 					break;
 
@@ -104,7 +104,7 @@ public:
 				/*if (GamePadSystem::upPressed && !GamePadSystem::buttonDirDown)
 				{
 					transform.position.y -= 100;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 475) transform.position.y = 675;
 					GamePadSystem::buttonDirDown = true;
 				}
@@ -112,7 +112,7 @@ public:
 				if (GamePadSystem::downPressed && !GamePadSystem::buttonDirDown)
 				{
 					transform.position.y += 100;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 675) transform.position.y = 475;
 					GamePadSystem::buttonDirDown = true;
 				}

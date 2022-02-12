@@ -343,7 +343,7 @@ void PlayerDeathState::OnEnter(Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 
 	health.deathTimer.Start();
-	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_die", 0, -1);
+	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_die", 0, -1);
 	animation.frameOffset = 0;
 	animation.numFrames = 4;
 	animation.frameSpeedRate = 10;
@@ -370,7 +370,7 @@ void PlayerDeathState::Update(Entity& entity)
 
 		if (health.deathTimer.GetTicks() > 3500)
 		{
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, -1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, -1);
 			Registry::Instance().GetSystem<RenderHUDSystem>().OnExit();
 			Registry::Instance().GetSystem<RenderHealthSystem>().OnExit();
 			game.GetStateMachine()->PopState();
@@ -399,7 +399,7 @@ void PlayerStairsState::OnEnter(Entity& entity)
 	timer.Start();
 
 	// Play the stairs soundFX
-	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
+	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
 }
 
 void PlayerStairsState::Update(Entity& entity)

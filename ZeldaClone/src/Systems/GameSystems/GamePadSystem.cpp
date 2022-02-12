@@ -160,7 +160,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 		{
 			transform.position.y -= sprite.height * 6;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 			if (transform.position.y < 200) transform.position.y = 584;
 					
 		}
@@ -168,7 +168,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
 		{
 			transform.position.y += sprite.height * 6;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 			if (transform.position.y > 584) transform.position.y = 200;
 			//GamePadSystem::buttonDirDown = true;
 		}
@@ -224,7 +224,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 		{
 			transform.position.y -= sprite.height * 6;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 			if (transform.position.y < 200) transform.position.y = 680;
 			//GamePadSystem::buttonDirDown = true;
 		}
@@ -232,7 +232,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
 		{
 			transform.position.y += sprite.height * 6;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 			if (transform.position.y > 680) transform.position.y = 200;
 			//GamePadSystem::buttonDirDown = true;
 		}
@@ -364,7 +364,7 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 			{
 				transform.position.y -= sprite.height * transform.scale.y * 2;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				NameState::row--;
 				if (transform.position.y < 200)
 				{
@@ -377,7 +377,7 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
 			{
 				transform.position.y += sprite.height * transform.scale.y * 2;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				NameState::row++;
 				if (transform.position.y > 584)
 				{
@@ -390,7 +390,7 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_RIGHT))
 			{
 				transform.position.x += sprite.width * transform.scale.x;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				NameState::col++;
 				if (transform.position.x > 708)
 				{
@@ -403,7 +403,7 @@ void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_LEFT))
 			{
 				transform.position.x -= sprite.width * transform.scale.x;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				NameState::col--;
 				if (transform.position.x < 260)
 				{
@@ -467,26 +467,26 @@ void GamePadSystem::PauseStateBtns(GamePadButtonPressedEvent& event)
 			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 			{
 				transform.position.y -= ((sprite.height * transform.scale.y) + 6);
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.y < 190) transform.position.y = 260;
 				
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
 			{
 				transform.position.y += ((sprite.height * transform.scale.y) + 6);
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.y > 260) transform.position.y = 190;
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_RIGHT))
 			{
 				transform.position.x += 100;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.x > 686) transform.position.x = 386;
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_LEFT))
 			{
 				transform.position.x -= 100;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 				if (transform.position.x < 386) transform.position.x = 686;
 			}
 			else if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))

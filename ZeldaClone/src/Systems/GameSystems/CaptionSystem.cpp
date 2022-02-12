@@ -104,7 +104,7 @@ void CaptionSystem::Update()
 
 					// play the text scroll sound
 					Mix_Volume(6, 10);
-					Game::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "text_slow", 1, 6);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "text_slow", 1, 6);
 
 					// Check completion
 					if (caption.currentFrame == caption.caption.length())

@@ -30,8 +30,8 @@ MenuState::MenuState()
 void MenuState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	
 
 	reg.Update();
@@ -46,8 +46,8 @@ void MenuState::Update(const double& deltaTime)
 
 void MenuState::Render()
 {
-	//reg.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	reg.GetSystem<RenderMainMenuSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	//Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderMainMenuSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool MenuState::OnEnter()
@@ -62,7 +62,7 @@ bool MenuState::OnEnter()
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
 
-	game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
+	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 
 	loader.LoadMenuScreenFromLuaTable(lua, "save1");
 	loader.LoadMenuScreenFromLuaTable(lua, "save2");
@@ -78,8 +78,8 @@ bool MenuState::OnEnter()
 
 bool MenuState::OnExit()
 {
-	reg.GetSystem<RenderMainMenuSystem>().OnExit();
-	//reg.GetSystem<RenderTextSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderMainMenuSystem>().OnExit();
+	//Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 
 	//reg.RemoveSystem<RenderMainMenuSystem>();
 	//reg.RemoveSystem<MenuKeyboardControlSystem>();
@@ -88,7 +88,7 @@ bool MenuState::OnExit()
 
 void MenuState::ProcessEvents(SDL_Event& event)
 {
-	//reg.GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	//Registry::Instance().GetSystem<GamePadSystem>().UpdateOtherStates(event);
 }
 
 void MenuState::OnKeyDown(SDL_Event* event)

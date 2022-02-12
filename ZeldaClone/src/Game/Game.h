@@ -55,12 +55,8 @@ class Game
 		bool candle;
 	};
 
-
-
-	
-
 public:
-	
+
 	enum class Action
 	{
 		MOVE_UP = 0,
@@ -92,15 +88,19 @@ public:
 
 	static ItemType mSelectedItem;
 
+	// Change these from statics and created getters also make them const!!
+	// ==================================================
 	static int gameScale;
 	static int tilePixels;
 	static int windowWidth;
 	static int windowHeight;
+	// ==================================================
+
 	static bool isDebug;
 
 	~Game();
 
-	
+
 	// Creation of the singleton Game
 	static Game& Instance();
 
@@ -111,41 +111,41 @@ public:
 	void Draw();
 	void Shutdown();
 	void Run();
-	
+
 	// Getters and Setters of objects to be used through-out the game
 	SDL_Renderer* GetRenderer() const { return mRenderer; }
-	SDL_Window* GetWindow() { return mWindow;  }
+	SDL_Window* GetWindow() { return mWindow; }
 	SDL_Rect& GetCamera();
-	
+
 	void SetCameraY(int change);
 	void SetCameraX(int change);
-	
+
 	SDL_Rect& GetMouseBox();
 	SDL_Event& GetEvent();
-	
+
 	const bool HasSword();
 	bool PlayerHold();
-	
+
 	bool& GetAttack();
 	inline bool& IsRunning() { return mIsRunning; }
-	inline bool& GetCameraMoving(){ return cameraMoving;}
-	inline bool& GetGameRunning(){ return mIsRunning;}
+	inline bool& GetCameraMoving() { return cameraMoving; }
+	inline bool& GetGameRunning() { return mIsRunning; }
 	inline bool& GetplayerCreated() { return playerCreated; }
-	
+
 	inline bool& StartFadeIn() { return startFadeIn; }
 	inline bool& StartFadeOut() { return startFadeOut; }
 	inline bool& FadeFinished() { return fadeFinished; }
 
 	inline int& GetLevelWidth() { return mLevelWidth; }
 	inline int& GetLevelHeight() { return mLevelHeight; }
-	
+
 	void FadeScreen();
 
 	inline std::unique_ptr<AssetManager>& GetAssetManager() { return assetManager; }
 	inline std::unique_ptr<EventManager>& GetEventManager() { return eventManager; }
 	inline std::unique_ptr<GameStateMachine>& GetStateMachine() { return gameStateMachine; }
-	
-	
+
+
 	inline GameItems& GetGameItems() { return mGameItems; }
 	unsigned& GetPlayerNum();
 	inline glm::vec2& GetPlayerPos() { return mPlayerPos; }
@@ -168,10 +168,10 @@ public:
 	bool IsSecretFound(const std::string& locationID);
 	void SetSecretFound(const std::string& locationID, bool found);
 	std::map<std::string, bool> GetGameSecrets() { return gameSecrets; }
-	template<typename TSystem> TSystem& GetSystem();
+	
 
 	int milliSecondsPreviousFrame;
-	
+
 	StateMachine& GetPlayerStateMachine() { return psm; }
 
 
@@ -192,6 +192,8 @@ public:
 		AddKeyToMap(Action::ATTACK, SDLK_RSHIFT);
 		AddKeyToMap(Action::USE_ITEM, SDLK_SPACE);
 		AddKeyToMap(Action::PAUSE, SDLK_q);
+		AddKeyToMap(Action::SELECT, SDLK_SPACE);
+		AddKeyToMap(Action::CANCEL, SDLK_BACKSPACE);
 	}
 
 	void ChangeKeyBinding(Action action, SDL_Keycode key)
@@ -235,7 +237,8 @@ private:
 
 	std::map<Action, SDL_Keycode> mMappedKeys;
 	std::map<Action, SDL_GameControllerButton> mMappedButtons;
-	
+	std::map<std::string, bool> gameSecrets;
+
 	int milliSecondsPerFrame;
 	bool mIsRunning;
 	bool attack;
@@ -251,9 +254,9 @@ private:
 	bool startFadeIn = false;
 	bool startFadeOut = false;
 	bool fadeFinished = true;
-	
+
 	unsigned gamePlayerNum;
-	
+
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
 	double deltaTime;
@@ -262,16 +265,15 @@ private:
 	SDL_Rect mouseBox;
 	SDL_Event sdlEvent;
 	Uint8 fadeAlpha;
-	
+
 	std::unique_ptr<GameStateMachine> gameStateMachine;
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<EventManager> eventManager;
-	
+
 	static std::unique_ptr<Game> mInstance;
-	
-	
+
 	GameItems mGameItems;
-	
+
 	glm::vec2 mPlayerPos;
 	int mLevelWidth;
 	int mLevelHeight;
@@ -281,13 +283,11 @@ private:
 
 	// Constructor
 	Game();
-
-	std::map<std::string, bool> gameSecrets;
 };
 
-// Why is this needed?
-template<typename TSystem>
-TSystem& Game::GetSystem()
-{
-	return Registry::Instance().GetSystem<TSystem>();
-}
+//// Why is this needed?
+//template<typename TSystem>
+//TSystem& Game::GetSystem()
+//{
+//	return Registry::Instance().GetSystem<TSystem>();
+//}

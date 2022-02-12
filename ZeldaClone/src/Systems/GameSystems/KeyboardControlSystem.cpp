@@ -239,13 +239,13 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 				{
 				case SDLK_UP:
 					transform.position.y -= sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 200) transform.position.y = 584;
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 584) transform.position.y = 200;
 					break;
 
@@ -306,7 +306,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 				{
 				case SDLK_UP:
 					transform.position.y -= sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 
 					if (!MenuState::eliminate)
 					{
@@ -323,7 +323,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 
 				case SDLK_DOWN:
 					transform.position.y += sprite.height * 6;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 
 					if (!MenuState::eliminate)
 					{
@@ -471,25 +471,25 @@ void KeyboardControlSystem::PauseStateKeys(KeyPressedEvent& event)
 				{
 				case SDLK_UP:
 					transform.position.y -= ((sprite.height * transform.scale.y) + 6);
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y < 190) transform.position.y = 260;
 					break;
 
 				case SDLK_DOWN:
 					transform.position.y += ((sprite.height * transform.scale.y) + 6);
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.y > 260) transform.position.y = 190;
 					break;
 
 				case SDLK_RIGHT:
 					transform.position.x += 100;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.x > 686) transform.position.x = 386;
 					break;
 
 				case SDLK_LEFT:
 					transform.position.x -= 100;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 					if (transform.position.x < 386) transform.position.x = 686;
 
 					break;
@@ -609,7 +609,7 @@ void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
 	{
 	case SDLK_UP:
 		transform.position.y -= sprite.height * transform.scale.y * 2;
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 		NameState::row--;
 		if (transform.position.y < 200)
 		{
@@ -621,7 +621,7 @@ void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
 
 	case SDLK_DOWN:
 		transform.position.y += sprite.height * transform.scale.y * 2;
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 		NameState::row++;
 		if (transform.position.y > 584)
 		{
@@ -633,7 +633,7 @@ void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
 
 	case SDLK_RIGHT:
 		transform.position.x += sprite.width * transform.scale.x;
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 		NameState::col++;
 		if (transform.position.x > 708)
 		{
@@ -645,7 +645,7 @@ void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
 
 	case SDLK_LEFT:
 		transform.position.x -= sprite.width * transform.scale.x;
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
 		NameState::col--;
 		if (transform.position.x < 260)
 		{

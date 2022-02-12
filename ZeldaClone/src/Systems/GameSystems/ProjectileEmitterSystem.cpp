@@ -247,7 +247,7 @@ void ProjectileEmitterSystem::UseMagicWand()
 
 void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::string& fileName)
 {
-	
+
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
@@ -268,7 +268,7 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 	while (true)
 	{
 		sol::optional<sol::table> hasAttribs = atrib[i];
-		
+
 		if (hasAttribs == sol::nullopt)
 			break;
 
@@ -279,19 +279,19 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 			ProjectileAttrib newItem;
 			std::string name = item_attrib["name"];
 
-			newItem.group		= item_attrib["group"];
+			newItem.group = item_attrib["group"];
 			newItem.sprite_name = item_attrib["asset_id"];
-			newItem.width		= item_attrib["width"].get_or(16);
-			newItem.height		= item_attrib["height"].get_or(16);
-			newItem.srcRectX	= item_attrib["src_rect_x"].get_or(0);
-			newItem.srcRectY	= item_attrib["src_rect_y"].get_or(0);
-			newItem.numFrames	= item_attrib["num_frames"].get_or(1);
-			
+			newItem.width = item_attrib["width"].get_or(16);
+			newItem.height = item_attrib["height"].get_or(16);
+			newItem.srcRectX = item_attrib["src_rect_x"].get_or(0);
+			newItem.srcRectY = item_attrib["src_rect_y"].get_or(0);
+			newItem.numFrames = item_attrib["num_frames"].get_or(1);
+
 			newItem.scale = glm::vec2(
 				item_attrib["scale"]["x"].get_or(4),
 				item_attrib["scale"]["y"].get_or(4)
 			);
-			
+
 			newItem.transOffsetUp = glm::vec2(
 				item_attrib["trans_offset_up"]["x"].get_or(0),
 				item_attrib["trans_offset_up"]["y"].get_or(0)
@@ -312,7 +312,7 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 				item_attrib["trans_offset_left"]["y"].get_or(0)
 			);
 
-			newItem.boxSizeUp= glm::vec2(
+			newItem.boxSizeUp = glm::vec2(
 				item_attrib["box_size_up"]["x"].get_or(0),
 				item_attrib["box_size_up"]["y"].get_or(0)
 			);
@@ -357,7 +357,7 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 
 			// Place the item in the map
 			projectileAttributeMap.emplace(name, newItem);
-			
+
 		}
 		i++;
 	}
@@ -369,6 +369,10 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 
 void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 {
+	auto player = Registry::Instance().GetEntityByTag("player");
+
+	auto& rigid = player.GetComponent<RigidBodyComponent>();
+
 	if (!game.PlayerHold())
 	{
 		if (event.symbol == SDLK_BACKSPACE)
@@ -377,9 +381,11 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 			ReloadItemMap();
 		}
 
-		if (event.symbol == game.GetKeyBindings().at(Game::Action::USE_ITEM) && !KeyboardControlSystem::keyDown)
+		if (event.symbol == game.GetKeyBindings().at(Game::Action::USE_ITEM) /*&& !KeyboardControlSystem::keyDown*/)
 		{
-			if (Game::mSelectedItem == Game::ItemType::WOOD_BOW || 
+			rigid.velocity = glm::vec2(0);
+
+			if (Game::mSelectedItem == Game::ItemType::WOOD_BOW ||
 				Game::mSelectedItem == Game::ItemType::MAGIC_BOW)
 			{
 				// Bow uses rupees, must be greater than zero!
@@ -389,7 +395,7 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 					UseItem(projectileAttributeMap.at("bow"));
 
 					// Play the arrow sound!
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					// Subtract from the total rupees when using the bow!
 					GameState::totalRupees--;
 				}
@@ -401,14 +407,14 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 				{
 					UseItem(projectileAttributeMap.at("bomb"));
 					GameState::totalBombs--;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
 				}
 				KeyboardControlSystem::keyDown = true;
 			}
 			else if (Game::mSelectedItem == Game::ItemType::CANDLE)
 			{
 				UseItem(projectileAttributeMap.at("candle"));
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
 				KeyboardControlSystem::keyDown = true;
 			}
 			else if (Game::mSelectedItem == Game::ItemType::BOOMERANG)
@@ -416,21 +422,22 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 				if (!boomerangReturned)
 				{
 					UseItem(projectileAttributeMap.at("boomerang"));
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					KeyboardControlSystem::keyDown = true;
 				}
 			}
 			else if (Game::mSelectedItem == Game::ItemType::MAGIC_ROD)
 			{
 				UseMagicWand();
-				
+
 				UseItem(projectileAttributeMap.at("magic_rod"));
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
 				KeyboardControlSystem::keyDown = true;
 			}
 		}
-		else if (event.symbol == game.GetKeyBindings().at(Game::Action::ATTACK) && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
+		else if (event.symbol == game.GetKeyBindings().at(Game::Action::ATTACK) /*&& !KeyboardControlSystem::keyDown*/ && swordTimer.GetTicks() == 0)
 		{
+			rigid.velocity = glm::vec2(0);
 			// Do not use the sword if we do not have a sword
 			if (game.HasSword())
 			{
@@ -441,10 +448,10 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 					// Create Sword beam projectile
 					UseItem(projectileAttributeMap.at("beam"));
 
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
 				}
 				else
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
 
 				swordTimer.Start();
 				KeyboardControlSystem::keyDown = true;
@@ -455,6 +462,10 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 
 void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 {
+	auto player = Registry::Instance().GetEntityByTag("player");
+
+	auto& rigid = player.GetComponent<RigidBodyComponent>();
+
 	if (!game.PlayerHold())
 	{
 		//if (event.button == SDL_CONTROLLER_BUTTON_BACK)
@@ -463,9 +474,10 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 		//	ReloadItemMap();
 		//}
 
-		if (event.button == game.GetBtnBindings().at(Game::Action::USE_ITEM) && !KeyboardControlSystem::keyDown)
+		if (event.button == game.GetBtnBindings().at(Game::Action::USE_ITEM)/* && !KeyboardControlSystem::keyDown*/)
 		{
-			if (Game::mSelectedItem == Game::ItemType::WOOD_BOW || 
+			rigid.velocity = glm::vec2(0);
+			if (Game::mSelectedItem == Game::ItemType::WOOD_BOW ||
 				Game::mSelectedItem == Game::ItemType::MAGIC_BOW)
 			{
 				// Bow uses rupees, must be greater than zero!
@@ -474,7 +486,7 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 					UseItem(projectileAttributeMap.at("bow"));
 
 					// Play the arrow sound!
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					// Subtract from the total rupees when using the bow!
 					GameState::totalRupees--;
 				}
@@ -486,14 +498,14 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 				{
 					UseItem(projectileAttributeMap.at("bomb"));
 					GameState::totalBombs--;
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
 				}
 				KeyboardControlSystem::keyDown = true;
 			}
 			else if (Game::mSelectedItem == Game::ItemType::CANDLE)
 			{
 				UseItem(projectileAttributeMap.at("candle"));
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
 				KeyboardControlSystem::keyDown = true;
 			}
 			else if (Game::mSelectedItem == Game::ItemType::BOOMERANG)
@@ -501,7 +513,7 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 				if (!boomerangReturned)
 				{
 					UseItem(projectileAttributeMap.at("boomerang"));
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
 					KeyboardControlSystem::keyDown = true;
 				}
 			}
@@ -509,12 +521,13 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 			{
 				UseMagicWand();
 				UseItem(projectileAttributeMap.at("magic_rod"));
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
 				KeyboardControlSystem::keyDown = true;
 			}
 		}
-		else if (event.button == game.GetBtnBindings().at(Game::Action::ATTACK) && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
+		else if (event.button == game.GetBtnBindings().at(Game::Action::ATTACK) /*&& !KeyboardControlSystem::keyDown*/ && swordTimer.GetTicks() == 0)
 		{
+			rigid.velocity = glm::vec2(0);
 			// Do not use the sword if we do not have a sword
 			if (game.HasSword())
 			{
@@ -525,10 +538,10 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 					// Create Sword beam projectile
 					UseItem(projectileAttributeMap.at("beam"));
 
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
 				}
 				else
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
 
 				swordTimer.Start();
 				KeyboardControlSystem::keyDown = true;

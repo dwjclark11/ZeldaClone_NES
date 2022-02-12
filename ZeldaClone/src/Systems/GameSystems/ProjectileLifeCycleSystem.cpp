@@ -41,7 +41,7 @@ void ProjectileLifeCycleSystem::Update()
 			explosion.Group("explode");
 			entity.Kill();
 
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_blow", 0, 1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_blow", 0, 1);
 		}
 		if ((SDL_GetTicks() - projectile.startTime) > projectile.duration && entity.BelongsToGroup("beam"))
 		{

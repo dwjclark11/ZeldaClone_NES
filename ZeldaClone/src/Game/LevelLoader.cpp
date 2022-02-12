@@ -299,7 +299,7 @@ void LevelLoader::EliminatePlayerToDefault(int slotNum, std::string& name)
 		playerHearts.Kill();
 
 	// Play Eliminate Sound
-	game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "Eliminate", 0, 1);
+	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "Eliminate", 0, 1);
 }
 
 bool LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
@@ -1325,7 +1325,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 			// Call the Trigger Function
 			if (entity.GetComponent<SecretComponent>().found)
 			{
-				game.GetSystem<TriggerSystem>().SecretTrigger(entity, true);
+				Registry::Instance().GetSystem<TriggerSystem>().SecretTrigger(entity, true);
 				Logger::Log("Loading Secrets");
 			}
 				

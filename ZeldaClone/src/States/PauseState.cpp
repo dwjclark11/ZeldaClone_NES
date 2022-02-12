@@ -26,11 +26,11 @@ PauseState::PauseState()
 void PauseState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	//reg.GetSystem<ItemSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
+	//Registry::Instance().GetSystem<ItemSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	//reg.GetSystem<ItemSelectKeyboardControlSystem>().Update();
+	//Registry::Instance().GetSystem<ItemSelectKeyboardControlSystem>().Update();
 
 	if (GameState::totalBombs > 0 && !game.GetGameItems().bombs)
 	{
@@ -59,10 +59,10 @@ void PauseState::Update(const double& deltaTime)
 
 void PauseState::Render()
 {
-	game.GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	game.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	game.GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	//reg.GetSystem<AnimationSystem>().Update();
+	Registry::Instance().GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	//Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
 
 bool PauseState::OnEnter()
@@ -198,7 +198,7 @@ bool PauseState::OnEnter()
 
 bool PauseState::OnExit()
 {
-	reg.GetSystem<RenderPauseSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderPauseSystem>().OnExit();
 	return true;
 }
 

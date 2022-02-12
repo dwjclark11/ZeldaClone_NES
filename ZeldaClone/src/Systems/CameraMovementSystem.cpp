@@ -4,6 +4,7 @@
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
+#include "../Components/PlayerComponent.h"
 #include <SDL.h>
 #include "../Game/Game.h"
 
@@ -29,6 +30,10 @@ CameraMovementSystem::CameraMovementSystem()
 
 void CameraMovementSystem::Update(SDL_Rect& camera)
 {
+	// Common Variables
+	const auto& currentState = game.GetStateMachine()->GetCurrentState();
+	auto& cameraMoving = game.GetCameraMoving();
+	
 	for (const auto& entity : GetSystemEntities())
 	{
 		auto& transform = entity.GetComponent<TransformComponent>();
@@ -37,7 +42,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 		const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
 
 		// Check to see what the current state is and move the camera according to the required state
-		if (game.GetStateMachine()->GetCurrentState() == "EDITOR")
+		if (currentState == "EDITOR")
 		{
 			if (!first)
 			{
@@ -52,7 +57,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 			camera.x = (camera.x + camera.w > 100000) ? 100000 - camera.w : camera.x; // if Camera.x is > than the width of the screen
 			camera.y = (camera.y + camera.h > 100000) ? 100000 - camera.h : camera.y;
 		}
-		else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
+		else if (currentState == "GAMESTATE")
 		{
 			/*
 				Inside GameState the camera has a scrolling effect. Once the player is beyond the camera bounds,
@@ -66,7 +71,8 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 				{
 					for (int j = 0; j < game.GetLevelHeight(); j++)
 					{
-						if (transform.position.x + boxCollider.width * transform.scale.x + boxCollider.offset.x >= (1024 * i) && transform.position.x + boxCollider.width * transform.scale.x + boxCollider.offset.x <= 1024 + (1024 * i) && east)
+						if (transform.position.x + boxCollider.width * transform.scale.x + boxCollider.offset.x >= (1024 * i) 
+							&& transform.position.x + boxCollider.width * transform.scale.x + boxCollider.offset.x <= 1024 + (1024 * i) && east)
 						{
 							if (east)
 							{
@@ -79,7 +85,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							{
 								camera.x = i * 1024;
 								east = false;
-								game.GetCameraMoving() = false;
+								cameraMoving = false;
 							}
 						}
 						else if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i) && west)
@@ -95,7 +101,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							{
 								camera.x = i * 1024;
 								west = false;
-								game.GetCameraMoving() = false;
+								cameraMoving = false;
 							}
 						}
 
@@ -112,10 +118,11 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							{
 								camera.y = (j * 672) - 288;
 								north = false;
-								game.GetCameraMoving() = false;
+								cameraMoving = false;
 							}
 						}
-						else if (transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y >= (672 * j) && transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y <= 672 + (672 * j) && south)
+						else if (transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y >= (672 * j) 
+							&& transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y <= 672 + (672 * j) && south)
 						{
 							if (south)
 							{
@@ -127,41 +134,44 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							{
 								camera.y = (j * 672) - 288;
 								south = false;
-								game.GetCameraMoving() = false;
+								cameraMoving = false;
 							}
 						}
 					}
 				}
 			}
 
-			if (entity.HasTag("player") || entity.HasTag("the_sword") || entity.HasTag("the_shield"))
+			if (entity.HasComponent<PlayerComponent>())
 			{
-				if (camera.x > (transform.position.x + boxCollider.offset.x) && !west && !game.GetCameraMoving() && rigidBody.velocity.x < 0)
+				if (camera.x > (transform.position.x + boxCollider.offset.x) 
+					&& !west && !cameraMoving && rigidBody.velocity.x < 0)
 				{
 					west = true;
-					game.GetCameraMoving() = true;
+					cameraMoving = true;
 					rigidBody.velocity.x = 0;
 				}
 
-				if ((camera.x + camera.w) < transform.position.x + sprite.width / 4 && !east && !game.GetCameraMoving()
+				if ((camera.x + camera.w) < transform.position.x + sprite.width / 4 && !east && !cameraMoving
 					&& rigidBody.velocity.x > 0)
 				{
 					east = true;
-					game.GetCameraMoving() = true;
+					cameraMoving = true;
 					rigidBody.velocity.x = 0;
 				}
 
-				if (camera.y > (transform.position.y + boxCollider.offset.y) - (game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64) && !north && !game.GetCameraMoving() && rigidBody.velocity.y < 0)
+				if (camera.y > (transform.position.y + boxCollider.offset.y) - (game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64) 
+					&& !north && !cameraMoving && rigidBody.velocity.y < 0)
 				{
 					north = true;
-					game.GetCameraMoving() = true;
+					cameraMoving = true;
 					rigidBody.velocity.y = 0;
 				}
 
-				if ((camera.y + camera.h) < transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y && !south && !game.GetCameraMoving() && rigidBody.velocity.y > 0)
+				if ((camera.y + camera.h) < transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y 
+					&& !south && !cameraMoving && rigidBody.velocity.y > 0)
 				{
 					south = true;
-					game.GetCameraMoving() = true;
+					cameraMoving = true;
 					rigidBody.velocity.y = 0;
 				}
 			}
@@ -183,7 +193,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 		}
 	}
 	// If the current State is the Title State, Run this Camera 
-	if (game.GetStateMachine()->GetCurrentState() == "TITLESTATE")
+	if (currentState == "TITLESTATE")
 	{
 		/*
 			This part of the system controls the scroll of the camera during the title screen animations
@@ -202,7 +212,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 		if (!titleScreenScroll_1 && !titleScreenScroll_2 && !game.GetCameraMoving())
 		{
 			titleScreenScroll_1 = true;
-			game.GetCameraMoving() = true;
+			cameraMoving = true;
 		}
 
 		if (titleScreenScroll_1)
@@ -214,7 +224,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 			{
 				camera.y = 960;
 				titleScreenScroll_1 = false;
-				game.GetCameraMoving() = false;
+				cameraMoving = false;
 			}
 		}
 

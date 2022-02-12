@@ -4,6 +4,7 @@
 #include "../ECS/ECS.h"
 #include "../Components/AnimationComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/BackgroundImageComponent.h"
 #include "../Systems/CameraMovementSystem.h"
@@ -31,7 +32,7 @@ void TitleState::Update(const double& deltaTime)
 		RenderTitleSystem::titleTimer++;
 	}
 
-	reg.GetSystem<AnimationSystem>().Update();
+	Registry::Instance().GetSystem<AnimationSystem>().Update();
 	
 	if (timer >= 150)
 	{
@@ -47,12 +48,12 @@ void TitleState::Update(const double& deltaTime)
 			scroll = true;
 		}
 		// Start the camera Movement System to Scroll the screen down
-		reg.GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+		Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
 		
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
-		if (reg.GetSystem<CameraMovementSystem>().GetScrollFinished())
+		if (Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished())
 		{
-			reg.GetSystem<CameraMovementSystem>().GetScrollFinished() = false;
+			Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished() = false;
 			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(new TitleState());
 		}
@@ -61,7 +62,7 @@ void TitleState::Update(const double& deltaTime)
 
 void TitleState::Render()
 {
-	game.GetSystem<RenderTitleSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderTitleSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 }
 
 bool TitleState::OnEnter()
@@ -78,7 +79,7 @@ bool TitleState::OnEnter()
 	Mix_VolumeMusic(10);
 
 
-	reg.GetSystem<GamePadSystem>().Init();
+	Registry::Instance().GetSystem<GamePadSystem>().Init();
 
 	// Add Assets to the Asset Manager
 	game.GetAssetManager()->AddMusic("Title", "Assets/Music/Title_Theme.mp3");
@@ -90,12 +91,13 @@ bool TitleState::OnEnter()
 		game.GetAssetManager()->AddTextures(game.GetRenderer(), "waterfall", "./Assets/Backgrounds/waterfall.png");
 	
 	// Start the Title Screen Music
-	game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Title", -1);
+	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Title", -1);
 	
 	// Create the Title Screen Entity
 	Entity titleScreen = reg.CreateEntity();
 	titleScreen.AddComponent<SpriteComponent>("TitleScreen", 256, 240, 0, true);
 	titleScreen.AddComponent<BackgroundImageComponent>(glm::vec2(0,0), glm::vec2(4,4));
+	titleScreen.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(4,4));
 	titleScreen.AddComponent<AnimationComponent>(3, 4, false);
 	titleScreen.AddComponent<RigidBodyComponent>(glm::vec2(0));
 	titleScreen.Group("title");
@@ -111,8 +113,8 @@ bool TitleState::OnEnter()
 bool TitleState::OnExit()
 {
 	// Remove Assets/Entities from the game that are not needed anymore
-	game.GetSystem<RenderTitleSystem>().OnExit();
-	game.GetSystem<CameraMovementSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderTitleSystem>().OnExit();
+	Registry::Instance().GetSystem<CameraMovementSystem>().OnExit();
 	
 	// Remove the Render Title System If we are not using it!
 	reg.RemoveSystem<RenderTitleSystem>();

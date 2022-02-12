@@ -25,8 +25,8 @@ void GameOverState::Update(const double& deltaTime)
 
 void GameOverState::Render()
 {
-	game.GetSystem<RenderGameOverTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	game.GetSystem<RenderGameOverSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderGameOverTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderGameOverSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool GameOverState::OnEnter()
@@ -38,7 +38,7 @@ bool GameOverState::OnEnter()
 	if (!Registry::Instance().HasSystem<GameOverKeyboardControlSystem>()) 
 		Registry::Instance().AddSystem<GameOverKeyboardControlSystem>();
 	
-	game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
+	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 	
 	game.GetAssetManager()->AddTextures(game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
 
@@ -74,9 +74,9 @@ bool GameOverState::OnEnter()
 
 bool GameOverState::OnExit()
 {
-	game.GetSystem<RenderGameOverSystem>().OnExit();
-	game.GetSystem<RenderGameOverTextSystem>().OnExit();
-	game.GetSystem<RenderTextSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderGameOverSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderGameOverTextSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 	Logger::Log("Exiting Game Over State");
 	game.GetPlayerDead() = false;
 	return true;
@@ -84,7 +84,7 @@ bool GameOverState::OnExit()
 
 void GameOverState::ProcessEvents(SDL_Event& event)
 {
-	//game.GetSystem<GamePadSystem>().UpdateOtherStates(event);
+	//Registry::Instance().GetSystem<GamePadSystem>().UpdateOtherStates(event);
 }
 
 void GameOverState::OnKeyDown(SDL_Event* event)

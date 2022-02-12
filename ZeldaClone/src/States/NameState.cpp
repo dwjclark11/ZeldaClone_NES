@@ -27,17 +27,17 @@ NameState::NameState()
 void NameState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	//reg.GetSystem<NameSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
+	//Registry::Instance().GetSystem<NameSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	//reg.GetSystem<NameSelectKeyboardControlSystem>().Update();
+	//Registry::Instance().GetSystem<NameSelectKeyboardControlSystem>().Update();
 }
 
 void NameState::Render()
 {
-	reg.GetSystem<RenderNameSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	reg.GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderNameSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 }
 
 bool NameState::OnEnter()
@@ -67,7 +67,7 @@ bool NameState::OnEnter()
 
 bool NameState::OnExit()
 {
-	reg.GetSystem<RenderNameStateTextSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderNameStateTextSystem>().OnExit();
 	return true;
 }
 

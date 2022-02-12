@@ -22,11 +22,11 @@ EditorState::EditorState()
 void EditorState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	reg.GetSystem<EditorKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<EditorKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 
 	reg.Update();
-	reg.GetSystem<CameraMovementSystem>().Update(game.GetCamera());
-	//reg.GetSystem<AnimationSystem>().Update();
+	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+	//Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
 
 void EditorState::Render()
@@ -46,11 +46,11 @@ void EditorState::Render()
 			SDL_RenderDrawRect(game.GetRenderer(), &newRect);
 		}
 
-	reg.GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	reg.GetSystem<MouseControlSystem>().Update(game.GetAssetManager(), game.GetRenderer(),
+	Registry::Instance().GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<MouseControlSystem>().Update(game.GetAssetManager(), game.GetRenderer(),
 		game.GetMouseBox(), game.GetEvent(), game.GetCamera());
-	reg.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
-	reg.GetSystem<RenderEditorGUISystem>().Update(game.GetAssetManager(), game.GetRenderer());
+	Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderEditorGUISystem>().Update(game.GetAssetManager(), game.GetRenderer());
 
 	// Draw The Editor Boundries
 	SDL_SetRenderDrawColor(game.GetRenderer(), 70, 70, 70, 70);
@@ -102,7 +102,7 @@ bool EditorState::OnEnter()
 bool EditorState::OnExit()
 {
 	// Delete the editor entities
-	reg.GetSystem<RenderEditorSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderEditorSystem>().OnExit();
 
 	game.GetCamera().w = game.windowWidth;
 	game.GetCamera().h = game.windowHeight;

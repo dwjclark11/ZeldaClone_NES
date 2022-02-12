@@ -135,7 +135,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		Logger::Log("Blasted open " + secret.locationID + " Secret!");
 		secret.found = true;
 		game.SetSecretFound(secret.locationID, true);
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
 
 		loader.SaveSecrets();
 	
@@ -272,9 +272,9 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			else
 			{
 				//// Remove all the prior assets/entities from the current scene
-				game.GetSystem<RenderSystem>().OnExit();
-				game.GetSystem<RenderTileSystem>().OnExit();
-				game.GetSystem<RenderCollisionSystem>().OnExit();
+				Registry::Instance().GetSystem<RenderSystem>().OnExit();
+				Registry::Instance().GetSystem<RenderTileSystem>().OnExit();
+				Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
 				
 		
 				// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
@@ -294,9 +294,9 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 
 				// Start the new scene's music || stop the music
 				if (levelMusic != "stop")
-					game.GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), levelMusic, -1);
+					Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), levelMusic, -1);
 				else
-					game.GetSystem<MusicPlayerSystem>().StopMusic();
+					Registry::Instance().GetSystem<MusicPlayerSystem>().StopMusic();
 
 				// If there is an entity file, NPCs, Store Items, etc. Load it
 				if (entityFile != "no_file")
@@ -356,7 +356,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			playerTransform.position = trig.transportOffset;
 			game.GetCamera().x = trig.cameraOffset.x;
 			game.GetCamera().y = trig.cameraOffset.y;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
 			// Finish the fade screen 
 			game.StartFadeOut() = false;
 			game.StartFadeIn() = true;
@@ -384,13 +384,13 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			if (playerRigidBody.up)
 			{
 				trig.active = true;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
 				secret.moveUp = true;
 			}
 			else if (playerRigidBody.down)
 			{
 				trig.active = true;
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
 				secret.moveDown = true;
 			}
 		}
@@ -402,7 +402,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	{
 		if (!trig.active)
 		{
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, 1);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, 1);
 			game.GetPlayerItem() = true;
 			trig.active = true;
 		}
@@ -445,7 +445,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			// Test --> Collect the item
 			if (!trig.active)
 			{
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, -1);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, -1);
 				game.GetPlayerItem() = true;
 				trig.active = true;
 				GameState::scrollRupees = shopItem.price;

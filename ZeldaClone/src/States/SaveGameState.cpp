@@ -16,16 +16,16 @@ SaveGameState::SaveGameState()
 void SaveGameState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	reg.GetSystem<SaveSelectKeyboardSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<SaveSelectKeyboardSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	reg.GetSystem<AnimationSystem>().Update();
+	Registry::Instance().GetSystem<AnimationSystem>().Update();
 
 	//if (State::exitToMain) game.GetStateMachine()->PopState();
 }
 
 void SaveGameState::Render()
 {
-	game.GetSystem<RenderSaveStateSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderSaveStateSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool SaveGameState::OnEnter()

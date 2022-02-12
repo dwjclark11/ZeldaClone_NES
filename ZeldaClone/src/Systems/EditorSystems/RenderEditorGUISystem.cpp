@@ -916,8 +916,8 @@ bool RenderEditorGUISystem::LoadEntireMapSprite(const std::unique_ptr<AssetManag
 {
 	std::string mapAssetID = "";
 	// Remove all Entities from the Editor
-	game.GetSystem<RenderEditorSystem>().OnExit();
-	game.GetSystem<RenderCollisionSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderEditorSystem>().OnExit();
+	Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
 
 	// Load the image to the asset manager and query the width and height
 	if (!LoadNewImage(assetManager, renderer, mapAssetID, mapWidth, mapHeight))

@@ -94,7 +94,7 @@ void HealthSystem::Update()
 				// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
 				if (currentHealth <= 2 && currentHealth > 0 && health.lowHeathTimer.GetTicks() > 250)
 				{
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "low_health", 0, 5);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "low_health", 0, 5);
 					health.lowHeathTimer.Stop();
 					lowHealth = false;
 				}

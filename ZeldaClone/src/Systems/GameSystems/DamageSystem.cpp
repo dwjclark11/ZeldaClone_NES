@@ -79,7 +79,7 @@ void DamageSystem::OnPlayerHitsProjectile(Entity projectile, Entity player)
 			playerHealth.healthPercentage -= project.hitPercentDamage; // This will need to change based on the enemy attack power!
 			playerTransform.position.x += 5;
 			playerTransform.position.y += 5;
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_hurt", 0, 2);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_hurt", 0, 2);
 			playerHealth.isHurt = true;
 			Logger::Log("Projectile Damage: " + std::to_string(project.hitPercentDamage));
 			// Remove the projectile
@@ -88,7 +88,7 @@ void DamageSystem::OnPlayerHitsProjectile(Entity projectile, Entity player)
 		// Have the projectile bounce off the shield and not hurt the player
 		else if (projectile.BelongsToGroup("projectile") && player.HasTag("the_shield") && !project.isFriendly)
 		{
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "shield", 0, 6);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "shield", 0, 6);
 
 			if (projectileRigid.velocity.y < 0)
 			{
@@ -139,12 +139,12 @@ void DamageSystem::OnPlayerSwordHitsEnemy(Entity sword, Entity enemy)
 				if (enemyRigidbody.velocity.y < 0) enemyTransform.position.y += 5;
 
 				// Play the enemy hit sound FX
-				game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
 
 				if (enemyHealth.healthPercentage <= 0)
 				{
 					// Play the enemy die sound and kill the entity
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
 				}
 				enemyHealth.isHurt = true;
 			}
@@ -166,12 +166,12 @@ void DamageSystem::OnPlayerSwordHitsEnemy(Entity sword, Entity enemy)
 					if (enemyRigidbody.velocity.y < 0) enemyTransform.position.y += 5;
 
 					// Play the enemy hit sound FX
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
 
 					if (enemyHealth.healthPercentage <= 0)
 					{
 						// Play the enemy die sound and kill the entity
-						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
+						Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
 					}
 					enemyHealth.isHurt = true;
 				}
@@ -205,12 +205,12 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 				if (health.healthPercentage <= 0)
 				{
 					// Play the enemy die sound and kill the entity
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
 				}
 				else
 				{
 					// Play the enemy hit sound FX
-					game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
 				}
 
 				health.isHurt = true;
@@ -233,12 +233,12 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 					if (health.healthPercentage <= 0)
 					{
 						// Play the enemy die sound and kill the entity
-						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
+						Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_die", 0, 2);
 					}
 					else
 					{
 						// Play the enemy hit sound FX
-						game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
+						Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
 					}
 
 					health.isHurt = true;
@@ -262,7 +262,7 @@ void DamageSystem::OnEnemyHitsPlayer(Entity enemy, Entity player)
 		playerTransform.position.x += 5;
 		playerTransform.position.y += 5;
 
-		game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_hurt", 0, 2);
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_hurt", 0, 2);
 		playerHealth.isHurt = true;
 	}
 }
@@ -280,7 +280,7 @@ void DamageSystem::OnEnemyHitsBoomerang(Entity enemy, Entity boomerang)
 		{
 			enemyAI.SetStunned(true);
 			// Play the enemy hit sound FX
-			game.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "enemy_hit", 0, 2);
 		}
 	}
 }

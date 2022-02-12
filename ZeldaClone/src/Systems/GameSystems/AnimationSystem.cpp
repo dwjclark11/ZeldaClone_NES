@@ -3,22 +3,35 @@
 #include "../../Components/AnimationComponent.h"
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/HealthComponent.h"
+#include "../../Components/TransformComponent.h"
 #include "../../Components/AIComponent.h"
+#include "../../Game/Game.h"
+
 #include <SDL.h>
 
 AnimationSystem::AnimationSystem()
 {
 	RequiredComponent<AnimationComponent>();
 	RequiredComponent<SpriteComponent>();
+	RequiredComponent<TransformComponent>();
 }
 
 void AnimationSystem::Update()
 {
 	for (const auto& entity : GetSystemEntities())
 	{
+		auto& transform = entity.GetComponent<TransformComponent>();
+		auto& playerPos = Game::Instance().GetPlayerPos();
+		int entX = transform.position.x / 1024;
+		int entY = transform.position.y / 672;
+		
+		if (entX != playerPos.x || entY != playerPos.y)
+			continue;
+
+
 		auto& animation = entity.GetComponent<AnimationComponent>();
 		auto& sprite = entity.GetComponent<SpriteComponent>();
-
+		
 
 		auto health = HealthComponent();
 		auto ai = AIComponent();
@@ -49,8 +62,10 @@ void AnimationSystem::Update()
 		}
 		else
 		{
+			const auto& playerTag = entity.HasTag("player");
+			
 			// If the animation is a vertical scroll use this
-			if (animation.vertical && (entity.HasTag("player")))
+			if (animation.vertical && playerTag)
 			{
 				if (rigidbody.velocity != glm::vec2(0))
 				{
@@ -59,7 +74,7 @@ void AnimationSystem::Update()
 				else if (health.isHurt) // If the enemy is hurt use this frame
 					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 			}
-			else if (animation.vertical && !entity.HasTag("player"))
+			else if (animation.vertical && !playerTag)
 			{
 				sprite.srcRect.y = animation.currentFrame * sprite.height;
 			}
