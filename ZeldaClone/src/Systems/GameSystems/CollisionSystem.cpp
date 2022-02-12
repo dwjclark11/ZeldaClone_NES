@@ -58,50 +58,22 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 			if (checkBX != playerPos.x || checkBY != playerPos.y)
 				continue;
 
-			auto bCol = std::async([&b]() { return b.HasComponent<ColliderComponent>(); });
-			auto aCol = a.HasComponent<ColliderComponent>();
-
-			// bypass if both are colliders
-			if (bCol.get() && aCol)
+			if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
 				continue;
 
-
-			/*if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
-				continue;*/
-
-
-			auto bTrig = std::async([&b]() { return b.HasComponent<TriggerBoxComponent>(); });
-			if (bTrig.get() && aCol)
+			if (a.HasComponent<ColliderComponent>() && b.HasComponent<TriggerBoxComponent>())
 			{
 				// Check to see if the trigger is a collider
 				if (!b.GetComponent<TriggerBoxComponent>().collider)
 					continue;
 			}
 
-			//if (a.HasComponent<ColliderComponent>() && b.HasComponent<TriggerBoxComponent>())
-			//{
-			//	// Check to see if the trigger is a collider
-			//	if (!b.GetComponent<TriggerBoxComponent>().collider)
-			//		continue;
-			//}
-
-
-			auto bCol2 = std::async([&b]() { return b.HasComponent<ColliderComponent>(); });
-			auto aTrig = a.HasComponent<TriggerBoxComponent>();
-
-			if (bCol2.get() && aTrig)
+			if (a.HasComponent<TriggerBoxComponent>() && b.HasComponent<ColliderComponent>())
 			{
 				// Check to see if the trigger is a collider
 				if (!a.GetComponent<TriggerBoxComponent>().collider)
 					continue;
 			}
-
-			//if (a.HasComponent<TriggerBoxComponent>() && b.HasComponent<ColliderComponent>())
-			//{
-			//	// Check to see if the trigger is a collider
-			//	if (!a.GetComponent<TriggerBoxComponent>().collider)
-			//		continue;
-			//}
 
 			const auto& aCollider = a.GetComponent<BoxColliderComponent>();
 			const auto& bCollider = b.GetComponent<BoxColliderComponent>();
