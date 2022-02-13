@@ -34,6 +34,7 @@ This project is created with:
 
 ![xbox_controller](https://user-images.githubusercontent.com/63356975/153439752-0862e46e-48c1-461a-a79b-481d6e00307c.png)
 * GamePad Buttons are based on the SDL_GameControllerButtons == X BOX Style Gamepad.
+* These are default keys that are now changable inside of the settings state. Changes the Action/Key/Btn Bindings.
 
 ## User Experience
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
@@ -76,7 +77,7 @@ Some of the desired changes are:
 * Add enemies to any maps using the editor
 * Add a functional AI state machine with for entities/enemies done in lua
     *  Currently this is done in C++, Not easy to make small changes!
-* Ability for user to change keys/gamepad controls (Currently Hard Coded)
+* ~~Ability for user to change keys/gamepad controls (Currently Hard Coded)~~ Completed.
 * Remove a lot of static variables 
 * Figure out how to remove the Game Singleton and create a loose coupling amongst concrete classes.
 
