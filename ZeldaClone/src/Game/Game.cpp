@@ -250,6 +250,31 @@ void Game::Draw()
 	SDL_RenderPresent(mRenderer);
 }
 
+void Game::CreateDefaultBtnBindings()
+{
+	AddBtnToMap(Action::MOVE_UP, SDL_CONTROLLER_BUTTON_DPAD_UP);
+	AddBtnToMap(Action::MOVE_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+	AddBtnToMap(Action::MOVE_DOWN, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+	AddBtnToMap(Action::MOVE_LEFT, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+	AddBtnToMap(Action::ATTACK, SDL_CONTROLLER_BUTTON_A);
+	AddBtnToMap(Action::USE_ITEM, SDL_CONTROLLER_BUTTON_X);
+	AddBtnToMap(Action::PAUSE, SDL_CONTROLLER_BUTTON_START);
+	AddBtnToMap(Action::SELECT, SDL_CONTROLLER_BUTTON_A);
+	AddBtnToMap(Action::CANCEL, SDL_CONTROLLER_BUTTON_B);
+}
+
+void Game::CreateDefaultKeyBindings()
+{
+	AddKeyToMap(Action::MOVE_UP, SDLK_w);
+	AddKeyToMap(Action::MOVE_RIGHT, SDLK_d);
+	AddKeyToMap(Action::MOVE_DOWN, SDLK_s);
+	AddKeyToMap(Action::MOVE_LEFT, SDLK_a);
+	AddKeyToMap(Action::ATTACK, SDLK_RSHIFT);
+	AddKeyToMap(Action::USE_ITEM, SDLK_SPACE);
+	AddKeyToMap(Action::PAUSE, SDLK_q);
+	AddKeyToMap(Action::SELECT, SDLK_SPACE);
+	AddKeyToMap(Action::CANCEL, SDLK_BACKSPACE);
+}
 void Game::Shutdown()
 {
 	// Shutdown ImGui
@@ -394,3 +419,31 @@ void Game::SetSecretFound(const std::string& locationID, bool found)
 		gameSecrets[locationID] = found;
 	}
 }
+
+void Game::AddKeyToMap(Action action, SDL_Keycode key)
+{
+	if (mMappedKeys.find(action) == mMappedKeys.end())
+	{
+		mMappedKeys.emplace(action, key);
+	}
+}
+
+void Game::ChangeKeyBinding(Action action, SDL_Keycode key)
+{
+	if (mMappedKeys.find(action) != mMappedKeys.end())
+		mMappedKeys[action] = key;
+}
+void Game::AddBtnToMap(Action action, SDL_GameControllerButton button)
+{
+	if (mMappedButtons.find(action) == mMappedButtons.end())
+	{
+		mMappedButtons.emplace(action, button);
+	}
+}
+
+void Game::ChangeBtnBinding(Action action, SDL_GameControllerButton button)
+{
+	if (mMappedButtons.find(action) != mMappedButtons.end())
+		mMappedButtons[action] = button;
+}
+

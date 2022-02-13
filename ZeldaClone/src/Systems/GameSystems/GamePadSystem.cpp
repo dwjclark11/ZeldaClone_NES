@@ -3,8 +3,10 @@
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
+#include "../../Components/GamePadComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/TextLabelComponent.h"
+#include "../../Components/SettingsComponent.h"
 #include "../SoundFXSystem.h"
 #include "KeyboardControlSystem.h"
 #include <filesystem>
@@ -13,6 +15,7 @@
 #include "../../States/GameState.h"
 #include "../../States/NameState.h"
 #include "../../States/EditorState.h"
+#include "../../States/SettingsState.h"
 #include "../../Game/Game.h"
 #include "../../Game/LevelLoader.h"
 
@@ -23,8 +26,9 @@ GamePadSystem::GamePadSystem()
 	, game(Game::Instance())
 
 {
-	RequiredComponent<TransformComponent>();
-	RequiredComponent<SpriteComponent>();
+	//RequiredComponent<TransformComponent>();
+	//RequiredComponent<SpriteComponent>();
+	RequiredComponent<GamePadComponent>();
 }
 
 void GamePadSystem::Init()
@@ -344,6 +348,99 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 	}
 }
 
+void GamePadSystem::SettingsStateBtns(GamePadButtonPressedEvent& event)
+{
+	auto selector = Registry::Instance().GetEntityByTag("settings_selector");
+	auto& selectTransform = selector.GetComponent<TransformComponent>();
+
+
+	for (const auto& entity : GetSystemEntities())
+	{
+		if (entity.HasComponent<SettingsComponent>())
+		{
+			const auto& settings = entity.GetComponent<SettingsComponent>();
+
+			if (!SettingsState::mEnterKey)
+			{
+				if (event.button == SDL_CONTROLLER_BUTTON_A)
+				{
+					SettingsState::mEnterKey = true;
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					break;
+
+				}
+				else if (event.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+				{
+					selectTransform.position.y -= 75;
+					SettingsState::mActionIndex--;
+
+					if (selectTransform.position.y < 225)
+					{
+						selectTransform.position.y = 600;
+						SettingsState::mActionIndex = 5;
+					}
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				}
+				else if (event.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
+				{
+					selectTransform.position.y += 75;
+					SettingsState::mActionIndex++;
+
+					if (selectTransform.position.y > 600)
+					{
+						selectTransform.position.y = 225;
+						SettingsState::mActionIndex = 0;
+					}
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				}
+			}
+			else
+			{
+				Game::Instance().ChangeBtnBinding(static_cast<Game::Action>(SettingsState::mActionIndex), 
+					static_cast<SDL_GameControllerButton>(event.button));
+				
+				std::string btnPressed = std::string(SDL_GameControllerGetStringForButton(static_cast<SDL_GameControllerButton>(event.button)));
+				
+				if (entity.HasComponent<TextLabelComponent>())
+				{
+					Logger::Log("set index: " + std::to_string(settings.index));
+
+					if (settings.index == SettingsState::mActionIndex && settings.input == SettingsComponent::Input::BUTTON)
+					{
+						auto& text = entity.GetComponent<TextLabelComponent>();
+						text.text = btnPressed;
+						Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+						SettingsState::mEnterKey = false;
+						break;
+					}
+				}
+			}
+		}
+		else
+			continue;
+	}
+
+
+
+	auto& selectText = selector.GetComponent<TextLabelComponent>();
+	if (SettingsState::mEnterKey)
+	{
+		switch (SettingsState::mActionIndex)
+		{
+		case 0: selectText.text = "Changing Move Up Button"; break;
+		case 1: selectText.text = "Changing Move Down Button"; break;
+		case 2: selectText.text = "Changing Move Left Button"; break;
+		case 3: selectText.text = "Changing Move Right Button"; break;
+		case 4: selectText.text = "Changing Attack Button"; break;
+		case 5: selectText.text = "Changing Use Item Button"; break;
+		default: break;
+		}
+	}
+	else
+		selectText.text = "Choose an Action to Change!";
+}
+
+
 void GamePadSystem::NameStateBtns(GamePadButtonPressedEvent& event)
 {
 	if (MenuState::player1Name.size() == 0)
@@ -604,5 +701,9 @@ void GamePadSystem::OnButtonPressed(GamePadButtonPressedEvent& event)
 	else if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
 	{
 		PauseStateBtns(event);
+	}
+	else if (game.GetStateMachine()->GetCurrentState() == "SETTINGS")
+	{
+		SettingsStateBtns(event);
 	}
 }

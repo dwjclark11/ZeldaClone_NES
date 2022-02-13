@@ -99,16 +99,8 @@ public:
 	static bool isDebug;
 
 	~Game();
-
-
 	// Creation of the singleton Game
 	static Game& Instance();
-
-	// Function Declarations
-	void Initialize();
-	void Update();
-	void ProcessEvents();
-	void Draw();
 	void Shutdown();
 	void Run();
 
@@ -169,68 +161,14 @@ public:
 	void SetSecretFound(const std::string& locationID, bool found);
 	std::map<std::string, bool> GetGameSecrets() { return gameSecrets; }
 	
-
-	int milliSecondsPreviousFrame;
-
 	StateMachine& GetPlayerStateMachine() { return psm; }
 
-
-	void AddKeyToMap(Action action, SDL_Keycode key)
-	{
-		if (mMappedKeys.find(action) == mMappedKeys.end())
-		{
-			mMappedKeys.emplace(action, key);
-		}
-	}
-
-	void CreateDefaultKeyBindings()
-	{
-		AddKeyToMap(Action::MOVE_UP, SDLK_w);
-		AddKeyToMap(Action::MOVE_RIGHT, SDLK_d);
-		AddKeyToMap(Action::MOVE_DOWN, SDLK_s);
-		AddKeyToMap(Action::MOVE_LEFT, SDLK_a);
-		AddKeyToMap(Action::ATTACK, SDLK_RSHIFT);
-		AddKeyToMap(Action::USE_ITEM, SDLK_SPACE);
-		AddKeyToMap(Action::PAUSE, SDLK_q);
-		AddKeyToMap(Action::SELECT, SDLK_SPACE);
-		AddKeyToMap(Action::CANCEL, SDLK_BACKSPACE);
-	}
-
-	void ChangeKeyBinding(Action action, SDL_Keycode key)
-	{
-		if (mMappedKeys.find(action) != mMappedKeys.end())
-			mMappedKeys[action] = key;
-	}
-
+	void AddKeyToMap(Action action, SDL_Keycode key);
+	void ChangeKeyBinding(Action action, SDL_Keycode key);
 	const std::map<Action, SDL_Keycode>& GetKeyBindings() const { return mMappedKeys; }
 
-	void AddBtnToMap(Action action, SDL_GameControllerButton button)
-	{
-		if (mMappedButtons.find(action) == mMappedButtons.end())
-		{
-			mMappedButtons.emplace(action, button);
-		}
-	}
-
-	void CreateDefaultBtnBindings()
-	{
-		AddBtnToMap(Action::MOVE_UP, SDL_CONTROLLER_BUTTON_DPAD_UP);
-		AddBtnToMap(Action::MOVE_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-		AddBtnToMap(Action::MOVE_DOWN, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-		AddBtnToMap(Action::MOVE_LEFT, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-		AddBtnToMap(Action::ATTACK, SDL_CONTROLLER_BUTTON_A);
-		AddBtnToMap(Action::USE_ITEM, SDL_CONTROLLER_BUTTON_X);
-		AddBtnToMap(Action::PAUSE, SDL_CONTROLLER_BUTTON_START);
-		AddBtnToMap(Action::SELECT, SDL_CONTROLLER_BUTTON_A);
-		AddBtnToMap(Action::CANCEL, SDL_CONTROLLER_BUTTON_B);
-	}
-
-	void ChangeBtnBinding(Action action, SDL_GameControllerButton button)
-	{
-		if (mMappedButtons.find(action) != mMappedButtons.end())
-			mMappedButtons[action] = button;
-	}
-
+	void AddBtnToMap(Action action, SDL_GameControllerButton button);
+	void ChangeBtnBinding(Action action, SDL_GameControllerButton button);
 	const std::map<Action, SDL_GameControllerButton>& GetBtnBindings() const { return mMappedButtons; }
 
 private:
@@ -238,7 +176,7 @@ private:
 	std::map<Action, SDL_Keycode> mMappedKeys;
 	std::map<Action, SDL_GameControllerButton> mMappedButtons;
 	std::map<std::string, bool> gameSecrets;
-
+	int milliSecondsPreviousFrame;
 	int milliSecondsPerFrame;
 	bool mIsRunning;
 	bool attack;
@@ -283,11 +221,13 @@ private:
 
 	// Constructor
 	Game();
+
+	// Private Function Declarations
+	void Initialize();
+	void Update();
+	void ProcessEvents();
+	void Draw();
+	void CreateDefaultBtnBindings();
+	void CreateDefaultKeyBindings();
 };
 
-//// Why is this needed?
-//template<typename TSystem>
-//TSystem& Game::GetSystem()
-//{
-//	return Registry::Instance().GetSystem<TSystem>();
-//}

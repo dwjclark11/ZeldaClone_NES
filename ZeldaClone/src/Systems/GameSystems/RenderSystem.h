@@ -8,4 +8,5 @@ public:
 
 	void Update(struct SDL_Renderer* renderer, std::unique_ptr<class AssetManager>& assetManager, struct SDL_Rect& camera);
 	void OnExit();
+	
 };

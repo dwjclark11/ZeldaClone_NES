@@ -9,6 +9,7 @@ private:
 	class Game& game;
 	void GameStateBtns(GamePadButtonPressedEvent& event);
 	void MenuStateBtns(GamePadButtonPressedEvent& event);
+	void SettingsStateBtns(GamePadButtonPressedEvent& event);
 	void NameStateBtns(GamePadButtonPressedEvent& event);
 	void PauseStateBtns(GamePadButtonPressedEvent& event);
 	void OnButtonPressed(GamePadButtonPressedEvent& event);

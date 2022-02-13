@@ -273,6 +273,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 				heart.AddComponent<SpriteComponent>("hearts", 16, 16, 0, false, 0, 0);
 				heart.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(4, 4), 0.0);
 				heart.AddComponent<MenuComponent>();
+
 			}
 
 			auto entity = reg.GetEntityByTag(entityTag);

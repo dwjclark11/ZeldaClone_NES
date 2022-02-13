@@ -4,6 +4,8 @@
 class SettingsState : public State
 {
 public:
+	static int mActionIndex;
+	static bool mEnterKey;
 	SettingsState();
 	virtual ~SettingsState() { Logger::Err("Settings State Destroyed!!"); }
 

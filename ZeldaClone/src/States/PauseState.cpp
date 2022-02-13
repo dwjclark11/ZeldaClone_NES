@@ -7,10 +7,10 @@
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/GameSystems/KeyboardControlSystem.h"
-//#include "../Systems/PauseSystems/ItemSelectKeyboardSystem.h"
 #include "../Game/LevelLoader.h"
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Components/KeyboardControlComponent.h"
+#include "../Components/GamePadComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/PauseComponent.h"
@@ -26,11 +26,11 @@ PauseState::PauseState()
 void PauseState::Update(const double& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	//Registry::Instance().GetSystem<ItemSelectKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
-	//Registry::Instance().GetSystem<ItemSelectKeyboardControlSystem>().Update();
+	
 
 	if (GameState::totalBombs > 0 && !game.GetGameItems().bombs)
 	{
@@ -54,7 +54,6 @@ void PauseState::Update(const double& deltaTime)
 	}
 
 	if (GameState::totalBombs == 0 && game.GetGameItems().bombs) game.GetGameItems().bombs = false;
-	//if (State::exitToMain) game.GetStateMachine()->PopState();
 }
 
 void PauseState::Render()
@@ -62,7 +61,6 @@ void PauseState::Render()
 	Registry::Instance().GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 	Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-	//Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
 
 bool PauseState::OnEnter()
@@ -74,8 +72,6 @@ bool PauseState::OnEnter()
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
 	// =============================================================================================================================
-	//if (!reg.HasSystem<ItemSelectKeyboardControlSystem>()) 
-	//	reg.AddSystem<ItemSelectKeyboardControlSystem>();
 	if (!reg.HasSystem<RenderPauseSystem>()) 
 		reg.AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
@@ -89,6 +85,7 @@ bool PauseState::OnEnter()
 	pauseSelector.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
 	pauseSelector.AddComponent<PauseComponent>();
 	pauseSelector.AddComponent<KeyboardControlComponent>();
+	pauseSelector.AddComponent<GamePadComponent>();
 	pauseSelector.Tag("pauseSelector");
 	pauseSelector.Group("pause");
 

@@ -1,5 +1,6 @@
 #include "RenderTextSystem.h"
 #include "../Components/TextLabelComponent.h"
+#include "../Components/SettingsComponent.h"
 #include "../AssetManager/AssetManager.h"
 #include "../States/GameState.h"
 #include "../Game/Game.h"
@@ -18,33 +19,33 @@ void RenderTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 	{
 		auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
-		if (entity.HasTag("rupees"))
-		{
-			textLabel.text = std::to_string(GameState::totalRupees);
-		}
-		if (entity.HasTag("keys"))
-		{
-			textLabel.text = std::to_string(GameState::totalKeys);
-		}
-		if (entity.HasTag("bombs"))
-		{
-			textLabel.text = std::to_string(GameState::totalBombs);
-		}
+		//if (entity.HasTag("rupees"))
+		//{
+		//	textLabel.text = std::to_string(GameState::totalRupees);
+		//}
+		//if (entity.HasTag("keys"))
+		//{
+		//	textLabel.text = std::to_string(GameState::totalKeys);
+		//}
+		//if (entity.HasTag("bombs"))
+		//{
+		//	textLabel.text = std::to_string(GameState::totalBombs);
+		//}
 
-		if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
-		{
-			if (entity.HasTag("rupees")) textLabel.position.y = 800;
-			if (entity.HasTag("keys")) textLabel.position.y = 832;
-			if (entity.HasTag("bombs")) textLabel.position.y = 864;
-			if (entity.HasTag("lifeText")) textLabel.position.y = 810;
-		}
-		else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON")
-		{
-			if (entity.HasTag("rupees")) textLabel.position.y = 40;
-			if (entity.HasTag("keys")) textLabel.position.y = 72;
-			if (entity.HasTag("bombs")) textLabel.position.y = 104;
-			if (entity.HasTag("lifeText")) textLabel.position.y = 50;
-		}
+		//if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
+		//{
+		//	if (entity.HasTag("rupees")) textLabel.position.y = 800;
+		//	if (entity.HasTag("keys")) textLabel.position.y = 832;
+		//	if (entity.HasTag("bombs")) textLabel.position.y = 864;
+		//	if (entity.HasTag("lifeText")) textLabel.position.y = 810;
+		//}
+		//else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON")
+		//{
+		//	if (entity.HasTag("rupees")) textLabel.position.y = 40;
+		//	if (entity.HasTag("keys")) textLabel.position.y = 72;
+		//	if (entity.HasTag("bombs")) textLabel.position.y = 104;
+		//	if (entity.HasTag("lifeText")) textLabel.position.y = 50;
+		//}
 
 		SDL_SetRenderDrawColor(renderer, textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
 
@@ -83,5 +84,18 @@ void RenderTextSystem::OnExit()
 	for (auto& entity : GetSystemEntities())
 	{
 		entity.Kill();
+	}
+}
+
+void RenderTextSystem::OnExitSettings()
+{
+	for (auto& entity : GetSystemEntities())
+	{
+		if (entity.HasComponent<SettingsComponent>())
+		{
+			Logger::Log("Killing");
+			entity.Kill();
+		}
+
 	}
 }

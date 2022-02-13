@@ -475,8 +475,10 @@
     <ClInclude Include="src\Components\CaptionComponent.h" />
     <ClInclude Include="src\Components\ColliderComponent.h" />
     <ClInclude Include="src\Components\EnemyComponent.h" />
+    <ClInclude Include="src\Components\GamePadComponent.h" />
     <ClInclude Include="src\Components\PlayerComponent.h" />
     <ClInclude Include="src\Components\SecretComponent.h" />
+    <ClInclude Include="src\Components\SettingsComponent.h" />
     <ClInclude Include="src\StateMachines\BossStates.h" />
     <ClInclude Include="src\StateMachines\NewEnemyStates.h" />
     <ClInclude Include="src\StateMachines\NewPlayerStates.h" />

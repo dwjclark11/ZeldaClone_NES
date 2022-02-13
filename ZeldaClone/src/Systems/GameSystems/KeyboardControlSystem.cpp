@@ -7,6 +7,7 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/KeyboardControlComponent.h"
+#include "../../Components/SettingsComponent.h"
 #include "../../Components/TextLabelComponent.h"
 #include "../../Components/SaveComponent.h"
 #include "../../Components/MenuComponent.h"
@@ -289,7 +290,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 							MenuState::slotsFull = true;
 							break;
 						}
-						game.GetStateMachine()->PopState();
+						//game.GetStateMachine()->PopState();
 						game.GetStateMachine()->PushState(new NameState());
 					}
 					else if (transform.position.y == 584)
@@ -461,6 +462,95 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 		else 
 			continue;
 	}
+}
+
+void KeyboardControlSystem::SettingsStateKeys(KeyPressedEvent& event)
+{
+	auto selector = Registry::Instance().GetEntityByTag("settings_selector");
+	auto& selectTransform = selector.GetComponent<TransformComponent>();
+
+
+	for (const auto& entity : GetSystemEntities())
+	{
+		if (entity.HasComponent<SettingsComponent>())
+		{
+			const auto& settings = entity.GetComponent<SettingsComponent>();
+
+			if (!SettingsState::mEnterKey)
+			{
+				if (event.symbol == SDLK_RETURN)
+				{
+					SettingsState::mEnterKey = true;
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+					break;
+					
+				}
+				else if (event.symbol == SDLK_UP)
+				{
+					selectTransform.position.y -= 75;
+					SettingsState::mActionIndex--;
+
+					if (selectTransform.position.y < 225)
+					{
+						selectTransform.position.y = 600;
+						SettingsState::mActionIndex = 5;
+					}
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				}
+				else if (event.symbol == SDLK_DOWN)
+				{
+					selectTransform.position.y += 75;
+					SettingsState::mActionIndex++;
+
+					if (selectTransform.position.y > 600)
+					{
+						selectTransform.position.y = 225;
+						SettingsState::mActionIndex = 0;
+					}
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				}
+			}
+			else
+			{
+				Game::Instance().ChangeKeyBinding(static_cast<Game::Action>(SettingsState::mActionIndex), event.symbol);
+				std::string keyPressed = std::string(SDL_GetKeyName(event.symbol));
+				if (entity.HasComponent<TextLabelComponent>())
+				{
+					
+					if (settings.index == SettingsState::mActionIndex && settings.input == SettingsComponent::Input::KEY)
+					{
+						Logger::Log(keyPressed);
+						auto& text = entity.GetComponent<TextLabelComponent>();
+						text.text = keyPressed;
+						Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+						SettingsState::mEnterKey = false;
+						break;
+					}
+				}
+			}
+		}
+		else
+			continue;
+	}
+
+
+	auto& selectText = selector.GetComponent<TextLabelComponent>();
+	if (SettingsState::mEnterKey)
+	{
+
+		switch (SettingsState::mActionIndex)
+		{
+		case 0: selectText.text = "Changing Move Up Key"; break;
+		case 1: selectText.text = "Changing Move Down Key"; break;
+		case 2: selectText.text = "Changing Move Left Key"; break;
+		case 3: selectText.text = "Changing Move Right Key"; break;
+		case 4: selectText.text = "Changing Attack Key"; break;
+		case 5: selectText.text = "Changing Use Item Key"; break;
+		default: break;
+		}
+	}
+	else
+		selectText.text = "Choose an Action to Change!";
 }
 
 void KeyboardControlSystem::EditorStateKeys(KeyPressedEvent& event)
@@ -992,6 +1082,10 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 	else if (currentState == "SAVE")
 	{
 		SaveStateKeys(event);
+	}
+	else if (currentState == "SETTINGS")
+	{
+		SettingsStateKeys(event);
 	}
 }
 

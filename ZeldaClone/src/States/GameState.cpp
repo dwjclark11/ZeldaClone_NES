@@ -76,7 +76,6 @@ GameState::GameState(glm::vec2 cameraOffset)
 
 void GameState::Update(const double& deltaTime)
 {
-
 	if (GamePadSystem::paused && game.GetFadeAlpha() == 0)
 	{
 		game.FadeFinished() = true;
@@ -95,12 +94,6 @@ void GameState::Update(const double& deltaTime)
 		unpause = false;
 	}
 
-	//if (State::exitToMain)
-	//{
-	//	game.GetStateMachine()->PopState();
-	//	game.GetStateMachine()->PushState(new MenuState());
-	//	State::exitToMain = false;
-	//}
 	// Reset the event manager queue
 	game.GetEventManager()->Reset();
 
@@ -112,7 +105,6 @@ void GameState::Update(const double& deltaTime)
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
-
 
 	// Update the registry values
 	reg.Update();
@@ -198,13 +190,13 @@ bool GameState::OnEnter()
 		
 		// Make sure the game is not in debug mode!!
 		Game::isDebug = false;
+		
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
-		
 		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
 		loader.LoadColliders("overworld_colliders");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
-		
+
 		// =============================================================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
 		// =============================================================================================================================
@@ -265,7 +257,7 @@ bool GameState::OnEnter()
 
 	
 	if (reg.HasSystem<RenderMainMenuSystem>()) reg.RemoveSystem<RenderMainMenuSystem>();
-
+	
 	return true;
 }
 

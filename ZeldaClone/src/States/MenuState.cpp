@@ -57,11 +57,14 @@ bool MenuState::OnEnter()
 	Logger::Err("Enter Menu State");
 
 	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
+	if (!reg.HasSystem<RenderSystem>()) reg.AddSystem<RenderSystem>();
 	if (!reg.HasSystem<RenderMainMenuSystem>()) reg.AddSystem<RenderMainMenuSystem>();
 
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
 	game.GetAssetManager()->AddFonts("charriot-font-40", "./Assets/Fonts/charriot.ttf", 40);
+	game.GetAssetManager()->AddFonts("charriot-font-60", "./Assets/Fonts/charriot.ttf", 60);
+
 	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 
 	// Check to see if the save file exists, if it does call the loader function
