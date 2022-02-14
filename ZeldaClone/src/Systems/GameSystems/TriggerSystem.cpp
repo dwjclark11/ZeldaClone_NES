@@ -132,7 +132,6 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
 		secretArea.AddComponent<GameComponent>();
 
-		Logger::Log("Blasted open " + secret.locationID + " Secret!");
 		secret.found = true;
 		game.SetSecretFound(secret.locationID, true);
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
@@ -331,7 +330,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				game.StartFadeIn() = true;
 				// Remove the current trigger
 				trigger.Kill();
-				Logger::Log("Image: " + tileImageName);
+				//Logger::Log("Image: " + tileImageName);
 				game.SetStairsFinished(false);
 				// Set player sprite back to start
 				sprite.srcRect.y = 0;
@@ -394,7 +393,6 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				secret.moveDown = true;
 			}
 		}
-
 	}
 		break;
 

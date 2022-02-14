@@ -39,13 +39,12 @@ void MenuState::Update(const double& deltaTime)
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	
-
 	reg.Update();
 }
 
 void MenuState::Render()
 {
-	//Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	// Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 	Registry::Instance().GetSystem<RenderMainMenuSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
@@ -54,7 +53,6 @@ bool MenuState::OnEnter()
 	reg.Update();
 	LevelLoader loader;
 	full = false;
-	Logger::Err("Enter Menu State");
 
 	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
 	if (!reg.HasSystem<RenderSystem>()) reg.AddSystem<RenderSystem>();

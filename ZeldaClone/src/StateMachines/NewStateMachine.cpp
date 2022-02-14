@@ -7,12 +7,12 @@ StateMachine::StateMachine()
 	, mIsAdding(false)
 	, mIsReplacing(false)
 {
-	Logger::Err("State Machine Created!");
+	//Logger::Err("State Machine Created!");
 }
 
 StateMachine::~StateMachine()
 {
-	Logger::Err("State Machine Destroyed!");
+	//Logger::Err("State Machine Destroyed!");
 }
 
 void StateMachine::AddState(StateRef newState, bool isReplacing)

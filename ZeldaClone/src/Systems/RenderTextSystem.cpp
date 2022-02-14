@@ -19,34 +19,6 @@ void RenderTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 	{
 		auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
-		//if (entity.HasTag("rupees"))
-		//{
-		//	textLabel.text = std::to_string(GameState::totalRupees);
-		//}
-		//if (entity.HasTag("keys"))
-		//{
-		//	textLabel.text = std::to_string(GameState::totalKeys);
-		//}
-		//if (entity.HasTag("bombs"))
-		//{
-		//	textLabel.text = std::to_string(GameState::totalBombs);
-		//}
-
-		//if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
-		//{
-		//	if (entity.HasTag("rupees")) textLabel.position.y = 800;
-		//	if (entity.HasTag("keys")) textLabel.position.y = 832;
-		//	if (entity.HasTag("bombs")) textLabel.position.y = 864;
-		//	if (entity.HasTag("lifeText")) textLabel.position.y = 810;
-		//}
-		//else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON")
-		//{
-		//	if (entity.HasTag("rupees")) textLabel.position.y = 40;
-		//	if (entity.HasTag("keys")) textLabel.position.y = 72;
-		//	if (entity.HasTag("bombs")) textLabel.position.y = 104;
-		//	if (entity.HasTag("lifeText")) textLabel.position.y = 50;
-		//}
-
 		SDL_SetRenderDrawColor(renderer, textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
 
 		SDL_Surface* surface = TTF_RenderText_Blended(
@@ -76,7 +48,6 @@ void RenderTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 		SDL_DestroyTexture(texture);
 	}
-
 }
 
 void RenderTextSystem::OnExit()
@@ -93,9 +64,7 @@ void RenderTextSystem::OnExitSettings()
 	{
 		if (entity.HasComponent<SettingsComponent>())
 		{
-			Logger::Log("Killing");
 			entity.Kill();
 		}
-
 	}
 }

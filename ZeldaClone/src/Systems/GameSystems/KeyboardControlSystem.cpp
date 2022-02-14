@@ -438,12 +438,12 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					else if (transform.position.y == 680)
 					{
 						game.GetStateMachine()->PopState();
-						game.GetStateMachine()->PushState(new EditorState());
+						game.GetStateMachine()->PushState(new SettingsState());
 					}
 					else if (transform.position.y == 776)
 					{
 						game.GetStateMachine()->PopState();
-						game.GetStateMachine()->PushState(new SettingsState());
+						game.GetStateMachine()->PushState(new EditorState());
 					}
 					break;
 				}
@@ -560,22 +560,22 @@ void KeyboardControlSystem::EditorStateKeys(KeyPressedEvent& event)
 		// Move the camera UP
 	case SDLK_w:
 		//game.SetCameraY(-16); // Why 16? Should be based on the sprite_size*scale
-		game.GetCamera().y -= 100;
+		game.GetCamera().y -= 32;
 		break;
 		// Move the camera RIGHT
 	case SDLK_d:
 		//game.SetCameraX(16);
-		game.GetCamera().x += 100;
+		game.GetCamera().x += 64;
 		break;
 		// Move the camera DOWN
 	case SDLK_s:
 		//game.SetCameraY(16);
-		game.GetCamera().y += 100;
+		game.GetCamera().y += 32;
 		break;
 		// Move the camera LEFT
 	case SDLK_a:
 		//game.SetCameraX(-16);
-		game.GetCamera().x -= 100;
+		game.GetCamera().x -= 64;
 		break;
 		// Toggle the Collision
 	case SDLK_c:

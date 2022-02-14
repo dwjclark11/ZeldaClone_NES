@@ -180,25 +180,26 @@ void MovementSystem::SubscribeToEvents(const std::unique_ptr<EventManager>& even
 	eventManager->SubscribeToEvent<CollisionEvent>(this, &MovementSystem::OnCollision);
 }
 
-
 void MovementSystem::OnCollision(CollisionEvent& colEvent)
 {
 	Entity a = colEvent.a;
 	Entity b = colEvent.b;
 
-	if ((a.BelongsToGroup("colliders") || a.BelongsToGroup("tiles")) && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword"))) OnPlayerHitsObstacle(a, b);
-	if ((b.BelongsToGroup("colliders") || b.BelongsToGroup("tiles")) && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword"))) OnPlayerHitsObstacle(b, a);
+	if ((a.BelongsToGroup("colliders") || a.BelongsToGroup("tiles")) && (b.HasTag("player"))) 
+		OnPlayerHitsObstacle(a, b);
+	if ((b.BelongsToGroup("colliders") || b.BelongsToGroup("tiles")) && (a.HasTag("player"))) 
+		OnPlayerHitsObstacle(b, a);
 
 	if ((b.BelongsToGroup("colliders") || b.BelongsToGroup("tiles")) && a.BelongsToGroup("enemies")) OnEnemyHitsObstacle(a, b);
 	if (b.BelongsToGroup("enemies") && (a.BelongsToGroup("colliders") || a.BelongsToGroup("tiles"))) OnEnemyHitsObstacle(b, a);
 
-	if (a.HasComponent<TriggerBoxComponent>() && (b.HasTag("player") || b.HasTag("the_shield") || b.HasTag("the_sword")))
+	if (a.HasComponent<TriggerBoxComponent>() && (b.HasTag("player")))
 	{
 		if (a.GetComponent<TriggerBoxComponent>().collider)
 			OnPlayerHitsObstacle(a, b);
 	}
 
-	if (b.HasComponent<TriggerBoxComponent>() && (a.HasTag("player") || a.HasTag("the_shield") || a.HasTag("the_sword")))
+	if (b.HasComponent<TriggerBoxComponent>() && (a.HasTag("player")))
 	{
 		if (b.GetComponent<TriggerBoxComponent>().collider)
 			OnPlayerHitsObstacle(b, a);

@@ -194,7 +194,7 @@ bool GameState::OnEnter()
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
 		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
-		loader.LoadColliders("overworld_colliders");
+		loader.LoadColliders("overworld_colliders_1");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
 
 		// =============================================================================================================================

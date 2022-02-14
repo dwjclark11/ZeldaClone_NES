@@ -483,9 +483,9 @@ void MouseControlSystem::MouseBox(const std::unique_ptr<AssetManager>& assetMana
 	else
 	{
 		if (!trigger)
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 50);
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
 		else
-			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 100);
+			SDL_SetRenderDrawColor(renderer, 0, 255, 0, 125);
 
 		SDL_RenderFillRect(renderer, &dstRect);
 		SDL_RenderDrawRect(renderer, &dstRect);

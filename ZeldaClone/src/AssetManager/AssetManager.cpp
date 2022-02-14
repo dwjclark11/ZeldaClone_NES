@@ -60,7 +60,7 @@ void AssetManager::RemoveTexture(const std::string& assetID)
 		auto it = textures.find(assetID);
 		SDL_DestroyTexture(textures.at(assetID));
 		textures.erase(it);
-		Logger::Log("Texture: " + assetID + " has been destroyed!");
+		//Logger::Log("Texture: " + assetID + " has been destroyed!");
 	}
 	else
 		Logger::Log("ASSET_MANAGER: TEXTURE: __LINE__66: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
@@ -119,7 +119,7 @@ void AssetManager::RemoveMusic(const std::string& assetID)
 		auto it = music.find(assetID);
 		Mix_FreeMusic(music.at(assetID));
 		music.erase(it);
-		Logger::Log("Music: " + assetID + " has been destroyed!");
+		//Logger::Log("Music: " + assetID + " has been destroyed!");
 	}
 	else
 		Logger::Log("ASSET_MANAGER: MUSIC: __LINE__123: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
@@ -153,7 +153,7 @@ void AssetManager::RemoveSoundFX(const std::string& assetID)
 		auto it = soundFX.find(assetID);
 		Mix_FreeChunk(soundFX.at(assetID));
 		soundFX.erase(it);
-		Logger::Log("SoundFX: " + assetID + " has been destroyed!");
+		//Logger::Log("SoundFX: " + assetID + " has been destroyed!");
 	}
 	else
 		Logger::Log("ASSET_MANAGER: SOUNDFX: __LINE__159: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");

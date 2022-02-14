@@ -154,13 +154,13 @@ menu =
 			}, 
 		}
 	},
-	[8] = -- TileMapEditor
+	[8] = -- TileMapEditor -- This is only selectable in DEBUG MODE!
 	{
 		components = 
 		{
 			transform = 
 			{
-				position = {x = 320, y = 700 },
+				position = {x = 320, y = 800 },
 				scale = {x = 1.5, y = 1.5 },
 				rotation = 0
 			},
@@ -258,6 +258,32 @@ menu =
 			menu = 
 			{
 				slot_pos = 3
+			}
+		}
+	},
+	[12] = -- Settings
+	{
+		components = 
+		{
+			transform = 
+			{
+				position = {x = 320, y = 700 },
+				scale = {x = 1.5, y = 1.5 },
+				rotation = 0
+			},
+			sprite = 
+			{
+				asset_id = "main_menu_gui",
+				width = 224,
+				height = 16, 
+				z_index = 0,
+				fixed = false,
+				src_rect_x = 0,
+				src_rect_y = 96
+			}, 
+			menu = 
+			{
+				slot_pos = 0
 			}
 		}
 	},

@@ -361,10 +361,6 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 		}
 		i++;
 	}
-	for (auto& [key, value] : projectileAttributeMap)
-	{
-		Logger::Log("Int map: " + key);
-	}
 }
 
 void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)

@@ -221,7 +221,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 
 		if (hasData == sol::nullopt)
 		{
-			Logger::Err("There is no Player Data!");
+			//Logger::Err("There is no Player Data!");
 			break;
 		}
 		sol::table player = data[i];
@@ -689,8 +689,8 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 			sol::optional<sol::table> triggerBox = trigger["components"]["trigger_box"];
 			if (triggerBox != sol::nullopt)
 			{
-				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
-				Logger::Log(trigger["components"]["trigger_box"]["trigger_file"]);
+				
+				//Logger::Log(trigger["components"]["trigger_box"]["trigger_file"]);
 				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
 
 				newTrigger.AddComponent<TriggerBoxComponent>(
@@ -1170,7 +1170,6 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 			GameState::totalKeys = player["inventory"]["num_keys"].get_or(0);
 		}
 		i++;
-		Logger::Log("Player Loaded Today");
 	}
 }
 
@@ -1328,10 +1327,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 			if (entity.GetComponent<SecretComponent>().found)
 			{
 				Registry::Instance().GetSystem<TriggerSystem>().SecretTrigger(entity, true);
-				Logger::Log("Loading Secrets");
 			}
-				
-			
 		}
 		else
 			continue;

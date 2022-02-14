@@ -225,20 +225,37 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 	}
 	else
 	{
-		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
+		if (event.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
 		{
 			transform.position.y -= sprite.height * 6;
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-			if (transform.position.y < 200) transform.position.y = 680;
-			//GamePadSystem::buttonDirDown = true;
+			if (!MenuState::eliminate)
+			{
+				if (transform.position.y < 200) 
+					transform.position.y = 776;
+			}
+			else
+			{
+				if (transform.position.y < 200)
+					transform.position.y = 392;
+			}
 		}
 
-		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
+		if (event.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN)
 		{
 			transform.position.y += sprite.height * 6;
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
-			if (transform.position.y > 680) transform.position.y = 200;
-			//GamePadSystem::buttonDirDown = true;
+			
+			if (!MenuState::eliminate)
+			{
+				if (transform.position.y > 776) 
+					transform.position.y = 200;
+			}
+			else
+			{ 
+				if (transform.position.y > 392)
+					transform.position.y = 200;
+			}
 		}
 
 		if (event.button == game.GetBtnBindings().at(Game::Action::SELECT))
@@ -281,7 +298,6 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 					const std::string save2File = "./Assets/SavedFiles/save2.lua";
 					if (std::filesystem::remove(save2File))
 					{
-						Logger::Log("Player: " + MenuState::player2Name + " was eliminated");
 						LevelLoader loader;
 						loader.EliminatePlayerToDefault(2, MenuState::player2Name);
 						MenuState::player2Name = "";
@@ -335,6 +351,11 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 				}
 			}
 			else if (transform.position.y == 680)
+			{
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new SettingsState());
+			}
+			else if (transform.position.y == 776)
 			{
 				game.GetStateMachine()->PopState();
 				game.GetStateMachine()->PushState(new EditorState());

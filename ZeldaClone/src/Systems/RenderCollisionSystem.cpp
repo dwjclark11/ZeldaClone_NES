@@ -35,7 +35,7 @@ void RenderCollisionSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
 		}
 		else // Set the color for physical collsions
 		{
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 50);
+			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 125);
 			SDL_RenderFillRect(renderer, &srcRect);
 		}
 		SDL_RenderDrawRect(renderer, &srcRect);
