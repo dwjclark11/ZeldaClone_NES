@@ -539,7 +539,7 @@ void LevelLoader::LoadColliders(const std::string& filename)
 {
 	// Open and read the text file
 	std::fstream mapFile;
-	mapFile.open("./Assets/Levels/" + filename + ".map");
+	mapFile.open("./Assets/Levels/Colliders/" + filename + ".map");
 
 	if (!mapFile.is_open())
 	{
@@ -638,7 +638,7 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 
 void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 {
-	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
+	sol::load_result script = lua.load_file("./Assets/Levels/Triggers/" + fileName + ".lua");
 
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
@@ -650,7 +650,7 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/Levels/" + fileName + ".lua");
+	lua.script_file("./Assets/Levels/Triggers/" + fileName + ".lua");
 
 	// =========================================================================================================
 	// Read the Triggers
@@ -1175,7 +1175,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 
 void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 {
-	sol::load_result script = lua.load_file("./Assets/Levels/" + fileName + ".lua");
+	sol::load_result script = lua.load_file("./Assets/Levels/Enemies/" + fileName + ".lua");
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -1186,7 +1186,7 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/Levels/" + fileName + ".lua");
+	lua.script_file("./Assets/Levels/Enemies/" + fileName + ".lua");
 
 	sol::table entities = lua["enemies"];
 
@@ -1544,7 +1544,7 @@ bool LevelLoader::CheckForItemInInventory(ItemComponent::SpecialItemType& type)
 
 void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename)
 {
-	sol::load_result script = lua.load_file("./Assets/Levels/" + filename + ".lua");
+	sol::load_result script = lua.load_file("./Assets/Levels/Entities/" + filename + ".lua");
 
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
@@ -1556,7 +1556,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/Levels/" + filename + ".lua");
+	lua.script_file("./Assets/Levels/Entities/" + filename + ".lua");
 
 	sol::table data = lua["level"];
 

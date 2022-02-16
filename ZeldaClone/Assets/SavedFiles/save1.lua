@@ -21,6 +21,7 @@ player_data = {
             steel_sword = false,
             magic_sword = false,
             magic_rod = true,
+            candle = true,
             bombs = false,
             food = false,
             flute = false,
@@ -35,7 +36,7 @@ player_data = {
             master_key = false},
         inventory = {
             num_rupees = 0,
-            num_bombs = 0,
+            num_bombs = 3,
             num_keys = 0
         }
     }

@@ -179,12 +179,12 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	Entity& b = event.b;
 
 	// Check to see if the player has activated a trigger
-	if (a.HasComponent<TriggerBoxComponent>() && b.HasTag("player"))
+	if (!a.HasComponent<SecretComponent>() && a.HasComponent<TriggerBoxComponent>() && b.HasTag("player"))
 	{
 		OnEnterTrigger(b, a);
 	}
 
-	if (b.HasComponent<TriggerBoxComponent>() && a.HasTag("player"))
+	if (!b.HasComponent<SecretComponent>() && b.HasComponent<TriggerBoxComponent>() && a.HasTag("player"))
 	{
 		OnEnterTrigger(a, b);
 	}
@@ -192,7 +192,6 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	// Check for secret Component 
 	if (b.HasComponent<SecretComponent>())
 	{
-
 		auto& trig = b.GetComponent<TriggerBoxComponent>();
 		if (trig.triggerType == TriggerBoxComponent::TriggerType::BOMB_SECRET && a.BelongsToGroup("explode"))
 			OnEnterTrigger(a, b);
