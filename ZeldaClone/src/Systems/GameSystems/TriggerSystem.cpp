@@ -639,8 +639,8 @@ void TriggerSystem::Update()
 
 					if (secret.moveUp && KeyboardControlSystem::dir == UP)
 					{
-						playerTransform.position.y-= 2;
-						raftTransform.position.y-=2;
+						playerTransform.position.y -= 200 * game.GetDeltaTime();
+						raftTransform.position.y -= 200 * game.GetDeltaTime();
 						if (playerTransform.position.y <= trig.transportOffset.y)
 						{
 							trig.active = false;
@@ -650,8 +650,8 @@ void TriggerSystem::Update()
 					}
 					else if (secret.moveDown && KeyboardControlSystem::dir == DOWN)
 					{
-						playerTransform.position.y+=2;
-						raftTransform.position.y+=2;
+						playerTransform.position.y += 200 * game.GetDeltaTime();
+						raftTransform.position.y += 200 * game.GetDeltaTime();
 
 						if (playerTransform.position.y >= trig.transportOffset.y)
 						{
