@@ -885,7 +885,7 @@ void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
-		if (!game.PlayerHold() || event.symbol != game.GetKeyBindings().at(Game::Action::ATTACK))
+		if (!game.PlayerHold() && event.symbol != game.GetKeyBindings().at(Game::Action::ATTACK))
 		{
 			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_UP))
 			{

@@ -5,6 +5,8 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/PlayerComponent.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
+
 #include <SDL.h>
 #include "../Game/Game.h"
 
@@ -160,7 +162,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 				}
 
 				if (camera.y > (transform.position.y + boxCollider.offset.y) - (game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64) 
-					&& !north && !cameraMoving && rigidBody.velocity.y < 0)
+					&& !north && !cameraMoving && (rigidBody.velocity.y < 0 || (game.GetRaft() && KeyboardControlSystem::dir == UP)))
 				{
 					north = true;
 					cameraMoving = true;
@@ -168,7 +170,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 				}
 
 				if ((camera.y + camera.h) < transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y 
-					&& !south && !cameraMoving && rigidBody.velocity.y > 0)
+					&& !south && !cameraMoving && (rigidBody.velocity.y > 0 || (game.GetRaft() && KeyboardControlSystem::dir == DOWN)))
 				{
 					south = true;
 					cameraMoving = true;

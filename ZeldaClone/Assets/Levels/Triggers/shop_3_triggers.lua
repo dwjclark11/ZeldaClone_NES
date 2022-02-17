@@ -3,7 +3,7 @@
 ---------------------------------------------------------
 
 triggers = {
-	-- First Sword Cave Entrance
+	-- Shop 3 Cave Entrance
 	[1] = {
 		group = "trigger",
 		components = {

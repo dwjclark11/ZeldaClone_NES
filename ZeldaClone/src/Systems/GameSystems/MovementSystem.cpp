@@ -29,6 +29,7 @@ void MovementSystem::Update(const double& deltaTime)
 		auto& transform = entity.GetComponent<TransformComponent>();
 		auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
 		auto& sprite = entity.GetComponent<SpriteComponent>();
+		auto& collision = entity.GetComponent<BoxColliderComponent>();
 
 		if (!transform.collision)
 		{
@@ -45,9 +46,9 @@ void MovementSystem::Update(const double& deltaTime)
 			{
 				for (int j = 0; j < MAX_WORLD_HEIGHT; j++)
 				{
-					if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i))
+					if (transform.position.x  >= (1024 * i) && transform.position.x + collision.offset.x <= 1024 + (1024 * i))
 					{
-						if (transform.position.y >= (672 * j) && transform.position.y <= 672 + (672 * j))
+						if (transform.position.y + collision.height - collision.offset.y >= (672 * j) && transform.position.y + collision.offset.y <= 672 + (672 * j))
 						{
 							playerPos.x = i;
 							playerPos.y = j;

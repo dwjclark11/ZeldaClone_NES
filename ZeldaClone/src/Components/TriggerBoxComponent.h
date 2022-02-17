@@ -19,7 +19,9 @@ public:
 		BOMB_SECRET = 6,
 		LOCKED_DOOR = 7,
 		HIDDEN_OBJECT = 8,
-		SHOP_ITEM = 9
+		SHOP_ITEM = 9,
+		LADDER,
+		RAFT,
 	};
 
 	TriggerType triggerType;

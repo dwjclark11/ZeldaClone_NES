@@ -25,7 +25,7 @@ player_data = {
             bombs = false,
             food = false,
             flute = false,
-            raft = false,
+            raft = true,
             ladder = false,
             bow_wood = false,
             magic_shield = false,
@@ -35,7 +35,7 @@ player_data = {
             red_potion = false,
             master_key = false},
         inventory = {
-            num_rupees = 0,
+            num_rupees = 200,
             num_bombs = 3,
             num_keys = 0
         }

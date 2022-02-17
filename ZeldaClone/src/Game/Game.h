@@ -150,7 +150,8 @@ public:
 
 	inline bool GetStairsFinished() { return stairsFinished; }
 	inline void SetStairsFinished(bool finished) { stairsFinished = finished; }
-
+	inline void SetOnRaft(bool raft) { onRaft = raft; }
+	inline bool GetRaft() { return onRaft; }
 	inline void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
 	inline Uint8 GetFadeAlpha() { return fadeAlpha; }
 	inline const double& GetDeltaTime() const { return deltaTime; }
@@ -187,6 +188,7 @@ private:
 	bool playerDead = false;
 
 	bool onStairs = false;
+	bool onRaft = false;
 	bool stairsFinished = false;
 
 	bool startFadeIn = false;

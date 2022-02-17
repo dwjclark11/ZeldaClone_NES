@@ -252,10 +252,16 @@ bool GameState::OnEnter()
 		}
 	}
 
-	// Test Read in all secrets!!
+	// Read in all secrets!!
 	loader.ReadInSecrets(game.GetLuaState());
 
-	
+	// Test Ladder Trigger
+	//auto ladderTrig = reg.CreateEntity();
+	//ladderTrig.AddComponent<TransformComponent>(glm::vec2(15936, 3680), glm::vec2(4, 4), 0);
+	//ladderTrig.AddComponent<BoxColliderComponent>(16, 16);
+	//ladderTrig.AddComponent<TriggerBoxComponent>(TriggerBoxComponent::TriggerType::LADDER);
+
+	// Remove the menu system for it is not needed in the game state
 	if (reg.HasSystem<RenderMainMenuSystem>()) reg.RemoveSystem<RenderMainMenuSystem>();
 	
 	return true;

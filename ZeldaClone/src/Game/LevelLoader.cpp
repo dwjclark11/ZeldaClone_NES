@@ -595,6 +595,12 @@ TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::st
 		return TriggerBoxComponent::TriggerType::HIDDEN_OBJECT;
 	else if (type == "shop_item")
 		return TriggerBoxComponent::TriggerType::SHOP_ITEM;
+	else if (type == "raft")
+		return TriggerBoxComponent::TriggerType::RAFT;
+	else if (type == "ladder")
+		return TriggerBoxComponent::TriggerType::LADDER;
+	else 
+		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
 }
 
 AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
@@ -728,10 +734,15 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 					trigger["components"]["secret"]["sprite_width"].get_or(0),
 					trigger["components"]["secret"]["sprite_height"].get_or(0),
 					trigger["components"]["secret"]["sprite_src_x"].get_or(0),
-					trigger["components"]["secret"]["sprite_src_y"].get_or(0)
+					trigger["components"]["secret"]["sprite_src_y"].get_or(0),
+					glm::vec2(
+						trigger["components"]["secret"]["start_pos"]["x"].get_or(0),
+						trigger["components"]["secret"]["start_pos"]["y"].get_or(0)),
+					trigger["components"]["secret"]["move_up"].get_or(false),
+					trigger["components"]["secret"]["move_down"].get_or(false)
 					);
 
-
+				// Set the start postition to the transform position
 				newTrigger.GetComponent<SecretComponent>().startPos = newTrigger.GetComponent<TransformComponent>().position;
 			}
 

@@ -456,4 +456,216 @@ triggers = {
 			},
 		}
 	},
+	-- Raft Secret to Level 3 
+	[13] = {
+		group = "secret",
+		components = {
+			transform = {
+				position = { x = 5632, y = 3552},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "raft",
+				transport_offset 	= { x = 5632, y = 3264 },
+				camera_offset 		= { x = 0, y = 0 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "no_file", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "no_file",
+				entity_file			= "no_file",
+				trigger_file		= "no_file",
+				image_width			= 0,
+				image_height		= 0,
+				collider			= false
+			},
+			secret = {
+				location_id			= "none",
+				new_trigger			= "no_trigger",
+				new_sprite_id		= "none",
+				sprite_width		= 0,
+				sprite_height		= 0,
+				sprite_src_x		= 0,
+				sprite_src_y		= 0,
+				start_pos			= { x = 0, y = 0 },
+				move_up				= true,
+				move_down			= false
+			},
+		}
+	},
+	-- Raft Secret from Level 3 
+	[14] = {
+		group = "secret",
+		components = {
+			transform = {
+				position = { x = 5632, y = 3328},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "raft",
+				transport_offset 	= { x = 5632, y = 3616 },
+				camera_offset 		= { x = 0, y = 0 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "no_file", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "no_file",
+				entity_file			= "no_file",
+				trigger_file		= "no_file",
+				image_width			= 0,
+				image_height		= 0,
+				collider			= false
+			},
+			secret = {
+				location_id			= "none",
+				new_trigger			= "no_trigger",
+				new_sprite_id		= "none",
+				sprite_width		= 0,
+				sprite_height		= 0,
+				sprite_src_x		= 0,
+				sprite_src_y		= 0,
+				start_pos			= { x = 0, y = 0 },
+				move_up				= false,
+				move_down			= true
+			},
+		}
+	},
+	-- Ladder Trigger
+	[15] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 15936, y = 3680 },
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "ladder",
+				transport_offset 	= { x = 0, y = 0 },
+				camera_offset 		= { x = 0, y = 0 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "no_file", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "no_file",
+				entity_file			= "no_file", 
+				image_width			= 0,
+				image_height		= 0,
+				trigger_file		= "no_file"
+			},
+		}
+	},
+	-- Ladder Trigger
+	[16] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 16064, y = 3680 },
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "ladder",
+				transport_offset 	= { x = 0, y = 0 },
+				camera_offset 		= { x = 0, y = 0 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "no_file", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "no_file",
+				entity_file			= "no_file", 
+				image_width			= 0,
+				image_height		= 0,
+				trigger_file		= "no_file"
+			},
+		}
+	},
+	-- Ladder Trigger
+	[17] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 15936, y = 3008 },
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "ladder",
+				transport_offset 	= { x = 0, y = 0 },
+				camera_offset 		= { x = 0, y = 0 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "no_file", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "no_file",
+				entity_file			= "no_file", 
+				image_width			= 0,
+				image_height		= 0,
+				trigger_file		= "no_file"
+			},
+		}
+	},
+	-- Ladder Trigger
+	[18] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 16064, y = 3008 },
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "ladder",
+				transport_offset 	= { x = 0, y = 0 },
+				camera_offset 		= { x = 0, y = 0 },
+				level_music			= "stop",
+				asset_file			= "no_file",
+				enemy_file			= "no_file",
+				collider_file		= "no_file", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "no_file",
+				entity_file			= "no_file", 
+				image_width			= 0,
+				image_height		= 0,
+				trigger_file		= "no_file"
+			},
+		}
+	},
 }

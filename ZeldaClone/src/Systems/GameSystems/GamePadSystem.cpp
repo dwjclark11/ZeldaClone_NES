@@ -69,7 +69,7 @@ void GamePadSystem::GameStateBtns(GamePadButtonPressedEvent& event)
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
-		if (!game.PlayerHold() || event.button != game.GetKeyBindings().at(Game::Action::ATTACK))
+		if (!game.PlayerHold() && event.button != game.GetKeyBindings().at(Game::Action::ATTACK))
 		{
 			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 			{

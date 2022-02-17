@@ -337,7 +337,7 @@ const bool Game::HasSword()
 
 bool Game::PlayerHold()
 {
-	if (playerDead || onStairs || playerItem || startFadeOut || startFadeIn)
+	if (playerDead || onStairs || playerItem || startFadeOut || startFadeIn || onRaft)
 		return true;
 	else
 		return false;

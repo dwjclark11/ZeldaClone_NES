@@ -12,7 +12,8 @@ private:
 
 	bool CheckInventory(ItemComponent::SpecialItemType& item);
 	void SetInventory(ItemComponent::SpecialItemType& item);
-
+	void StopPlayerMovement(Entity& player, Entity& trigger);
+	
 public:
 
 	TriggerSystem();

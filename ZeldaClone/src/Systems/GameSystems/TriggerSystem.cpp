@@ -8,6 +8,7 @@
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/SecretComponent.h"
 #include "../../Systems/GameSystems/RenderTileSystem.h"
+#include "../../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../../Events/CollisionEvent.h"
 #include "../../Events/TriggerEvent.h"
 #include "../../Events/EventManager.h"
@@ -106,6 +107,51 @@ void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 	}
 }
 
+void TriggerSystem::StopPlayerMovement(Entity& player, Entity& trigger)
+{
+	if (player.HasComponent<TransformComponent>() && player.HasComponent<BoxColliderComponent>())
+	{
+		auto& playerTransform = player.GetComponent<TransformComponent>();
+		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
+		auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
+
+		auto& obstacleTransform = trigger.GetComponent<TransformComponent>();
+		auto& obstacleCollider = trigger.GetComponent<BoxColliderComponent>();
+
+		if (KeyboardControlSystem::dir == UP)
+		{
+			playerTransform.collision = true;
+			playerRigidbody.velocity.y = 0;
+			playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) + (obstacleCollider.height * obstacleTransform.scale.y);
+			playerTransform.position.x = playerTransform.position.x;
+		}
+
+		if (KeyboardControlSystem::dir == DOWN)
+		{
+			playerTransform.collision = true;
+			playerRigidbody.velocity.y = 0;
+			playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) - (playerCollider.height * playerTransform.scale.y);
+			playerTransform.position.x = playerTransform.position.x;
+		}
+
+		if (KeyboardControlSystem::dir == LEFT)
+		{
+			playerTransform.collision = true;
+			playerRigidbody.velocity.x = 0;
+			playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) + (obstacleCollider.width * obstacleTransform.scale.x);
+			playerTransform.position.y = playerTransform.position.y;
+		}
+
+		if (KeyboardControlSystem::dir == RIGHT)
+		{
+			playerTransform.collision = true;
+			playerRigidbody.velocity.x = 0;
+			playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
+			playerTransform.position.y = playerTransform.position.y;
+		}
+	}
+}
+
 void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 {
 	auto& secret = trigger.GetComponent<SecretComponent>();
@@ -165,6 +211,7 @@ TriggerSystem::TriggerSystem()
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
+	RequiredComponent<TriggerBoxComponent>();
 }
 
 
@@ -199,6 +246,8 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 			OnEnterTrigger(a, b);
 		if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS && a.HasTag("player"))
 			OnEnterTrigger(a, b);
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT && a.HasTag("player"))
+			OnEnterTrigger(a, b);
 	}
 
 	if (a.HasComponent<SecretComponent>())
@@ -209,6 +258,8 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 		if (trig.triggerType == TriggerBoxComponent::TriggerType::BURN_BUSHES && b.BelongsToGroup("fire"))
 			OnEnterTrigger(b, a);
 		if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS && b.HasTag("player"))
+			OnEnterTrigger(b, a);
+		if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT && b.HasTag("player"))
 			OnEnterTrigger(b, a);
 	}
 }
@@ -448,7 +499,6 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				GameState::scrollRupees = shopItem.price;
 				GameState::buyItem = true;
 			}
-
 		}
 		else
 		{
@@ -456,6 +506,87 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			break;
 		}
 		break;
+	case TriggerBoxComponent::TriggerType::RAFT:
+	{
+		auto& trigs = trigger.GetComponent<TriggerBoxComponent>();
+		auto& secret = trigger.GetComponent<SecretComponent>();
+		const auto& pTran = player.GetComponent<TransformComponent>();
+
+		if (game.GetGameItems().raft)
+		{
+			if ((secret.moveDown && KeyboardControlSystem::dir == DOWN) || (secret.moveUp && KeyboardControlSystem::dir == UP))
+			{
+				if (!trigs.active)
+				{
+					StopPlayerMovement(player, trigger);
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
+					auto raft = Registry::Instance().CreateEntity();
+					raft.Tag("raft");
+					raft.AddComponent<TransformComponent>(pTran);
+					raft.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 0, 16);
+					raft.AddComponent<GameComponent>();
+					raft.GetComponent<TransformComponent>().position.x += 32;
+					raft.GetComponent<TransformComponent>().position.y += 32;
+				}
+					
+				trigs.active = true;
+				game.SetOnRaft(true);
+			}
+		}
+		else
+		{
+			StopPlayerMovement(player, trigger);
+		}
+		break;
+	}
+	case TriggerBoxComponent::TriggerType::LADDER:
+	{
+		auto& trigs = trigger.GetComponent<TriggerBoxComponent>();
+		auto& trigTransform = trigger.GetComponent<TransformComponent>();
+
+		if (game.GetGameItems().ladder)
+		{
+			if (!trigs.active)
+			{
+				auto xOffset = 64;
+				auto yOffset = 64;
+
+				if (KeyboardControlSystem::dir == UP)
+				{
+					xOffset = 32;
+					yOffset = -64;
+				}
+				else if (KeyboardControlSystem::dir == DOWN)
+				{
+					xOffset = 32;
+					yOffset = 64;
+				}
+				else if (KeyboardControlSystem::dir == LEFT)
+				{
+					xOffset = -16;
+					yOffset = 32;
+				}
+				else if (KeyboardControlSystem::dir == RIGHT)
+				{
+					xOffset = 64;
+					yOffset = 32;
+				}
+				auto ladder = Registry::Instance().CreateEntity();
+				ladder.Tag("ladder");
+				ladder.AddComponent<TransformComponent>(playerTransform);
+				ladder.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 112, 48);
+				ladder.AddComponent<GameComponent>();
+				ladder.GetComponent<TransformComponent>().position.x += xOffset;
+				ladder.GetComponent<TransformComponent>().position.y += yOffset;
+				trigs.active = true;
+			}
+		}
+		else
+		{
+			StopPlayerMovement(player, trigger);
+		}
+		break;
+	}
 	default:
 		break;
 	}
@@ -465,26 +596,81 @@ void TriggerSystem::Update()
 {
 	for (const auto& entity : GetSystemEntities())
 	{
-		if (entity.HasComponent<TriggerBoxComponent>() && entity.HasComponent<SecretComponent>() && entity.HasComponent<SpriteComponent>())
+		if (entity.HasComponent<TriggerBoxComponent>())
 		{
+			// Get the player
+			auto player = Registry::Instance().GetEntityByTag("player");
+			auto& playerTransform = player.GetComponent<TransformComponent>();
+
 			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& secret = entity.GetComponent<SecretComponent>();
-			auto& sprite = entity.GetComponent<SpriteComponent>();
+			
+			auto sprite = SpriteComponent(); 
+			auto secret = SecretComponent();
+
+			if (entity.HasComponent<SpriteComponent>())
+				sprite = entity.GetComponent<SpriteComponent>();
+
+			if (entity.HasComponent<SecretComponent>())
+				secret = entity.GetComponent<SecretComponent>();
+
 			auto& trig = entity.GetComponent<TriggerBoxComponent>();
 				
-			if (trig.active && !secret.found)
+			if (trig.active)
 			{
-				if (transform.position.y > secret.startPos.y - sprite.width * Game::gameScale && secret.moveUp)
+				if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS)
 				{
-					transform.position.y--;
+					if (transform.position.y > secret.startPos.y - sprite.width * Game::gameScale && secret.moveUp)
+					{
+						transform.position.y--;
+					}
+					else if (transform.position.y < secret.startPos.y + sprite.width * Game::gameScale && secret.moveDown)
+					{
+						transform.position.y++;
+					}
+					else
+					{
+						secret.found = true;
+					}
 				}
-				else if (transform.position.y < secret.startPos.y + sprite.width * Game::gameScale && secret.moveDown)
+				else if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT)
 				{
-					transform.position.y++;
+					auto raft = Registry::Instance().GetEntityByTag("raft");
+					auto& raftTransform = raft.GetComponent<TransformComponent>();
+
+					if (secret.moveUp && KeyboardControlSystem::dir == UP)
+					{
+						playerTransform.position.y-= 2;
+						raftTransform.position.y-=2;
+						if (playerTransform.position.y <= trig.transportOffset.y)
+						{
+							trig.active = false;
+							game.SetOnRaft(false);
+							raft.Kill();
+						}
+					}
+					else if (secret.moveDown && KeyboardControlSystem::dir == DOWN)
+					{
+						playerTransform.position.y+=2;
+						raftTransform.position.y+=2;
+
+						if (playerTransform.position.y >= trig.transportOffset.y)
+						{
+							trig.active = false;
+							game.SetOnRaft(false);
+							raft.Kill();
+						}
+					}
 				}
-				else
+				else if (trig.triggerType == TriggerBoxComponent::TriggerType::LADDER)
 				{
-					secret.found = true;
+				
+					if (playerTransform.position.x < transform.position.x - 64 ||
+						playerTransform.position.x > transform.position.x + 32)
+					{
+						auto ladder = Registry::Instance().GetEntityByTag("ladder");
+						trig.active = false;
+						ladder.Kill();
+					}
 				}
 			}
 		}
