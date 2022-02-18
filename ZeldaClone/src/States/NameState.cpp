@@ -7,9 +7,11 @@
 #include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Components/RegisterNameComponent.h"
 #include "../Components/TransformComponent.h"
+#include "../Components/TextLabelComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/KeyboardControlComponent.h"
 #include "../States/MenuState.h"
+#include "../AssetManager/AssetManager.h"
 #include "../Game/Game.h"
 
 const std::string NameState::nameID = "NAME";

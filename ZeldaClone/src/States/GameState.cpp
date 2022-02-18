@@ -236,7 +236,7 @@ bool GameState::OnEnter()
 	{
 		loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
 		// Load the player file based on the selected slot
-		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()));
+		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()), game.GetPlayerNum());
 
 		auto player = Registry::Instance().GetEntityByTag("player");
 		// Reset the player health after pressing continue [Game Over]

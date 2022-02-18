@@ -339,7 +339,6 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 						if (transform.position.y > 392)
 							transform.position.y = 200;
 					}
-
 					break;
 
 				case SDLK_SPACE:
@@ -355,7 +354,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 						else if (MenuState::player1Name.size() != 0 && MenuState::eliminate)
 						{
 							// Remove file from Saved files
-							const std::string save1File = "./Assets/SavedFiles/save1.lua";
+							const std::string save1File = "./Assets/SavedFiles/slot_1/save1.lua";
 							if (std::filesystem::remove(save1File))
 							{
 								Logger::Log("Player: " + MenuState::player1Name + " was eliminated");
@@ -363,6 +362,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 								loader.EliminatePlayerToDefault(1, MenuState::player1Name);
 								MenuState::player1Name = "";
 								MenuState::eliminate = false;
+								std::filesystem::remove("./Assets/SavedFiles/slot_1/GameSecrets_1.lua");
 							}
 							else
 								Logger::Err("Error, File could not be deleted");
@@ -379,7 +379,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 						else if (MenuState::player2Name.size() != 0 && MenuState::eliminate)
 						{
 							// Remove file from Saved files
-							const std::string save2File = "./Assets/SavedFiles/save2.lua";
+							const std::string save2File = "./Assets/SavedFiles/slot_2/save2.lua";
 							if (std::filesystem::remove(save2File))
 							{
 								Logger::Log("Player: " + MenuState::player2Name + " was eliminated");
@@ -387,6 +387,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 								loader.EliminatePlayerToDefault(2, MenuState::player2Name);
 								MenuState::player2Name = "";
 								MenuState::eliminate = false;
+								std::filesystem::remove("./Assets/SavedFiles/slot_2/GameSecrets_2.lua");
 							}
 							else
 								Logger::Err("Error, File could not be deleted");
@@ -404,7 +405,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 						else if (MenuState::player3Name.size() != 0 && MenuState::eliminate)
 						{
 							// Remove file from Saved files
-							const std::string save3File = "./Assets/SavedFiles/save3.lua";
+							const std::string save3File = "./Assets/SavedFiles/slot_3/save3.lua";
 							if (std::filesystem::remove(save3File))
 							{
 								Logger::Log("Player: " + MenuState::player3Name + " was eliminated");
@@ -412,6 +413,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 								loader.EliminatePlayerToDefault(3, MenuState::player3Name);
 								MenuState::player3Name = "";
 								MenuState::eliminate = false;
+								std::filesystem::remove("./Assets/SavedFiles/slot_3/GameSecrets_3.lua");
 							}
 							else
 								Logger::Err("Error, File could not be deleted");

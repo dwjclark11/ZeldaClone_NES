@@ -27,8 +27,6 @@ private:
 	class Registry& reg;
 
 	// Helper Functions
-	
-	std::string SetName(std::string filePath, bool wExtension = true, char separator = '/');
 	AssetType ConvertToAssetType(std::string& type);
 	ItemComponent::SpecialItemType ConvertLuaStringToSpecial(std::string& special);
 	
@@ -43,6 +41,8 @@ private:
 	void ReadProjectileEmitterComponent(sol::table& table, Entity& entity);
 	void ReadTransformComponent(sol::table& table, Entity& entity);
 	void ReadRigidBodyComponent(sol::table& table, Entity& entity);
+
+	void CreateNewGameSecretsFile(int slotNum);
 
 public:
 	LevelLoader();
@@ -60,8 +60,8 @@ public:
 	void SavePlayerNameToLuaTable(std::string saveNum, std::string& name);
 
 	void CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName);
+	void LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName, int slotNum);
+	void LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName, int slotNum);
 	void LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadHUDFromLuaTable(sol::state& lua, std::string fileName);

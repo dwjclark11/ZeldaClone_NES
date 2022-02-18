@@ -188,6 +188,7 @@
     <ClCompile Include="src\Systems\CameraMovementSystem.cpp" />
     <ClCompile Include="src\Systems\EditorSystems\MouseControlSystem.cpp" />
     <ClCompile Include="src\Systems\EditorSystems\RenderEditorGUISystem.cpp" />
+    <ClCompile Include="src\Systems\EditorSystems\RenderEditorSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\AISystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\AnimationSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\CaptionSystem.cpp" />
@@ -205,9 +206,11 @@
     <ClCompile Include="src\Systems\GameSystems\RenderHUDSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderTileSystem.cpp" />
+    <ClCompile Include="src\Systems\GameSystems\ScriptSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\TriggerSystem.cpp" />
     <ClCompile Include="src\Systems\MenuSystems\RenderMainMenuSystem.cpp" />
     <ClCompile Include="src\Systems\MusicPlayerSystem.cpp" />
+    <ClCompile Include="src\Systems\NameSystems\RenderNameStateTextSystem.cpp" />
     <ClCompile Include="src\Systems\NameSystems\RenderNameSystem.cpp" />
     <ClCompile Include="src\Systems\PauseSystems\RenderPauseSystem.cpp" />
     <ClCompile Include="src\Systems\PauseSystems\RenderSaveStateSystem.cpp" />

@@ -31,6 +31,7 @@
 #include "../Systems/GameSystems/TriggerSystem.h"
 #include <string>
 #include <fstream>
+#include <filesystem>
 #include <SDL.h>
 
 LevelLoader::LevelLoader()
@@ -182,10 +183,10 @@ LevelLoader::AssetType LevelLoader::ConvertToAssetType(std::string& type)
 		return LevelLoader::AssetType::MUSIC;
 }
 
-void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName)
+void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName, int slotNum)
 {
 	bool valid = false;
-	sol::load_result script = lua.load_file("./Assets/SavedFiles/" + fileName + ".lua");
+	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/" + fileName + ".lua");
 	// Check the syntax of the Lua script 
 	if (!script.valid())
 	{
@@ -197,7 +198,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 
 
 	// Execute the script using the sol state 
-	lua.script_file("./Assets/SavedFiles/" + fileName + ".lua");
+	lua.script_file("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/" + fileName + ".lua");
 
 	// Read the main table first
 	sol::table data = lua["player_data"];
@@ -432,6 +433,67 @@ void LevelLoader::ReadRigidBodyComponent(sol::table& table, Entity& entity)
 	}
 }
 
+void LevelLoader::CreateNewGameSecretsFile(int slotNum)
+{
+	LuaTableWriter m_writer;
+
+	std::ofstream newFile("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/GameSecrets_" + std::to_string(slotNum) + ".lua");
+	newFile.close();
+
+	std::fstream file;
+
+	file.open("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/GameSecrets_" + std::to_string(slotNum) + ".lua");
+
+	// Start the Lua Table
+	m_writer.WriteStartDocument();
+
+	// Write a comment in Lua format
+	m_writer.WriteCommentSeparation(file);
+	m_writer.WriteCommentLine("Game Secrets file#: " + std::to_string(slotNum), file);
+	m_writer.WriteCommentSeparation(file);
+	m_writer.WriteDeclareTable("secrets", file);
+
+	m_writer.WriteStartTable(1, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "Sword_cave_Area", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	m_writer.WriteStartTable(2, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "bomb_secret_hearts_1", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	m_writer.WriteStartTable(3, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "bomb_secret_money_1", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	m_writer.WriteStartTable(4, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "bomb_secret_rupees_1", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	m_writer.WriteStartTable(5, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "bomb_secret_rupees_2", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	m_writer.WriteStartTable(6, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "burn_bush_potion_shop_1", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	m_writer.WriteStartTable(7, false, file);
+	m_writer.WriteKeyAndQuotedValue("location", "push_rock_to_highway_1", file);
+	m_writer.WriteKeyAndUnquotedValue("found", "false", file);
+	m_writer.WriteEndTable(false, file);
+
+	// Close the above tables
+	m_writer.WriteEndTable(false, file);
+	// Close the new lua file
+	file.close();
+}
+
 void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
@@ -628,19 +690,6 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 	else
 		return AIComponent::EnemyType::OCTOROK;
 }
-
-//std::string LevelLoader::SetName(std::string filePath, bool wExtension, char separator)
-//{
-//	// Get the last '.' position
-//	std::size_t sepPos = filePath.rfind(separator);
-//	std::size_t found = filePath.find_last_of('.');
-//	if (sepPos != std::string::npos)
-//	{
-//		std::string name = filePath = filePath.substr(0, found);
-//		return name.substr(sepPos + 1);
-//	}
-//	return "";
-//}
 
 void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 {
@@ -923,13 +972,17 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& newName)
 {
 	LuaTableWriter m_writer;
+	
+	// Check to see if the directory exists and if not, create it
+	if (!std::filesystem::is_directory("./Assets/SavedFiles/slot_" + saveNum) || !std::filesystem::exists("./Assets/SavedFiles/slot_" + saveNum))
+		std::filesystem::create_directory("./Assets/SavedFiles/slot_" + saveNum);
 
-	std::ofstream newFile("./Assets/SavedFiles/save" + saveNum + ".lua");
+	std::ofstream newFile("./Assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua");
 	newFile.close();
 
 	std::fstream file;
 
-	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
+	file.open("./Assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua");
 
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
@@ -1029,6 +1082,8 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 
 	// Close the new lua file
 	file.close();
+
+	CreateNewGameSecretsFile(atoi(saveNum.c_str()));
 }
 
 
@@ -1096,9 +1151,9 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 	}
 }
 
-void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName)
+void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName, int slotNum)
 {
-	sol::load_result script = lua.load_file("./Assets/SavedFiles/" + fileName + ".lua");
+	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/" + fileName + ".lua");
 
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
@@ -1110,7 +1165,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/SavedFiles/" + fileName + ".lua");
+	lua.script_file("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/" + fileName + ".lua");
 
 	sol::table data = lua["player_data"];
 
@@ -1270,7 +1325,7 @@ void LevelLoader::SaveSecrets()
 {
 	LuaTableWriter writer;
 	std::fstream file;
-	file.open("./Assets/SavedFiles/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua", std::ios::out);
+	file.open("./Assets/SavedFiles/slot_" + std::to_string(game.GetPlayerNum()) + "/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua", std::ios::out);
 	writer.WriteStartDocument();
 	writer.WriteCommentSeparation(file);
 	writer.WriteCommentLine("Game Secrets", file);
@@ -1300,7 +1355,7 @@ void LevelLoader::SaveSecrets()
 
 void LevelLoader::ReadInSecrets(sol::state& lua)
 {
-	sol::load_result script = lua.load_file("./Assets/SavedFiles/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
+	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(game.GetPlayerNum()) + "/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
 
 	if (!script.valid())
 	{
@@ -1311,7 +1366,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 	}
 
 	// Execute the script
-	lua.script_file("./Assets/SavedFiles/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
+	lua.script_file("./Assets/SavedFiles/slot_"+ std::to_string(game.GetPlayerNum()) + "/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
 	sol::table data = lua["secrets"];
 
 	int i = 1;

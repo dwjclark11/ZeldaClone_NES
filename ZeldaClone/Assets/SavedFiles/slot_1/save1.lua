@@ -1,11 +1,11 @@
 ----------------------------------------------------------
--- Save file#: 3
+-- Save file#: 1
 ----------------------------------------------------------
 
 player_data = {
     [1] = {
         menu_shared_values = {
-            name = "F",
+            name = "DUSTIN",
             num_hearts = 3,
             blue_ring = false,
             red_ring = false

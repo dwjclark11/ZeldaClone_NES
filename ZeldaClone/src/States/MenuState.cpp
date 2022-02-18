@@ -60,21 +60,24 @@ bool MenuState::OnEnter()
 
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
-	game.GetAssetManager()->AddFonts("charriot-font-40", "./Assets/Fonts/charriot.ttf", 40);
-	game.GetAssetManager()->AddFonts("charriot-font-60", "./Assets/Fonts/charriot.ttf", 60);
+	
+	if (!game.GetAssetManager()->HasFont("charriot-font-40"))
+		game.GetAssetManager()->AddFonts("charriot-font-40", "./Assets/Fonts/charriot.ttf", 40);
+	if (!game.GetAssetManager()->HasFont("charriot-font-60"))
+		game.GetAssetManager()->AddFonts("charriot-font-60", "./Assets/Fonts/charriot.ttf", 60);
 
 	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 
 	// Check to see if the save file exists, if it does call the loader function
-	fs::path saves("./Assets/SavedFiles/save1.lua");
+	fs::path saves("./Assets/SavedFiles/slot_1/save1.lua");
 	if (fs::status_known(fs::file_status{}) ? fs::exists(fs::file_status{}) : fs::exists(saves))
-		loader.LoadMenuScreenFromLuaTable(lua, "save1");
-	saves = "./Assets/SavedFiles/save2.lua";
+		loader.LoadMenuScreenFromLuaTable(lua, "save1", 1);
+	saves = "./Assets/SavedFiles/slot_2/save2.lua";
 	if (fs::status_known(fs::file_status{}) ? fs::exists(fs::file_status{}) : fs::exists(saves))
-		loader.LoadMenuScreenFromLuaTable(lua, "save2");
-	saves = "./Assets/SavedFiles/save3.lua";
+		loader.LoadMenuScreenFromLuaTable(lua, "save2", 2);
+	saves = "./Assets/SavedFiles/slot_3/save3.lua";
 	if (fs::status_known(fs::file_status{}) ? fs::exists(fs::file_status{}) : fs::exists(saves))
-		loader.LoadMenuScreenFromLuaTable(lua, "save3");
+		loader.LoadMenuScreenFromLuaTable(lua, "save3", 3);
 	
 	auto selector = reg.GetEntityByTag("selector");
 	
@@ -103,6 +106,9 @@ bool MenuState::OnExit()
 	game.GetAssetManager()->RemoveMusic("Main_Menu");
 	// Remove Unused SoundFXs
 	game.GetAssetManager()->RemoveSoundFX("Eliminate");
+	// Remove Fonts
+	game.GetAssetManager()->RemoveFont("charriot-font-40");
+	game.GetAssetManager()->RemoveFont("charriot-font-60");
 	return true;
 }
 
