@@ -913,6 +913,7 @@ void EditorFileLoader::WriteTriggerBoxComponent(LuaTableWriter& writer, const cl
 	writer.WriteKeyAndQuotedValue("collider_file", triggerBox.colliderFile, file);
 	writer.WriteKeyAndQuotedValue("tilemap_name", triggerBox.tileMapName, file);
 	writer.WriteKeyAndQuotedValue("tilemap_image", triggerBox.tileImageName, file);
+	writer.WriteKeyAndQuotedValue("map_image", triggerBox.tileImageName, file);
 	writer.WriteKeyAndQuotedValue("entity_file", triggerBox.entityFileName, file);
 	writer.WriteKeyAndUnquotedValue("image_width", triggerBox.imageWidth, file);
 	writer.WriteKeyAndUnquotedValue("image_height", triggerBox.imageHeight, file);

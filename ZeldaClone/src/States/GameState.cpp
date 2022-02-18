@@ -163,6 +163,7 @@ void GameState::Render()
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 
 	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 
 	Registry::Instance().GetSystem<HealthSystem>().Update();
 	Registry::Instance().GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
@@ -260,19 +261,22 @@ bool GameState::OnEnter()
 	// Remove the menu/Game over system for it is not needed in the game state
 	if (reg.HasSystem<RenderMainMenuSystem>()) 
 		reg.RemoveSystem<RenderMainMenuSystem>();
-	if (Registry::Instance().HasSystem<RenderGameOverTextSystem>())
-		Registry::Instance().RemoveSystem<RenderGameOverTextSystem>();
-	if (Registry::Instance().HasSystem<RenderGameOverSystem>())
-		Registry::Instance().RemoveSystem<RenderGameOverSystem>();
+	if (reg.HasSystem<RenderGameOverTextSystem>())
+		reg.RemoveSystem<RenderGameOverTextSystem>();
+	if (reg.HasSystem<RenderGameOverSystem>())
+		reg.RemoveSystem<RenderGameOverSystem>();
+	
+
+	game.GetAssetManager()->AddFonts("game_font", "./Assets/Fonts/prstart.ttf", 30);
 
 	return true;
 }
 
 bool GameState::OnExit()
 {
-	Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
-	Registry::Instance().GetSystem<RenderSystem>().OnExit();
-	Registry::Instance().GetSystem<RenderTileSystem>().OnExit();
+	reg.GetSystem<RenderCollisionSystem>().OnExit();
+	reg.GetSystem<RenderSystem>().OnExit();
+	reg.GetSystem<RenderTileSystem>().OnExit();
 	firstEntered = false;
 	return true;
 }
@@ -302,7 +306,7 @@ void GameState::OnKeyUp(SDL_Event* event)
 		GamePadSystem::paused = true;
 	}
 
-	Registry::Instance().GetSystem<KeyboardControlSystem>().UpdatePlayer();
+	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
 	KeyboardControlSystem::keyDown = false;
 }
 
@@ -322,7 +326,7 @@ void GameState::OnBtnUp(SDL_Event* event)
 	}
 
 	KeyboardControlSystem::keyDown = false;
-	Registry::Instance().GetSystem<KeyboardControlSystem>().UpdatePlayer();
+	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
 }
 
 
@@ -373,7 +377,7 @@ void GameState::RupeeScroll()
 		}
 		// Play the collect rupee sound
 		Mix_Volume(8, 10);
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 8);
+		reg.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 8);
 		scrollRupees--;
 
 		// Check for money scroll completion

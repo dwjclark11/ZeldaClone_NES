@@ -70,7 +70,7 @@ void LevelLoader::LoadTilemap(std::string fileName, std::string imageName)
 	// Check to see if the file opened correctly
 	if (!mapFile.is_open())
 	{
-		Logger::Err("Unable to open [" + fileName + "] This");
+		Logger::Err("ERROR: LEVEL_LOADER: __LINE__ 73: Unable to open [" + fileName + "]");
 	}
 
 	// Load the tilemap file 
@@ -88,7 +88,7 @@ void LevelLoader::LoadTilemap(std::string fileName, std::string imageName)
 		int tileWidth = 0;
 		int tileHeight = 0;
 		std::string group = "";
-		//std::string assetID = "";
+		
 		glm::vec2 offset = glm::vec2(0, 0);
 		bool collider = false;
 
@@ -717,6 +717,7 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 					trigger["components"]["trigger_box"]["collider_file"].get_or(std::string("no_file")),
 					trigger["components"]["trigger_box"]["tilemap_name"].get_or(std::string("no_file")),
 					trigger["components"]["trigger_box"]["tilemap_image"].get_or(std::string("no_file")),
+					trigger["components"]["trigger_box"]["map_image"].get_or(std::string("no_file")),
 					trigger["components"]["trigger_box"]["entity_file"].get_or(std::string("no_file")),
 					trigger["components"]["trigger_box"]["image_width"].get_or(0),
 					trigger["components"]["trigger_box"]["image_height"].get_or(0),
@@ -1654,6 +1655,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					lvlData["components"]["trigger_box"]["collider_file"],
 					lvlData["components"]["trigger_box"]["tilemap_name"],
 					lvlData["components"]["trigger_box"]["tilemap_image"],
+					lvlData["components"]["trigger_box"]["map_image"],
 					lvlData["components"]["trigger_box"]["entity_file"],
 					lvlData["components"]["trigger_box"]["image_width"].get_or(0),
 					lvlData["components"]["trigger_box"]["image_height"].get_or(0),

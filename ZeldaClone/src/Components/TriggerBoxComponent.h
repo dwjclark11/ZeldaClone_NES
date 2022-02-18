@@ -34,6 +34,7 @@ public:
 	std::string colliderFile;
 	std::string tileMapName;
 	std::string tileImageName;
+	std::string mapImageName;
 	std::string entityFileName;
 	std::string triggerFile;
 
@@ -47,7 +48,7 @@ public:
 
 	TriggerBoxComponent(TriggerType trigger = TriggerType::NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0),
 		std::string levelMusic = "no_file", std::string assetFile = "no_file", std::string enemyFile = "no_file", std::string colliderFile = "no_file",
-		std::string tileMapName = "no_file", std::string tileImageName = "no_file", std::string entityFileName = "no_file", int imageWidth = 0, int imageHeight = 0, std::string triggerFile = "no_file", bool collider = false)
+		std::string tileMapName = "no_file", std::string tileImageName = "no_file", std::string mapImageName = "no_file", std::string entityFileName = "no_file", int imageWidth = 0, int imageHeight = 0, std::string triggerFile = "no_file", bool collider = false)
 	{
 		this->triggerType = trigger;
 		this->transportOffset = offset;
@@ -58,6 +59,7 @@ public:
 		this->colliderFile = colliderFile;
 		this->tileMapName = tileMapName;
 		this->tileImageName = tileImageName;
+		this->mapImageName = mapImageName;
 		this->entityFileName = entityFileName;
 		this->triggerFile = triggerFile;
 		this->imageHeight = imageHeight;

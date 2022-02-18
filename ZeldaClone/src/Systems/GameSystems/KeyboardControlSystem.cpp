@@ -837,7 +837,6 @@ void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
 
 			if (valid)
 				text.text += newChar;
-
 		}
 
 		if (transform.position.x == 452 && transform.position.y == 584)
@@ -964,7 +963,6 @@ void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 			dir = LEFT;
 		}
 	}
-
 }
 
 void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)

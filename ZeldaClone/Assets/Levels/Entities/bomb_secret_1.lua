@@ -124,8 +124,8 @@ level = {
 		group = "caption",	
 		components = {
 			caption = {
-				captions = "It's a Secret to Everyone!",
-				x_pos = 150,
+				captions = "It's a Secret to     Everyone!",
+				x_pos = 250,
 				y_pos = 135,
 				num_frames = 22,
 			},

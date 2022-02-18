@@ -9,6 +9,7 @@
 #include "../../Components/SecretComponent.h"
 #include "../../Systems/GameSystems/RenderTileSystem.h"
 #include "../../Systems/GameSystems/KeyboardControlSystem.h"
+#include "../../Systems/RenderTextSystem.h"
 #include "../../Events/CollisionEvent.h"
 #include "../../Events/TriggerEvent.h"
 #include "../../Events/EventManager.h"
@@ -171,7 +172,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 			secretTrigger.transportOffset, secretTrigger.cameraOffset,
 			secretTrigger.levelMusic, secretTrigger.assetFile,
 			secretTrigger.enemyFile, secretTrigger.colliderFile,
-			secretTrigger.tileMapName, secretTrigger.tileImageName,
+			secretTrigger.tileMapName, secretTrigger.tileImageName, secretTrigger.mapImageName,
 			secretTrigger.entityFileName, secretTrigger.imageWidth, secretTrigger.imageHeight, secretTrigger.triggerFile);
 
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
@@ -196,7 +197,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 			secretTrigger.transportOffset, secretTrigger.cameraOffset,
 			secretTrigger.levelMusic, secretTrigger.assetFile,
 			secretTrigger.enemyFile, secretTrigger.colliderFile,
-			secretTrigger.tileMapName, secretTrigger.tileImageName,
+			secretTrigger.tileMapName, secretTrigger.tileImageName, secretTrigger.mapImageName,
 			secretTrigger.entityFileName, secretTrigger.imageWidth, secretTrigger.imageHeight, secretTrigger.triggerFile);
 
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
@@ -324,6 +325,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				Registry::Instance().GetSystem<RenderSystem>().OnExit();
 				Registry::Instance().GetSystem<RenderTileSystem>().OnExit();
 				Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
+				Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 				
 		
 				// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
@@ -331,14 +333,13 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 					loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
 
 				// load the tilemap only if there is an image and a corresponding map
-				if (tileMapName != "no_file" && tileImageName != "no_file")
+				if (tileMapName != "no_file" && trig.mapImageName != "no_file")
 				{
-
-					loader.LoadTilemap(mapFile, tileImageName);
+					loader.LoadTilemap(mapFile, trig.mapImageName);
 				}
 
 				// If there is only an image name than it is a full map image, not tiles --> Just load the map
-				if (tileImageName != "no_file" && tileMapName == "no_file")
+				if (tileImageName != "no_file")
 					loader.LoadMap(tileImageName, width, height);
 
 				// Start the new scene's music || stop the music

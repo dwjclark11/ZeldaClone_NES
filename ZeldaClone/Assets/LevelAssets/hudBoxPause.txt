@@ -1,9 +1,0 @@
-lines lines 16 16 0 0 0 428 770 4 4 0 1 2
-lines lines 16 16 0 0 0 428 903 4 4 0 1 2
-lines lines 16 16 0 16 0 495 805 4 4 1 0 3
-lines lines 16 16 0 16 0 392 805 4 4 1 0 3
-
-lines lines 16 16 0 0 0 548 770 4 4 0 1 2
-lines lines 16 16 0 0 0 548 903 4 4 0 1 2
-lines lines 16 16 0 16 0 615 805 4 4 1 0 3
-lines lines 16 16 0 16 0 512 805 4 4 1 0 3

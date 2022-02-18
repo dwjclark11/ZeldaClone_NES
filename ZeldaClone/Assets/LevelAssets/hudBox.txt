@@ -1,9 +1,0 @@
-lines lines 16 16 0 0 0 428 10 4 4 0 1 2
-lines lines 16 16 0 0 0 428 143 4 4 0 1 2
-lines lines 16 16 0 16 0 495 45 4 4 1 0 3
-lines lines 16 16 0 16 0 392 45 4 4 1 0 3
-
-lines lines 16 16 0 0 0 548 10 4 4 0 1 2
-lines lines 16 16 0 0 0 548 143 4 4 0 1 2
-lines lines 16 16 0 16 0 615 45 4 4 1 0 3
-lines lines 16 16 0 16 0 512 45 4 4 1 0 3

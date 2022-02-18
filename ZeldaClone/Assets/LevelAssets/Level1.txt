@@ -1,3 +1,0 @@
-TEXTURE Sprites Backgrounds/sprites.png
-TEXTURE tiles Backgrounds/Zelda_overworld.png
-MUSIC Overworld Music/Overworld_Theme.mp3

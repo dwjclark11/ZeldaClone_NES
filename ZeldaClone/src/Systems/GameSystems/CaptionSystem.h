@@ -4,13 +4,14 @@
 class CaptionSystem : public System
 {
 private:
-	
+	Entity& AddCaption(const Entity& entity, int& spaceX, int& spaceY);
+	void AddCaption(const Entity& entity, int& spaceX, int& spaceY, char letter);
+	Entity& AddNumberCaption(const Entity& entity, int spaceX, int spaceY);
+	int NextLine(std::string& str);
+
+	const int LETTER_SPACE = 32;
+
 public:
 	CaptionSystem();
-
-	Entity& AddCaption(const Entity& entity, int& spaceX, int& spaceY);
-	Entity& AddNumberCaption(const Entity& entity, int spaceX, int spaceY);
-
 	void Update();
-
 };
