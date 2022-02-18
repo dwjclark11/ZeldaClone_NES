@@ -25,6 +25,7 @@ int CaptionSystem::NextLine(std::string& str)
 }
 
 CaptionSystem::CaptionSystem()
+	: mCurrentLetter(0)
 {
 	RequiredComponent<CaptionComponent>();
 }
@@ -45,10 +46,11 @@ Entity& CaptionSystem::AddCaption(const Entity& entity, int& spaceX, int& spaceY
 void CaptionSystem::AddCaption(const Entity& entity, int& spaceX, int& spaceY, char letter)
 {
 	auto& caption = entity.GetComponent<CaptionComponent>();
-	std::string newLetterStr(&letter);
+	std::string newLetterStr(1, letter);
 	Entity newCaption = Registry::Instance().CreateEntity();
 	newCaption.Group("caption");
-	newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos + spaceX, caption.yPos + spaceY), newLetterStr, "game_font", SDL_Color{ 255,255,255,255 }, false);
+	// Does the std::move make sense hear?
+	newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos + spaceX, caption.yPos + spaceY), std::move(newLetterStr), "game_font", SDL_Color{ 255,255,255,255 }, false);
 	newCaption.AddComponent<GameComponent>();
 }
 
@@ -87,26 +89,28 @@ void CaptionSystem::Update()
 				}
 
 				// Scoll is based on time
-				if (caption.scrollTimer.GetTicks() >= 100 * caption.currentFrame)
+				if (caption.scrollTimer.GetTicks() >= 5000 * Game::Instance().GetDeltaTime() * caption.currentFrame)
 				{
-					int spaceX = caption.currentFrame * LETTER_SPACE; // Change this to not a magic number!   
+					int spaceX = caption.currentFrame * LETTER_SPACE;   
 					int spaceY = 0;
-					// Space changes also based on currentFrame amount since the row changes
 
+					// Space changes also based on currentFrame amount since the row changes
 					char letter = ' ';
 
 					if (caption.caption[caption.currentFrame] != ' ')
 						letter = std::toupper(caption.caption[caption.currentFrame]);
 
 					int nextLine = NextLine(caption.caption);
+
 					if (caption.currentFrame > nextLine)
 					{
 						// This starts it back at zero for the next row
-						spaceX = (caption.currentFrame - nextLine) * LETTER_SPACE; // * spriteWidth;
-						spaceY = LETTER_SPACE; // Change this maybe to row * spriteHeight;
+						spaceX = (caption.currentFrame - nextLine) * LETTER_SPACE; 
+						spaceY = LETTER_SPACE; 
 					}
 
 					AddCaption(entity, spaceX, spaceY, letter);
+
 					// increase the frame index
 					caption.currentFrame++;
 
@@ -123,99 +127,113 @@ void CaptionSystem::Update()
 					}
 				}
 			}
-			else if (caption.numbers)
+			else
 			{
-				int spaceX = 0; // Change this to not a magic number!   
-				int spaceY = 0;
-
-				if (caption.hundreds > 0)
+				auto& caption = entity.GetComponent<CaptionComponent>();
+				if (!caption.started)
 				{
-					auto newCaption = AddNumberCaption(entity, spaceX, spaceY);
-
-					spaceX = LETTER_SPACE;
-					if (caption.hundreds >= 0 && caption.hundreds <= 9)
-					{
-						newCaption.GetComponent<SpriteComponent>().srcRect.x = 8 * caption.hundreds;
-						newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
-					}
-						
-					caption.currentFrame++;
-					spaceX *= caption.currentFrame;
-				}
-						
-				if (caption.tens >= 0)
-				{
-					auto newCaption = AddNumberCaption(entity, spaceX, spaceY);
-					spaceX = LETTER_SPACE;
-					if (caption.tens >= 0 && caption.tens <= 9)
-					{
-						newCaption.GetComponent<SpriteComponent>().srcRect.x = 8 * caption.tens;
-						newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
-					}
-					caption.currentFrame++;
-					spaceX *= caption.currentFrame;
-				}
-
-				if (caption.ones >= 0)
-				{
-					auto newCaption = AddNumberCaption(entity, spaceX, spaceY);
-					spaceX = LETTER_SPACE;
-					if (caption.ones >= 0 && caption.ones <= 9)
-					{
-						newCaption.GetComponent<SpriteComponent>().srcRect.x = 8 * caption.ones;
-						newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
-					}
-
-					caption.finished = true;
+					Entity newCaption = Registry::Instance().CreateEntity();
+					newCaption.Group("caption");
+					// Does the std::move make sense hear?
+					newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos, caption.yPos), caption.caption, "game_font", SDL_Color{ 255,255,255,255 }, false);
+					newCaption.AddComponent<GameComponent>();
+					caption.started = true;
 				}
 			}
-			else 
-			{
-				int spaceX = 0; // Change this to not a magic number!   
-				int spaceY = 0;
 
-				if (caption.currentFrame > 22)
-				{
-					// This starts it back at zero for the next row
-					spaceX = (caption.currentFrame - 19) * LETTER_SPACE; // * spriteWidth;
-					spaceY = 32; // Change this maybe to row * spriteHeight;
-				}
-				auto newCaption = AddCaption(entity, spaceX, spaceY);
-				spaceX = LETTER_SPACE;
-						
-				char letter = ' ';
+		//	else if (caption.numbers)
+		//	{
+		//		int spaceX = 0; // Change this to not a magic number!   
+		//		int spaceY = 0;
 
-				if (caption.caption[caption.currentFrame] != ' ')
-					letter = std::toupper(caption.caption[caption.currentFrame]);
-				else
-				{
-					newCaption.GetComponent<SpriteComponent>().srcRect.x = 16 * 26;
-					newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
-				}
-				// Check to see if the letters are part of the alphabet       
-				if (letter >= 65 && letter <= 90)
-				{
-					newCaption.GetComponent<SpriteComponent>().srcRect.x = 16 * (letter - 65);
-					newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
-				}
+		//		if (caption.hundreds > 0)
+		//		{
+		//			auto newCaption = AddNumberCaption(entity, spaceX, spaceY);
 
-				// Check to see if the letters are punctuation marks
-				if (letter >= 33 && letter <= 47)
-				{
-					newCaption.GetComponent<SpriteComponent>().srcRect.x = 16 * (letter - 33);
-					newCaption.GetComponent<SpriteComponent>().srcRect.y = 16;
-				}
-				// increase the frame index
-				caption.currentFrame++;
-				spaceX *= caption.currentFrame;
+		//			spaceX = LETTER_SPACE;
+		//			if (caption.hundreds >= 0 && caption.hundreds <= 9)
+		//			{
+		//				newCaption.GetComponent<SpriteComponent>().srcRect.x = 8 * caption.hundreds;
+		//				newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
+		//			}
+		//				
+		//			caption.currentFrame++;
+		//			spaceX *= caption.currentFrame;
+		//		}
+		//				
+		//		if (caption.tens >= 0)
+		//		{
+		//			auto newCaption = AddNumberCaption(entity, spaceX, spaceY);
+		//			spaceX = LETTER_SPACE;
+		//			if (caption.tens >= 0 && caption.tens <= 9)
+		//			{
+		//				newCaption.GetComponent<SpriteComponent>().srcRect.x = 8 * caption.tens;
+		//				newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
+		//			}
+		//			caption.currentFrame++;
+		//			spaceX *= caption.currentFrame;
+		//		}
 
-				// Check completion
-				if (caption.currentFrame == caption.caption.length())
-				{
-					caption.finished = true;
-					continue;
-				}
-			}
+		//		if (caption.ones >= 0)
+		//		{
+		//			auto newCaption = AddNumberCaption(entity, spaceX, spaceY);
+		//			spaceX = LETTER_SPACE;
+		//			if (caption.ones >= 0 && caption.ones <= 9)
+		//			{
+		//				newCaption.GetComponent<SpriteComponent>().srcRect.x = 8 * caption.ones;
+		//				newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
+		//			}
+
+		//			caption.finished = true;
+		//		}
+		//	}
+		//	else 
+		//	{
+		//		int spaceX = 0; // Change this to not a magic number!   
+		//		int spaceY = 0;
+
+		//		if (caption.currentFrame > 22)
+		//		{
+		//			// This starts it back at zero for the next row
+		//			spaceX = (caption.currentFrame - 19) * LETTER_SPACE; // * spriteWidth;
+		//			spaceY = 32; // Change this maybe to row * spriteHeight;
+		//		}
+		//		auto newCaption = AddCaption(entity, spaceX, spaceY);
+		//		spaceX = LETTER_SPACE;
+		//				
+		//		char letter = ' ';
+
+		//		if (caption.caption[caption.currentFrame] != ' ')
+		//			letter = std::toupper(caption.caption[caption.currentFrame]);
+		//		else
+		//		{
+		//			newCaption.GetComponent<SpriteComponent>().srcRect.x = 16 * 26;
+		//			newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
+		//		}
+		//		// Check to see if the letters are part of the alphabet       
+		//		if (letter >= 65 && letter <= 90)
+		//		{
+		//			newCaption.GetComponent<SpriteComponent>().srcRect.x = 16 * (letter - 65);
+		//			newCaption.GetComponent<SpriteComponent>().srcRect.y = 0;
+		//		}
+
+		//		// Check to see if the letters are punctuation marks
+		//		if (letter >= 33 && letter <= 47)
+		//		{
+		//			newCaption.GetComponent<SpriteComponent>().srcRect.x = 16 * (letter - 33);
+		//			newCaption.GetComponent<SpriteComponent>().srcRect.y = 16;
+		//		}
+		//		// increase the frame index
+		//		caption.currentFrame++;
+		//		spaceX *= caption.currentFrame;
+
+		//		// Check completion
+		//		if (caption.currentFrame == caption.caption.length())
+		//		{
+		//			caption.finished = true;
+		//			continue;
+		//		}
+		//	}
 		}
 	}
 }

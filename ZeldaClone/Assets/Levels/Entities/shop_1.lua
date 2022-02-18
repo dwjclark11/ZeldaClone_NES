@@ -227,15 +227,10 @@ level = {
 		group = "caption",	
 		components = {
 			caption = {
-				captions = "no_caption",
+				captions = "130",
 				scrollable = false,
-				numbers = true,
 				x_pos = 284,
 				y_pos = 400,
-				num_frames = 3,
-				ones = 0,
-				tens = 3, 
-				hundreds = 1
 			},
 		}
 	},
@@ -244,15 +239,10 @@ level = {
 		group = "caption",	
 		components = {
 			caption = {
-				captions = "no_caption",
+				captions = "20",
 				scrollable = false,
-				numbers = true,
 				x_pos = 480,
 				y_pos = 400,
-				num_frames = 3,
-				ones = 0,
-				tens = 2, 
-				hundreds = 0
 			},
 		}
 	},
@@ -261,15 +251,10 @@ level = {
 		group = "caption",	
 		components = {
 			caption = {
-				captions = "no_caption",
+				captions = "80",
 				scrollable = false,
-				numbers = true,
 				x_pos = 660,
 				y_pos = 400,
-				num_frames = 3,
-				ones = 0,
-				tens = 8, 
-				hundreds = 0
 			},
 		}
 	},

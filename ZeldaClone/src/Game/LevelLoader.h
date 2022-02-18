@@ -10,17 +10,19 @@
 
 
 
-enum AssetType
-{
-	TEXTURE = 0,
-	SOUNDFX,
-	MUSIC,
-	FONT
-};
+
 
 class LevelLoader
 {
 private:
+	enum class AssetType
+	{
+		TEXTURE = 0,
+		SOUNDFX,
+		MUSIC,
+		FONT
+	};
+
 	class Game& game;
 	class Registry& reg;
 

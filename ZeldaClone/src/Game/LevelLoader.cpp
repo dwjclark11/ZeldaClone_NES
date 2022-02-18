@@ -114,7 +114,6 @@ void LevelLoader::LoadTilemap(std::string fileName, std::string imageName)
 
 		else
 		{
-			//Logger::Log("Game Tile");
 			tile.AddComponent<GameComponent>(); // RenderTileSystem needs to be changed to to layers
 			tile.Group("layered");
 		}
@@ -122,7 +121,6 @@ void LevelLoader::LoadTilemap(std::string fileName, std::string imageName)
 		// If the tile is a collider, add a boxColliderComponent
 		if (collider)
 		{
-			//Logger::Log("Collider");
 			tile.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
 		}
 	}
@@ -147,23 +145,23 @@ void LevelLoader::LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, c
 		std::string assetID = "";
 		std::string path = "./Assets/";
 		std::string assetPath = "";
-		AssetType assetType = TEXTURE;
+		AssetType assetType = LevelLoader::AssetType::TEXTURE;
 		lvlFile >> type >> assetID >> assetPath;
 
 		assetType = ConvertToAssetType(type);
 
 		switch (assetType)
 		{
-		case TEXTURE:
+		case LevelLoader::AssetType::TEXTURE:
 			assetManager->AddTextures(game.GetRenderer(), assetID, (path + assetPath));
 			break;
-		case MUSIC:
+		case LevelLoader::AssetType::MUSIC:
 			assetManager->AddMusic(assetID, path + assetPath);
 			break;
-		case SOUNDFX:
+		case LevelLoader::AssetType::SOUNDFX:
 			assetManager->AddSoundFX(assetID, path + assetPath);
 			break;
-		case FONT:
+		case LevelLoader::AssetType::FONT:
 			assetManager->AddFonts(assetID, path + assetPath, 14);
 			break;
 		default:
@@ -172,16 +170,16 @@ void LevelLoader::LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, c
 	}
 }
 
-AssetType LevelLoader::ConvertToAssetType(std::string& type)
+LevelLoader::AssetType LevelLoader::ConvertToAssetType(std::string& type)
 {
 	if (type == "TEXTURE")
-		return TEXTURE;
+		return LevelLoader::AssetType::TEXTURE;
 	if (type == "SOUNDFX")
-		return SOUNDFX;
+		return LevelLoader::AssetType::SOUNDFX;
 	if (type == "FONT")
-		return FONT;
+		return LevelLoader::AssetType::FONT;
 	if (type == "MUSIC")
-		return MUSIC;
+		return LevelLoader::AssetType::MUSIC;
 }
 
 void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName)
@@ -1691,13 +1689,13 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 				newLvlObject.AddComponent<CaptionComponent>(
 					lvlData["components"]["caption"]["captions"],
 					lvlData["components"]["caption"]["scrollable"].get_or(true),
-					lvlData["components"]["caption"]["numbers"].get_or(false),
+					//lvlData["components"]["caption"]["numbers"].get_or(false),
 					lvlData["components"]["caption"]["x_pos"].get_or(0),
-					lvlData["components"]["caption"]["y_pos"].get_or(0),
-					lvlData["components"]["caption"]["num_frames"].get_or(1),
-					lvlData["components"]["caption"]["ones"].get_or(0),
-					lvlData["components"]["caption"]["tens"].get_or(0),
-					lvlData["components"]["caption"]["hundreds"].get_or(0)
+					lvlData["components"]["caption"]["y_pos"].get_or(0)//,
+					//lvlData["components"]["caption"]["num_frames"].get_or(1),
+					//lvlData["components"]["caption"]["ones"].get_or(0),
+					//lvlData["components"]["caption"]["tens"].get_or(0),
+					//lvlData["components"]["caption"]["hundreds"].get_or(0)
 					);
 			}
 		}

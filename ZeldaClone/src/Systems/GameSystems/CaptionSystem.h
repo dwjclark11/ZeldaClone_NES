@@ -10,6 +10,7 @@ private:
 	int NextLine(std::string& str);
 
 	const int LETTER_SPACE = 32;
+	int mCurrentLetter;
 
 public:
 	CaptionSystem();
