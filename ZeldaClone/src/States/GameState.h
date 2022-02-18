@@ -28,7 +28,7 @@ public:
 
 	GameState(glm::vec2 cameraOffset);
 	
-	virtual void Update(const double& deltaTime) override;
+	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;
 
 	virtual bool OnEnter() override;

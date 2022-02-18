@@ -1,6 +1,6 @@
 #include "GameStateMachine.h"
 
-void GameStateMachine::Update(const double& deltaTime)
+void GameStateMachine::Update(const float& deltaTime)
 {
 	if (!states.empty())
 	{

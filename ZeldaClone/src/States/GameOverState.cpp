@@ -18,7 +18,7 @@ GameOverState::GameOverState()
 {
 }
 
-void GameOverState::Update(const double& deltaTime)
+void GameOverState::Update(const float& deltaTime)
 {
 	
 	game.GetEventManager()->Reset();
@@ -81,7 +81,7 @@ bool GameOverState::OnExit()
 	Registry::Instance().GetSystem<RenderGameOverTextSystem>().OnExit();
 	Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 	Logger::Log("Exiting Game Over State");
-	game.GetPlayerDead() = false;
+	game.SetPlayerDead(false);
 	return true;
 }
 

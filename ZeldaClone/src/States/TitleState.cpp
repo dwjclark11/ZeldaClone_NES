@@ -17,10 +17,12 @@ const std::string TitleState::titleID = "TITLESTATE";
 
 TitleState::TitleState()
 	: game(Game::Instance()), reg(Registry::Instance())
+	, timer(0)
+	, scroll(false)
 {
 }
 
-void TitleState::Update(const double& deltaTime)
+void TitleState::Update(const float& deltaTime)
 {
 	reg.Update();
 	
@@ -48,7 +50,7 @@ void TitleState::Update(const double& deltaTime)
 			scroll = true;
 		}
 		// Start the camera Movement System to Scroll the screen down
-		Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+		Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
 		
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
 		if (Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished())

@@ -12,7 +12,7 @@ public:
 	NameState();
 	~NameState() {}
 
-	virtual void Update(const double& deltaTime) override;
+	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;
 
 	virtual bool OnEnter() override;

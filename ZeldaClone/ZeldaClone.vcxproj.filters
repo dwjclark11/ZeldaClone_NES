@@ -111,9 +111,6 @@
     <ClCompile Include="src\States\SaveGameState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\States\State.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Utilities\Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

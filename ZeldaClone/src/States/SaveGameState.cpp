@@ -18,7 +18,7 @@ SaveGameState::SaveGameState()
 {
 }
 
-void SaveGameState::Update(const double& deltaTime)
+void SaveGameState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());

@@ -25,7 +25,7 @@ SettingsState::SettingsState()
 {
 }
 
-void SettingsState::Update(const double& deltaTime)
+void SettingsState::Update(const float& deltaTime)
 {
 	Game::Instance().GetEventManager()->Reset();
 

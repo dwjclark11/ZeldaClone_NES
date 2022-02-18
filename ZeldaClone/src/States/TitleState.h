@@ -7,7 +7,7 @@ public:
 	TitleState();
 	~TitleState() { Logger::Err(GetStateID() + " was Destroyed!"); };
 
-	virtual void Update(const double& deltaTime) override;
+	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;
 
 	virtual bool OnEnter() override;
@@ -23,10 +23,13 @@ public:
 
 
 private:
-	int timer;
-	bool scroll;
-	static const std::string titleID;
-
 	class Game& game;
 	class Registry& reg;
+
+	int timer;
+	bool scroll;
+	
+	static const std::string titleID;
+
+	
 };

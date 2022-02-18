@@ -9,7 +9,7 @@ public:
 	SettingsState();
 	virtual ~SettingsState() { Logger::Err("Settings State Destroyed!!"); }
 
-	virtual void Update(const double& deltaTime);
+	virtual void Update(const float& deltaTime);
 	virtual void Render();
 
 	virtual bool OnEnter();

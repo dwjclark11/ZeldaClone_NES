@@ -10,7 +10,7 @@ public:
 	virtual ~State() { Logger::Err("State Destroyed!!"); }
 	
 
-	virtual void Update(const double& deltaTime) = 0;
+	virtual void Update(const float& deltaTime) = 0;
 	virtual void Render() = 0;
 
 	virtual bool OnEnter() = 0;

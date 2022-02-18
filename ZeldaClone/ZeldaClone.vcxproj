@@ -184,7 +184,6 @@
     <ClCompile Include="src\States\PauseState.cpp" />
     <ClCompile Include="src\States\SaveGameState.cpp" />
     <ClCompile Include="src\States\SettingsState.cpp" />
-    <ClCompile Include="src\States\State.cpp" />
     <ClCompile Include="src\States\TitleState.cpp" />
     <ClCompile Include="src\Systems\CameraMovementSystem.cpp" />
     <ClCompile Include="src\Systems\EditorSystems\MouseControlSystem.cpp" />

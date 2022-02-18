@@ -407,7 +407,7 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 
 	if (ImGui::MenuItem("Quit"))
 	{
-		game.GetGameRunning() = false;
+		game.SetGameRunning(false);
 	}
 }
 

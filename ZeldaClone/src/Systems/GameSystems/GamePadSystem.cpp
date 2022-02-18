@@ -183,7 +183,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 			{
 				if (MenuState::player1Name.size() != 0)
 				{
-					game.GetPlayerNum() = 1;
+					game.SetPlayerNum(1);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}
@@ -193,7 +193,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 			{
 				if (MenuState::player2Name.size() != 0)
 				{
-					game.GetPlayerNum() = 2;
+					game.SetPlayerNum(2);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}
@@ -203,7 +203,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 			{
 				if (MenuState::player1Name.size() != 0)
 				{
-					game.GetPlayerNum() = 3;
+					game.SetPlayerNum(3);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}
@@ -264,7 +264,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 			{
 				if (MenuState::player1Name.size() != 0 &&!MenuState::eliminate)
 				{
-					game.GetPlayerNum() = 1;
+					game.SetPlayerNum(1);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}
@@ -288,7 +288,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 			{
 				if (MenuState::player2Name.size() != 0 && !MenuState::eliminate)
 				{
-					game.GetPlayerNum() = 2;
+					game.SetPlayerNum(2);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}
@@ -312,7 +312,7 @@ void GamePadSystem::MenuStateBtns(GamePadButtonPressedEvent& event)
 			{
 				if (MenuState::player3Name.size() != 0 && !MenuState::eliminate)
 				{
-					game.GetPlayerNum() = 3;
+					game.SetPlayerNum(3);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}

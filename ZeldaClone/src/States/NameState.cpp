@@ -24,7 +24,7 @@ NameState::NameState()
 {
 }
 
-void NameState::Update(const double& deltaTime)
+void NameState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	

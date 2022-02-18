@@ -259,7 +259,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					{
 						if (MenuState::player1Name.size() != 0)
 						{
-							game.GetPlayerNum() = 1;
+							game.SetPlayerNum(1);
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
 						}
@@ -269,7 +269,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					{
 						if (MenuState::player2Name.size() != 0)
 						{
-							game.GetPlayerNum() = 2;
+							game.SetPlayerNum(2);
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState());
 						}
@@ -279,7 +279,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					{
 						if (MenuState::player3Name.size() != 0)
 						{
-							game.GetPlayerNum() = 3;
+							game.SetPlayerNum(3);
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState());
 						}
@@ -348,7 +348,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					{
 						if (MenuState::player1Name.size() != 0 && !MenuState::eliminate)
 						{
-							game.GetPlayerNum() = 1;
+							game.SetPlayerNum(1);
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState());
 						}
@@ -372,7 +372,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					{
 						if (MenuState::player2Name.size() != 0 && !MenuState::eliminate)
 						{
-							game.GetPlayerNum() = 2;
+							game.SetPlayerNum(2);
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState());
 						}
@@ -397,7 +397,7 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 					{
 						if (MenuState::player3Name.size() != 0 && !MenuState::eliminate)
 						{
-							game.GetPlayerNum() = 3;
+							game.SetPlayerNum(3);
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState());
 						}
@@ -1022,7 +1022,7 @@ void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)
 					}
 					else if (transform.position.y == 585)
 					{
-						game.GetGameRunning() = false;
+						game.SetGameRunning(false);
 					}
 					break;
 				}
@@ -1063,8 +1063,8 @@ void KeyboardControlSystem::GameOverStateKeys(KeyPressedEvent& event)
 			{
 				if (transform.position.y == 475)
 				{
-					game.GetplayerCreated() = false;
-					game.GetPlayerDead() = false;
+					game.SetPlayerCreated(false);
+					game.SetPlayerDead(false);
 					game.GetStateMachine()->PopState();
 					game.GetStateMachine()->PushState(new GameState());
 				}

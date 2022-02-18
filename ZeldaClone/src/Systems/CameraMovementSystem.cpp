@@ -34,7 +34,7 @@ CameraMovementSystem::CameraMovementSystem()
 
 }
 
-void CameraMovementSystem::Update(SDL_Rect& camera)
+void CameraMovementSystem::Update(SDL_Rect& camera, const float& dt)
 {
 	// Common Variables
 	const auto& currentState = game.GetStateMachine()->GetCurrentState();
@@ -83,14 +83,14 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (east)
 							{
 								rigidBody.velocity.x = 0;
-								camera.x += 400 * game.GetDeltaTime();
+								camera.x += 400 * dt;
 							}
 
 							if (camera.x >= i * 1024 && east)
 							{
 								camera.x = i * 1024;
 								east = false;
-								cameraMoving = false;
+								game.SetCameraMoving(false);
 							}
 						}
 						else if (transform.position.x >= (1024 * i) && transform.position.x <= 1024 + (1024 * i) && west)
@@ -98,14 +98,14 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (west)
 							{
 								rigidBody.velocity.x = 0;
-								camera.x -= 400 * game.GetDeltaTime();
+								camera.x -= 400 * dt;
 							}
 
 							if (camera.x <= i * 1024 && west)
 							{
 								camera.x = i * 1024;
 								west = false;
-								cameraMoving = false;
+								game.SetCameraMoving(false);
 							}
 						}
 
@@ -114,14 +114,14 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (north)
 							{
 								rigidBody.velocity.y = 0;
-								camera.y -= 200 * game.GetDeltaTime();
+								camera.y -= 200 * dt;
 							}
 
 							if (camera.y <= (j * 672) - 288 && north)
 							{
 								camera.y = (j * 672) - 288;
 								north = false;
-								cameraMoving = false;
+								game.SetCameraMoving(false);
 							}
 						}
 						else if (transform.position.y + boxCollider.height * transform.scale.y + boxCollider.offset.y >= (672 * j) 
@@ -130,13 +130,13 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (south)
 							{
 								rigidBody.velocity.y = 0;
-								camera.y += 200 * game.GetDeltaTime();
+								camera.y += 200 * dt;
 							}
 							if (camera.y >= (j * 672) - 288 && south)
 							{
 								camera.y = (j * 672) - 288;
 								south = false;
-								cameraMoving = false;
+								game.SetCameraMoving(false);
 							}
 						}
 					}
@@ -149,7 +149,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 					&& !west && !cameraMoving && rigidBody.velocity.x < 0)
 				{
 					west = true;
-					cameraMoving = true;
+					game.SetCameraMoving(true);
 					rigidBody.velocity.x = 0;
 				}
 
@@ -157,7 +157,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 					&& rigidBody.velocity.x > 0)
 				{
 					east = true;
-					cameraMoving = true;
+					game.SetCameraMoving(true);
 					rigidBody.velocity.x = 0;
 				}
 
@@ -165,7 +165,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 					&& !north && !cameraMoving && (rigidBody.velocity.y < 0 || (game.GetRaft() && KeyboardControlSystem::dir == UP)))
 				{
 					north = true;
-					cameraMoving = true;
+					game.SetCameraMoving(true);
 					rigidBody.velocity.y = 0;
 				}
 
@@ -173,7 +173,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 					&& !south && !cameraMoving && (rigidBody.velocity.y > 0 || (game.GetRaft() && KeyboardControlSystem::dir == DOWN)))
 				{
 					south = true;
-					cameraMoving = true;
+					game.SetCameraMoving(true);
 					rigidBody.velocity.y = 0;
 				}
 			}
@@ -219,19 +219,19 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 		if (!titleScreenScroll_1 && !titleScreenScroll_2 && !game.GetCameraMoving())
 		{
 			titleScreenScroll_1 = true;
-			cameraMoving = true;
+			game.SetCameraMoving(true);
 		}
 
 		if (titleScreenScroll_1)
 		{
-			camera.y += 100 * game.GetDeltaTime();
+			camera.y += 100 * dt;
 			std::this_thread::sleep_for(std::chrono::microseconds(5));
 
 			if (camera.y >= 960)
 			{
 				camera.y = 960;
 				titleScreenScroll_1 = false;
-				cameraMoving = false;
+				game.SetCameraMoving(true);
 				
 			}
 		}
@@ -244,7 +244,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 
 		if (titleScreenScroll_2)
 		{
-			camera.y += 100 * game.GetDeltaTime();
+			camera.y += 100 * dt;
 
 			if (camera.y >= 6720)
 			{
@@ -274,6 +274,6 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 void CameraMovementSystem::OnExit()
 {
 	first = false;
-	game.GetCameraMoving() = false;
+	game.SetCameraMoving(false);
 	scrollTimer = 0;
 }

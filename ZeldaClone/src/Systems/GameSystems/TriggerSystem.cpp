@@ -317,7 +317,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 
 			if (game.GetFadeAlpha() > 0)
 			{
-				game.StartFadeOut() = true;
+				game.StartFadeOut(true);
 			}
 			else
 			{
@@ -377,8 +377,8 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				_player.GetComponent<TransformComponent>().position.y = y;
 
 				// Finish the fade screen 
-				game.StartFadeOut() = false;
-				game.StartFadeIn() = true;
+				game.StartFadeOut(false);
+				game.StartFadeIn(true);
 				// Remove the current trigger
 				trigger.Kill();
 				//Logger::Log("Image: " + tileImageName);
@@ -399,7 +399,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		
 		if (game.GetFadeAlpha() > 0)
 		{
-			game.StartFadeOut() = true;
+			game.StartFadeOut(true);
 		}
 		else
 		{
@@ -408,8 +408,8 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			game.GetCamera().y = trig.cameraOffset.y;
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
 			// Finish the fade screen 
-			game.StartFadeOut() = false;
-			game.StartFadeIn() = true;
+			game.StartFadeOut(false);
+			game.StartFadeIn(true);
 		}
 		break;
 	
@@ -452,7 +452,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		if (!trig.active)
 		{
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, 1);
-			game.GetPlayerItem() = true;
+			game.SetPlayerItem(true);
 			trig.active = true;
 		}
 		break;
@@ -495,7 +495,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			if (!trig.active)
 			{
 				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "fanfare", 0, -1);
-				game.GetPlayerItem() = true;
+				game.SetPlayerItem(true);
 				trig.active = true;
 				GameState::scrollRupees = shopItem.price;
 				GameState::buyItem = true;

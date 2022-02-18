@@ -12,7 +12,7 @@ public:
 	GameStateMachine() {}
 	~GameStateMachine() {}
 
-	void Update(const double& deltaTime);
+	void Update(const float& deltaTime);
 	void Render();
 
 	void PushState(State* state);

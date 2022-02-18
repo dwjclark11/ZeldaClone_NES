@@ -76,12 +76,12 @@ GameState::GameState(glm::vec2 cameraOffset)
 	game.GetCamera().y = this->cameraOffset.y;
 }
 
-void GameState::Update(const double& deltaTime)
+void GameState::Update(const float& deltaTime)
 {
 	if (GamePadSystem::paused && game.GetFadeAlpha() == 0)
 	{
-		game.FadeFinished() = true;
-		game.StartFadeOut() = false;
+		game.SetFadeFinished(true);
+		game.StartFadeOut(false);
 
 		game.GetStateMachine()->PushState(new PauseState());
 	}
@@ -92,7 +92,7 @@ void GameState::Update(const double& deltaTime)
 		// Turn music volume up
 		Mix_VolumeMusic(10);
 
-		game.StartFadeIn() = true;
+		game.StartFadeIn(true);
 		unpause = false;
 	}
 
@@ -123,14 +123,14 @@ void GameState::Update(const double& deltaTime)
 	
 	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<MovementSystem>().Update(deltaTime);
-	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
 
 	Registry::Instance().GetSystem<ProjectileLifeCycleSystem>().Update();
 	Registry::Instance().GetSystem<CollisionSystem>().Update(game.GetEventManager());
 
 	Registry::Instance().GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	Registry::Instance().GetSystem<AISystem>().Update();
-	Registry::Instance().GetSystem<CaptionSystem>().Update();
+	Registry::Instance().GetSystem<CaptionSystem>().Update(deltaTime);
 	Registry::Instance().GetSystem<TriggerSystem>().Update();
 
 	// Update the rupeeScroll 
@@ -232,7 +232,7 @@ bool GameState::OnEnter()
 		Registry::Instance().GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
 	}
 
-	if (!game.GetplayerCreated())
+	if (!game.GetPlayerCreated())
 	{
 		loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
 		// Load the player file based on the selected slot
@@ -247,7 +247,7 @@ bool GameState::OnEnter()
 			playerHealth.healthPercentage = 2 * playerHealth.maxHearts;
 		}
 		ConvertHUDNumbers();
-		game.GetplayerCreated() = true;
+		game.SetPlayerCreated(true);
 
 		{
 			game.GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
@@ -300,9 +300,9 @@ void GameState::OnKeyUp(SDL_Event* event)
 	// Set to paused
 	if (event->key.keysym.sym == SDLK_q)
 	{
-		game.FadeFinished() = false;
-		game.StartFadeOut() = true;
-		game.StartFadeIn() = false;
+		game.SetFadeFinished(false);
+		game.StartFadeOut(true);
+		game.StartFadeIn(false);
 		GamePadSystem::paused = true;
 	}
 
@@ -319,9 +319,9 @@ void GameState::OnBtnUp(SDL_Event* event)
 {
 	if (event->cbutton.button == game.GetBtnBindings().at(Game::Action::PAUSE))
 	{
-		game.FadeFinished() = false;
-		game.StartFadeOut() = true;
-		game.StartFadeIn() = false;
+		game.SetFadeFinished(false);
+		game.StartFadeOut(true);
+		game.StartFadeIn(false);
 		GamePadSystem::paused = true;
 	}
 
@@ -332,7 +332,7 @@ void GameState::OnBtnUp(SDL_Event* event)
 
 void GameState::ConvertHUDNumbers()
 {
-	if (totalRupees != totalPrevRupees || !game.GetplayerCreated())
+	if (totalRupees != totalPrevRupees || !game.GetPlayerCreated())
 	{
 		ConvertNumberParser("rupee_hundreds", totalRupees, 2);
 		ConvertNumberParser("rupee_tens", totalRupees, 1);
@@ -340,14 +340,14 @@ void GameState::ConvertHUDNumbers()
 		totalPrevRupees = totalRupees;
 	}
 
-	if (totalKeys != totalPrevKeys || !game.GetplayerCreated())
+	if (totalKeys != totalPrevKeys || !game.GetPlayerCreated())
 	{
 		ConvertNumberParser("keys_tens", totalKeys, 1);
 		ConvertNumberParser("key_ones", totalKeys, 0);
 		totalPrevKeys = totalKeys;
 	}
 
-	if (totalBombs != totalPrevBombs || !game.GetplayerCreated())
+	if (totalBombs != totalPrevBombs || !game.GetPlayerCreated())
 	{
 		ConvertNumberParser("bombs_tens", totalBombs, 1);
 		ConvertNumberParser("bombs_ones", totalBombs, 0);

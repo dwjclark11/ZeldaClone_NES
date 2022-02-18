@@ -23,7 +23,7 @@ PauseState::PauseState()
 {
 }
 
-void PauseState::Update(const double& deltaTime)
+void PauseState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	
@@ -48,8 +48,8 @@ void PauseState::Update(const double& deltaTime)
 	{
 		GameState::unpause = true;
 		GamePadSystem::paused = false;
-		game.FadeFinished() = true;
-		game.StartFadeOut() = false;
+		game.SetFadeFinished(true);
+		game.StartFadeOut(false);
 		game.GetStateMachine()->PopState();
 	}
 
@@ -68,7 +68,7 @@ bool PauseState::OnEnter()
 	// Turn music volume down while paused
 	Mix_VolumeMusic(3);
 
-	game.StartFadeIn() = true;
+	game.StartFadeIn(true);
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
 	// =============================================================================================================================
@@ -218,8 +218,8 @@ void PauseState::OnKeyUp(SDL_Event* event)
 {
 	if (event->key.keysym.sym == SDLK_q)
 	{
-		game.FadeFinished() = false;
-		game.StartFadeOut() = true;
+		game.SetFadeFinished(false);
+		game.StartFadeOut(true);
 	}
 }
 
@@ -232,8 +232,8 @@ void PauseState::OnBtnUp(SDL_Event* event)
 {
 	if (event->cbutton.button == game.GetBtnBindings().at(Game::Action::PAUSE))
 	{
-		game.FadeFinished() = false;
-		game.StartFadeOut() = true;
+		game.SetFadeFinished(false);
+		game.StartFadeOut(true);
 	}
 }
 

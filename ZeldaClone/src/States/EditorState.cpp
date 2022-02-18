@@ -18,13 +18,13 @@ EditorState::EditorState()
 
 }
 
-void EditorState::Update(const double& deltaTime)
+void EditorState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 
 	reg.Update();
-	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera());
+	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
 	//Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
 

@@ -187,7 +187,7 @@ void Game::ProcessEvents()
 		const int buttons = SDL_GetMouseState(&mouseX, &mouseY);
 
 		// Set up mouse inpots for ImGui
-		io.MousePos = ImVec2(mouseX, mouseY);
+		io.MousePos = ImVec2(static_cast<float>(mouseX), static_cast<float>(mouseY));
 		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		
@@ -327,7 +327,7 @@ SDL_Event& Game::GetEvent()
 	return sdlEvent;
 }
 
-const bool Game::HasSword()
+const bool Game::HasSword() const 
 {
 	if (mGameItems.woodSword || mGameItems.steelSword || mGameItems.magicSword)
 		return true;
@@ -335,7 +335,7 @@ const bool Game::HasSword()
 	return false;
 }
 
-bool Game::PlayerHold()
+const bool Game::PlayerHold() const 
 {
 	if (playerDead || onStairs || playerItem || startFadeOut || startFadeIn || onRaft)
 		return true;
@@ -375,14 +375,9 @@ void Game::FadeScreen()
 	}
 }
 
-unsigned& Game::GetPlayerNum()
+const unsigned& Game::GetPlayerNum() const 
 {
 	return gamePlayerNum;
-}
-
-double& Game::GetDeltaTime()
-{
-	return deltaTime;
 }
 
 void Game::AddGameSecrets(const std::string& locationID, bool found)

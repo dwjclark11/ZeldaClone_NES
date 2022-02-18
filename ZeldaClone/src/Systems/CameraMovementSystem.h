@@ -23,7 +23,7 @@ public:
 
 	CameraMovementSystem();
 
-	void Update(struct SDL_Rect& camera);
+	void Update(struct SDL_Rect& camera, const float& dt);
 	inline const bool GetScrollFinished() const { return titleScreenScroll_Finished; }
 	inline void SetScrollFinished(bool finished) { titleScreenScroll_Finished = finished; }
 	void OnExit();

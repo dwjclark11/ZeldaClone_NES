@@ -32,7 +32,7 @@ MenuState::MenuState()
 {
 }
 
-void MenuState::Update(const double& deltaTime)
+void MenuState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
 	

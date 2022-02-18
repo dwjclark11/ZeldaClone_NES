@@ -115,21 +115,32 @@ public:
 	SDL_Rect& GetMouseBox();
 	SDL_Event& GetEvent();
 
-	const bool HasSword();
-	bool PlayerHold();
+	const const bool HasSword() const;
+	const bool PlayerHold() const;
 
 	bool& GetAttack();
-	inline bool& IsRunning() { return mIsRunning; }
-	inline bool& GetCameraMoving() { return cameraMoving; }
-	inline bool& GetGameRunning() { return mIsRunning; }
-	inline bool& GetplayerCreated() { return playerCreated; }
+	
+	inline const bool& IsRunning() const { return mIsRunning; }
+	inline void SetGameRunning(bool running) { mIsRunning = running; }
 
-	inline bool& StartFadeIn() { return startFadeIn; }
-	inline bool& StartFadeOut() { return startFadeOut; }
-	inline bool& FadeFinished() { return fadeFinished; }
+	inline const bool& GetCameraMoving() const { return cameraMoving; }
+	inline void SetCameraMoving(bool moving) { cameraMoving = moving; }
 
-	inline int& GetLevelWidth() { return mLevelWidth; }
-	inline int& GetLevelHeight() { return mLevelHeight; }
+	
+	inline const bool& GetPlayerCreated() const { return playerCreated; }
+	inline void SetPlayerCreated(bool created) { playerCreated = created; }
+
+	inline const bool& FadeInStarted()  const { return startFadeIn; }
+	inline void StartFadeIn(bool fade) { startFadeIn = fade; }
+	
+	inline const bool& FadeOutStarted() const { return startFadeOut; }
+	inline void StartFadeOut(bool fade) { startFadeOut = fade; }
+	
+	inline const bool& FadeFinished() const { return fadeFinished; }
+	inline void SetFadeFinished(bool finished) { fadeFinished = finished; }
+
+	inline const int& GetLevelWidth()  const { return mLevelWidth; }
+	inline const int& GetLevelHeight() const { return mLevelHeight; }
 
 	void FadeScreen();
 
@@ -139,22 +150,34 @@ public:
 
 
 	inline GameItems& GetGameItems() { return mGameItems; }
-	unsigned& GetPlayerNum();
-	inline glm::vec2& GetPlayerPos() { return mPlayerPos; }
-	double& GetDeltaTime();
+	
+	const unsigned& GetPlayerNum() const;
+	inline void SetPlayerNum(unsigned num) { gamePlayerNum = num; }
+
+	inline const glm::vec2& GetPlayerPos() const { return mPlayerPos; }
+	inline void SetPlayerPos(glm::vec2 pos) { mPlayerPos = pos; }
+
 	inline sol::state& GetLuaState() { return lua; }
-	inline bool& GetPlayerItem() { return playerItem; }
-	inline bool& GetPlayerDead() { return playerDead; }
-	inline bool GetPlayerOnStairs() { return onStairs; }
+
+	inline const bool& GetPlayerItem() const { return playerItem; }
+	inline void SetPlayerItem(bool item) { playerItem = item; }
+
+	inline const bool& GetPlayerDead() const { return playerDead; }
+	inline void SetPlayerDead(bool dead) { playerDead = dead; }
+
+	inline const bool& GetPlayerOnStairs() const { return onStairs; }
 	inline void SetPlayerOnStairs(bool stairs) { onStairs = stairs; }
 
-	inline bool GetStairsFinished() { return stairsFinished; }
+	inline const bool& GetStairsFinished() const { return stairsFinished; }
 	inline void SetStairsFinished(bool finished) { stairsFinished = finished; }
+
 	inline void SetOnRaft(bool raft) { onRaft = raft; }
-	inline bool GetRaft() { return onRaft; }
+	inline const bool& GetRaft() const { return onRaft; }
+	
 	inline void SetFadeAlpha(Uint8 alpha) { fadeAlpha = alpha; }
-	inline Uint8 GetFadeAlpha() { return fadeAlpha; }
-	inline const double& GetDeltaTime() const { return deltaTime; }
+	inline const Uint8& GetFadeAlpha() const { return fadeAlpha; }
+	
+	inline const float& GetDeltaTime() const { return deltaTime; }
 
 	void AddGameSecrets(const std::string& locationID, bool found);
 	bool HasSecret(const std::string& locationID);
@@ -199,7 +222,7 @@ private:
 
 	SDL_Window* mWindow;
 	SDL_Renderer* mRenderer;
-	double deltaTime;
+	float deltaTime;
 
 	SDL_Rect camera;
 	SDL_Rect mouseBox;

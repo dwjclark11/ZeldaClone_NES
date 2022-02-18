@@ -91,7 +91,7 @@ void CheckItem(ItemComponent::ItemCollectType type)
 // Player Idle State definitions
 void IdleState::OnEnter(Entity& entity)
 {
-	game.GetPlayerItem() = false;
+	game.SetPlayerItem(false);
 }
 
 void IdleState::OnExit(Entity& entity)
@@ -356,7 +356,7 @@ void PlayerDeathState::Update(Entity& entity)
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 	auto& sm = Game::Instance().GetPlayerStateMachine();
 
-	game.GetPlayerDead() = true;
+	game.SetPlayerDead(true);
 
 	if (health.deathTimer.GetTicks() > 3000)
 	{
