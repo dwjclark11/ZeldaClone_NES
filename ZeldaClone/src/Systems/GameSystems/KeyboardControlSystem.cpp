@@ -20,6 +20,7 @@
 #include "../../States/NameState.h"
 #include "../../States/EditorState.h"
 #include "../../States/SettingsState.h"
+#include "../../States/GameOverState.h"
 #include "../SoundFXSystem.h"
 #include <string>
 #include <filesystem>
@@ -866,7 +867,7 @@ void KeyboardControlSystem::NameStateKeys(KeyPressedEvent& event)
 
 void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 {
-	if (game.GetFadeAlpha() == 255)
+	if (game.GetFadeAlpha() == 255 && !game.PlayerHold() && event.symbol != game.GetKeyBindings().at(Game::Action::ATTACK))
 	{
 		auto player = Registry::Instance().GetEntityByTag("player");
 		auto& playerTransform = player.GetComponent<TransformComponent>();
@@ -885,87 +886,85 @@ void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
 		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
-		if (!game.PlayerHold() && event.symbol != game.GetKeyBindings().at(Game::Action::ATTACK))
+		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_UP))
 		{
-			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_UP))
-			{
-				playerRigidbody.velocity = playerControl.upVelocity;
-				playerSprite.srcRect.x = playerSprite.width * 2;
+			playerRigidbody.velocity = playerControl.upVelocity;
+			playerSprite.srcRect.x = playerSprite.width * 2;
 
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 2;
-				shieldCollider.width = 24;
-				shieldCollider.offset = glm::vec2(48, 32);
-				shieldRigidbody = playerRigidbody;
+			shieldTransform.position = playerTransform.position;
+			shieldCollider.height = 2;
+			shieldCollider.width = 24;
+			shieldCollider.offset = glm::vec2(48, 32);
+			shieldRigidbody = playerRigidbody;
 
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
+			swordTransform.position = playerTransform.position;
+			swordCollider.height = 2;
+			swordCollider.width = 2;
+			swordCollider.offset = glm::vec2(64, 60);
+			swordRigidbody = playerRigidbody;
 
-				dir = UP;
-			}
+			dir = UP;
+		}
 
-			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_RIGHT))
-			{
-				playerSprite.srcRect.x = playerSprite.width * 3;
-				playerRigidbody.velocity = playerControl.rightVelocity;
+		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_RIGHT))
+		{
+			playerSprite.srcRect.x = playerSprite.width * 3;
+			playerRigidbody.velocity = playerControl.rightVelocity;
 
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 30;
-				shieldCollider.width = 2;
-				shieldCollider.offset = glm::vec2(90, 56);
-				shieldRigidbody = playerRigidbody;
+			shieldTransform.position = playerTransform.position;
+			shieldCollider.height = 30;
+			shieldCollider.width = 2;
+			shieldCollider.offset = glm::vec2(90, 56);
+			shieldRigidbody = playerRigidbody;
 
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
+			swordTransform.position = playerTransform.position;
+			swordCollider.height = 2;
+			swordCollider.width = 2;
+			swordCollider.offset = glm::vec2(64, 60);
+			swordRigidbody = playerRigidbody;
 
-				dir = RIGHT;
-			}
-			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_DOWN))
-			{
-				playerRigidbody.velocity = playerControl.downVelocity;
-				playerSprite.srcRect.x = playerSprite.width * 0;
+			dir = RIGHT;
+		}
+		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_DOWN))
+		{
+			playerRigidbody.velocity = playerControl.downVelocity;
+			playerSprite.srcRect.x = playerSprite.width * 0;
 
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 2;
-				shieldCollider.width = 24;
-				shieldCollider.offset = glm::vec2(40, 84);
-				shieldRigidbody = playerRigidbody;
+			shieldTransform.position = playerTransform.position;
+			shieldCollider.height = 2;
+			shieldCollider.width = 24;
+			shieldCollider.offset = glm::vec2(40, 84);
+			shieldRigidbody = playerRigidbody;
 
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
+			swordTransform.position = playerTransform.position;
+			swordCollider.height = 2;
+			swordCollider.width = 2;
+			swordCollider.offset = glm::vec2(64, 60);
+			swordRigidbody = playerRigidbody;
 
-				dir = DOWN;
-			}
-			if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_LEFT))
-			{
-				playerRigidbody.velocity = playerControl.leftVelocity;
-				playerSprite.srcRect.x = playerSprite.width * 1;
+			dir = DOWN;
+		}
+		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_LEFT))
+		{
+			playerRigidbody.velocity = playerControl.leftVelocity;
+			playerSprite.srcRect.x = playerSprite.width * 1;
 
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 30;
-				shieldCollider.width = 2;
-				shieldCollider.offset = glm::vec2(30, 50);
-				shieldRigidbody = playerRigidbody;
+			shieldTransform.position = playerTransform.position;
+			shieldCollider.height = 30;
+			shieldCollider.width = 2;
+			shieldCollider.offset = glm::vec2(30, 50);
+			shieldRigidbody = playerRigidbody;
 
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
+			swordTransform.position = playerTransform.position;
+			swordCollider.height = 2;
+			swordCollider.width = 2;
+			swordCollider.offset = glm::vec2(64, 60);
+			swordRigidbody = playerRigidbody;
 
-				dir = LEFT;
-			}
+			dir = LEFT;
 		}
 	}
+
 }
 
 void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)
@@ -1039,6 +1038,59 @@ void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)
 	}
 }
 
+void KeyboardControlSystem::GameOverStateKeys(KeyPressedEvent& event)
+{
+	for (auto& entity : GetSystemEntities())
+	{
+		auto& sprite = entity.GetComponent<SpriteComponent>();
+		auto& transform = entity.GetComponent<TransformComponent>();
+
+		if (entity.HasTag("gameOverSelector"))
+		{
+			switch (event.symbol)
+			{
+			case SDLK_UP:
+				transform.position.y -= 100;
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				if (transform.position.y < 475) transform.position.y = 675;
+				break;
+
+			case SDLK_DOWN:
+				transform.position.y += 100;
+				Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, 1);
+				if (transform.position.y > 675) transform.position.y = 475;
+				break;
+
+			case SDLK_SPACE:
+			{
+				if (transform.position.y == 475)
+				{
+					game.GetplayerCreated() = false;
+					game.GetPlayerDead() = false;
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
+				}
+				else if (transform.position.y == 575)
+				{
+					game.GetPlayerNum();
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new GameState());
+				}
+				else if (transform.position.y == 675)
+				{
+
+					game.GetStateMachine()->PopState();
+					game.GetStateMachine()->PushState(new MenuState());
+				}
+				break;
+			}
+			default:
+				break;
+			}
+		}
+	}
+}
+
 KeyboardControlSystem::KeyboardControlSystem()
 	: game(Game::Instance())
 {
@@ -1049,7 +1101,8 @@ KeyboardControlSystem::KeyboardControlSystem()
 
 void KeyboardControlSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
 {
-	if (!game.GetCameraMoving() && !game.GetPlayerItem() && !game.GetPlayerDead())
+	const auto& currentState = game.GetStateMachine()->GetCurrentState();
+	if ((!game.GetCameraMoving() && !game.GetPlayerItem() && !game.GetPlayerDead()) || currentState == "GAMEOVER")
 	{
 		eventManager->SubscribeToEvent<KeyPressedEvent>(this, &KeyboardControlSystem::OnKeyPressed); // Callback Function
 	}
@@ -1058,7 +1111,7 @@ void KeyboardControlSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eve
 void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 {
 	const auto& currentState = game.GetStateMachine()->GetCurrentState();
-
+	
 	if (currentState == "GAMESTATE")
 	{
 		GameStateKeys(event);
@@ -1086,6 +1139,10 @@ void KeyboardControlSystem::OnKeyPressed(KeyPressedEvent& event)
 	else if (currentState == "SETTINGS")
 	{
 		SettingsStateKeys(event);
+	}
+	else if (currentState == "GAMEOVER")
+	{
+		GameOverStateKeys(event);
 	}
 }
 

@@ -5,7 +5,7 @@
 #include "../../Components/AnimationComponent.h"
 #include "../../Components/SoundComponent.h"
 #include "../../Components/RigidBodyComponent.h"
-#include "../../Components/RupeeTypeComponent.h"
+#include "../../Components/RupeeGameComponent.h"
 #include "../../Components/ColliderComponent.h"
 #include "../../Components/PlayerComponent.h"
 #include "../../Events/EventManager.h"

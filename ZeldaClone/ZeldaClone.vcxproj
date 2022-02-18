@@ -215,6 +215,7 @@
     <ClCompile Include="src\Systems\RenderCollisionSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTextSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTitleSystem.cpp" />
+    <ClCompile Include="src\Systems\SoundFXSystem.cpp" />
     <ClCompile Include="src\Utilities\FileManagerUtils.cpp" />
     <ClCompile Include="src\Utilities\LuaTableWriter.cpp" />
     <ClCompile Include="src\Utilities\Timer.cpp" />
@@ -503,7 +504,7 @@
     <ClInclude Include="src\Components\ProjectileEmitterComponent.h" />
     <ClInclude Include="src\Components\RegisterNameComponent.h" />
     <ClInclude Include="src\Components\RigidBodyComponent.h" />
-    <ClInclude Include="src\Components\RupeeTypeComponent.h" />
+    <ClInclude Include="src\Components\RupeeGameComponent.h" />
     <ClInclude Include="src\Components\SaveComponent.h" />
     <ClInclude Include="src\Components\ScriptComponent.h" />
     <ClInclude Include="src\Components\SoundComponent.h" />
@@ -545,7 +546,6 @@
     <ClInclude Include="src\Systems\GameSystems\CollectItemSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\CollisionSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\DamageSystem.h" />
-    <ClInclude Include="src\Systems\GameSystems\GameOverKeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\GamePadSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\HealthSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\KeyboardControlSystem.h" />

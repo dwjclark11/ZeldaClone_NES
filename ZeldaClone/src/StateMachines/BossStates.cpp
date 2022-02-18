@@ -10,7 +10,7 @@
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
 #include "../Components/ItemComponent.h"
-#include "../Components/RupeeTypeComponent.h"
+#include "../Components/RupeeGameComponent.h"
 #include "../Components/GameComponent.h"
 
 void BossIdleState::OnEnter(Entity& entity)

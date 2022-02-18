@@ -207,6 +207,9 @@
     <ClCompile Include="src\Systems\PauseSystems\RenderSaveStateSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Systems\SoundFXSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Game\Game.h">
@@ -1109,9 +1112,6 @@
     <ClInclude Include="src\Systems\GameSystems\DamageSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Systems\GameSystems\GameOverKeyboardControlSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Systems\GameSystems\KeyboardControlSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1175,7 +1175,7 @@
     <ClInclude Include="src\Components\CameraComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Components\RupeeTypeComponent.h">
+    <ClInclude Include="src\Components\RupeeGameComponent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Systems\GameSystems\CollectItemSystem.h">

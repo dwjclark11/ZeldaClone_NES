@@ -13,6 +13,8 @@
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/RenderTileSystem.h"
+#include "../Systems/GameSystems/RenderGameOverTextSystem.h"
+#include "../Systems/GameSystems/RenderGameOverSystem.h"
 #include "../Systems/GameSystems/HealthSystem.h"
 #include "../Systems/GameSystems/TriggerSystem.h"
 #include "../Systems/CameraMovementSystem.h"
@@ -30,7 +32,7 @@
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/ProjectileComponent.h"
 #include "../Components/HealthComponent.h"
-#include "../Components/RupeeTypeComponent.h"
+#include "../Components/RupeeGameComponent.h"
 #include "../Components/SecretComponent.h"
 #include "../Components/GameComponent.h"
 #include "../Components/ItemComponent.h"
@@ -178,6 +180,7 @@ bool GameState::OnEnter()
 
 	if (!firstEntered)
 	{
+
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
 		if (game.GetCamera().x != 7168 && game.GetCamera().x != 4416)
 		{
@@ -245,7 +248,6 @@ bool GameState::OnEnter()
 		ConvertHUDNumbers();
 		game.GetplayerCreated() = true;
 
-
 		{
 			game.GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
 			game.GetPlayerStateMachine().ChangeState(player);
@@ -255,15 +257,14 @@ bool GameState::OnEnter()
 	// Read in all secrets!!
 	loader.ReadInSecrets(game.GetLuaState());
 
-	// Test Ladder Trigger
-	//auto ladderTrig = reg.CreateEntity();
-	//ladderTrig.AddComponent<TransformComponent>(glm::vec2(15936, 3680), glm::vec2(4, 4), 0);
-	//ladderTrig.AddComponent<BoxColliderComponent>(16, 16);
-	//ladderTrig.AddComponent<TriggerBoxComponent>(TriggerBoxComponent::TriggerType::LADDER);
+	// Remove the menu/Game over system for it is not needed in the game state
+	if (reg.HasSystem<RenderMainMenuSystem>()) 
+		reg.RemoveSystem<RenderMainMenuSystem>();
+	if (Registry::Instance().HasSystem<RenderGameOverTextSystem>())
+		Registry::Instance().RemoveSystem<RenderGameOverTextSystem>();
+	if (Registry::Instance().HasSystem<RenderGameOverSystem>())
+		Registry::Instance().RemoveSystem<RenderGameOverSystem>();
 
-	// Remove the menu system for it is not needed in the game state
-	if (reg.HasSystem<RenderMainMenuSystem>()) reg.RemoveSystem<RenderMainMenuSystem>();
-	
 	return true;
 }
 

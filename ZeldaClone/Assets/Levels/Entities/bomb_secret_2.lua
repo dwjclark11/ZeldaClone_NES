@@ -211,4 +211,45 @@ level = {
 			},
 		}
 	},
+	-- RUPEE animation
+	[9] ={
+		--group = "NPC",	
+		components = {
+			transform = {
+				position = { x = 160, y = 360},
+				scale = { x = 4, y = 4},
+				rotation = 0.0
+			},
+			sprite = {
+				asset_id = "hearts",
+				width = 16,
+				height = 16,
+				layer = 4,
+				fixed = false,
+				src_rect_x = 48, 
+				src_rect_y = 0 
+			}, 
+			animation = {
+				num_frames = 2,
+				frame_rate = 10,
+				vertical = false, 
+				looped = true, 
+				frame_offset = 48
+			}
+		}
+	},
+	-- Caption -- X
+	[10] ={
+		group = "caption",	
+		components = {
+			caption = {
+				captions = "X",
+				scrollable = false,
+				numbers = false,
+				x_pos = 212,
+				y_pos = 400,
+				num_frames = 1,
+			},
+		}
+	},
 }

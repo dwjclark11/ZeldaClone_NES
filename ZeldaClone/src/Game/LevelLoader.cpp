@@ -599,6 +599,8 @@ TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::st
 		return TriggerBoxComponent::TriggerType::RAFT;
 	else if (type == "ladder")
 		return TriggerBoxComponent::TriggerType::LADDER;
+	else if (type == "money_game")
+		return TriggerBoxComponent::TriggerType::MONEY_GAME;
 	else 
 		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
 }
@@ -709,16 +711,16 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 						trigger["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
 						trigger["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
 					),
-					trigger["components"]["trigger_box"]["level_music"],
-					trigger["components"]["trigger_box"]["asset_file"],
-					trigger["components"]["trigger_box"]["enemy_file"],
-					trigger["components"]["trigger_box"]["collider_file"],
-					trigger["components"]["trigger_box"]["tilemap_name"],
-					trigger["components"]["trigger_box"]["tilemap_image"],
-					trigger["components"]["trigger_box"]["entity_file"],
+					trigger["components"]["trigger_box"]["level_music"].get_or(std::string("stop")),
+					trigger["components"]["trigger_box"]["asset_file"].get_or(std::string("no_file")),
+					trigger["components"]["trigger_box"]["enemy_file"].get_or(std::string("no_file")),
+					trigger["components"]["trigger_box"]["collider_file"].get_or(std::string("no_file")),
+					trigger["components"]["trigger_box"]["tilemap_name"].get_or(std::string("no_file")),
+					trigger["components"]["trigger_box"]["tilemap_image"].get_or(std::string("no_file")),
+					trigger["components"]["trigger_box"]["entity_file"].get_or(std::string("no_file")),
 					trigger["components"]["trigger_box"]["image_width"].get_or(0),
 					trigger["components"]["trigger_box"]["image_height"].get_or(0),
-					trigger["components"]["trigger_box"]["trigger_file"],
+					trigger["components"]["trigger_box"]["trigger_file"].get_or(std::string("no_file")),
 					trigger["components"]["trigger_box"]["collider"].get_or(false)
 					);
 			}

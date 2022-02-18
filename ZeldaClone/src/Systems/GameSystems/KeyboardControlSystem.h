@@ -15,6 +15,7 @@ private:
 	void NameStateKeys(class KeyPressedEvent& event);
 	void GameStateKeys(class KeyPressedEvent& event);
 	void SaveStateKeys(class KeyPressedEvent& event);
+	void GameOverStateKeys(class KeyPressedEvent& event);
 
 public:
 	static directionE dir;

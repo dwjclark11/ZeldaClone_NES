@@ -6,9 +6,12 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/PlayerComponent.h"
 #include "../Systems/GameSystems/KeyboardControlSystem.h"
+#include <chrono>
+#include <thread>
 
 #include <SDL.h>
 #include "../Game/Game.h"
+
 
 CameraMovementSystem::CameraMovementSystem()
 	: game(Game::Instance())
@@ -28,6 +31,7 @@ CameraMovementSystem::CameraMovementSystem()
 	timerStart = false;
 	titleScreenScroll_Finished = false;
 	scrollTimer = 0;
+
 }
 
 void CameraMovementSystem::Update(SDL_Rect& camera)
@@ -79,8 +83,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (east)
 							{
 								rigidBody.velocity.x = 0;
-								camera.x += 8;
-								Sleep(1);
+								camera.x += 400 * game.GetDeltaTime();
 							}
 
 							if (camera.x >= i * 1024 && east)
@@ -95,8 +98,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (west)
 							{
 								rigidBody.velocity.x = 0;
-								camera.x -= 8;
-								Sleep(1);
+								camera.x -= 400 * game.GetDeltaTime();
 							}
 
 							if (camera.x <= i * 1024 && west)
@@ -112,8 +114,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (north)
 							{
 								rigidBody.velocity.y = 0;
-								camera.y -= 4;
-								Sleep(1);
+								camera.y -= 200 * game.GetDeltaTime();
 							}
 
 							if (camera.y <= (j * 672) - 288 && north)
@@ -129,8 +130,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 							if (south)
 							{
 								rigidBody.velocity.y = 0;
-								camera.y += 4;
-								Sleep(1);
+								camera.y += 200 * game.GetDeltaTime();
 							}
 							if (camera.y >= (j * 672) - 288 && south)
 							{
@@ -197,6 +197,10 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 	// If the current State is the Title State, Run this Camera 
 	if (currentState == "TITLESTATE")
 	{
+		if (!timer.isStarted())
+			timer.Start();
+
+		//if (timer.isStarted()) Logger::Log("ticks: " + std::to_string(timer.GetTicks()));
 		/*
 			This part of the system controls the scroll of the camera during the title screen animations
 			The camera will wait for a certain amount of time and then the screen should appear to scroll
@@ -206,6 +210,7 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 		// Where to place the Origin of the camera during the first entrance of the state
 		if (!first)
 		{
+			
 			camera.x = 0;
 			camera.y = 0;
 			first = true;
@@ -219,27 +224,27 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 
 		if (titleScreenScroll_1)
 		{
-			camera.y += 1;
-			Sleep(5);
+			camera.y += 100 * game.GetDeltaTime();
+			std::this_thread::sleep_for(std::chrono::microseconds(5));
 
 			if (camera.y >= 960)
 			{
 				camera.y = 960;
 				titleScreenScroll_1 = false;
 				cameraMoving = false;
+				
 			}
 		}
 
 		if (!titleScreenScroll_1 && !titleScreenScroll_2 && !titleScreenScroll_3)
-		{
-			Sleep(3000);
-			titleScreenScroll_2 = true;
+		{	
+			if (timer.GetTicks() > 18000)
+				titleScreenScroll_2 = true;
 		}
 
 		if (titleScreenScroll_2)
 		{
-			camera.y += 1;
-			Sleep(5);
+			camera.y += 100 * game.GetDeltaTime();
 
 			if (camera.y >= 6720)
 			{
@@ -249,17 +254,14 @@ void CameraMovementSystem::Update(SDL_Rect& camera)
 		}
 		if (titleScreenScroll_3)
 		{
-			if (scrollTimer < 50)
-			{
-				Sleep(100);
-				scrollTimer++;
-			}
-			else
+			//if (timer.isStarted()) Logger::Log("ticks: " + std::to_string(timer.GetTicks()));
+			if (timer.GetTicks() > 120000)
 			{
 				titleScreenScroll_Finished = true;
 				titleScreenScroll_3 = false;
 				titleScreenScroll_2 = false;
 				titleScreenScroll_1 = false;
+				timer.Stop();
 				camera.y = 0;
 			}
 		}

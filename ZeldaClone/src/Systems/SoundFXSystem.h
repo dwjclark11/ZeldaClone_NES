@@ -8,12 +8,9 @@ class SoundFXSystem : public System
 {
 public:
 	// Constructor / Destructor
-	SoundFXSystem() {}
-	~SoundFXSystem() {}
+	SoundFXSystem();
+	~SoundFXSystem();
 	
 	// Functions --> Play sound effects
-	void PlaySoundFX(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops = 1, int channel = 1)
-	{
-		Mix_PlayChannel(channel, assetManager->GetSoundFX(assetID), loops);
-	}
+	void PlaySoundFX(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops = 1, int channel = 1);
 };

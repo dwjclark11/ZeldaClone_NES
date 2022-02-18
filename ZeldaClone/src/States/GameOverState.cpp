@@ -2,11 +2,14 @@
 #include "../ECS/ECS.h"
 #include "../Components/TextLabelComponent.h"
 #include "../Components/TransformComponent.h"
+#include "../Components/KeyboardControlComponent.h"
 #include "../Components/SpriteComponent.h"
-#include "../Systems/GameSystems/GameOverKeyboardControlSystem.h"
+#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/RenderGameOverSystem.h"
+#include "../Systems/GameSystems/RenderGameOverTextSystem.h"
 #include "../Systems/GameSystems/RenderSystem.h"
 #include "../AssetManager/AssetManager.h"
+#include "../Game/Game.h"
 
 const std::string GameOverState::gameOverID = "GAMEOVER";
 
@@ -17,10 +20,11 @@ GameOverState::GameOverState()
 
 void GameOverState::Update(const double& deltaTime)
 {
+	
 	game.GetEventManager()->Reset();
-	Registry::Instance().GetSystem<GameOverKeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+
+	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().Update();
-	Registry::Instance().GetSystem<GameOverKeyboardControlSystem>().Update();
 }
 
 void GameOverState::Render()
@@ -35,9 +39,7 @@ bool GameOverState::OnEnter()
 		Registry::Instance().AddSystem<RenderGameOverTextSystem>();
 	if (!Registry::Instance().HasSystem<RenderGameOverSystem>()) 
 		Registry::Instance().AddSystem<RenderGameOverSystem>();
-	if (!Registry::Instance().HasSystem<GameOverKeyboardControlSystem>()) 
-		Registry::Instance().AddSystem<GameOverKeyboardControlSystem>();
-	
+
 	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
 	
 	game.GetAssetManager()->AddTextures(game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
@@ -65,6 +67,7 @@ bool GameOverState::OnEnter()
 	Entity selector = Registry::Instance().CreateEntity();
 	selector.AddComponent<SpriteComponent>("hearts", 16, 16, 0, false);
 	selector.AddComponent<TransformComponent>(glm::vec2(260, 475), glm::vec2(4, 4), 0.0);
+	selector.AddComponent<KeyboardControlComponent>();
 	selector.Tag("gameOverSelector");
 	selector.Group("game_over");
 

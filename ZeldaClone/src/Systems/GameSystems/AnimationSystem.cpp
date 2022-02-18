@@ -21,14 +21,17 @@ void AnimationSystem::Update()
 	for (const auto& entity : GetSystemEntities())
 	{
 		auto& transform = entity.GetComponent<TransformComponent>();
-		auto& playerPos = Game::Instance().GetPlayerPos();
-		int entX = transform.position.x / 1024;
-		int entY = transform.position.y / 672;
 		
-		if (entX != playerPos.x || entY != playerPos.y)
-			continue;
+		if (Game::Instance().GetStateMachine()->GetCurrentState() == "GAMESTATE")
+		{
+			auto& playerPos = Game::Instance().GetPlayerPos();
+			int entX = transform.position.x / 1024;
+			int entY = transform.position.y / 672;
 
-
+			if (entX != playerPos.x || entY != playerPos.y)
+				continue;
+		}
+	
 		auto& animation = entity.GetComponent<AnimationComponent>();
 		auto& sprite = entity.GetComponent<SpriteComponent>();
 		

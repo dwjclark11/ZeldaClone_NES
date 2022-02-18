@@ -1,20 +1,11 @@
 #pragma once
 #include "../ECS/ECS.h"
-
-
-// Fix for linux
-#ifdef WIN32
-#include <windows.h>
-#else
-#include <unistd.h>
-#define Sleep(x) usleep((x)*1000)
-#endif
+#include "../Utilities/Timer.h"
 
 class CameraMovementSystem : public System
 {
 private:
 	class Game& game;
-public:
 	bool first;
 	bool west;
 	bool east;
@@ -25,13 +16,16 @@ public:
 	bool titleScreenScroll_3;
 	bool timerStart;
 	bool titleScreenScroll_Finished;
-	
+
 	int scrollTimer;
+	Timer timer;
+public:
 
 	CameraMovementSystem();
 
 	void Update(struct SDL_Rect& camera);
-	inline bool& GetScrollFinished() { return titleScreenScroll_Finished; }
+	inline const bool GetScrollFinished() const { return titleScreenScroll_Finished; }
+	inline void SetScrollFinished(bool finished) { titleScreenScroll_Finished = finished; }
 	void OnExit();
 
 };

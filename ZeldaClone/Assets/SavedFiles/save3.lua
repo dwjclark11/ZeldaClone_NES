@@ -5,7 +5,7 @@
 player_data = {
     [1] = {
         menu_shared_values = {
-            name = "UVW",
+            name = "F",
             num_hearts = 3,
             blue_ring = false,
             red_ring = false

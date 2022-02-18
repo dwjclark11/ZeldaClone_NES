@@ -26,8 +26,7 @@ void TitleState::Update(const double& deltaTime)
 	
 	if (timer < 150)
 	{
-		
-		Sleep(100);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		timer++;
 		RenderTitleSystem::titleTimer++;
 	}
@@ -40,6 +39,7 @@ void TitleState::Update(const double& deltaTime)
 		{
 			Entity scrollSheet = reg.CreateEntity();
 			scrollSheet.AddComponent<SpriteComponent>("title_scroll", 256, 1920, 2, false);
+			scrollSheet.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(4,4));
 			scrollSheet.AddComponent<BackgroundImageComponent>(glm::vec2(0,0), glm::vec2(4,4));
 			scrollSheet.AddComponent<RigidBodyComponent>(glm::vec2(0));
 			scrollSheet.AddComponent<AnimationComponent>(2, 6, false);
@@ -53,7 +53,7 @@ void TitleState::Update(const double& deltaTime)
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
 		if (Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished())
 		{
-			Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished() = false;
+			Registry::Instance().GetSystem<CameraMovementSystem>().SetScrollFinished(false);
 			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(new TitleState());
 		}

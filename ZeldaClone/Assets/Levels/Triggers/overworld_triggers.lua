@@ -194,19 +194,6 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "push_rocks",
-				transport_offset 	= { x = 0, y = 0 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file",
-				trigger_file		= "no_file",
-				image_width			= 0,
-				image_height		= 0,
-				trigger_file = "no_file",
                 collider = true
 			},
 			secret = {
@@ -456,7 +443,7 @@ triggers = {
 			},
 		}
 	},
-	-- Raft Secret to Level 3 
+	-- Raft Secret to Level 
 	[13] = {
 		group = "secret",
 		components = {
@@ -473,18 +460,6 @@ triggers = {
 			trigger_box  = { 
 				trigger_type		= "raft",
 				transport_offset 	= { x = 5632, y = 3264 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file",
-				trigger_file		= "no_file",
-				image_width			= 0,
-				image_height		= 0,
-				collider			= false
 			},
 			secret = {
 				location_id			= "none",
@@ -500,7 +475,7 @@ triggers = {
 			},
 		}
 	},
-	-- Raft Secret from Level 3 
+	-- Raft Secret from Level 4
 	[14] = {
 		group = "secret",
 		components = {
@@ -517,18 +492,6 @@ triggers = {
 			trigger_box  = { 
 				trigger_type		= "raft",
 				transport_offset 	= { x = 5632, y = 3616 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file",
-				trigger_file		= "no_file",
-				image_width			= 0,
-				image_height		= 0,
-				collider			= false
 			},
 			secret = {
 				location_id			= "none",
@@ -560,18 +523,6 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "ladder",
-				transport_offset 	= { x = 0, y = 0 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file", 
-				image_width			= 0,
-				image_height		= 0,
-				trigger_file		= "no_file"
 			},
 		}
 	},
@@ -591,18 +542,6 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "ladder",
-				transport_offset 	= { x = 0, y = 0 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file", 
-				image_width			= 0,
-				image_height		= 0,
-				trigger_file		= "no_file"
 			},
 		}
 	},
@@ -622,18 +561,6 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "ladder",
-				transport_offset 	= { x = 0, y = 0 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file", 
-				image_width			= 0,
-				image_height		= 0,
-				trigger_file		= "no_file"
 			},
 		}
 	},
@@ -653,18 +580,6 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "ladder",
-				transport_offset 	= { x = 0, y = 0 },
-				camera_offset 		= { x = 0, y = 0 },
-				level_music			= "stop",
-				asset_file			= "no_file",
-				enemy_file			= "no_file",
-				collider_file		= "no_file", 
-				tilemap_name 		= "no_file",
-				tilemap_image   	= "no_file",
-				entity_file			= "no_file", 
-				image_width			= 0,
-				image_height		= 0,
-				trigger_file		= "no_file"
 			},
 		}
 	},

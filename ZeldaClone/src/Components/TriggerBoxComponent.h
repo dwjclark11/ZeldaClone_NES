@@ -22,6 +22,7 @@ public:
 		SHOP_ITEM = 9,
 		LADDER,
 		RAFT,
+		MONEY_GAME,
 	};
 
 	TriggerType triggerType;
