@@ -101,7 +101,8 @@ level = {
 			box_collider = {
 				width = 16,
 				height = 16,
-				offset = {x = 32, y = 32}
+				offset_x = 32,
+				offset_y = 32
 			},
 			trigger_box = {
 				trigger_type = "collect_item", -- Collect Item -- Need to convert to enum 

@@ -45,7 +45,7 @@ int MouseControlSystem::CanvasHeight = 4224;
 
 bool MouseControlSystem::OverImGuiWindow = false;
 
-AIComponent::EnemyType MouseControlSystem::enemyType = AIComponent::EnemyType::OCTOROK;
+AIComponent::EnemyType MouseControlSystem::enemyType = AIComponent::EnemyType::NO_TYPE;
 
 MouseControlSystem::MouseControlSystem()
 {
@@ -63,6 +63,7 @@ void MouseControlSystem::Update(const std::unique_ptr<AssetManager>& assets, SDL
 	if (createObstacles) CreateObstacles(assets, renderer, mouseBox, event, camera);
 	if (createBoxCollider) CreateBoxCollider(assets, renderer, mouseBox, event, camera);
 	if (createTrigger) CreateTrigger(assets, renderer, mouseBox, event, camera);
+	
 	if (createEnemy)
 	{
 		if (enemyType != prevEnemyType)
@@ -388,6 +389,7 @@ void MouseControlSystem::SetEnemyImage()
 	case AIComponent::EnemyType::DARKNUT:
 		enemyFile = "Darknut";
 		enemy_Type = "darknut";
+		Logger::Log("Log type");
 		break;
 	case AIComponent::EnemyType::LEEVER:
 		enemyFile = "Leever";

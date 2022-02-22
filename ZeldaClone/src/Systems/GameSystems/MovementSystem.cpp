@@ -36,8 +36,6 @@ void MovementSystem::Update(const double& deltaTime)
 			transform.position.x += rigidBody.velocity.x * deltaTime;
 			transform.position.y += rigidBody.velocity.y * deltaTime;
 		}
-		
-		//auto& playerPos = game.GetPlayerPos();
 
 		// Update the player position for the location map in the HUD!
 		if (entity.HasTag("player"))
@@ -50,9 +48,7 @@ void MovementSystem::Update(const double& deltaTime)
 					{
 						if (transform.position.y + collision.height - collision.offset.y >= (672 * j) && transform.position.y + collision.offset.y <= 672 + (672 * j))
 						{
-							/*playerPos.x = i;
-							playerPos.y = j;
-							*/game.SetPlayerPos(glm::vec2(i, j));
+							game.SetPlayerPos(glm::vec2(i, j));
 						}
 					}
 				}

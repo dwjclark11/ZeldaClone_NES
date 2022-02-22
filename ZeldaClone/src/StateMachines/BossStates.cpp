@@ -15,7 +15,7 @@
 
 void BossIdleState::OnEnter(Entity& entity)
 {
-	
+	Logger::Err("Boss Idle State Entered!!");
 }
 
 void BossIdleState::OnExit(Entity& entity) 
@@ -25,7 +25,7 @@ void BossIdleState::OnExit(Entity& entity)
 
 void BossIdleState::Update(Entity& entity) 
 {
-	
+	Logger::Err("Updating Boss State Entered!!");
 }
 
 void BossAttackState::OnEnter(class Entity& entity)

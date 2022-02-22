@@ -17,6 +17,7 @@ Assets =
 	{type = "texture", id = "moblin", 					file =  "./Assets/EnemySprites/moblin.png"}, 
 	{type = "texture", id = "darknut", 					file =  "./Assets/EnemySprites/darknut.png"}, 
 	{type = "texture", id = "leever", 					file =  "./Assets/EnemySprites/leever.png"}, 
+	{type = "texture", id = "aquamentus", 				file =  "./Assets/EnemySprites/aquamentus.png"}, 
 	{type = "texture", id = "enemy_death", 				file =  "./Assets/EnemySprites/EnemyDeath.png"}, 
 	{type = "texture", id = "player_death", 			file =  "./Assets/PlayerSprites/player_death.png"}, 
 	{type = "texture", id = "numbers", 					file =  "./Assets/Fonts/numbers.png"}, 

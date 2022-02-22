@@ -54,11 +54,17 @@ void AnimationSystem::Update()
 		// Check for AI component
 		if (entity.HasComponent<AIComponent>())
 		{
-			//ai = entity.GetComponent<AIComponent>();
-
+			// If the animation is a horizontal scroll
 			if (rigidbody.velocity != glm::vec2(0))
 			{
-				sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
+				if (!animation.vertical)
+				{
+					sprite.srcRect.x = (animation.currentFrame * sprite.width) + animation.frameOffset;
+				}
+				else
+				{
+					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
+				}
 			}
 			else if (health.isHurt) // If the enemy is hurt use this frame
 				sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;

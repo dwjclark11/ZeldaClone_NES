@@ -1,11 +1,11 @@
 ----------------------------------------------------------
--- Save file#: 1
+-- Save file#: 2
 ----------------------------------------------------------
 
 player_data = {
     [1] = {
         menu_shared_values = {
-            name = "DUSTIN",
+            name = "ELI",
             num_hearts = 3,
             blue_ring = false,
             red_ring = false
@@ -25,8 +25,8 @@ player_data = {
             bombs = false,
             food = false,
             flute = false,
-            raft = true,
-            ladder = true,
+            raft = false,
+            ladder = false,
             bow_wood = false,
             magic_shield = false,
             power_braclet = false,

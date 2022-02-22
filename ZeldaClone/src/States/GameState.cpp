@@ -181,7 +181,6 @@ bool GameState::OnEnter()
 
 	if (!firstEntered)
 	{
-
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
 		if (game.GetCamera().x != 7168 && game.GetCamera().x != 4416)
 		{
@@ -197,7 +196,7 @@ bool GameState::OnEnter()
 		
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
-		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies");
+		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies_1");
 		loader.LoadColliders("overworld_colliders_1");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
 
@@ -266,7 +265,6 @@ bool GameState::OnEnter()
 	if (reg.HasSystem<RenderGameOverSystem>())
 		reg.RemoveSystem<RenderGameOverSystem>();
 	
-
 	game.GetAssetManager()->AddFonts("game_font", "./Assets/Fonts/prstart.ttf", 30);
 
 	return true;

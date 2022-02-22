@@ -24,7 +24,6 @@ EditorFileLoader::EditorFileLoader()
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
-	Logger::Log("Level Loader Constructor Run");
 }
 
 EditorFileLoader::~EditorFileLoader()
@@ -161,7 +160,7 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 
 	if (!mapFile.is_open())
 	{
-		Logger::Err("Unable to open [" + fileName + "]");
+		Logger::Err("EDITOR_LOADER: COLLIDERS: __LINE__ 164: Unable to open [" + fileName + "]");
 	}
 
 	while (true)
@@ -219,7 +218,6 @@ void EditorFileLoader::SaveTilemap(std::string filepath, const std::unique_ptr<A
 				
 				if (entity.HasComponent<EditorComponent>())
 				{
-					Logger::Err("Removed Editor Component");
 					entity.RemoveComponent<EditorComponent>();
 				}
 
@@ -346,7 +344,7 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath)
 			m_writer.WriteDeclareTable("components", file);
 
 			WriteTransformComponent(m_writer, transform, file, false);
-			Logger::Log("Middle");
+			
 			WriteBoxColliderComponent(m_writer, collision, file, false);
 
 			//m_writer.WriteEndTable(false, file);
@@ -359,7 +357,7 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath)
 	}
 
 	m_writer.WriteEndTable(false, file);
-	Logger::Log("Out the table written");
+	
 	m_writer.WriteEndDocument(file);
 	file.close();
 	
@@ -371,17 +369,19 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	LuaTableWriter m_writer;
 	std::fstream file;
 	int i = 1;
-	//bool trigger = false;
-	Logger::Err("FilePath: " + filepath);
+
 	// open the file to save to
 	file.open(filepath, std::ios::out);
+	std::filesystem::path path(filepath);
+
+	std::string comment = path.stem().string();
 
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
 
 	// Write a comment in Lua format
 	m_writer.WriteCommentSeparation(file);
-	m_writer.WriteCommentLine(filepath, file);
+	m_writer.WriteCommentLine(comment, file);
 	m_writer.WriteCommentSeparation(file);
 	m_writer.WriteDeclareTable("enemies", file);
 
@@ -444,20 +444,6 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			m_writer.WriteDeclareTable("components", file);
 
 			WriteTransformComponent(m_writer, transform, file, false);
-			//m_writer.WriteDeclareTable("transform", file);
-			//m_writer.WriteDeclareTable("position", file);
-			//m_writer.WriteKeyAndValue('x', transform.position.x, false, file);
-			//m_writer.WriteKeyAndValue('y', transform.position.y, true, file);
-			//m_writer.WriteEndTable(true, file);
-			//m_writer.WriteDeclareTable("scale", file);
-			//m_writer.WriteKeyAndValue('x', transform.scale.x, false, file);
-			//m_writer.WriteKeyAndValue('y', transform.scale.y, true, file);
-			//m_writer.WriteEndTable(true, file);
-			//m_writer.WriteDeclareTable("rotation", file);
-			//m_writer.WriteUnquotedValue(transform.rotation, false, file);
-			//m_writer.WriteEndTable(true, file);
-
-			//m_writer.WriteEndTable(false, file);
 
 			// Box Collider Component
 			m_writer.WriteDeclareTable("box_collider", file);
@@ -534,22 +520,17 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 			if (ai)
 			{
 				std::string enemy_type_str = ConvertAIEnemyToString(ai_comp.GetEnemyType());
+				
 				m_writer.WriteDeclareTable("ai_component", file);
 				m_writer.WriteDeclareTable("enemy_pos", file);
 				m_writer.WriteKeyAndValue("x", 0, false, file);
 				m_writer.WriteKeyAndValue("y", 0, true, file);
 				m_writer.WriteEndTable(true, file);
-				m_writer.WriteKeyAndQuotedValue("enemy_type", enemy_type_str, file);
+				m_writer.WriteKeyAndQuotedValue("enemy_type", std::move(enemy_type_str), file);
 				m_writer.WriteEndTable(false, file);
 
 			}
-			//// Script Component
-			//if (script)
-			//{
-			//	// TODO: Add a proper way to save the scripts to a lua table
-			//	// ImGui::EnterText? MultiText? 
-			//}
-			//m_writer.WriteEndTable(false, file);
+
 			m_writer.WriteEndTableWithSeparator(false, file);
 			m_writer.WriteEndTableWithSeparator(false, file);
 
@@ -560,7 +541,6 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	
 	// Write the end of the tables and close the file
 	m_writer.WriteEndTable(false, file);
-	Logger::Log("Out the table written");
 	file.close();
 }
 
@@ -722,6 +702,13 @@ void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& fileN
 			MouseControlSystem::spriteComponent.srcRect.x = enemy["components"]["sprite"]["src_rect_x"].get_or(0);
 			MouseControlSystem::spriteComponent.srcRect.y = enemy["components"]["sprite"]["src_rect_y"].get_or(0);
 		}
+
+		sol::optional<sol::table> ai = enemy["components"]["ai_component"];
+		if (ai != sol::nullopt)
+		{
+			LevelLoader loader;
+			MouseControlSystem::enemyType = loader.ConvertStringToEnemyType(enemy["components"]["ai_component"]["enemy_type"]);
+		}
 	}
 }
 
@@ -820,12 +807,14 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, st
 		sol::optional<sol::table> ai = enemy["components"]["ai_component"];
 		if (ai != sol::nullopt)
 		{
+			
+			LevelLoader loader;
 			newEnemy.AddComponent<AIComponent>(
 				glm::vec2(
 					enemy["components"]["ai_component"]["enemy_pos"]["x"],
 					enemy["components"]["ai_component"]["enemy_pos"]["y"]
 				),
-				enemy["components"]["ai_component"]["enemy_type"]
+				loader.ConvertStringToEnemyType(enemy["components"]["ai_component"]["enemy_type"])
 				);
 		}
 	}
@@ -852,6 +841,30 @@ std::string EditorFileLoader::ConvertAIEnemyToString(AIComponent::EnemyType type
 {
 	switch (type)
 	{
+	case AIComponent::EnemyType::OCTOROK:
+		return "octorok";
+		break;
+	case AIComponent::EnemyType::MOBLIN:
+		return "moblin";
+		break;
+	case AIComponent::EnemyType::DARKNUT:
+		return "darknut";
+		break;
+	case AIComponent::EnemyType::LEEVER:
+		return "leever";
+		break;
+	case AIComponent::EnemyType::GHINI:
+		return "ghini";
+		break;
+	case AIComponent::EnemyType::LYNEL:
+		return "lynel";
+		break;
+	case AIComponent::EnemyType::PEAHAT:
+		return "peahat";
+		break;
+	case AIComponent::EnemyType::NO_TYPE:
+		return "no_type";
+		break;
 	default:
 		break;
 	}

@@ -1,11 +1,10 @@
 -------------------------------------------------------------
---  Red Darknut Attributes
+--  Leever Attributes
 -------------------------------------------------------------
-
-darknut = {
+leever = {
     components = {
         sprite = {
-            asset_id    = "darknut",
+            asset_id    = "leever",
             width       = 16,
             height      = 16,
             layer       = 1,
@@ -15,8 +14,8 @@ darknut = {
             src_offset  = { x = 0, y = 0 }
         },
         box_collider = {
-            width       = 16,
-            height      = 16,
+            width       = 32,
+            height      = 32,
             offset      = { x = 0, y = 0 }
         },
         health = {
@@ -24,7 +23,7 @@ darknut = {
             max_hearts = 3
         },
         rigid_body = {
-            velocity = { x = 75, y = 0}
+            velocity = { x = 50, y = 0}
         },
         animation = {
             num_frames = 2,
@@ -34,11 +33,11 @@ darknut = {
             frame_offset = 0
         }, 
         projectile_emitter = {
-			
+    
         },
         ai_component = {
                 enemy_pos = { x = 0,  y = 0},
-                enemy_type = "darknut",
+                enemy_type = "leever",
         }
     }
 }

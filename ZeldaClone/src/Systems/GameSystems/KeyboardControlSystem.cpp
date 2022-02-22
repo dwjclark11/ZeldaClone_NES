@@ -263,7 +263,6 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
 						}
-
 					}
 					else if (transform.position.y == 296)
 					{
@@ -273,7 +272,6 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 							game.GetStateMachine()->PopState();
 							game.GetStateMachine()->PushState(new GameState());
 						}
-
 					}
 					else if (transform.position.y == 392)
 					{
@@ -322,7 +320,6 @@ void KeyboardControlSystem::MenuStateKeys(KeyPressedEvent& event)
 						if (transform.position.y < 200)
 							transform.position.y = 392;
 					}
-
 					break;
 
 				case SDLK_DOWN:

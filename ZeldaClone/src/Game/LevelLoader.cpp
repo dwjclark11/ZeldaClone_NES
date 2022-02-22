@@ -318,6 +318,7 @@ bool LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
 			glm::vec2(
 				table["components"]["sprite"]["offset"]["x"].get_or(0),
 				table["components"]["sprite"]["offset"]["y"].get_or(0)));
+		
 		return true;
 	}
 	return false;
@@ -688,7 +689,17 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 	else if (enemyType == "zora")
 		return AIComponent::EnemyType::ZORA;
 	else
-		return AIComponent::EnemyType::OCTOROK;
+		return AIComponent::EnemyType::NO_TYPE;
+}
+
+AIComponent::EnemyBossType LevelLoader::ConvertStringToEnemyBossType(std::string bossType)
+{
+	if (bossType == "aquamentus")
+		return AIComponent::EnemyBossType::AQUAMENTUS;
+	else if (bossType == "not_a_boss")
+		return AIComponent::EnemyBossType::NOT_A_BOSS;
+	else
+		return AIComponent::EnemyBossType::NOT_A_BOSS;
 }
 
 void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
@@ -1042,7 +1053,9 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	m_writer.WriteKeyAndUnquotedValue("magic_sword", "false", file);
 	// Magic Rod
 	m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
-	// Bomgs
+	// Candle
+	m_writer.WriteKeyAndUnquotedValue("candle", "false", file);
+	// Bombs
 	m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
 	// Food
 	m_writer.WriteKeyAndUnquotedValue("food", "false", file);
@@ -1305,13 +1318,16 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 			sol::optional<sol::table> ai = entity["components"]["ai_component"];
 			if (ai != sol::nullopt)
 			{
-				AIComponent::EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"]);
+				AIComponent::EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"].get_or(std::string("no_type")));
+				AIComponent::EnemyBossType boss_type = ConvertStringToEnemyBossType(entity["components"]["ai_component"]["enemy_boss_type"].get_or(std::string("not_a_boss")));
 
 				newEntity.AddComponent<AIComponent>(
 					glm::vec2(
 						entity["components"]["ai_component"]["enemy_pos"]["x"].get_or(0),
 						entity["components"]["ai_component"]["enemy_pos"]["y"].get_or(0)),
-					type
+					type,
+					boss_type,
+					entity["components"]["ai_component"]["is_boss"].get_or(false)
 					);
 			}
 			newEntity.AddComponent<GameComponent>();

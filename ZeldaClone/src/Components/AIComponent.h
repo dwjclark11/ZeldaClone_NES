@@ -63,6 +63,7 @@ public:
 	inline void SetStunned(bool stun) { stunned = stun; }
 	inline const bool GetStunned() { return stunned; }
 	inline const EnemyType GetEnemyType() const { return enemyType; }
+	inline void SetEnemyType(EnemyType type) { enemyType = type; }
 	inline const EnemyBossType GetBossType() const { return bossType; }
 	inline const bool IsABoss() const { return boss; }
 	inline void SetCreated(bool create) { created = create; }

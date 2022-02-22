@@ -85,7 +85,7 @@ triggers = {
 				camera_offset 		= { x = 2048, y = 3744 },
 				level_music			= "dungeon",
 				asset_file			= "no_file",
-				enemy_file			= "no_file",
+				enemy_file			= "Level1_enemies",
 				collider_file		= "Test_Colliders", 
 				tilemap_name 		= "Level_1_tiles",
 				tilemap_image   	= "level_1",

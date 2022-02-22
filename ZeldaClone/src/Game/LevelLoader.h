@@ -74,6 +74,8 @@ public:
 	void ReadInSecrets(sol::state& lua);
 
 	TriggerBoxComponent::TriggerType ConvertStringToTriggerType(std::string type);
+
 	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
+	AIComponent::EnemyBossType ConvertStringToEnemyBossType(std::string bossType);
 
 };
