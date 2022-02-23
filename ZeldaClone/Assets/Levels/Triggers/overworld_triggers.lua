@@ -18,9 +18,11 @@ triggers = {
 				offset 	 = { x = 0, y = 0 }
 			},
 			trigger_box  = { 
-				trigger_type		= "secret_area",
+				trigger_type		= "scene_change",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -28,9 +30,10 @@ triggers = {
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "secret_dungeon",
 				entity_file			= "sword_cave",
+				trigger_file		= "sword_cave_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				trigger_file		= "sword_cave_triggers"
+				
 			},
 		}
 	},
@@ -49,9 +52,11 @@ triggers = {
 				offset 	 = { x = 0, y = 0 }
 			},
 			trigger_box  = { 
-				trigger_type		= "secret_area",
+				trigger_type		= "scene_change",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -59,9 +64,9 @@ triggers = {
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "secret_dungeon",
 				entity_file			= "shop_1",
+				trigger_file		= "shop_1_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				trigger_file		= "shop_1_triggers"
 			},
 		}
 	},
@@ -80,9 +85,11 @@ triggers = {
 				offset 	 = { x = 0, y = 0 }
 			},
 			trigger_box  = { 
-				trigger_type		= "secret_area",
+				trigger_type		= "scene_change",
 				transport_offset 	= { x = 2505, y = 4545 },
 				camera_offset 		= { x = 2048, y = 3744 },
+			},
+			scene_change = {
 				level_music			= "dungeon",
 				asset_file			= "no_file",
 				enemy_file			= "Level1_enemies",
@@ -115,6 +122,9 @@ triggers = {
 				trigger_type		= "bomb_secret",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+				collider			= true
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -125,11 +135,10 @@ triggers = {
 				trigger_file		= "bomb_1_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				collider			= true
 			},
 			secret = {
 				location_id			= "bomb_secret_rupees_1",
-				new_trigger			= "secret_area",
+				new_trigger			= "scene_change",
 				new_sprite_id		= "Overworld_Tiles",
 				sprite_width		= 16,
 				sprite_height		= 16,
@@ -156,6 +165,9 @@ triggers = {
 				trigger_type		= "burn_bush",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+				collider			= true
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -166,11 +178,10 @@ triggers = {
 				trigger_file		= "sword_cave_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				collider			= true
 			},
 			secret = {
 				location_id			= "burn_bush_potion_shop_1",
-				new_trigger			= "secret_area",
+				new_trigger			= "scene_change",
 				new_sprite_id		= "Dungeon_Tiles",
 				sprite_width		= 16,
 				sprite_height		= 16,
@@ -232,10 +243,13 @@ triggers = {
 				offset 	 = { x = 0, y = 0 }
             },
             trigger_box = {
-                trigger_type = "secret_area",
+                trigger_type = "scene_change",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
-                level_music = "stop",
+                collider = false
+            }, 
+			scene_change = {
+                level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
 				collider_file		= "secret_dungeon_colliders", 
@@ -245,8 +259,7 @@ triggers = {
 				trigger_file		= "sword_cave_triggers",
 				image_width			= 256,
 				image_height		= 176,
-                collider = false
-            }, 
+			},
 			sprite = {
 				asset_id = "Overworld_Tiles",
 				width = 16, 
@@ -277,6 +290,9 @@ triggers = {
 				trigger_type		= "bomb_secret",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+				collider			= true
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -287,11 +303,10 @@ triggers = {
 				trigger_file		= "bomb_1_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				collider			= true
 			},
 			secret = {
 				location_id			= "bomb_secret_hearts_1",
-				new_trigger			= "secret_area",
+				new_trigger			= "scene_change",
 				new_sprite_id		= "Overworld_Tiles",
 				sprite_width		= 16,
 				sprite_height		= 16,
@@ -318,6 +333,9 @@ triggers = {
 				trigger_type		= "bomb_secret",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+				collider			= true
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -328,11 +346,10 @@ triggers = {
 				trigger_file		= "bomb_2_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				collider			= true
-			},
+			}, 
 			secret = {
 				location_id			= "bomb_secret_money_1",
-				new_trigger			= "secret_area",
+				new_trigger			= "scene_change",
 				new_sprite_id		= "Overworld_Tiles",
 				sprite_width		= 16,
 				sprite_height		= 16,
@@ -359,6 +376,9 @@ triggers = {
 				trigger_type		= "bomb_secret",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+				collider			= true
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
@@ -369,11 +389,10 @@ triggers = {
 				trigger_file		= "bomb_1_triggers",
 				image_width			= 256,
 				image_height		= 176,
-				collider			= true
 			},
 			secret = {
 				location_id			= "bomb_secret_rupees_2",
-				new_trigger			= "secret_area",
+				new_trigger			= "scene_change",
 				new_sprite_id		= "Overworld_Tiles",
 				sprite_width		= 16,
 				sprite_height		= 16,
@@ -400,16 +419,18 @@ triggers = {
 				trigger_type		= "secret_area",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
 				collider_file		= "secret_dungeon_colliders", 
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "secret_dungeon",
-				entity_file			= "shop_2", 
+				entity_file			= "shop_2",
+				trigger_file		= "shop_2_triggers",
 				image_width			= 256,
-				image_height		= 176,
-				trigger_file		= "shop_2_triggers"
+				image_height		= 176
 			},
 		}
 	},
@@ -431,16 +452,18 @@ triggers = {
 				trigger_type		= "secret_area",
 				transport_offset 	= { x = 450, y = 500 },
 				camera_offset 		= { x = 0, y = -288 },
+			},
+			scene_change = {
 				level_music			= "stop",
 				asset_file			= "no_file",
 				enemy_file			= "no_file",
 				collider_file		= "secret_dungeon_colliders", 
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "secret_dungeon",
-				entity_file			= "shop_3", 
+				entity_file			= "shop_3",
+				trigger_file		= "shop_3_triggers",
 				image_width			= 256,
-				image_height		= 176,
-				trigger_file		= "shop_3_triggers"
+				image_height		= 176
 			},
 		}
 	},

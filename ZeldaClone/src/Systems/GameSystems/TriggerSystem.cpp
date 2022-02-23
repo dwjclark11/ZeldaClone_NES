@@ -6,6 +6,7 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/GameComponent.h"
 #include "../../Components/RigidBodyComponent.h"
+#include "../../Components/SceneChangeComponent.h"
 #include "../../Components/SecretComponent.h"
 #include "../../Systems/GameSystems/RenderTileSystem.h"
 #include "../../Systems/GameSystems/KeyboardControlSystem.h"
@@ -169,11 +170,18 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 	
 		secretArea.AddComponent<TriggerBoxComponent>(trigType,
-			secretTrigger.transportOffset, secretTrigger.cameraOffset,
-			secretTrigger.levelMusic, secretTrigger.assetFile,
-			secretTrigger.enemyFile, secretTrigger.colliderFile,
-			secretTrigger.tileMapName, secretTrigger.tileImageName, secretTrigger.mapImageName,
-			secretTrigger.entityFileName, secretTrigger.imageWidth, secretTrigger.imageHeight, secretTrigger.triggerFile);
+			secretTrigger.transportOffset, secretTrigger.cameraOffset);
+		
+		if (trigger.HasComponent<SceneChangeComponent>())
+		{
+			const auto& scene = trigger.GetComponent<SceneChangeComponent>();
+			secretArea.AddComponent<SceneChangeComponent>(
+				scene.levelMusic, scene.assetFile, scene.enemyFile,
+				scene.colliderFile, scene.tileMapName, scene.tileImageName,
+				scene.mapImageName, scene.entityFileName, scene.triggerFile,
+				scene.imageWidth, scene.imageHeight);
+		}
+
 
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
 		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
@@ -194,11 +202,18 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 		secretArea.AddComponent<TriggerBoxComponent>(trigType,
-			secretTrigger.transportOffset, secretTrigger.cameraOffset,
-			secretTrigger.levelMusic, secretTrigger.assetFile,
-			secretTrigger.enemyFile, secretTrigger.colliderFile,
-			secretTrigger.tileMapName, secretTrigger.tileImageName, secretTrigger.mapImageName,
-			secretTrigger.entityFileName, secretTrigger.imageWidth, secretTrigger.imageHeight, secretTrigger.triggerFile);
+			secretTrigger.transportOffset, secretTrigger.cameraOffset);
+
+
+		if (trigger.HasComponent<SceneChangeComponent>())
+		{
+			const auto& scene = trigger.GetComponent<SceneChangeComponent>();
+			secretArea.AddComponent<SceneChangeComponent>(
+				scene.levelMusic, scene.assetFile, scene.enemyFile,
+				scene.colliderFile, scene.tileMapName, scene.tileImageName,
+				scene.mapImageName, scene.entityFileName, scene.triggerFile,
+				scene.imageWidth, scene.imageHeight);
+		}
 
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
 		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
@@ -271,34 +286,18 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 	auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 	float x = trig.transportOffset.x;
 	float y = trig.transportOffset.y;
+
 	// Get the needed componenets from the player
-
-	// Set variables for the files to load assets/tilemaps/enemies/ etc.
-	std::string& assetFile = trig.assetFile;
-	std::string mapFile = "Assets/Tilemaps/Maps/" + trig.tileMapName + ".map";
-	std::string tileFile = "Assets/Tilemaps/Tiles/" + trig.tileImageName + ".png";
-	std::string& entityFile = trig.entityFileName;
-	std::string& triggerFile = trig.triggerFile;
-	std::string& colliderFile = trig.colliderFile;
-	std::string& enemyFile = trig.enemyFile;
-	std::string& levelMusic = trig.levelMusic;
-	std::string& tileMapName = trig.tileMapName;
-	std::string& tileImageName = trig.tileImageName;
-
-	const auto& width = trig.imageWidth;
-	const auto& height = trig.imageHeight;
-	const auto& camPosX = trig.cameraOffset.x;
-	const auto& camPosY = trig.cameraOffset.y;
-
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 	Timer loadTimer;
+	
 	switch (trig.triggerType)
 	{
 	case TriggerBoxComponent::TriggerType::NO_TRIGGER:
 		Logger::Err("TRIGGER_SYSTEM: __LINE: 174 - There is not trigger set for this entity");
 		break;
 
-	case TriggerBoxComponent::TriggerType::SECRET_AREA: // Change this to scene transition TriggerType::CHANGE_SCENE?
+	case TriggerBoxComponent::TriggerType::SCENE_CHANGE: // Change this to scene transition TriggerType::CHANGE_SCENE?
 	{
 		if (game.GetStairsFinished())
 		{
@@ -306,7 +305,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 
 			auto& rigidbody = _player.GetComponent<RigidBodyComponent>();
 			auto& sprite = _player.GetComponent<SpriteComponent>();
-
+			auto& scene = trigger.GetComponent<SceneChangeComponent>();
 			// Stop the player movement during the scene transition
 			rigidbody.velocity = glm::vec2(0);
 
@@ -329,46 +328,51 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				
 		
 				// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
-				if (assetFile != "no_file")
-					loader.LoadAssetsFromLuaTable(game.GetLuaState(), assetFile);
+				if (scene.assetFile != "no_file")
+					loader.LoadAssetsFromLuaTable(game.GetLuaState(), scene.assetFile);
 
 				// load the tilemap only if there is an image and a corresponding map
-				if (tileMapName != "no_file" && trig.mapImageName != "no_file")
+				if (scene.tileMapName != "no_file" && scene.mapImageName != "no_file")
 				{
-					loader.LoadTilemap(mapFile, trig.mapImageName);
+					std::string mapFile = "Assets/Tilemaps/Maps/" + scene.tileMapName + ".map";
+					
+					loader.LoadTilemap(mapFile, scene.mapImageName);
 				}
-
+				
 				// If there is only an image name than it is a full map image, not tiles --> Just load the map
-				if (tileImageName != "no_file")
-					loader.LoadMap(tileImageName, width, height);
-
+				if (scene.tileImageName != "no_file")
+				{
+					//Logger::Log("Map: Width[" + std::to_string(scene.imageWidth) + "], Height[" + std::to_string(scene.imageHeight) + "]");
+					loader.LoadMap(scene.tileImageName, scene.imageWidth, scene.imageHeight);
+				}
+					
 				// Start the new scene's music || stop the music
-				if (levelMusic != "stop")
-					Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), levelMusic, -1);
+				if (scene.levelMusic != "stop")
+					Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), scene.levelMusic, -1);
 				else
 					Registry::Instance().GetSystem<MusicPlayerSystem>().StopMusic();
 
 				// If there is an entity file, NPCs, Store Items, etc. Load it
-				if (entityFile != "no_file")
-					loader.LoadEntitiesFromLuaTable(game.GetLuaState(), entityFile);
+				if (scene.entityFileName != "no_file")
+					loader.LoadEntitiesFromLuaTable(game.GetLuaState(), scene.entityFileName);
 
 				// Adjust the camera location to the trigger offset
-				game.GetCamera().x = camPosX;
-				game.GetCamera().y = camPosY;
+				game.GetCamera().x = trig.cameraOffset.x;
+				game.GetCamera().y = trig.cameraOffset.y;
 
 				// Check to see if there is a collider file
-				if (colliderFile != "no_file")
-					loader.LoadColliders(colliderFile);
+				if (scene.colliderFile != "no_file")
+					loader.LoadColliders(scene.colliderFile);
 				// Check to see if there is a trigger file
-				if (trig.triggerFile != "no_file")
+				if (scene.triggerFile != "no_file")
 				{
-					Logger::Log("Trig " + trig.triggerFile);
-					loader.LoadTriggers(game.GetLuaState(), trig.triggerFile);
+					Logger::Log("Trig " + scene.triggerFile);
+					loader.LoadTriggers(game.GetLuaState(), scene.triggerFile);
 				}
 
 				// Check to see if there is an enemy file
-				if (enemyFile != "no_file")
-					loader.LoadEnemiesFromLuaTable(game.GetLuaState(), enemyFile);
+				if (scene.enemyFile != "no_file")
+					loader.LoadEnemiesFromLuaTable(game.GetLuaState(), scene.enemyFile);
 
 				loader.ReadInSecrets(game.GetLuaState());
 				

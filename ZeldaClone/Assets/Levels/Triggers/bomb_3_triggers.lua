@@ -18,9 +18,12 @@ triggers = {
 				offset 	 = { x = 0, y = 0 }
 			},
 			trigger_box  = { 
-				trigger_type		= "secret_area", -- Change Secret Area to scene change?
+				trigger_type		= "scene_change", 
 				transport_offset 	= { x = 7616, y = 4165 },
 				camera_offset 		= { x = 7168, y = 3744 }, 
+
+			},
+			scene_change = {
 				level_music			= "Overworld",
 				asset_file			= "game_state_assets",
 				enemy_file			= "overworld_enemies",

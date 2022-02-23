@@ -826,7 +826,7 @@ std::string EditorFileLoader::ConvertToString(TriggerBoxComponent::TriggerType t
 	switch (triggerType)
 	{
 		case TriggerBoxComponent::TriggerType::NO_TRIGGER: return "no_trigger"; break;
-		case TriggerBoxComponent::TriggerType::SECRET_AREA: return "secret_area"; break;
+		case TriggerBoxComponent::TriggerType::SCENE_CHANGE: return "scene_change"; break;
 		case TriggerBoxComponent::TriggerType::TRANSPORT: return "transport"; break;
 		case TriggerBoxComponent::TriggerType::BURN_BUSHES: return "burn_bushes"; break;
 		case TriggerBoxComponent::TriggerType::PUSH_ROCKS: return "push_rocks"; break;
@@ -920,17 +920,17 @@ void EditorFileLoader::WriteTriggerBoxComponent(LuaTableWriter& writer, const cl
 	writer.WriteKeyAndValue("x", triggerBox.cameraOffset.x, false, file);
 	writer.WriteKeyAndValue("y", triggerBox.cameraOffset.y, true, file);
 	writer.WriteEndTable(true, file);
-	writer.WriteKeyAndQuotedValue("level_music", triggerBox.levelMusic, file);
-	writer.WriteKeyAndQuotedValue("asset_file", triggerBox.assetFile, file);
-	writer.WriteKeyAndQuotedValue("enemy_file", triggerBox.enemyFile, file);
-	writer.WriteKeyAndQuotedValue("collider_file", triggerBox.colliderFile, file);
-	writer.WriteKeyAndQuotedValue("tilemap_name", triggerBox.tileMapName, file);
-	writer.WriteKeyAndQuotedValue("tilemap_image", triggerBox.tileImageName, file);
-	writer.WriteKeyAndQuotedValue("map_image", triggerBox.tileImageName, file);
-	writer.WriteKeyAndQuotedValue("entity_file", triggerBox.entityFileName, file);
-	writer.WriteKeyAndUnquotedValue("image_width", triggerBox.imageWidth, file);
-	writer.WriteKeyAndUnquotedValue("image_height", triggerBox.imageHeight, file);
-	writer.WriteKeyAndQuotedValue("trigger_file", triggerBox.triggerFile, file);
+	//writer.WriteKeyAndQuotedValue("level_music", triggerBox.levelMusic, file);
+	//writer.WriteKeyAndQuotedValue("asset_file", triggerBox.assetFile, file);
+	//writer.WriteKeyAndQuotedValue("enemy_file", triggerBox.enemyFile, file);
+	//writer.WriteKeyAndQuotedValue("collider_file", triggerBox.colliderFile, file);
+	//writer.WriteKeyAndQuotedValue("tilemap_name", triggerBox.tileMapName, file);
+	//writer.WriteKeyAndQuotedValue("tilemap_image", triggerBox.tileImageName, file);
+	//writer.WriteKeyAndQuotedValue("map_image", triggerBox.tileImageName, file);
+	//writer.WriteKeyAndQuotedValue("entity_file", triggerBox.entityFileName, file);
+	//writer.WriteKeyAndUnquotedValue("image_width", triggerBox.imageWidth, file);
+	//writer.WriteKeyAndUnquotedValue("image_height", triggerBox.imageHeight, file);
+	//writer.WriteKeyAndQuotedValue("trigger_file", triggerBox.triggerFile, file);
 
 	std::string collider = "false";
 	if (triggerBox.collider)

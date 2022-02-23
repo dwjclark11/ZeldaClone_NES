@@ -24,6 +24,9 @@ triggers =
                 trigger_type = "push_rocks",
                 transport_offset = { x = 0, y = 0},
                 camera_offset = { x = 0, y = 0},
+                collider = true
+            },
+            scene_change = {
                 level_music = "stop",
                 asset_file = "no_file",
                 enemy_file = "no_file",
@@ -34,7 +37,6 @@ triggers =
                 image_width = 0,
                 image_height = 0,
                 trigger_file = "no_file",
-                collider = true
             },
             secret = {
                 location_id = "none",
@@ -75,6 +77,9 @@ triggers =
                 trigger_type = "transport",
                 transport_offset = { x = 187, y = 728},
                 camera_offset = { x = 0, y = 384},
+                collider = false
+            }, 
+            scene_change = {
                 level_music = "stop",
                 asset_file = "no_file",
                 enemy_file = "no_file",
@@ -85,8 +90,7 @@ triggers =
                 image_width = 0,
                 image_height = 0,
                 trigger_file = "no_file",
-                collider = false
-            }
+            },
         }
     },
     [3] = {
@@ -107,6 +111,9 @@ triggers =
                 trigger_type = "transport",
                 transport_offset = { x = 1410, y = 960},
                 camera_offset = { x = 1024, y = 384},
+                collider = false
+            },
+            scene_change = {
                 level_music = "stop",
                 asset_file = "no_file",
                 enemy_file = "no_file",
@@ -117,8 +124,7 @@ triggers =
                 image_width = 0,
                 image_height = 0,
                 trigger_file = "no_file",
-                collider = false
-            }
+            },
         }
     },
 	-- Eagle Level Entrance/Exit
@@ -139,6 +145,8 @@ triggers =
 				trigger_type		= "secret_area",
 				transport_offset 	= { x = 7616, y = 2344 },
 				camera_offset 		= { x = 7168, y = 1728 },
+			},
+            scene_change = {
 				level_music			= "Overworld",
 				asset_file			= "game_state_assets",
 				enemy_file			= "overworld_enemies",
@@ -149,7 +157,7 @@ triggers =
 				trigger_file		= "overworld_triggers",
 				image_width			= 4096,
 				image_height		= 1344
-			},
+            },
 		}
 	},
 }

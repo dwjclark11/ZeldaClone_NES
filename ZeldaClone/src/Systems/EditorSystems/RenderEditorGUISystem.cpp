@@ -664,14 +664,14 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			MouseControlSystem::mouseRectX = mouseRectX;
 			MouseControlSystem::mouseRectY = mouseRectY;
 
-			MouseControlSystem::triggerBox.levelMusic = levelMusic;
-			MouseControlSystem::triggerBox.assetFile = assetFile;
-			MouseControlSystem::triggerBox.enemyFile = enemyFile;
-			MouseControlSystem::triggerBox.colliderFile = colliderFile;
-			MouseControlSystem::triggerBox.tileMapName= tileMapName;
-			MouseControlSystem::triggerBox.tileImageName = tileMapImageName;
-			MouseControlSystem::triggerBox.entityFileName = entityFileName;
-			MouseControlSystem::triggerBox.triggerFile = triggerFile;
+			//MouseControlSystem::triggerBox.levelMusic = levelMusic;
+			//MouseControlSystem::triggerBox.assetFile = assetFile;
+			//MouseControlSystem::triggerBox.enemyFile = enemyFile;
+			//MouseControlSystem::triggerBox.colliderFile = colliderFile;
+			//MouseControlSystem::triggerBox.tileMapName= tileMapName;
+			//MouseControlSystem::triggerBox.tileImageName = tileMapImageName;
+			//MouseControlSystem::triggerBox.entityFileName = entityFileName;
+			//MouseControlSystem::triggerBox.triggerFile = triggerFile;
 
 			// Set Secret Attributes
 			if (MouseControlSystem::secretSelected)
@@ -702,8 +702,8 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 			// Set Trigger Types
 			if (current_trigger == "no_trigger")
 				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::NO_TRIGGER;
-			else if (current_trigger == "secret_area")
-				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::SECRET_AREA;
+			else if (current_trigger == "scene_change")
+				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::SCENE_CHANGE;
 			else if (current_trigger == "transport")
 				MouseControlSystem::triggerBox.triggerType = TriggerBoxComponent::TriggerType::TRANSPORT;
 			else if (current_trigger == "burn_bushes")

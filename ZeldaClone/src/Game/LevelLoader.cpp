@@ -20,6 +20,7 @@
 #include "../Components/ScriptComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/CameraFollowComponent.h"
+#include "../Components/SceneChangeComponent.h"
 #include "../Components/ItemComponent.h"
 #include "../States/NameState.h"
 #include "../States/MenuState.h"
@@ -638,8 +639,8 @@ TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::st
 {
 	if (type == "no_trigger")
 		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
-	else if (type == "secret_area")
-		return TriggerBoxComponent::TriggerType::SECRET_AREA;
+	else if (type == "scene_change")
+		return TriggerBoxComponent::TriggerType::SCENE_CHANGE;
 	else if (type == "burn_bush")
 		return TriggerBoxComponent::TriggerType::BURN_BUSHES;
 	else if (type == "transport")
@@ -769,19 +770,28 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 						trigger["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
 						trigger["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
 					),
-					trigger["components"]["trigger_box"]["level_music"].get_or(std::string("stop")),
-					trigger["components"]["trigger_box"]["asset_file"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["enemy_file"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["collider_file"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["tilemap_name"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["tilemap_image"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["map_image"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["entity_file"].get_or(std::string("no_file")),
-					trigger["components"]["trigger_box"]["image_width"].get_or(0),
-					trigger["components"]["trigger_box"]["image_height"].get_or(0),
-					trigger["components"]["trigger_box"]["trigger_file"].get_or(std::string("no_file")),
+
 					trigger["components"]["trigger_box"]["collider"].get_or(false)
 					);
+			}
+
+			sol::optional<sol::table> scene = trigger["components"]["scene_change"];
+			
+			// Check if the trigger has a scene component
+			if (scene != sol::nullopt)
+			{
+				newTrigger.AddComponent<SceneChangeComponent>(
+					trigger["components"]["scene_change"]["level_music"].get_or(std::string("stop")),
+					trigger["components"]["scene_change"]["asset_file"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["enemy_file"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["collider_file"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["tilemap_name"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["tilemap_image"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["map_image"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["entity_file"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["trigger_file"].get_or(std::string("no_file")),
+					trigger["components"]["scene_change"]["image_width"].get_or(0),
+					trigger["components"]["scene_change"]["image_height"].get_or(0));
 			}
 
 			// Check if the trigger is a secret/Hidden Area
@@ -1717,7 +1727,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					glm::vec2(
 						lvlData["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
 						lvlData["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
-					),
+					)/*,
 					lvlData["components"]["trigger_box"]["level_music"],
 					lvlData["components"]["trigger_box"]["asset_file"],
 					lvlData["components"]["trigger_box"]["enemy_file"],
@@ -1728,7 +1738,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					lvlData["components"]["trigger_box"]["entity_file"],
 					lvlData["components"]["trigger_box"]["image_width"].get_or(0),
 					lvlData["components"]["trigger_box"]["image_height"].get_or(0),
-					lvlData["components"]["trigger_box"]["trigger_file"]
+					lvlData["components"]["trigger_box"]["trigger_file"]*/
 					);
 			}
 
