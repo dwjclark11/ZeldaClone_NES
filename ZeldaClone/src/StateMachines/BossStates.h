@@ -1,7 +1,7 @@
 #pragma once
 #include "NewState.h"
+#include "../Utilities/Timer.h"
 
-class Timer;
 class Entity;
 
 class BossIdleState : public States
@@ -24,6 +24,8 @@ public:
 
 class BossPatrolState : public States
 {
+private:
+	Timer walkTimer;
 public:
 	virtual ~BossPatrolState() {};
 	void OnEnter(class Entity& entity) override;

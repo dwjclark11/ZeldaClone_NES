@@ -104,53 +104,56 @@ void MovementSystem::Update(const double& deltaTime)
 		{
 			auto& ai = entity.GetComponent<AIComponent>();
 
-			if (rigidBody.velocity.y > 0)
+			if (ai.GetEnemyType() != AIComponent::EnemyType::NO_TYPE)
 			{
-				if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-					sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
+				if (rigidBody.velocity.y > 0)
+				{
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER )
+						sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
 
-				// Set the direction
-				rigidBody.down = true;
-				rigidBody.up = false;
-				rigidBody.left = false;
-				rigidBody.right = false;
-				//Logger::Log("Down");
-			}
-			if (rigidBody.velocity.y < 0)
-			{
-				if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-					sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
+					// Set the direction
+					rigidBody.down = true;
+					rigidBody.up = false;
+					rigidBody.left = false;
+					rigidBody.right = false;
+					//Logger::Log("Down");
+				}
+				if (rigidBody.velocity.y < 0)
+				{
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
 
-				// Set the direction
-				rigidBody.down = false;
-				rigidBody.up = true;
-				rigidBody.left = false;
-				rigidBody.right = false;
-				//Logger::Log("Up");
-			}
-			if (rigidBody.velocity.x > 0)
-			{
-				if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-					sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = true;
+					rigidBody.left = false;
+					rigidBody.right = false;
+					//Logger::Log("Up");
+				}
+				if (rigidBody.velocity.x > 0)
+				{
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
 
-				// Set the direction
-				rigidBody.down = false;
-				rigidBody.up = false;
-				rigidBody.left = false;
-				rigidBody.right = true;
-				//Logger::Log("Right");
-			}
-			if (rigidBody.velocity.x < 0)
-			{
-				if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-					sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = false;
+					rigidBody.left = false;
+					rigidBody.right = true;
+					//Logger::Log("Right");
+				}
+				if (rigidBody.velocity.x < 0 )
+				{
+					if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+						sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
 
-				// Set the direction
-				rigidBody.down = false;
-				rigidBody.up = false;
-				rigidBody.left = true;
-				rigidBody.right = false;
-				//Logger::Log("Left");
+					// Set the direction
+					rigidBody.down = false;
+					rigidBody.up = false;
+					rigidBody.left = true;
+					rigidBody.right = false;
+					//Logger::Log("Left");
+				}
 			}
 
 			auto& enemyPos = ai.GetEnemyPos();

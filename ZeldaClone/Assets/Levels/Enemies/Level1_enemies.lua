@@ -10,10 +10,10 @@ enemies =
                 rotation = {0}
             },
             box_collider = {
-                width = 32,
-                height = 32,
-                offset_x = 0,
-                offset_y = 0
+                width = 24,
+                height = 24,
+                offset_x = 16,
+                offset_y = 16
             },
             sprite = {
                 asset_id = "aquamentus",
@@ -41,7 +41,7 @@ enemies =
             },
             animation = {
                 num_frames = 4,
-                frame_rate = 10,
+                frame_rate = 5,
                 vertical = false,
                 looped = true,
                 frame_offset = 0

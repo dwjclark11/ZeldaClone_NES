@@ -16,7 +16,7 @@ player =
       },
       box_collider = {
         width = 8,
-        height = 8,
+        height = 10,
         offset_x = 45,
         offset_y = 45
       },

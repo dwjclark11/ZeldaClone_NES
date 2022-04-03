@@ -1,7 +1,6 @@
 ----------------------------------------------------------
 -- level_1_trigger_test
 ----------------------------------------------------------
-
 triggers = 
 {
     [1] = 
@@ -142,7 +141,7 @@ triggers =
 				offset 	 = { x = 0, y = 0 }
 			},
 			trigger_box  = { 
-				trigger_type		= "secret_area",
+				trigger_type		= "scene_change",
 				transport_offset 	= { x = 7616, y = 2344 },
 				camera_offset 		= { x = 7168, y = 1728 },
 			},

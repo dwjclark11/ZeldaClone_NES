@@ -31,13 +31,13 @@ void ProjectileLifeCycleSystem::Update()
 		{
 			auto explosion = entity.registry->CreateEntity();
 			explosion.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>().position, glm::vec2(4, 4), 0.0);
-			explosion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 112);
+			explosion.AddComponent<SpriteComponent>("items", 16, 16, 3, false, 80, 112);
 			explosion.AddComponent<RigidBodyComponent>(glm::vec2(0));
 			explosion.AddComponent<ProjectileComponent>(false, 1, 500);
 			explosion.AddComponent<BoxColliderComponent>(16, 16);
 			explosion.AddComponent<AnimationComponent>(3, 10, false, false, 80);
 			explosion.AddComponent<GameComponent>();
-			//explosion.Group("projectile");
+			
 			explosion.Group("explode");
 			entity.Kill();
 

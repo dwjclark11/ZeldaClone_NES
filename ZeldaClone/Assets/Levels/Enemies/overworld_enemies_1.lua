@@ -12,10 +12,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -50,7 +50,7 @@ enemies = {
             },
             ai_component = {
                 enemy_pos = { x = 0, y = 0},
-                enemy_type = ""
+                enemy_type = "octorok"
             }
         }
     },
@@ -63,10 +63,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -114,10 +114,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -165,10 +165,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -216,10 +216,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -254,7 +254,7 @@ enemies = {
             },
             ai_component = {
                 enemy_pos = { x = 0, y = 0},
-                enemy_type = ""
+                enemy_type = "octorok"
             }
         }
     },
@@ -267,10 +267,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -318,10 +318,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -369,10 +369,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -420,10 +420,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -471,10 +471,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -509,7 +509,7 @@ enemies = {
             },
             ai_component = {
                 enemy_pos = { x = 0, y = 0},
-                enemy_type = ""
+                enemy_type = "octorok"
             }
         }
     },
@@ -522,10 +522,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -624,10 +624,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -662,7 +662,7 @@ enemies = {
             },
             ai_component = {
                 enemy_pos = { x = 0, y = 0},
-                enemy_type = ""
+                enemy_type = "octorok"
             }
         }
     },
@@ -675,10 +675,10 @@ enemies = {
                 rotation = {0}
             },
             box_collider = {
-                width = 16,
-                height = 16,
-                offset_x = 0,
-                offset_y = 0
+                width = 10,
+                height = 10,
+                offset_x = 10,
+                offset_y = 10
             },
             sprite = {
                 asset_id = "octorok",
@@ -713,7 +713,7 @@ enemies = {
             },
             ai_component = {
                 enemy_pos = { x = 0, y = 0},
-                enemy_type = ""
+                enemy_type = "octorok"
             }
         }
     }

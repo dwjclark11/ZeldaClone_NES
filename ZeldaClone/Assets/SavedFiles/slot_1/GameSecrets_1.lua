@@ -9,7 +9,7 @@ secrets = {
     },
     [2] = {
         location = "bomb_secret_hearts_1",
-        found = false
+        found = true
     },
     [3] = {
         location = "bomb_secret_money_1",
@@ -21,7 +21,7 @@ secrets = {
     },
     [5] = {
         location = "bomb_secret_rupees_2",
-        found = false
+        found = true
     },
     [6] = {
         location = "burn_bush_potion_shop_1",

@@ -12,10 +12,10 @@ enemies = {
         rotation = {0}
       },
       box_collider = {
-        width = 16,
-        height = 16,
-        offset_x = 0,
-        offset_y = 0
+        width = 10,
+        height = 10,
+        offset_x = 10,
+        offset_y = 10
       },
       sprite = {
         asset_id = "octorok",
@@ -59,10 +59,10 @@ enemies = {
         rotation = {0}
       },
       box_collider = {
-        width = 16,
-        height = 16,
-        offset_x = 0,
-        offset_y = 0
+        width = 10,
+        height = 10,
+        offset_x = 10,
+        offset_y = 10
       },
       sprite = {
         asset_id = "octorok",
@@ -106,10 +106,10 @@ enemies = {
         rotation = {0}
       },
       box_collider = {
-        width = 16,
-        height = 16,
-        offset_x = 0,
-        offset_y = 0
+        width = 10,
+        height = 10,
+        offset_x = 10,
+        offset_y = 10
       },
       sprite = {
         asset_id = "octorok",
@@ -153,10 +153,10 @@ enemies = {
         rotation = {0}
       },
       box_collider = {
-        width = 16,
-        height = 16,
-        offset_x = 0,
-        offset_y = 0
+        width = 10,
+        height = 10,
+        offset_x = 10,
+        offset_y = 10
       },
       sprite = {
         asset_id = "octorok",
@@ -200,10 +200,10 @@ enemies = {
         rotation = {0}
       },
       box_collider = {
-        width = 16,
-        height = 16,
-        offset_x = 0,
-        offset_y = 0
+        width = 10,
+        height = 10,
+        offset_x = 10,
+        offset_y = 10
       },
       sprite = {
         asset_id = "octorok",

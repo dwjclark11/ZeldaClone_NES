@@ -21,8 +21,6 @@ std::string FileDialogs::OpenFile(const char* filter, HWND owner)
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-    std::string fileNameStr;
-
     if (GetOpenFileNameA(&ofn))
     {
         return ofn.lpstrFile;
@@ -46,8 +44,6 @@ std::string FileDialogs::OpenImage(const char* filter, HWND owner)
     ofn.nMaxFile = sizeof(szFile);
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-    std::string fileNameStr;
 
     if (GetOpenFileNameA(&ofn))
     {
@@ -73,8 +69,6 @@ std::string FileDialogs::SaveFile(const char* filter, HWND owner)
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-    std::string fileNameStr;
-
     if (GetSaveFileNameA(&ofn))
     {
         return ofn.lpstrFile;
@@ -99,8 +93,6 @@ std::string FileDialogs::SaveObjFile(const char* filter, HWND owner)
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-    std::string fileNameStr;
-
     if (GetSaveFileNameA(&ofn))
     {
         return ofn.lpstrFile;
@@ -124,8 +116,6 @@ std::string FileDialogs::SaveBoxColliderFile(const char* filter, HWND owner)
     ofn.nMaxFile = sizeof(szFile);
     ofn.nFilterIndex = 1;
     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-    std::string fileNameStr;
 
     if (GetSaveFileNameA(&ofn))
     {
