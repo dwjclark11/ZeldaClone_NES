@@ -19,6 +19,7 @@ This project is created with:
 * Lua 5.3
 * SDL2
 * ImGui
+* Sprites were created/edited using Aseprite!
 
 ## Game Controls
 | Key |  Button  |   Function  |  
