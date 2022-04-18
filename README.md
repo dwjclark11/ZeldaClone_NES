@@ -38,8 +38,14 @@ This project is created with:
 
 ## User Experience
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
+- New Video
 
 
+https://user-images.githubusercontent.com/63356975/163869073-acae6d9b-0948-48d3-aecb-b369309f7278.mp4
+
+
+
+- Old Video
 https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
 
 ## Tilemap Editor Controls
