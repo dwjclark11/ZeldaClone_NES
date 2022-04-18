@@ -832,7 +832,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	LuaTableWriter m_writer;
 	std::fstream file;
 
-	file.open("./Assets/SavedFiles/save" + saveNum + ".lua");
+	file.open("./Assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua", std::ios::out | std::ios::trunc);
 
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
@@ -981,7 +981,9 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	m_writer.WriteDeclareTable("inventory", file);
 	m_writer.WriteKeyAndUnquotedValue("num_rupees", GameState::totalRupees, file);
 	m_writer.WriteKeyAndUnquotedValue("num_bombs", GameState::totalBombs, file);
+	//m_writer.WriteKeyAndUnquotedValue("num_arrows", numArrows, file);
 	m_writer.WriteKeyAndUnquotedValue("num_keys", GameState::totalKeys, file);
+	// Close the remaining tables
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
@@ -1096,7 +1098,7 @@ void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& new
 	m_writer.WriteDeclareTable("inventory", file);
 	m_writer.WriteKeyAndUnquotedValue("num_rupees", numRupees, file);
 	m_writer.WriteKeyAndUnquotedValue("num_bombs", numBombs, file);
-	m_writer.WriteKeyAndUnquotedValue("num_arrows", numArrows, file);
+	//m_writer.WriteKeyAndUnquotedValue("num_arrows", numArrows, file);
 	m_writer.WriteKeyAndUnquotedValue("num_keys", numKeys, file);
 	// Close the remaining tables
 	m_writer.WriteEndTable(false, file);

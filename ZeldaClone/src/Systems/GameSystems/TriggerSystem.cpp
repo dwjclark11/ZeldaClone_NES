@@ -191,7 +191,8 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		game.SetSecretFound(secret.locationID, true);
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
 
-		loader.SaveSecrets();
+		// This needs to be moved to the save Screen!!
+		//loader.SaveSecrets();
 	
 	}
 	else if (secret.found && startup)
@@ -297,7 +298,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		Logger::Err("TRIGGER_SYSTEM: __LINE: 174 - There is not trigger set for this entity");
 		break;
 
-	case TriggerBoxComponent::TriggerType::SCENE_CHANGE: // Change this to scene transition TriggerType::CHANGE_SCENE?
+	case TriggerBoxComponent::TriggerType::SCENE_CHANGE: 
 	{
 		if (game.GetStairsFinished())
 		{
@@ -314,6 +315,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				trig.collectedTimer.Start();
 			}
 
+			// If the Scene has not faded, start the fade transition
 			if (game.GetFadeAlpha() > 0)
 			{
 				game.StartFadeOut(true);
@@ -374,6 +376,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 				if (scene.enemyFile != "no_file")
 					loader.LoadEnemiesFromLuaTable(game.GetLuaState(), scene.enemyFile);
 
+				// Load the secrets of the scene that have been found
 				loader.ReadInSecrets(game.GetLuaState());
 				
 				// Set player Position

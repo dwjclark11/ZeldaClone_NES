@@ -177,6 +177,9 @@ void Game::Update()
 
 void Game::ProcessEvents()
 {
+	// Update the Game Controller 
+	SDL_GameControllerUpdate();
+
 	while (SDL_PollEvent(&sdlEvent))
 	{
 		// ImGui SDL input
@@ -192,7 +195,7 @@ void Game::ProcessEvents()
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		
 		gameStateMachine->ProcessEvents(sdlEvent);
-		
+
 		// Handle Core SDL Events
 		switch (sdlEvent.type)
 		{
@@ -209,7 +212,7 @@ void Game::ProcessEvents()
 				if(sdlEvent.key.keysym.sym)
 					gameStateMachine->OnKeyDown(&sdlEvent);
 				break;
-
+				
 			case SDL_KEYUP:
 
 				if (sdlEvent.key.keysym.sym)
@@ -225,13 +228,17 @@ void Game::ProcessEvents()
 			case SDL_CONTROLLERBUTTONDOWN:
 			{
 				eventManager->EmitEvent<GamePadButtonPressedEvent>(sdlEvent.cbutton.button);
+				
 				gameStateMachine->OnBtnDown(&sdlEvent);
+				
 				break;
 			}
 			
 			case SDL_CONTROLLERBUTTONUP:
 			{
+				
 				gameStateMachine->OnBtnUp(&sdlEvent);
+				
 				break;
 			}
 		default:

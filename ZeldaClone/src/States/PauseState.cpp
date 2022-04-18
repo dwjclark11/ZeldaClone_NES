@@ -47,7 +47,7 @@ void PauseState::Update(const float& deltaTime)
 	if (game.GetFadeAlpha() == 0 && !game.FadeFinished())
 	{
 		GameState::unpause = true;
-		GamePadSystem::paused = false;
+		GamePadSystem::SetPaused(false);
 		game.SetFadeFinished(true);
 		game.StartFadeOut(false);
 		game.GetStateMachine()->PopState();
@@ -207,7 +207,7 @@ void PauseState::ProcessEvents(SDL_Event& event)
 void PauseState::OnKeyDown(SDL_Event* event)
 {
 
-
+	// Open the save Screen!
 	if (event->key.keysym.sym == SDLK_m)
 	{
 		game.GetStateMachine()->PushState(new SaveGameState());

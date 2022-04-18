@@ -8,5 +8,4 @@ private:
 public:
 	ProjectileLifeCycleSystem();
 	void Update();
-
 };

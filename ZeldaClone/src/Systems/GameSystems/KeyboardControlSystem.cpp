@@ -26,6 +26,10 @@
 #include <filesystem>
 #include <SDL.h>
 #include "../../Utilities/Timer.h"
+#include "../../Utilities/Utility.h"
+
+
+
 
 
 directionE KeyboardControlSystem::dir = directionE::NONE;
@@ -141,6 +145,7 @@ void KeyboardControlSystem::Update()
 		if (state[SDL_SCANCODE_W] && !state[SDL_SCANCODE_RSHIFT])
 		{
 
+			Logger::Log("Moving Up");
 
 			playerRigidbody.velocity = playerControl.upVelocity;
 			playerSprite.srcRect.x = playerSprite.width * 2;
@@ -537,7 +542,6 @@ void KeyboardControlSystem::SettingsStateKeys(KeyPressedEvent& event)
 	auto& selectText = selector.GetComponent<TextLabelComponent>();
 	if (SettingsState::mEnterKey)
 	{
-
 		switch (SettingsState::mActionIndex)
 		{
 		case 0: selectText.text = "Changing Move Up Key"; break;
@@ -868,97 +872,29 @@ void KeyboardControlSystem::GameStateKeys(KeyPressedEvent& event)
 	if (game.GetFadeAlpha() == 255 && !game.PlayerHold() && event.symbol != game.GetKeyBindings().at(Game::Action::ATTACK))
 	{
 		auto player = Registry::Instance().GetEntityByTag("player");
-		auto& playerTransform = player.GetComponent<TransformComponent>();
-		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
-		auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
-		auto& playerSprite = player.GetComponent<SpriteComponent>();
 		auto& playerControl = player.GetComponent<KeyboardControlComponent>();
-
-		auto shield = Registry::Instance().GetEntityByTag("the_shield");
-		auto& shieldTransform = shield.GetComponent<TransformComponent>();
-		auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
-		auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
-
-		auto sword = Registry::Instance().GetEntityByTag("the_sword");
-		auto& swordTransform = sword.GetComponent<TransformComponent>();
-		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
-		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
 		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_UP))
 		{
-			playerRigidbody.velocity = playerControl.upVelocity;
-			playerSprite.srcRect.x = playerSprite.width * 2;
-
-			shieldTransform.position = playerTransform.position;
-			shieldCollider.height = 2;
-			shieldCollider.width = 24;
-			shieldCollider.offset = glm::vec2(48, 32);
-			shieldRigidbody = playerRigidbody;
-
-			swordTransform.position = playerTransform.position;
-			swordCollider.height = 2;
-			swordCollider.width = 2;
-			swordCollider.offset = glm::vec2(64, 60);
-			swordRigidbody = playerRigidbody;
-
+			ChangePlayerAttrib(playerControl.upVelocity, glm::vec2(48, 32), glm::vec2(64, 60), 24,2, 2,2,2);
 			dir = UP;
 		}
-
 		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_RIGHT))
 		{
-			playerSprite.srcRect.x = playerSprite.width * 3;
-			playerRigidbody.velocity = playerControl.rightVelocity;
-
-			shieldTransform.position = playerTransform.position;
-			shieldCollider.height = 30;
-			shieldCollider.width = 2;
-			shieldCollider.offset = glm::vec2(90, 56);
-			shieldRigidbody = playerRigidbody;
-
-			swordTransform.position = playerTransform.position;
-			swordCollider.height = 2;
-			swordCollider.width = 2;
-			swordCollider.offset = glm::vec2(64, 60);
-			swordRigidbody = playerRigidbody;
-
+			ChangePlayerAttrib(playerControl.rightVelocity, glm::vec2(90, 56), glm::vec2(64, 60), 2, 30, 3, 2, 2);
+			
 			dir = RIGHT;
 		}
 		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_DOWN))
 		{
-			playerRigidbody.velocity = playerControl.downVelocity;
-			playerSprite.srcRect.x = playerSprite.width * 0;
-
-			shieldTransform.position = playerTransform.position;
-			shieldCollider.height = 2;
-			shieldCollider.width = 24;
-			shieldCollider.offset = glm::vec2(40, 84);
-			shieldRigidbody = playerRigidbody;
-
-			swordTransform.position = playerTransform.position;
-			swordCollider.height = 2;
-			swordCollider.width = 2;
-			swordCollider.offset = glm::vec2(64, 60);
-			swordRigidbody = playerRigidbody;
-
+			ChangePlayerAttrib(playerControl.downVelocity, glm::vec2(40, 84), glm::vec2(64, 60), 24, 2, 0, 2, 2);
+			
 			dir = DOWN;
 		}
 		if (event.symbol == game.GetKeyBindings().at(Game::Action::MOVE_LEFT))
 		{
-			playerRigidbody.velocity = playerControl.leftVelocity;
-			playerSprite.srcRect.x = playerSprite.width * 1;
-
-			shieldTransform.position = playerTransform.position;
-			shieldCollider.height = 30;
-			shieldCollider.width = 2;
-			shieldCollider.offset = glm::vec2(30, 50);
-			shieldRigidbody = playerRigidbody;
-
-			swordTransform.position = playerTransform.position;
-			swordCollider.height = 2;
-			swordCollider.width = 2;
-			swordCollider.offset = glm::vec2(64, 60);
-			swordRigidbody = playerRigidbody;
-
+			ChangePlayerAttrib(playerControl.leftVelocity, glm::vec2(30, 50), glm::vec2(64, 60), 30, 2, 1, 2, 2);
+			
 			dir = LEFT;
 		}
 	}
@@ -992,7 +928,7 @@ void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)
 					{
 						LevelLoader loader;
 
-						if (game.GetPlayerNum() == 1)
+						/*if (game.GetPlayerNum() == 1)
 						{
 							loader.SavePlayerDataToLuaTable("1");
 						}
@@ -1003,7 +939,11 @@ void KeyboardControlSystem::SaveStateKeys(KeyPressedEvent& event)
 						else if (game.GetPlayerNum() == 3)
 						{
 							loader.SavePlayerDataToLuaTable("3");
-						}
+						}*/
+
+						loader.SavePlayerDataToLuaTable(std::to_string(game.GetPlayerNum()));
+						loader.SaveSecrets();
+						Logger::Log("Saved Player: " + std::to_string(game.GetPlayerNum()));
 
 						//Entity saving = Registry::Instance().CreateEntity();
 						//saving.AddComponent<SpriteComponent>("save_gui", 96, 16, 1, true, 0, 0);

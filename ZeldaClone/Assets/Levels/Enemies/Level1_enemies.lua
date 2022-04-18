@@ -5,7 +5,7 @@ enemies =
         group = "enemies",
         components = {
             transform = {
-                position = { x = 4672, y = 1664},
+                position = { x = 4672, y = 1600},
                 scale = { x = 4, y = 4},
                 rotation = {0}
             },

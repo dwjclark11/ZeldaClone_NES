@@ -292,6 +292,7 @@ public:
 	// Tag Management 
 	void TagEntity(Entity entity, const std::string& tag);
 	bool EntityHasTag(Entity entity, const std::string& tag) const;
+	bool DoesTagExist(const std::string& tag) const;
 	Entity GetEntityByTag(const std::string& tag) const;
 	void RemoveEntityTag(Entity entity);
 

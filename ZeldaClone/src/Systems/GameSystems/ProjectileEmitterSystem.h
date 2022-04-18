@@ -134,6 +134,9 @@ private:
 			Logger::Err("Please Empty the item Map");
 	}
 
+	void ItemUsed();
+	void SwordUsed();
+
 public:
 
 	//GamePadSystem controller;
@@ -151,5 +154,6 @@ public:
 	void OnKeyPressed(KeyPressedEvent& event);
 	void OnBtnPressed(GamePadButtonPressedEvent& event);
 	void Update(Registry& registry);
-
+	void EnemyProjectileUpdate(Entity& entity);
+	void UpdateBoomerang(Entity& entity);
 };

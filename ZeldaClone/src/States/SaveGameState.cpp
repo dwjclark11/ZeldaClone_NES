@@ -24,8 +24,6 @@ void SaveGameState::Update(const float& deltaTime)
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
 	Registry::Instance().GetSystem<AnimationSystem>().Update();
-
-	//if (State::exitToMain) game.GetStateMachine()->PopState();
 }
 
 void SaveGameState::Render()

@@ -101,35 +101,21 @@ void BossPatrolState::Update (class Entity& entity)
 
 	if (walkTimer.GetTicks() > 2000)
 	{
-		if (rigid.down)
-		{
-			rigid.down = false;
-			rigid.right = false;
-			rigid.up = false;
-			rigid.left = true;
-		}
-		else if (rigid.left)
-		{
-			rigid.down = false;
-			rigid.right = false;
-			rigid.up = true;
-			rigid.left = false;
-
-		}
-		else if (rigid.right)
-		{
-			rigid.down = true;
-			rigid.right = false;
-			rigid.up = false;
-			rigid.left = false;
-
-		}
-		else if (rigid.up)
+		if (rigid.left)
 		{
 			rigid.down = false;
 			rigid.right = true;
 			rigid.up = false;
 			rigid.left = false;
+
+		}
+		else if (rigid.right)
+		{
+			rigid.down = false;
+			rigid.right = false;
+			rigid.up = false;
+			rigid.left = true;
+
 		}
 
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "boss_scream_1", 0, -1);

@@ -18,6 +18,7 @@
 #include "../../States/SettingsState.h"
 #include "../../Game/Game.h"
 #include "../../Game/LevelLoader.h"
+#include "../../Utilities/Utility.h"
 
 bool GamePadSystem::paused = false;
 
@@ -26,8 +27,6 @@ GamePadSystem::GamePadSystem()
 	, game(Game::Instance())
 
 {
-	//RequiredComponent<TransformComponent>();
-	//RequiredComponent<SpriteComponent>();
 	RequiredComponent<GamePadComponent>();
 }
 
@@ -50,104 +49,36 @@ void GamePadSystem::Init()
 
 void GamePadSystem::GameStateBtns(GamePadButtonPressedEvent& event)
 {
-	if (game.GetFadeAlpha() == 255)
+	if (game.GetFadeAlpha() == 255 && !game.PlayerHold() && event.button != game.GetBtnBindings().at(Game::Action::ATTACK))
 	{
 		auto player = Registry::Instance().GetEntityByTag("player");
-		auto& playerTransform = player.GetComponent<TransformComponent>();
-		auto& playerCollider = player.GetComponent<BoxColliderComponent>();
-		auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
-		auto& playerSprite = player.GetComponent<SpriteComponent>();
 		auto& playerControl = player.GetComponent<KeyboardControlComponent>();
+		
 
-		auto shield = Registry::Instance().GetEntityByTag("the_shield");
-		auto& shieldTransform = shield.GetComponent<TransformComponent>();
-		auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
-		auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
-
-		auto sword = Registry::Instance().GetEntityByTag("the_sword");
-		auto& swordTransform = sword.GetComponent<TransformComponent>();
-		auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
-		auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
-
-		if (!game.PlayerHold() && event.button != game.GetKeyBindings().at(Game::Action::ATTACK))
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
 		{
-			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_UP))
-			{
-				playerRigidbody.velocity = playerControl.upVelocity;
-				playerSprite.srcRect.x = playerSprite.width * 2;
+			ChangePlayerAttrib(playerControl.upVelocity, glm::vec2(48, 32), glm::vec2(64, 60), 24, 2, 2, 2, 2);
+			
+			KeyboardControlSystem::dir = UP;
+		}
 
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 2;
-				shieldCollider.width = 24;
-				shieldCollider.offset = glm::vec2(48, 32);
-				shieldRigidbody = playerRigidbody;
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_RIGHT))
+		{
+			ChangePlayerAttrib(playerControl.rightVelocity, glm::vec2(90, 56), glm::vec2(64, 60), 2, 30, 3, 2, 2);
 
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
+			KeyboardControlSystem::dir = RIGHT;
+		}
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
+		{
+			ChangePlayerAttrib(playerControl.downVelocity, glm::vec2(40, 84), glm::vec2(64, 60), 24, 2, 0, 2, 2);
 
-				KeyboardControlSystem::dir = UP;
-			}
+			KeyboardControlSystem::dir = DOWN;
+		}
+		if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_LEFT))
+		{
+			ChangePlayerAttrib(playerControl.leftVelocity, glm::vec2(30, 50), glm::vec2(64, 60), 30, 2, 1, 2, 2);
 
-			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_RIGHT))
-			{
-				playerSprite.srcRect.x = playerSprite.width * 3;
-				playerRigidbody.velocity = playerControl.rightVelocity;
-
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 30;
-				shieldCollider.width = 2;
-				shieldCollider.offset = glm::vec2(90, 56);
-				shieldRigidbody = playerRigidbody;
-
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
-
-				KeyboardControlSystem::dir = RIGHT;
-			}
-			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_DOWN))
-			{
-				playerRigidbody.velocity = playerControl.downVelocity;
-				playerSprite.srcRect.x = playerSprite.width * 0;
-
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 2;
-				shieldCollider.width = 24;
-				shieldCollider.offset = glm::vec2(40, 84);
-				shieldRigidbody = playerRigidbody;
-
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
-
-				KeyboardControlSystem::dir = DOWN;
-			}
-			if (event.button == game.GetBtnBindings().at(Game::Action::MOVE_LEFT))
-			{
-				playerRigidbody.velocity = playerControl.leftVelocity;
-				playerSprite.srcRect.x = playerSprite.width * 1;
-
-				shieldTransform.position = playerTransform.position;
-				shieldCollider.height = 30;
-				shieldCollider.width = 2;
-				shieldCollider.offset = glm::vec2(30, 50);
-				shieldRigidbody = playerRigidbody;
-
-				swordTransform.position = playerTransform.position;
-				swordCollider.height = 2;
-				swordCollider.width = 2;
-				swordCollider.offset = glm::vec2(64, 60);
-				swordRigidbody = playerRigidbody;
-
-				KeyboardControlSystem::dir = LEFT;
-			}
+			KeyboardControlSystem::dir = LEFT;
 		}
 	}
 }
@@ -702,8 +633,14 @@ void GamePadSystem::PauseStateBtns(GamePadButtonPressedEvent& event)
 
 void GamePadSystem::SubscribeToEvents(std::unique_ptr<class EventManager>& eventManager)
 {
-	eventManager->SubscribeToEvent<GamePadButtonPressedEvent>(this, &GamePadSystem::OnButtonPressed);
+	const auto& currentState = game.GetStateMachine()->GetCurrentState();
+	if ((!game.GetCameraMoving() && !game.GetPlayerItem() && !game.GetPlayerDead()) || currentState == "GAMEOVER")
+	{
+		eventManager->SubscribeToEvent<GamePadButtonPressedEvent>(this, &GamePadSystem::OnButtonPressed);
+		
+	}
 }
+
 
 void GamePadSystem::OnButtonPressed(GamePadButtonPressedEvent& event)
 {

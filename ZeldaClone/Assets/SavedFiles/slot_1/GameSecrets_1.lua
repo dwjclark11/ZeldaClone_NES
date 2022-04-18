@@ -9,23 +9,23 @@ secrets = {
     },
     [2] = {
         location = "bomb_secret_hearts_1",
-        found = true
+        found = false
     },
     [3] = {
         location = "bomb_secret_money_1",
-        found = true
+        found = false
     },
     [4] = {
         location = "bomb_secret_rupees_1",
-        found = true
+        found = false
     },
     [5] = {
         location = "bomb_secret_rupees_2",
-        found = true
+        found = false
     },
     [6] = {
         location = "burn_bush_potion_shop_1",
-        found = true
+        found = false
     },
     [7] = {
         location = "push_rock_to_highway_1",

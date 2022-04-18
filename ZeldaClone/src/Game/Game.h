@@ -197,6 +197,8 @@ public:
 
 private:
 
+	bool gamePadButtonDown = false;
+
 	std::map<Action, SDL_Keycode> mMappedKeys;
 	std::map<Action, SDL_GameControllerButton> mMappedButtons;
 	std::map<std::string, bool> gameSecrets;

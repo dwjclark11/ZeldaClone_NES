@@ -209,6 +209,15 @@ bool Registry::EntityHasTag(Entity entity, const std::string& tag) const
 	return entityPerTag.find(tag)->second == entity;
 }
 
+bool Registry::DoesTagExist(const std::string& tag) const
+{
+	// If the group exists
+	if (entityPerTag.find(tag) != entityPerTag.end())
+		return true;
+
+	return false;
+}
+
 Entity Registry::GetEntityByTag(const std::string& tag) const
 {
 	return entityPerTag.at(tag);

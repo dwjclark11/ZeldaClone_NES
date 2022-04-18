@@ -78,7 +78,7 @@ GameState::GameState(glm::vec2 cameraOffset)
 
 void GameState::Update(const float& deltaTime)
 {
-	if (GamePadSystem::paused && game.GetFadeAlpha() == 0)
+	if (GamePadSystem::GetPaused() && game.GetFadeAlpha() == 0)
 	{
 		game.SetFadeFinished(true);
 		game.StartFadeOut(false);
@@ -87,7 +87,7 @@ void GameState::Update(const float& deltaTime)
 	}
 
 	// Check to see if level music has been paused
-	if (!GamePadSystem::paused && unpause)
+	if (!GamePadSystem::GetPaused() && unpause)
 	{
 		// Turn music volume up
 		Mix_VolumeMusic(10);
@@ -105,6 +105,7 @@ void GameState::Update(const float& deltaTime)
 	Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
 
@@ -121,7 +122,7 @@ void GameState::Update(const float& deltaTime)
 
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
 	
-	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
+	
 	Registry::Instance().GetSystem<MovementSystem>().Update(deltaTime);
 	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
 
@@ -296,12 +297,12 @@ void GameState::OnKeyDown(SDL_Event* event)
 void GameState::OnKeyUp(SDL_Event* event)
 {
 	// Set to paused
-	if (event->key.keysym.sym == SDLK_q)
+	if (event->key.keysym.sym == game.GetKeyBindings().at(Game::Action::PAUSE))
 	{
 		game.SetFadeFinished(false);
 		game.StartFadeOut(true);
 		game.StartFadeIn(false);
-		GamePadSystem::paused = true;
+		GamePadSystem::SetPaused(true);
 	}
 
 	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
@@ -320,11 +321,11 @@ void GameState::OnBtnUp(SDL_Event* event)
 		game.SetFadeFinished(false);
 		game.StartFadeOut(true);
 		game.StartFadeIn(false);
-		GamePadSystem::paused = true;
+		GamePadSystem::SetPaused(true);
 	}
 
-	KeyboardControlSystem::keyDown = false;
 	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
+	KeyboardControlSystem::keyDown = false;
 }
 
 

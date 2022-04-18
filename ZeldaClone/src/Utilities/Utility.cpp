@@ -4,10 +4,14 @@
 #include "../ECS/ECS.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
+#include "../Components/KeyboardControlComponent.h"
+#include "../Components/RigidbodyComponent.h"
+#include "../Components/BoxColliderComponent.h"
 #include "../Components/HUDComponent.h"
 #include "../Components/GameComponent.h"
 #include "../Systems/SoundFXSystem.h"
 #include "../Game/Game.h"
+
 #include <Windows.h>
 #include "Timer.h"
 
@@ -86,4 +90,41 @@ void ConvertNumberParser(std::string group, int num, int power)
 			}
 		}
 	}
+}
+
+void ChangePlayerAttrib(const glm::vec2& velocity, const glm::vec2& shieldOffset,
+	const glm::vec2& swordOffset, const int& shieldWidth,
+	const int& shieldHeight, const int& spriteWidth, const int& swordWidth, const int& swordHeight)
+{
+	auto player = Registry::Instance().GetEntityByTag("player");
+	auto& playerTransform = player.GetComponent<TransformComponent>();
+	auto& playerCollider = player.GetComponent<BoxColliderComponent>();
+	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
+	auto& playerSprite = player.GetComponent<SpriteComponent>();
+
+	auto shield = Registry::Instance().GetEntityByTag("the_shield");
+	auto& shieldTransform = shield.GetComponent<TransformComponent>();
+	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
+	auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
+
+	auto sword = Registry::Instance().GetEntityByTag("the_sword");
+	auto& swordTransform = sword.GetComponent<TransformComponent>();
+	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
+	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
+
+	playerRigidbody.velocity = velocity;
+	playerSprite.srcRect.x = playerSprite.width * spriteWidth;
+
+	shieldTransform.position = playerTransform.position;
+	shieldCollider.height = shieldHeight;
+	shieldCollider.width = shieldWidth;
+	shieldCollider.offset = shieldOffset;
+	shieldRigidbody = playerRigidbody;
+
+	swordTransform.position = playerTransform.position;
+	swordCollider.height = swordHeight;
+	swordCollider.width = swordWidth;
+	swordCollider.offset = swordOffset;
+	swordRigidbody = playerRigidbody;
+
 }
