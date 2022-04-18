@@ -6,7 +6,7 @@
 #ifdef _DEBUG
 	bool Logger::debugMode = true;
 #elif NDEBUG
-	bool Logger::debugMode = false;
+	bool Logger::debugMode = true;
 #endif
 
 std::vector<LogEntry> Logger::messages;

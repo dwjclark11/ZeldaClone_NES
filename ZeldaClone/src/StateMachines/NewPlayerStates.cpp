@@ -43,10 +43,9 @@ void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 		break;
 
 	case ItemComponent::SpecialItemType::FULL_HEART:
-	{
 		health.addHeart = true;
 		break;
-	}
+	
 	case ItemComponent::SpecialItemType::RAFT:
 		game.GetGameItems().raft = true;
 		break;
@@ -108,20 +107,17 @@ void IdleState::Update(Entity& entity)
 
 	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
 	{
-		//pOwner->ChangeState(pOwner->moveState, entity);
 		sm.AddState(std::make_unique<MoveState>());
 		sm.ChangeState(entity);
 	}
 	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
 	{
-		//pOwner->ChangeState(pOwner->moveState, entity);
 		sm.AddState(std::make_unique<MoveState>());
 		sm.ChangeState(entity);
 	}
 	// If the player is hurt while in Idle state --> Switch to hurt state
 	if (playerHealth.isHurt)
 	{
-		//pOwner->ChangeState(pOwner->hurtState, entity);
 		sm.AddState(std::make_unique<PlayerHurtState>());
 		sm.ChangeState(entity);
 	}
@@ -154,7 +150,6 @@ void MoveState::OnExit(Entity& entity)
 
 void MoveState::Update(Entity& entity)
 {
-
 	glm::vec2 playerSpeed = glm::vec2(0);
 	auto player = entity;// Registry::Instance().GetEntityByTag("player");
 
@@ -175,7 +170,6 @@ void MoveState::Update(Entity& entity)
 	}
 	else
 	{
-		//pOwner->ChangeState(pOwner->idleState, entity);
 		sm.AddState(std::make_unique<IdleState>());
 		sm.ChangeState(entity);
 	}
@@ -184,10 +178,8 @@ void MoveState::Update(Entity& entity)
 	// If the player is collecting a special Item --> Move to the Collect Item State
 	if (game.GetPlayerItem())
 	{
-		//pOwner->ChangeState(pOwner->collectItemState, entity);
 		sm.AddState(std::make_unique<CollectItemState>());
-		sm.ChangeState(entity);
-		//pOwner->ChangeState(pOwner->stairState, entity);
+		sm.ChangeState(entity);	
 	}
 
 	// If the player is hurt --> Move to the HurtState
@@ -201,7 +193,6 @@ void MoveState::Update(Entity& entity)
 
 	if (game.GetPlayerOnStairs())
 	{
-		//pOwner->ChangeState(pOwner->stairState, entity);
 		sm.AddState(std::make_unique<PlayerStairsState>());
 		sm.ChangeState(entity);
 	}
@@ -251,7 +242,9 @@ void CollectItemState::Update(Entity& entity)
 				const auto& special = trigger.GetComponent<ItemComponent>();
 
 				if (special.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
+				{
 					SetSpecialItem(special.special, entity);
+				}
 
 				if (special.type != ItemComponent::ItemCollectType::DEFAULT)
 					SetItemCollect(special.type);
@@ -271,7 +264,6 @@ void CollectItemState::Update(Entity& entity)
 	// Wait for 2 seconds then change back to idle State
 	if (timer.GetTicks() > 2000)
 	{
-		//pOwner->ChangeState(pOwner->idleState, entity);
 		sm.AddState(std::make_unique<IdleState>());
 		sm.ChangeState(entity);
 	}
@@ -289,6 +281,7 @@ void PlayerHurtState::OnEnter(Entity& entity)
 	auto& animation = player.GetComponent<AnimationComponent>();
 	auto& sprite = player.GetComponent<SpriteComponent>();
 	auto& sm = Game::Instance().GetPlayerStateMachine();
+
 	// Start hurt Invincibility Timer
 	playerHealth.hurtTimer.Start();
 
@@ -311,14 +304,13 @@ void PlayerHurtState::Update(Entity& entity)
 	{
 		playerHealth.isHurt = false;
 		playerHealth.hurtTimer.Stop();
-		//pOwner->ChangeState(pOwner->idleState, entity);
+
 		sm.AddState(std::make_unique<IdleState>());
 		sm.ChangeState(entity);
 	}
 
 	if (playerHealth.healthPercentage <= 0)
 	{
-		//pOwner->ChangeState(pOwner->deathState, entity);
 		sm.AddState(std::make_unique<PlayerDeathState>());
 		sm.ChangeState(entity);
 	}
@@ -375,7 +367,7 @@ void PlayerDeathState::Update(Entity& entity)
 			Registry::Instance().GetSystem<RenderHealthSystem>().OnExit();
 			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(new GameOverState());
-			//pOwner->ChangeState(pOwner->idleState, entity);
+
 			sm.AddState(std::make_unique<IdleState>());
 			sm.ChangeState(entity);
 		}
@@ -416,7 +408,6 @@ void PlayerStairsState::Update(Entity& entity)
 
 	if (steps >= 4)
 	{
-		//pOwner->ChangeState(pOwner->idleState, entity);
 		sm.AddState(std::make_unique<IdleState>());
 		sm.ChangeState(entity);
 	}

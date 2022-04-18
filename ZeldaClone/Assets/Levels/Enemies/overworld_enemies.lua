@@ -28,8 +28,8 @@ enemies = {
         offset = { x = 0, y = 0}
       },
       health = {
-        health_percentage = 9,
-        max_hearts = 3
+        health_percentage = 2,
+        max_hearts = 1
       },
       rigidbody = {
         velocity = { x = 10, y = 0}
@@ -75,8 +75,8 @@ enemies = {
         offset = { x = 0, y = 0}
       },
       health = {
-        health_percentage = 9,
-        max_hearts = 3
+        health_percentage = 2,
+        max_hearts = 1
       },
       rigidbody = {
         velocity = { x = 10, y = 0}
@@ -122,8 +122,8 @@ enemies = {
         offset = { x = 0, y = 0}
       },
       health = {
-        health_percentage = 9,
-        max_hearts = 3
+        health_percentage = 2,
+        max_hearts = 1
       },
       rigidbody = {
         velocity = { x = 10, y = 0}
@@ -169,8 +169,8 @@ enemies = {
         offset = { x = 0, y = 0}
       },
       health = {
-        health_percentage = 9,
-        max_hearts = 3
+        health_percentage = 2,
+        max_hearts = 1
       },
       rigidbody = {
         velocity = { x = 10, y = 0}

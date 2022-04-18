@@ -365,8 +365,9 @@ void EnemyDeathState::OnEnter(Entity& entity)
 	animation.frameSpeedRate = 20;
 	animation.isLooped = false;
 	animation.vertical = false;
-	Timer time;
-	time.Start();
+	//Timer time;
+	//time.Start();
+
 	srand(SDL_GetTicks());
 
 	int chance = rand();

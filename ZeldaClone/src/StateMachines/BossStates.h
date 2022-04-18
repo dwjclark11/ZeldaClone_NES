@@ -55,6 +55,9 @@ public:
 	void OnEnter(class Entity& entity) override;
 	void OnExit	(class Entity& entity) override;
 	void Update (class Entity& entity) override;
+
+	void DropHeart(class Entity& entity);
+
 };
 
 class BossStunnedState : public States
