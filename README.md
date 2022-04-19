@@ -11,7 +11,7 @@ This game was created for educational purposes and to help develop my skills wit
 of data management. It uses the Pikuma Game Engine from the course https://courses.pikuma.com/courses/2dgameengine. 
 This was a great course and I recommend it to anyone wanting to start learning more on creating Game Engines. 
 I have taken what I learned from that course and applied it to creating this Zelda Clone and Tilemap/Quest Editor. 
-The game is not yet finished; however, I am still working on the functionality and this is a beautiful step into my journey to become a Software Developer!
+The game is not yet finished; There is still plenty of work to be done!
 
 ## Technologies
 This project is created with:
@@ -19,6 +19,7 @@ This project is created with:
 * Lua 5.3
 * SDL2
 * ImGui
+* Sprites were created/edited using Aseprite!
 
 ## Game Controls
 | Key |  Button  |   Function  |  
@@ -38,8 +39,14 @@ This project is created with:
 
 ## User Experience
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
+- New Video
 
 
+https://user-images.githubusercontent.com/63356975/163869073-acae6d9b-0948-48d3-aecb-b369309f7278.mp4
+
+
+
+- Old Video
 https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
 
 ## Tilemap Editor Controls
