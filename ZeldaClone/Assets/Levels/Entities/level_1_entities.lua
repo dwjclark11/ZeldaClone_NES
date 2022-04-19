@@ -165,4 +165,34 @@ level = {
 			}
 		}
 	},
+	-- Key outside of boss room
+	[7] ={
+		group = "items",	
+		components = {
+			transform = {
+				position = { x = 4860, y = 2528},
+				scale = { x = 4, y = 4},
+				rotation = 0.0
+			},
+			sprite = {
+				asset_id = "items",
+				width = 16,
+				height = 16,
+				layer = 4,
+				fixed = false,
+				src_rect_x = 64, 
+				src_rect_y = 32 
+			}, 
+			box_collider = {
+				width = 16,
+				height = 16,
+				offset_x = 0,
+				offset_y = 0
+			},
+			item = {
+				item_type = "keys",
+				special = "none"
+			}
+		}
+	},
 }

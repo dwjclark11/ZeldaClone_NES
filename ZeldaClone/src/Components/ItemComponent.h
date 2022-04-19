@@ -10,6 +10,7 @@ public:
 		DEFAULT,
 		YELLOW_RUPEE,
 		BLUE_RUPEE,
+		KEYS,
 	};
 
 	enum class SpecialItemType

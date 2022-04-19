@@ -3,6 +3,7 @@
 ----------------------------------------------------------
 triggers = 
 {
+    -- Block inn front of the stairs to the bow
     [1] = 
     {
         group = "secret",
@@ -25,18 +26,6 @@ triggers =
                 camera_offset = { x = 0, y = 0},
                 collider = true
             },
-            scene_change = {
-                level_music = "stop",
-                asset_file = "no_file",
-                enemy_file = "no_file",
-                collider_file = "no_file",
-                tilemap_name = "no_file",
-                tilemap_image = "no_file",
-                entity_file = "no_file",
-                image_width = 0,
-                image_height = 0,
-                trigger_file = "no_file",
-            },
             secret = {
                 location_id = "none",
                 new_trigger = "no_trigger",
@@ -58,6 +47,7 @@ triggers =
             }
         }
     },
+    -- Transport - Stairs to the Secret Bow Room 
 	[2] = {
         group = "triggers",
         components = {
@@ -78,25 +68,14 @@ triggers =
                 camera_offset = { x = 0, y = 384},
                 collider = false
             }, 
-            scene_change = {
-                level_music = "stop",
-                asset_file = "no_file",
-                enemy_file = "no_file",
-                collider_file = "no_file",
-                tilemap_name = "no_file",
-                tilemap_image = "no_file",
-                entity_file = "no_file",
-                image_width = 0,
-                image_height = 0,
-                trigger_file = "no_file",
-            },
         }
     },
+    -- Transport - Takes you back to the stairs to the secret room
     [3] = {
         group = "triggers",
         components = {
             transform = {
-                position = { x = 187, y = 677},
+                position = { x = 187, y = 732},
                 scale = { x = 4, y = 4},
                 rotation = {0}
             },
@@ -111,18 +90,6 @@ triggers =
                 transport_offset = { x = 1410, y = 960},
                 camera_offset = { x = 1024, y = 384},
                 collider = false
-            },
-            scene_change = {
-                level_music = "stop",
-                asset_file = "no_file",
-                enemy_file = "no_file",
-                collider_file = "no_file",
-                tilemap_name = "no_file",
-                tilemap_image = "no_file",
-                entity_file = "no_file",
-                image_width = 0,
-                image_height = 0,
-                trigger_file = "no_file",
             },
         }
     },

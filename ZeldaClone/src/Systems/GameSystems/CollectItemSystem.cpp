@@ -75,6 +75,12 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
 		item.Kill();
 	}
+	else if (type == ItemComponent::ItemCollectType::KEYS)
+	{
+		GameState::totalKeys++;
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		item.Kill();
+	}
 }
 
 void CollectItemSystem::OnBoomerangGetsItem(Entity& item, Entity& boomerang)

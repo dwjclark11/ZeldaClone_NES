@@ -1583,6 +1583,8 @@ ItemComponent::ItemCollectType LevelLoader::ConvertLuaStringToItem(std::string& 
 		return ItemComponent::ItemCollectType::BOMBS;
 	else if (type == "heart")
 		return ItemComponent::ItemCollectType::HEARTS;
+	else if (type == "keys")
+		return ItemComponent::ItemCollectType::KEYS;
 	else
 		return ItemComponent::ItemCollectType::DEFAULT;
 }
@@ -1757,18 +1759,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					glm::vec2(
 						lvlData["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
 						lvlData["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
-					)/*,
-					lvlData["components"]["trigger_box"]["level_music"],
-					lvlData["components"]["trigger_box"]["asset_file"],
-					lvlData["components"]["trigger_box"]["enemy_file"],
-					lvlData["components"]["trigger_box"]["collider_file"],
-					lvlData["components"]["trigger_box"]["tilemap_name"],
-					lvlData["components"]["trigger_box"]["tilemap_image"],
-					lvlData["components"]["trigger_box"]["map_image"],
-					lvlData["components"]["trigger_box"]["entity_file"],
-					lvlData["components"]["trigger_box"]["image_width"].get_or(0),
-					lvlData["components"]["trigger_box"]["image_height"].get_or(0),
-					lvlData["components"]["trigger_box"]["trigger_file"]*/
+					)
 					);
 			}
 
