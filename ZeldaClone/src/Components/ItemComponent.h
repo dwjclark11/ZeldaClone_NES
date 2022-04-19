@@ -26,6 +26,8 @@ public:
 		MAGIC_BOOMERANG,
 		LADDER,
 		ARROWS,
+		WOOD_BOW,
+		TRIFORCE_PIECE,
 	};
 
 	ItemCollectType type;

@@ -42,7 +42,7 @@ bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
 		if (game.GetGameItems().candle)
 			return true;
 		break;
-	case ItemComponent::SpecialItemType::ARROWS:
+	case ItemComponent::SpecialItemType::WOOD_BOW:
 		if (game.GetGameItems().bow)
 			return true;
 		break;
@@ -101,7 +101,7 @@ void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 	case ItemComponent::SpecialItemType::LADDER:
 		game.GetGameItems().ladder = true;
 		break;
-	case ItemComponent::SpecialItemType::ARROWS:
+	case ItemComponent::SpecialItemType::WOOD_BOW:
 		game.GetGameItems().bow = true;
 		break;
 	default:
@@ -322,13 +322,12 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			}
 			else
 			{
-				//// Remove all the prior assets/entities from the current scene
+				// Remove all the prior assets/entities from the current scene
 				Registry::Instance().GetSystem<RenderSystem>().OnExit();
 				Registry::Instance().GetSystem<RenderTileSystem>().OnExit();
 				Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
 				Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 				
-		
 				// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
 				if (scene.assetFile != "no_file")
 					loader.LoadAssetsFromLuaTable(game.GetLuaState(), scene.assetFile);
@@ -436,7 +435,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		auto& rockTransform = trigger.GetComponent<TransformComponent>();
 		auto& secret = trigger.GetComponent<SecretComponent>();
 
-		if (!trig.active)
+		if (!trig.active && !secret.found)
 		{
 			if (playerRigidBody.up)
 			{
@@ -472,7 +471,21 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			// After the new trigger is created, remove the current trigger!
 			trigger.Kill();
 		}
+		break;
 
+	case TriggerBoxComponent::TriggerType::LOCKED_DOOR:
+		
+		// Unlock the door if keys are available
+		if (GameState::totalKeys > 0)
+		{
+			// Play door open sound
+			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "door_unlock", 0, 1);
+			// Decrement total number of keys
+			GameState::totalKeys--;
+			// Remove the door
+			trigger.Kill();
+		}
+		
 		break;
 	case TriggerBoxComponent::TriggerType::SHOP_ITEM:
 		// Check to see if the trigger has an Item Components
@@ -579,6 +592,8 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 					xOffset = 64;
 					yOffset = 32;
 				}
+
+				// Create a temporary ladder entity
 				auto ladder = Registry::Instance().CreateEntity();
 				ladder.Tag("ladder");
 				ladder.AddComponent<TransformComponent>(playerTransform);
@@ -593,6 +608,11 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		{
 			StopPlayerMovement(player, trigger);
 		}
+		break;
+	}
+	case TriggerBoxComponent::TriggerType::TRAP_DOOR:
+	{
+		Logger::Err("Touching a trap door!!");
 		break;
 	}
 	default:
@@ -613,24 +633,28 @@ void TriggerSystem::Update()
 			auto& transform = entity.GetComponent<TransformComponent>();
 			
 			auto sprite = SpriteComponent(); 
-			auto secret = SecretComponent();
 
 			if (entity.HasComponent<SpriteComponent>())
 				sprite = entity.GetComponent<SpriteComponent>();
 
-			if (entity.HasComponent<SecretComponent>())
-				secret = entity.GetComponent<SecretComponent>();
-
 			auto& trig = entity.GetComponent<TriggerBoxComponent>();
 				
-			if (trig.active)
+			if (trig.active && entity.HasComponent<SecretComponent>())
 			{
+				auto& secret = entity.GetComponent<SecretComponent>();
+
+				// If the secret has already been found, nothing to do
+				if (secret.found)
+					continue;
+
 				if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS)
 				{
+					// Move the Block/Rock Up until it reaches its max position
 					if (transform.position.y > secret.startPos.y - sprite.width * Game::gameScale && secret.moveUp)
 					{
 						transform.position.y--;
 					}
+					// Move the Block/Rock Down until it reaches its max position
 					else if (transform.position.y < secret.startPos.y + sprite.width * Game::gameScale && secret.moveDown)
 					{
 						transform.position.y++;
@@ -638,6 +662,27 @@ void TriggerSystem::Update()
 					else
 					{
 						secret.found = true;
+
+						// Check to see if there is a Trap door or something else to remove
+						const auto & removeTag = trig.entityRemoveTag;
+						if (removeTag != "")
+						{
+							if (Registry::Instance().DoesTagExist(removeTag))
+							{
+								auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+
+								if (removedEntity.HasComponent<TriggerBoxComponent>())
+								{
+									const auto& triggerType = removedEntity.GetComponent<TriggerBoxComponent>().triggerType;
+									if (triggerType == TriggerBoxComponent::TriggerType::TRAP_DOOR)
+									{
+										Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "door_unlock", 0, -1);
+									}
+								}
+								// Remove the entity
+								removedEntity.Kill();
+							}
+						}
 					}
 				}
 				else if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT)
@@ -671,7 +716,6 @@ void TriggerSystem::Update()
 				}
 				else if (trig.triggerType == TriggerBoxComponent::TriggerType::LADDER)
 				{
-				
 					if (playerTransform.position.x < transform.position.x - 64 ||
 						playerTransform.position.x > transform.position.x + 32)
 					{

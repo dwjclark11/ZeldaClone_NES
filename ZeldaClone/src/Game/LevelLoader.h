@@ -8,10 +8,6 @@
 #include <memory>
 #include <sol/sol.hpp>
 
-
-
-
-
 class LevelLoader
 {
 private:

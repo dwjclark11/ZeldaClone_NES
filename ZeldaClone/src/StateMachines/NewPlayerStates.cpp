@@ -64,9 +64,14 @@ void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 	case ItemComponent::SpecialItemType::LADDER:
 		game.GetGameItems().ladder = true;
 		break;
-	case ItemComponent::SpecialItemType::ARROWS:
+	case ItemComponent::SpecialItemType::WOOD_BOW:
 		game.GetGameItems().bow = true;
 		break;
+	case ItemComponent::SpecialItemType::TRIFORCE_PIECE:
+	{
+		GameState::totalTriforcePieces++;
+		break;
+	}
 	default:
 		break;
 	}

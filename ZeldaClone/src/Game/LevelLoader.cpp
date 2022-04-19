@@ -663,6 +663,8 @@ TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::st
 		return TriggerBoxComponent::TriggerType::LADDER;
 	else if (type == "money_game")
 		return TriggerBoxComponent::TriggerType::MONEY_GAME;
+	else if (type == "trap_door")
+		return TriggerBoxComponent::TriggerType::TRAP_DOOR;
 	else 
 		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
 }
@@ -737,6 +739,22 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 
 		Entity newTrigger = reg.CreateEntity();
 
+		// Tag
+		sol::optional<std::string> tag = trigger["tag"];
+		
+
+		if (tag != sol::nullopt)
+		{
+			std::string tagName = trigger["tag"];
+			newTrigger.Tag(tagName);
+
+
+			if (reg.DoesTagExist(tagName))
+				Logger::Log("Exists");
+			else
+				Logger::Log("NOPE");
+		}
+		
 		// Group
 		sol::optional<std::string> group = trigger["group"];
 		if (group != sol::nullopt)
@@ -756,10 +774,9 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 			sol::optional<sol::table> triggerBox = trigger["components"]["trigger_box"];
 			if (triggerBox != sol::nullopt)
 			{
-				
 				//Logger::Log(trigger["components"]["trigger_box"]["trigger_file"]);
 				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
-
+			
 				newTrigger.AddComponent<TriggerBoxComponent>(
 					triggerType,
 					glm::vec2(
@@ -771,7 +788,8 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 						trigger["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
 					),
 
-					trigger["components"]["trigger_box"]["collider"].get_or(false)
+					trigger["components"]["trigger_box"]["collider"].get_or(false),
+					trigger["components"]["trigger_box"]["entity_removed_tag"].get_or(std::string(""))
 					);
 			}
 
@@ -1594,6 +1612,10 @@ ItemComponent::SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::strin
 		return ItemComponent::SpecialItemType::LADDER;
 	else if (special == "arrows")
 		return ItemComponent::SpecialItemType::ARROWS;
+	else if (special == "wood_bow")
+		return ItemComponent::SpecialItemType::WOOD_BOW;
+	else if (special == "triforce_piece")
+		return ItemComponent::SpecialItemType::TRIFORCE_PIECE;
 	else
 		return ItemComponent::SpecialItemType::NOT_SPECIAL;
 }
@@ -1628,6 +1650,12 @@ bool LevelLoader::CheckForItemInInventory(ItemComponent::SpecialItemType& type)
 		break;
 	case ItemComponent::SpecialItemType::STEEL_SWORD:
 		if (game.GetGameItems().steelSword)
+			return true;
+		else
+			return false;
+		break;
+	case ItemComponent::SpecialItemType::WOOD_BOW:
+		if (game.GetGameItems().bow)
 			return true;
 		else
 			return false;

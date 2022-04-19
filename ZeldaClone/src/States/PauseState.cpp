@@ -110,10 +110,10 @@ bool PauseState::OnEnter()
 	hudHolder2.Group("pause");
 
 	Entity triforce = reg.CreateEntity();
-	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, 0, 0);
+
+	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, GameState::totalTriforcePieces * 96, 0);
 	triforce.AddComponent<TransformComponent>(glm::vec2(325, 400), glm::vec2(4, 4), 0.0);
 	triforce.AddComponent<PauseComponent>();
-	triforce.Group("pause");
 
 	// Top Row Items
 	if (game.GetGameItems().woodBoomerang)

@@ -96,6 +96,8 @@ void BossPatrolState::OnExit (class Entity& entity)
 
 void BossPatrolState::Update (class Entity& entity)
 {
+	bool transition = false;
+
 	auto player = Registry::Instance().GetEntityByTag("player");
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 
@@ -107,7 +109,7 @@ void BossPatrolState::Update (class Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& esm = ai.GetEnemyStateMachine();
 	
-	if (walkTimer.GetTicks() > 2000)
+	if (transform.position.x <= startPos.x - 100)
 	{
 		if (rigid.left)
 		{
@@ -116,16 +118,26 @@ void BossPatrolState::Update (class Entity& entity)
 			rigid.up = false;
 			rigid.left = false;
 
+			transition = true;
 		}
-		else if (rigid.right)
+
+
+	}
+	else if (transform.position.x >= startPos.x)
+	{
+		if (rigid.right)
 		{
 			rigid.down = false;
 			rigid.right = false;
 			rigid.up = false;
 			rigid.left = true;
 
+			transition = true;
 		}
+	}
 
+	if (transition)
+	{
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "boss_scream_1", 0, -1);
 
 		ai.GetEnemyStateMachine().AddState(std::make_unique<BossIdleState>());
@@ -229,7 +241,19 @@ void BossDeathState::OnEnter(class Entity& entity)
 	animation.frameSpeedRate = 20;
 	animation.isLooped = false;
 	animation.vertical = false;
+
+	// Drop a new Full Heart // TODO: Add location --> For now just fall where the boss is
 	DropHeart(entity);
+
+	// Get the trap door entity
+	if (Registry::Instance().DoesTagExist("level1Door"))
+	{
+		auto trapDoor = Registry::Instance().GetEntityByTag("level1Door");
+		// Play door open sound
+		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "door_unlock", 0, 1);
+		trapDoor.Kill();
+	}
+
 }
 
 void BossDeathState::OnExit	(class Entity& entity)

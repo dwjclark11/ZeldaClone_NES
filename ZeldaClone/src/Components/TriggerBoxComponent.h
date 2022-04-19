@@ -18,9 +18,10 @@ public:
 		LOCKED_DOOR = 7,
 		HIDDEN_OBJECT = 8,
 		SHOP_ITEM = 9,
-		LADDER,
-		RAFT,
-		MONEY_GAME,
+		LADDER = 10,
+		RAFT = 11,
+		MONEY_GAME = 12,
+		TRAP_DOOR = 13,
 	};
 
 	TriggerType triggerType;
@@ -33,7 +34,9 @@ public:
 	bool collected;
 	bool collider;
 
-	TriggerBoxComponent(TriggerType trigger = TriggerType::NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0), bool collider = false)
+	std::string entityRemoveTag;
+
+	TriggerBoxComponent(TriggerType trigger = TriggerType::NO_TRIGGER, glm::vec2 offset = glm::vec2(0), glm::vec2 camera_offset = glm::vec2(0), bool collider = false, std::string entityRemoveTag = "")
 	{
 		this->triggerType = trigger;
 		this->transportOffset = offset;
@@ -42,5 +45,6 @@ public:
 		this->active = false;
 		this->collected = false;
 		this->collider = collider;
+		this->entityRemoveTag = entityRemoveTag;
 	}
 };

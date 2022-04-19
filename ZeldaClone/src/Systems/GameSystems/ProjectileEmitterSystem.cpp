@@ -34,7 +34,6 @@ void ProjectileEmitterSystem::ItemUsed()
 		// Bow uses rupees, must be greater than zero!
 		if (GameState::totalRupees > 0)
 		{
-			std::cout << projectileAttributeMap.at("bow").ToString() << std::endl;
 			UseItem(projectileAttributeMap.at("bow"));
 
 			// Play the arrow sound!
@@ -42,6 +41,7 @@ void ProjectileEmitterSystem::ItemUsed()
 			// Subtract from the total rupees when using the bow!
 			GameState::totalRupees--;
 		}
+
 		KeyboardControlSystem::keyDown = true;
 	}
 	else if (Game::mSelectedItem == Game::ItemType::BOMB)
@@ -52,6 +52,7 @@ void ProjectileEmitterSystem::ItemUsed()
 			GameState::totalBombs--;
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
 		}
+
 		KeyboardControlSystem::keyDown = true;
 	}
 	else if (Game::mSelectedItem == Game::ItemType::CANDLE)
@@ -237,7 +238,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 	if (attrib.animation)
 	{
 		// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
-		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 20, attrib.vertical, true);
+		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 10, attrib.vertical, true);
 	}
 	projectileEmitter.isFriendly = true;
 	newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);

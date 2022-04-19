@@ -18,7 +18,10 @@ public:
 	static int totalPrevBombs;
 	static int totalKeys;
 	static int totalPrevKeys;
+	static int totalTriforcePieces;
+	
 	static bool firstEntered;
+
 	static bool unpause;
 	static bool buyItem;
 

@@ -46,6 +46,7 @@ Assets =
 	{type = "soundFX", id = "boss_scream_1", 			file =   "./Assets/sounds/Boss_Scream1.wav"}, 
 	{type = "soundFX", id = "boss_hit", 				file =   "./Assets/sounds/Boss_Hit.wav"}, 
 	{type = "soundFX", id = "special_item", 			file =   "./Assets/sounds/Special_Item.wav"}, 
+	{type = "soundFX", id = "door_unlock", 			file =   "./Assets/sounds/Door_Unlock.wav"}, 
 	{type = "music",   id = "dungeon", 					file = "./Assets/Music/Dungeon_Theme.mp3"},
 	{type = "music",   id = "Overworld", 				file = "./Assets/Music/Overworld_Theme.mp3"},
 	

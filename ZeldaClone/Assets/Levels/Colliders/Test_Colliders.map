@@ -51,7 +51,6 @@ colliders 2240 2240 4 4 32 16 0 -32
 colliders 2240 2496 4 4 32 16 0 -32 
 colliders 2752 2496 4 4 32 16 0 -32 
 colliders 2752 2240 4 4 32 16 0 -32 
-colliders 1472 2368 4 4 16 16 0 -32 
 colliders 1472 1088 4 4 16 16 0 -32 
 colliders 1536 1152 4 4 16 16 0 -32 
 colliders 1600 1088 4 4 16 16 0 -32 

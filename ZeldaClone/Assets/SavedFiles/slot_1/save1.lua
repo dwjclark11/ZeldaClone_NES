@@ -17,17 +17,17 @@ player_data = {
         items = {
             boomerang = false,
             magic_boomerang = false,
-            wood_sword = false,
+            wood_sword = true,
             steel_sword = false,
             magic_sword = false,
             magic_rod = false,
-            candle = false,
+            candle = true,
             bombs = false,
             food = false,
             flute = false,
             raft = false,
             ladder = false,
-            bow_wood = false,
+            wood_bow = false,
             magic_shield = false,
             power_braclet = false,
             map = false,
@@ -37,7 +37,7 @@ player_data = {
         inventory = {
             num_rupees = 0,
             num_bombs = 0,
-            num_keys = 0
+            num_keys = 5
         }
     }
 }

@@ -1675,6 +1675,7 @@
     <None Include="libs\glm\gtx\wrap.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Assets\Levels\Entities\level_1_entities.lua" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Backgrounds\hearts_rupees.png">

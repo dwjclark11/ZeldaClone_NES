@@ -50,9 +50,11 @@
 
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
+
 bool GameState::firstEntered = false;
 bool GameState::unpause = false;
 bool GameState::buyItem = false;
+
 int GameState::scrollRupees = 0;
 int GameState::totalRupees = 0;
 int GameState::totalPrevRupees = 0;
@@ -60,6 +62,7 @@ int GameState::totalBombs = 0;
 int GameState::totalPrevBombs = 0;
 int GameState::totalKeys = 0;
 int GameState::totalPrevKeys = 0;
+int GameState::totalTriforcePieces = 0;
 
 GameState::GameState()
 	: game(Game::Instance()), reg(Registry::Instance()), cameraOffset(glm::vec2(0)), index(0)
@@ -342,7 +345,7 @@ void GameState::ConvertHUDNumbers()
 	if (totalKeys != totalPrevKeys || !game.GetPlayerCreated())
 	{
 		ConvertNumberParser("keys_tens", totalKeys, 1);
-		ConvertNumberParser("key_ones", totalKeys, 0);
+		ConvertNumberParser("keys_ones", totalKeys, 0);
 		totalPrevKeys = totalKeys;
 	}
 

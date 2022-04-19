@@ -5,7 +5,7 @@ enemies =
         group = "enemies",
         components = {
             transform = {
-                position = { x = 4672, y = 1600},
+                position = { x = 4700, y = 1600},
                 scale = { x = 4, y = 4},
                 rotation = {0}
             },
@@ -26,8 +26,8 @@ enemies =
                 offset = { x = 0, y = 0}
             },
             health = {
-                health_percentage = 9,
-                max_hearts = 3
+                health_percentage = 2,
+                max_hearts = 1
             },
             rigidbody = {
                 velocity = { x = 10, y = 0}

@@ -17,6 +17,7 @@ public:
 	// This is for the rock push and Raft Secrets/triggers
 	bool moveDown;
 	bool moveUp;
+
 	SecretComponent(std::string locationID = "none", std::string newTrigger = "none", std::string newSpriteAssetID = "none", int spriteWidth = 0, int spriteHeight = 0, int spriteSrcX = 0, int spriteSrcY = 0, glm::vec2 startPos = glm::vec2(0), bool moveUp = false, bool moveDown = false)
 	{
 		this->locationID = locationID;
@@ -27,7 +28,9 @@ public:
 		this->spriteSrcX = spriteSrcX;
 		this->spriteSrcY = spriteSrcY;
 		this->startPos = startPos;
+		
 		found = false;
+		
 		this->moveDown = moveDown;
 		this->moveUp = moveUp;
 	}

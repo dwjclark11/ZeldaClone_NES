@@ -1,6 +1,7 @@
 #pragma once
 #include "NewState.h"
 #include "../Utilities/Timer.h"
+#include <glm/glm.hpp>
 
 class Entity;
 
@@ -26,6 +27,8 @@ class BossPatrolState : public States
 {
 private:
 	Timer walkTimer;
+	glm::vec2 startPos = glm::vec2(4672, 1600);
+
 public:
 	virtual ~BossPatrolState() {};
 	void OnEnter(class Entity& entity) override;
