@@ -135,7 +135,7 @@ void GameState::Update(const float& deltaTime)
 	Registry::Instance().GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
 	Registry::Instance().GetSystem<AISystem>().Update();
 	Registry::Instance().GetSystem<CaptionSystem>().Update(deltaTime);
-	Registry::Instance().GetSystem<TriggerSystem>().Update();
+	Registry::Instance().GetSystem<TriggerSystem>().Update(deltaTime);
 
 	// Update the rupeeScroll 
 	if (scrollRupees > 0)
@@ -201,6 +201,7 @@ bool GameState::OnEnter()
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
 		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies_1");
+		loader.LoadEntitiesFromLuaTable(game.GetLuaState(), "over_world_entities");
 		loader.LoadColliders("overworld_colliders_1");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
 

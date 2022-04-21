@@ -44,7 +44,7 @@ void RenderCollisionSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
 
 void RenderCollisionSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		if (entity.HasComponent<ColliderComponent>() || entity.HasComponent<TriggerBoxComponent>())
 		{

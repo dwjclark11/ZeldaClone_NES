@@ -20,6 +20,11 @@ public:
 		GHINI,
 		LYNEL,
 		ZORA,
+		KEESE,
+		TRAP,
+		GEL,
+		STALFOS,
+		GORIYA,
 		NO_TYPE,
 	};
 	

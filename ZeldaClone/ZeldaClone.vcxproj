@@ -580,6 +580,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Levels\Entities\level_1_entities.lua" />
+    <None Include="Assets\Levels\Entities\over_world_entities.lua" />
     <None Include="libs\glm\detail\func_common.inl" />
     <None Include="libs\glm\detail\func_common_simd.inl" />
     <None Include="libs\glm\detail\func_exponential.inl" />

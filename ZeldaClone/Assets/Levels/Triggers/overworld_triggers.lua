@@ -94,7 +94,7 @@ triggers = {
 				asset_file			= "no_file",
 				enemy_file			= "Level1_enemies",
 				collider_file		= "Test_Colliders", 
-				tilemap_name 		= "Level_1_tiles",
+				tilemap_name 		= "Level_1_tiles_2",
 				tilemap_image   	= "level_1",
 				map_image   		= "Dungeon_Tiles",
 				entity_file			= "level_1_entities",
@@ -604,6 +604,44 @@ triggers = {
 			},
 			trigger_box  = { 
 				trigger_type		= "ladder",
+			},
+		}
+	},
+	-- Fairy Circle Trigger --> Near Level 1
+	[19] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 9626, y = 2460},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 64,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "fairy_circle",
+			},
+		}
+	},
+	-- Fairy Circle Trigger --> Near Lost Woods
+	[20] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 3408, y = 3136},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 64,
+				height 	 = 16,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "fairy_circle",
 			},
 		}
 	},

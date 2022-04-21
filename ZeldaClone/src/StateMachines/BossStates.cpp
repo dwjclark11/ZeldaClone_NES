@@ -38,27 +38,25 @@ void BossIdleState::Update(Entity& entity)
 	if (ai.GetBossType() == AIComponent::EnemyBossType::AQUAMENTUS)
 	{
 		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-
-		if (!projEmitter.shotTriggered)
+		
+		if (rigid.velocity == glm::vec2(0))
 		{
-			if (rigid.velocity == glm::vec2(0))
-			{
-				rigid.velocity = glm::vec2(-50, 0);
-				rigid.left = true;
-			}
-
-			if (rigid.down)
-				rigid.velocity = glm::vec2(0, 50);
-
-			if (rigid.up)
-				rigid.velocity = glm::vec2(0, -50);
-
-			if (rigid.right)
-				rigid.velocity = glm::vec2(50, 0);
-
-			if (rigid.left)
-				rigid.velocity = glm::vec2(-50, 0);
+			rigid.velocity = glm::vec2(-50, 0);
+			rigid.left = true;
 		}
+
+		if (rigid.down)
+			rigid.velocity = glm::vec2(0, 50);
+
+		if (rigid.up)
+			rigid.velocity = glm::vec2(0, -50);
+
+		if (rigid.right)
+			rigid.velocity = glm::vec2(50, 0);
+
+		if (rigid.left)
+			rigid.velocity = glm::vec2(-50, 0);
+		
 		if (rigid.velocity != glm::vec2(0, 0))
 		{
 			esm.AddState(std::make_unique<BossPatrolState>());
@@ -109,6 +107,8 @@ void BossPatrolState::Update (class Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& esm = ai.GetEnemyStateMachine();
 	
+	auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+
 	if (transform.position.x <= startPos.x - 100)
 	{
 		if (rigid.left)
@@ -135,6 +135,23 @@ void BossPatrolState::Update (class Entity& entity)
 			transition = true;
 		}
 	}
+
+	if (playerTransform.position.x > transform.position.x - 400 && playerTransform.position.x < transform.position.x + 400 &&
+		playerTransform.position.y > transform.position.y - 400 && playerTransform.position.y < transform.position.y + 400 && !projectileEmitter.timer.isStarted())
+	{
+		projectileEmitter.shotTriggered = true;
+		projectileEmitter.timer.Start();
+	}
+
+	// Check to see if the shot timer has started and passed the given ticks
+	if (projectileEmitter.timer.GetTicks() > 1000 && projectileEmitter.shotTriggered)
+	{
+		projectileEmitter.timer.Stop();
+		projectileEmitter.shotTriggered = false;
+		projectileEmitter.shotFired = false;
+	}
+
+
 
 	if (transition)
 	{

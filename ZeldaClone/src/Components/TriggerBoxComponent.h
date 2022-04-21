@@ -22,6 +22,7 @@ public:
 		RAFT = 11,
 		MONEY_GAME = 12,
 		TRAP_DOOR = 13,
+		FAIRY_CIRCLE = 14,
 	};
 
 	TriggerType triggerType;

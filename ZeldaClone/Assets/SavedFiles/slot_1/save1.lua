@@ -36,7 +36,7 @@ player_data = {
             master_key = false},
         inventory = {
             num_rupees = 0,
-            num_bombs = 0,
+            num_bombs = 5,
             num_keys = 5
         }
     }

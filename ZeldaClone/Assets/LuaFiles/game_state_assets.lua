@@ -19,6 +19,7 @@ Assets =
 	{type = "texture", id = "leever", 					file =  "./Assets/EnemySprites/leever.png"}, 
 	{type = "texture", id = "aquamentus", 				file =  "./Assets/EnemySprites/aquamentus.png"}, 
 	{type = "texture", id = "enemy_death", 				file =  "./Assets/EnemySprites/EnemyDeath.png"}, 
+	{type = "texture", id = "fire_ball", 				file =  "./Assets/EnemySprites/enemy_fire_ball.png"}, 
 	{type = "texture", id = "player_death", 			file =  "./Assets/PlayerSprites/player_death.png"}, 
 	{type = "texture", id = "numbers", 					file =  "./Assets/Fonts/numbers.png"}, 
 	{type = "texture", id = "full_heart", 				file =  "./Assets/ItemSprites/full_heart.png"}, 
@@ -46,7 +47,8 @@ Assets =
 	{type = "soundFX", id = "boss_scream_1", 			file =   "./Assets/sounds/Boss_Scream1.wav"}, 
 	{type = "soundFX", id = "boss_hit", 				file =   "./Assets/sounds/Boss_Hit.wav"}, 
 	{type = "soundFX", id = "special_item", 			file =   "./Assets/sounds/Special_Item.wav"}, 
-	{type = "soundFX", id = "door_unlock", 			file =   "./Assets/sounds/Door_Unlock.wav"}, 
+	{type = "soundFX", id = "door_unlock", 				file =   "./Assets/sounds/Door_Unlock.wav"}, 
+	{type = "soundFX", id = "refill_hearts", 			file =   "./Assets/sounds/Refill_Loop.wav"}, 
 	{type = "music",   id = "dungeon", 					file = "./Assets/Music/Dungeon_Theme.mp3"},
 	{type = "music",   id = "Overworld", 				file = "./Assets/Music/Overworld_Theme.mp3"},
 	

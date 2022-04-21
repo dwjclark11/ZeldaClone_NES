@@ -191,8 +191,6 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		game.SetSecretFound(secret.locationID, true);
 		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "secret", 0, -1);
 
-		// This needs to be moved to the save Screen!!
-		//loader.SaveSecrets();
 	
 	}
 	else if (secret.found && startup)
@@ -225,6 +223,8 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 
 TriggerSystem::TriggerSystem()
 	: game(Game::Instance())
+	, angle(0.f)
+	, heartOffset(0.f)
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
@@ -409,13 +409,16 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 		else
 		{
+	
 			playerTransform.position = trig.transportOffset;
 			game.GetCamera().x = trig.cameraOffset.x;
 			game.GetCamera().y = trig.cameraOffset.y;
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
+
 			// Finish the fade screen 
 			game.StartFadeOut(false);
 			game.StartFadeIn(true);
+
 		}
 		break;
 	
@@ -468,6 +471,21 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		{
 			SecretTrigger(trigger);
 
+			// Check to see if there is a Trap door or something else to remove
+			const auto& removeTag = trig.entityRemoveTag;
+			if (removeTag != "")
+			{
+				if (Registry::Instance().DoesTagExist(removeTag))
+				{
+					auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+
+					SecretTrigger(removedEntity);
+					// Remove the entity
+					removedEntity.Kill();
+				}
+			}
+
+
 			// After the new trigger is created, remove the current trigger!
 			trigger.Kill();
 		}
@@ -482,7 +500,18 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "door_unlock", 0, 1);
 			// Decrement total number of keys
 			GameState::totalKeys--;
-			// Remove the door
+
+			// Check to see if there is a sister door to remove
+			const auto& removeTag = trig.entityRemoveTag;
+			if (removeTag != "")
+			{
+				auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+				
+				// Remove/Kill the sister door
+				removedEntity.Kill();
+			}
+
+			// Remove the keyed door
 			trigger.Kill();
 		}
 		
@@ -615,118 +644,231 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		Logger::Err("Touching a trap door!!");
 		break;
 	}
+	case TriggerBoxComponent::TriggerType::FAIRY_CIRCLE:
+	{
+		auto& playerHealth = player.GetComponent<HealthComponent>();
+		// If the player's health is already at max, no need to start the fairy circle trigger
+		if (playerHealth.healthPercentage != playerHealth.maxHearts * 2)
+		{
+			for (const auto& fairy : Registry::Instance().GetEntitiesByGroup("fairy"))
+			{
+				// Get the fairy transform. It will be used to check against player position and 
+				// to position the circling hearts
+				auto& fairyTransform = fairy.GetComponent<TransformComponent>();
+				const int checkX = fairyTransform.position.x / 1024;
+				const int checkY = fairyTransform.position.y / 672;
+
+
+				// Check to see if the fairy is in the same panel as the player
+				if (checkX != game.GetPlayerPos().x || checkY != game.GetPlayerPos().y)
+					continue;
+
+				auto& fairyTrig = trigger.GetComponent<TriggerBoxComponent>();
+				// If the trigger is already active, the hearts would have already been created
+				if (fairyTrig.active)
+					continue;
+
+				// Set the fairy trigger to active
+				fairyTrig.active = true;
+
+				// There are Eight Hearts that Circle the fairy
+				for (int i = 0; i < 8; i++)
+				{
+					// Create a new Heart entity to circle the fairy
+					auto fairyHeart = Registry::Instance().CreateEntity();;
+					fairyHeart.Group("fairy_hearts");
+					fairyHeart.AddComponent<TransformComponent>(fairyTransform.position, fairyTransform.scale);
+					fairyHeart.AddComponent<SpriteComponent>("hearts", 16, 16, 2, false, 0, 0);
+					fairyHeart.AddComponent<GameComponent>();
+				}
+			}
+		}
+
+		break;
+	}
 	default:
 		break;
 	}
 }
 
-void TriggerSystem::Update()
+void TriggerSystem::Update(const float& dt)
 {
 	for (const auto& entity : GetSystemEntities())
 	{
-		if (entity.HasComponent<TriggerBoxComponent>())
-		{
-			// Get the player
-			auto player = Registry::Instance().GetEntityByTag("player");
-			auto& playerTransform = player.GetComponent<TransformComponent>();
+		// Get the player
+		auto player = Registry::Instance().GetEntityByTag("player");
+		auto& playerTransform = player.GetComponent<TransformComponent>();
 
-			auto& transform = entity.GetComponent<TransformComponent>();
+		auto& transform = entity.GetComponent<TransformComponent>();
 			
-			auto sprite = SpriteComponent(); 
+		auto sprite = SpriteComponent(); 
 
-			if (entity.HasComponent<SpriteComponent>())
-				sprite = entity.GetComponent<SpriteComponent>();
+		if (entity.HasComponent<SpriteComponent>())
+			sprite = entity.GetComponent<SpriteComponent>();
 
-			auto& trig = entity.GetComponent<TriggerBoxComponent>();
+		auto& trig = entity.GetComponent<TriggerBoxComponent>();
 				
-			if (trig.active && entity.HasComponent<SecretComponent>())
+		if (trig.active && entity.HasComponent<SecretComponent>())
+		{
+			auto& secret = entity.GetComponent<SecretComponent>();
+
+			// If the secret has already been found, nothing to do
+			if (secret.found)
+				continue;
+
+			if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS)
 			{
-				auto& secret = entity.GetComponent<SecretComponent>();
-
-				// If the secret has already been found, nothing to do
-				if (secret.found)
-					continue;
-
-				if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS)
+				// Move the Block/Rock Up until it reaches its max position
+				if (transform.position.y > secret.startPos.y - sprite.width * Game::gameScale && secret.moveUp)
 				{
-					// Move the Block/Rock Up until it reaches its max position
-					if (transform.position.y > secret.startPos.y - sprite.width * Game::gameScale && secret.moveUp)
-					{
-						transform.position.y--;
-					}
-					// Move the Block/Rock Down until it reaches its max position
-					else if (transform.position.y < secret.startPos.y + sprite.width * Game::gameScale && secret.moveDown)
-					{
-						transform.position.y++;
-					}
-					else
-					{
-						secret.found = true;
+					transform.position.y--;
+				}
+				// Move the Block/Rock Down until it reaches its max position
+				else if (transform.position.y < secret.startPos.y + sprite.width * Game::gameScale && secret.moveDown)
+				{
+					transform.position.y++;
+				}
+				else
+				{
+					secret.found = true;
 
-						// Check to see if there is a Trap door or something else to remove
-						const auto & removeTag = trig.entityRemoveTag;
-						if (removeTag != "")
+					// Check to see if there is a Trap door or something else to remove
+					const auto & removeTag = trig.entityRemoveTag;
+					if (removeTag != "")
+					{
+						if (Registry::Instance().DoesTagExist(removeTag))
 						{
-							if (Registry::Instance().DoesTagExist(removeTag))
+							auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+
+							if (removedEntity.HasComponent<TriggerBoxComponent>())
 							{
-								auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
-
-								if (removedEntity.HasComponent<TriggerBoxComponent>())
+								const auto& triggerType = removedEntity.GetComponent<TriggerBoxComponent>().triggerType;
+								if (triggerType == TriggerBoxComponent::TriggerType::TRAP_DOOR)
 								{
-									const auto& triggerType = removedEntity.GetComponent<TriggerBoxComponent>().triggerType;
-									if (triggerType == TriggerBoxComponent::TriggerType::TRAP_DOOR)
-									{
-										Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "door_unlock", 0, -1);
-									}
+									Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "door_unlock", 0, -1);
 								}
-								// Remove the entity
-								removedEntity.Kill();
 							}
+							// Remove the entity
+							removedEntity.Kill();
 						}
-					}
-				}
-				else if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT)
-				{
-					auto raft = Registry::Instance().GetEntityByTag("raft");
-					auto& raftTransform = raft.GetComponent<TransformComponent>();
-
-					if (secret.moveUp && KeyboardControlSystem::dir == UP)
-					{
-						playerTransform.position.y -= 200 * game.GetDeltaTime();
-						raftTransform.position.y -= 200 * game.GetDeltaTime();
-						if (playerTransform.position.y <= trig.transportOffset.y)
-						{
-							trig.active = false;
-							game.SetOnRaft(false);
-							raft.Kill();
-						}
-					}
-					else if (secret.moveDown && KeyboardControlSystem::dir == DOWN)
-					{
-						playerTransform.position.y += 200 * game.GetDeltaTime();
-						raftTransform.position.y += 200 * game.GetDeltaTime();
-
-						if (playerTransform.position.y >= trig.transportOffset.y)
-						{
-							trig.active = false;
-							game.SetOnRaft(false);
-							raft.Kill();
-						}
-					}
-				}
-				else if (trig.triggerType == TriggerBoxComponent::TriggerType::LADDER)
-				{
-					if (playerTransform.position.x < transform.position.x - 64 ||
-						playerTransform.position.x > transform.position.x + 32)
-					{
-						auto ladder = Registry::Instance().GetEntityByTag("ladder");
-						trig.active = false;
-						ladder.Kill();
 					}
 				}
 			}
+			else if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT)
+			{
+				auto raft = Registry::Instance().GetEntityByTag("raft");
+				auto& raftTransform = raft.GetComponent<TransformComponent>();
+
+				if (secret.moveUp && KeyboardControlSystem::dir == UP)
+				{
+					playerTransform.position.y -= 200 * game.GetDeltaTime();
+					raftTransform.position.y -= 200 * game.GetDeltaTime();
+					if (playerTransform.position.y <= trig.transportOffset.y)
+					{
+						trig.active = false;
+						game.SetOnRaft(false);
+						raft.Kill();
+					}
+				}
+				else if (secret.moveDown && KeyboardControlSystem::dir == DOWN)
+				{
+					playerTransform.position.y += 200 * game.GetDeltaTime();
+					raftTransform.position.y += 200 * game.GetDeltaTime();
+
+					if (playerTransform.position.y >= trig.transportOffset.y)
+					{
+						trig.active = false;
+						game.SetOnRaft(false);
+						raft.Kill();
+					}
+				}
+			}
+			else if (trig.triggerType == TriggerBoxComponent::TriggerType::LADDER)
+			{
+				if (playerTransform.position.x < transform.position.x - 64 ||
+					playerTransform.position.x > transform.position.x + 32)
+				{
+					auto ladder = Registry::Instance().GetEntityByTag("ladder");
+					trig.active = false;
+					ladder.Kill();
+				}
+			}
 		}
-		else
-			continue;
+		else if (trig.active && trig.triggerType == TriggerBoxComponent::TriggerType::FAIRY_CIRCLE)
+		{
+			auto& playerHealth = player.GetComponent<HealthComponent>();
+
+			// Temp variable
+			static int x = 0;
+
+			// Check to see if the player has full health, if so, leave the loop
+			if (playerHealth.healthPercentage != playerHealth.maxHearts * 2)
+			{
+				if (!trig.collectedTimer.isStarted())
+					trig.collectedTimer.Start();
+
+				
+
+				// Increment the player health after a certain interval
+				if (trig.collectedTimer.GetTicks() > 1000 * x)
+				{
+					playerHealth.healthPercentage += 1;
+					x++;
+				}
+
+				// Play the refill sound
+				if (Mix_Playing(6) == 0)
+					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "refill_hearts", 0, 6);
+			}
+			else
+			{
+				// Reset the trigger
+				trig.active = false;
+				// Reset the trigger timer
+				trig.collectedTimer.Stop();
+				// Remove All the created hearts
+				for (auto& heart : Registry::Instance().GetEntitiesByGroup("fairy_hearts"))
+				{
+					heart.Kill();
+				}
+
+				x = 0;
+				// Leave the loop
+				continue;
+			}
+				
+			// Increment the angle for the circle motion calculation
+			angle += 0.05f;
+
+			for (const auto& fairy : Registry::Instance().GetEntitiesByGroup("fairy"))
+			{
+				// Get the fairy transform. It will be used to check against player position and 
+				// to position the circling hearts
+				auto& fairyTransform = fairy.GetComponent<TransformComponent>();
+				const int checkX = fairyTransform.position.x / 1024;
+				const int checkY = fairyTransform.position.y / 672;
+
+
+				// Check to see if the fairy is in the same panel as the player
+				if (checkX != game.GetPlayerPos().x || checkY != game.GetPlayerPos().y)
+					continue;
+
+				// Loop through the 8 Circling hearts and change their position around the fairy, 
+				// The fairy's position is the center of the circle
+				for (auto& heart : Registry::Instance().GetEntitiesByGroup("fairy_hearts"))
+				{
+					auto& heartsTransform = heart.GetComponent<TransformComponent>();
+
+					// Move the heart in a circular motion
+					heartsTransform.position = glm::vec2((fairyTransform.position.x) + (cos(angle + heartOffset) * 288), (fairyTransform.position.y) + (sin(angle + heartOffset) * 288));
+					
+					// This is for offsetting each heart
+					heartOffset += 0.75f;
+
+				}
+				// Reset the heart offset back to zero so we can restart we we come back into the for loop
+				heartOffset = 0.f;
+			}
+		}
 	}
 }

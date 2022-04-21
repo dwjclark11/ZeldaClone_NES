@@ -58,16 +58,16 @@ void EnemyIdleState::Update(Entity& entity)
 		if (!projEmitter.shotTriggered)
 		{
 			if (rigid.down)
-				rigid.velocity = glm::vec2(0, 50);
+				rigid.velocity = glm::vec2(0, 150);
 
 			if (rigid.up)
-				rigid.velocity = glm::vec2(0, -50);
+				rigid.velocity = glm::vec2(0, -150);
 
 			if (rigid.right)
-				rigid.velocity = glm::vec2(50, 0);
+				rigid.velocity = glm::vec2(150, 0);
 
 			if (rigid.left)
-				rigid.velocity = glm::vec2(-50, 0);
+				rigid.velocity = glm::vec2(-150, 0);
 		}
 		if (rigid.velocity != glm::vec2(0, 0))
 		{
@@ -204,23 +204,24 @@ void PatrolState::Update(Entity& entity)
 		srand(time(NULL));
 		int num = rand() % 2 + 1;
 
+		sign = num > 1 ? 1 : -1;
 
 		// Set the direction of the enemy randomly
-		if (num > 1)
+	/*	if (num > 1)
 			sign = 1;
 		else
-			sign = -1;
+			sign = -1;*/
 
 		if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
 		{
 			if (rigid.down)
-				rigid.velocity = glm::vec2(sign * 50, 0);
+				rigid.velocity = glm::vec2(sign * 150, 0);
 			else if (rigid.up)
-				rigid.velocity = glm::vec2(sign * 50, 0);
+				rigid.velocity = glm::vec2(sign * 150, 0);
 			else if (rigid.left)
-				rigid.velocity = glm::vec2(0, sign * 50);
+				rigid.velocity = glm::vec2(0, sign * 150);
 			else if (rigid.right)
-				rigid.velocity = glm::vec2(0, sign * 50);
+				rigid.velocity = glm::vec2(0, sign * 150);
 		}
 		else
 		{

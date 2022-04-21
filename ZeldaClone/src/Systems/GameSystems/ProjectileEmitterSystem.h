@@ -155,5 +155,6 @@ public:
 	void OnBtnPressed(GamePadButtonPressedEvent& event);
 	void Update(Registry& registry);
 	void EnemyProjectileUpdate(Entity& entity);
+	void BossProjectileUpdate(Entity& entity);
 	void UpdateBoomerang(Entity& entity);
 };

@@ -665,6 +665,8 @@ TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::st
 		return TriggerBoxComponent::TriggerType::MONEY_GAME;
 	else if (type == "trap_door")
 		return TriggerBoxComponent::TriggerType::TRAP_DOOR;
+	else if (type == "fairy_circle")
+		return TriggerBoxComponent::TriggerType::FAIRY_CIRCLE;
 	else 
 		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
 }
@@ -691,9 +693,18 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 		return AIComponent::EnemyType::LYNEL;
 	else if (enemyType == "zora")
 		return AIComponent::EnemyType::ZORA;
+	else if (enemyType == "keese")
+		return AIComponent::EnemyType::KEESE;
+	else if (enemyType == "trap")
+		return AIComponent::EnemyType::TRAP;
+	else if (enemyType == "stalfos")
+		return AIComponent::EnemyType::STALFOS;
+	else if (enemyType == "goriya")
+		return AIComponent::EnemyType::GORIYA;
 	else
 		return AIComponent::EnemyType::NO_TYPE;
 }
+
 
 AIComponent::EnemyBossType LevelLoader::ConvertStringToEnemyBossType(std::string bossType)
 {

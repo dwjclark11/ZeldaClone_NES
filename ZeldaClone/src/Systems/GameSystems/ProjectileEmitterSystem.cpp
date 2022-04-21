@@ -495,7 +495,15 @@ void ProjectileEmitterSystem::Update(Registry& registry)
 
 		// Check the enemy projectile 
 		if (entity.BelongsToGroup("enemies"))
-			EnemyProjectileUpdate(entity);
+		{
+			const auto& ai = entity.GetComponent<AIComponent>();
+			// If the entity is just a regular enmemy, use this update
+			if (ai.GetEnemyType() != AIComponent::EnemyType::NO_TYPE)
+				EnemyProjectileUpdate(entity);
+			// If the entity is Boss, use this update
+			if (ai.GetBossType() != AIComponent::EnemyBossType::NOT_A_BOSS)
+				BossProjectileUpdate(entity);
+		}
 	}
 }
 
@@ -594,6 +602,73 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 		enemyProjectile.AddComponent<GameComponent>();
 
 		projectileEmitter.shotFired = true;
+	}
+}
+
+void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
+{
+	// Player variables
+	auto player = Registry::Instance().GetEntityByTag("player");
+	auto& playerPos = player.GetComponent<TransformComponent>();
+
+	// Boss Variables
+	auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+	auto& projectileTransform = entity.GetComponent<TransformComponent>();
+	auto& rigid = entity.GetComponent<RigidBodyComponent>();
+	const auto& ai = entity.GetComponent<AIComponent>();
+
+	if (ai.GetBossType() == AIComponent::EnemyBossType::AQUAMENTUS)
+	{
+		if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
+		{
+			Entity enemyProjectile = entity.registry->CreateEntity();
+			Entity enemyProjectile2 = entity.registry->CreateEntity();
+			Entity enemyProjectile3 = entity.registry->CreateEntity();
+
+			// Have the fireball change direction based on the player position
+			glm::vec2 direction = glm::normalize(playerPos.position - projectileTransform.position);
+
+
+			enemyProjectile.Group("projectile");
+			enemyProjectile.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x, projectileTransform.position.y), glm::vec2(4, 4), 0.0);
+
+			enemyProjectile.AddComponent<RigidBodyComponent>(glm::vec2(direction.x * 300, direction.y * 300));
+			enemyProjectile.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
+
+			projectileEmitter.isFriendly = false;
+			enemyProjectile.AddComponent<SpriteComponent>("fire_ball", 16, 16, 2, false, 0, 0);
+			enemyProjectile.AddComponent<AnimationComponent>(4, 20, false, true, 0);
+			enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+			enemyProjectile.AddComponent<GameComponent>();
+
+			enemyProjectile2.Group("projectile");
+			enemyProjectile2.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x, projectileTransform.position.y), glm::vec2(4, 4), 0.0);
+
+			enemyProjectile2.AddComponent<RigidBodyComponent>(glm::vec2(direction.x * 300, direction.y * 400));
+			enemyProjectile2.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
+
+			projectileEmitter.isFriendly = false;
+			enemyProjectile2.AddComponent<SpriteComponent>("fire_ball", 16, 16, 2, false, 0, 0);
+			enemyProjectile2.AddComponent<AnimationComponent>(4, 20, false, true, 0);
+			enemyProjectile2.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+			enemyProjectile2.AddComponent<GameComponent>();
+
+			enemyProjectile3.Group("projectile");
+			enemyProjectile3.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x, projectileTransform.position.y), glm::vec2(4, 4), 0.0);
+
+			enemyProjectile3.AddComponent<RigidBodyComponent>(glm::vec2(direction.x * 300, direction.y * -300));
+			enemyProjectile3.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
+
+			projectileEmitter.isFriendly = false;
+			enemyProjectile3.AddComponent<SpriteComponent>("fire_ball", 16, 16, 2, false, 0, 0);
+			enemyProjectile3.AddComponent<AnimationComponent>(4, 20, false, true, 0);
+			enemyProjectile3.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+			enemyProjectile3.AddComponent<GameComponent>();
+
+
+
+			projectileEmitter.shotFired = true;
+		}
 	}
 }
 
