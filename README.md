@@ -100,10 +100,9 @@ Some of the desired changes are:
 
 ## There are still a lot of bugs that must be fixed to have a properly working demo
 Some of the bugs are as follows:
-* ~~SDL Window crashes when mouse goes outside of the zero boundaries -> Works fine otherwise~~ Fixed.
-* ~~When changing scenes, there are issues removing mass entities.~~ Fixed.
-* ~~Game is really slow in Debug mode. Release mode runs pretty good.~~ Fixed
-* ~~Game does not really work properly. You can kill enemies and collect items; however, the removal of entities when changing scenes is having undesired results.~~ Fixed.
+* Sometimes the player/enemies go through colliders/walls after getting hit.
+* Enemies can leave the screen the player is on 
+    *  Maybe create an enemy collider that reflects them in the opposite direction? 
 
 ## Dustin 
 
