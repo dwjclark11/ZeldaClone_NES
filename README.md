@@ -39,14 +39,21 @@ This project is created with:
 
 ## User Experience
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
-- New Video
+- New Video - Basic Gameplay
 
 
 https://user-images.githubusercontent.com/63356975/163869073-acae6d9b-0948-48d3-aecb-b369309f7278.mp4
 
 
+- Fairy Fountain
 
-- Old Video
+
+https://user-images.githubusercontent.com/63356975/164451922-1915021e-952e-4653-a596-64e2b1feb660.mp4
+
+
+
+- Oldest Video
+
 https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
 
 ## Tilemap Editor Controls
