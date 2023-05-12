@@ -63,8 +63,10 @@ public:
 	// Manage entity tags and groups
 	void Tag(const std::string& tag);
 	bool HasTag(const std::string& tag) const;
+	const std::vector<std::string>& GetTags() const;
 	void Group(const std::string& group);
 	bool BelongsToGroup(const std::string& group) const;
+
 
 	// Manage Entity components
 	template <typename TComponent, typename ...TArgs> void AddComponent(TArgs&& ...args);
@@ -87,13 +89,13 @@ private:
 	std::vector<Entity>		entities;
 
 public:
-	System() = default;
+	System() { entities.reserve(5000); }
 	~System() = default;
 
-	void							AddEntityToSystem(Entity entity);
-	void							RemoveEntityFromSystem(Entity entity);
+	void AddEntityToSystem(Entity entity);
+	void RemoveEntityFromSystem(Entity entity);
 
-	std::vector<Entity>				GetSystemEntities() const;
+	std::vector<Entity> GetSystemEntities();
 	const Signature& GetComponentSignature() const;
 
 	// Defines the component type that entities must have to be considered by the system
@@ -208,7 +210,6 @@ public:
 	{
 		if (entityIDToIndex.find(entityID) != entityIDToIndex.end())
 		{
-			//Logger::Log("Entity Removed: " + std::to_string(entityID));
 			Remove(entityID);
 		}
 	}
@@ -237,7 +238,7 @@ class Registry
 private:
 	// Keep track of how many entities were added to the scene
 	int numEntities = 0;
-	int entityID;
+	int mEntityID;
 	std::set<Entity> entitiesToBeAdded; // Entities awaitng creation in the next Registry Update()
 	std::set<Entity> entitiesToBeKilled; // Entities awaitng destruction in the next Registry Update()
 
@@ -259,19 +260,29 @@ private:
 
 	// Entity tags (one tag name per entity)
 	std::unordered_map<std::string, Entity> entityPerTag;
-	std::unordered_map<int, std::string> tagPerEntity; // Int is used to go by ID #
+	std::unordered_map<int, std::vector<std::string>> tagPerEntity; // Int is used to go by ID #
 
 	// Entiy groups (a set of entities per group name)
 	std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
-	std::unordered_map<int, std::string> groupPerEntity;;
+
+	std::unordered_map<int, std::vector<std::string>> groupPerEntity;;
 
 	//static Registry* instance;
 	static std::unique_ptr<Registry> instance;
+
+	// My test entities
+	std::vector<Entity> entities;
+
+
+	void AddEntities();
+	void RemoveEntities();
+
 public:
 	// Management of entities, systems, and components
-	Registry() : entityID(1)
+	Registry() : mEntityID(1)
 	{
 		Logger::Log("Registry Constructor Called");
+		entities.reserve(5000);
 	}
 	~Registry()
 	{
@@ -288,10 +299,15 @@ public:
 	void RemoveEntityFromSystems(Entity entity);
 
 	void Update();
-	void RemoveEntityFromPool(Entity entity);
+
 	// Tag Management 
 	void TagEntity(Entity entity, const std::string& tag);
 	bool EntityHasTag(Entity entity, const std::string& tag) const;
+	const std::vector<std::string>& GetEntityTags(const Entity& entity) const;
+
+	std::vector<std::string> GetEntityGroups(const Entity& entity);
+
+
 	bool DoesTagExist(const std::string& tag) const;
 	Entity GetEntityByTag(const std::string& tag) const;
 	void RemoveEntityTag(Entity entity);
@@ -300,16 +316,16 @@ public:
 	void GroupEntity(Entity entity, const std::string& group);
 	bool EntityBelongsToGroup(Entity entity, const std::string& group) const;
 	std::vector<Entity> GetEntitiesByGroup(const std::string& group) const;
+
 	bool DoesGroupExist(const std::string& group) const;
+
 	void RemoveEntityGroup(Entity entity);
 	std::set<Entity> GetEntitiesToBeKilled() const { return entitiesToBeKilled; }
-	
-	//static Registry* Instance();
+
 	static Registry& Instance();
-	//static void ReleaseInstance();
-	
-	
-	
+
+	Entity GetEntityFromID(int id);
+
 	// Component Management Functions
 	// Function template to add a componenet of type T to a given entity
 	template <typename TComponent, typename ...TArgs> void AddComponent(Entity entity, TArgs&& ...args);
@@ -353,7 +369,7 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args)
 		std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
 		componentPools[componentID] = newComponentPool;
 	}
-	//std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentID]);
+
 	std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentID]);
 
 	// Create a new Component object of type TComponent, and forward the various parameters to the constructor
@@ -364,10 +380,6 @@ void Registry::AddComponent(Entity entity, TArgs&& ...args)
 
 	// Finally, change the component signature of the entity and set the component ID on the bitset to 1
 	entityComponentSignatures[entityID].set(componentID);
-
-	//Logger::Log("Component ID = " + std::to_string(componentID) + " was added to entity ID: " + std::to_string(entityID));
-
-	 //std::cout << "COMPONENT ID = " << componentID << " --> POOL SIZEL " << componentPool->GetSize() << std::endl;
 }
 
 template <typename TComponent>
@@ -382,8 +394,6 @@ void Registry::RemoveComponent(Entity entity)
 
 	// Set this component signature for that entity to false
 	entityComponentSignatures[entityID].set(componentID, false);
-
-	//Logger::Log("Component ID = " + std::to_string(componentID) + " was Removed to entity ID: " + std::to_string(entityID));
 }
 
 template <typename TComponent>
@@ -407,9 +417,23 @@ inline TComponent& Registry::GetComponent(Entity entity) const
 }
 
 // System Templates
+template<typename TSystem>
+inline bool Registry::HasSystem()
+{
+	/*
+		Find for the key and the pointer is different than the last end pointer
+		Than this is the key
+	*/
+
+	return systems.find(std::type_index(typeid(TSystem))) != systems.end();
+}
+
 template<typename TSystem, typename ...TArgs>
 inline void Registry::AddSystem(TArgs && ...args)
 {
+	if (HasSystem<TSystem>())
+		return;
+
 	std::shared_ptr<TSystem> newSystem = std::make_shared<TSystem>(std::forward_as_tuple<TArgs>(args)...);
 	systems.insert(std::make_pair(std::type_index(typeid(TSystem)), newSystem)); // Adding a new Key value to the sytem data structure
 }
@@ -421,16 +445,7 @@ inline void Registry::RemoveSystem()
 	systems.erase(system); // remove that system
 }
 
-template<typename TSystem>
-inline bool Registry::HasSystem()
-{
-	/*
-		Find for the key and the pointer is different than the last end pointer
-		Than this is the key
-	*/
 
-	return systems.find(std::type_index(typeid(TSystem))) != systems.end();
-}
 
 template<typename TSystem>
 inline TSystem& Registry::GetSystem() const
@@ -447,7 +462,6 @@ inline TSystem& Registry::GetSystem() const
 template<typename TComponent, typename ...TArgs>
 inline void Entity::AddComponent(TArgs && ...args)
 {
-	//registry->AddComponent<TComponent>(*this); // try this later
 	registry->AddComponent<TComponent>(*this, std::forward<TArgs>(args)...);
 }
 
