@@ -135,7 +135,7 @@ items = {
 	}, 
 	[6] = {
 		name 				= "beam",
-		group 				= "beam",
+		group 				= "projectile",
 		asset_id 			= "Sword",
 		width 				= 32,
 		height 				= 32, 

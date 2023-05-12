@@ -15,13 +15,13 @@ moblin = {
             src_offset  = { x = 0, y = 0 }
         },
         box_collider = {
-            width       = 32,
-            height      = 32,
-            offset      = { x = 0, y = 0 }
+            width       = 12,
+            height      = 12,
+            offset      = { x = 12, y = 12 }
         },
         health = {
-            health_percentage = 9,
-            max_hearts = 3
+            health_percentage = 2,
+            max_hearts = 1
         },
         rigid_body = {
             velocity = { x = 50, y = 0}

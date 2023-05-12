@@ -115,7 +115,7 @@ triggers =
             scene_change = {
 				level_music			= "Overworld",
 				asset_file			= "game_state_assets",
-				enemy_file			= "overworld_enemies",
+				enemy_file			= "overworld_enemies_2",
 				collider_file		= "overworld_colliders_1", 
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "map",
@@ -125,8 +125,8 @@ triggers =
 				image_height		= 1344
             },
 		}
-	},
-    -- First Locked Door 
+	},--]]
+    -- [[ First Locked Door 
     [5] = {
         group = "trigger",
         components = {
@@ -158,8 +158,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Trap door - 6 bats
+    },--]]
+    -- [[ Trap door - 6 bats
     [6] = {
         group = "trigger",
         components = {
@@ -191,8 +191,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Trap door - To old man
+    },--]]
+    -- [[ Trap door - To old man
     [7] = {
         tag = "td_eagle_old_man",
         group = "trigger",
@@ -225,8 +225,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Trap door - Boss Door to triforce
+    },--]]
+    -- [[ Trap door - Boss Door to triforce
     [8] = {
         tag = "level1Door",
         group = "trigger",
@@ -259,8 +259,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Boss Locked Door 
+    },--]]
+    -- [[ Boss Locked Door 
     [9] = {
         group = "trigger",
         components = {
@@ -292,7 +292,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
+    },--]]
+    -- [[
     [10] = 
     {
         group = "secret",
@@ -336,8 +337,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Bomb Secret - First Side Bomb Wall 
+    },--]]
+    -- [[ Bomb Secret - First Side Bomb Wall 
 	[11] = {
         tag = "bomb_eagle_1",
 		group = "secret",
@@ -369,8 +370,8 @@ triggers =
 				sprite_src_y		= 80
 			},
 		}
-	},	
-    -- Bomb Secret - Second Side Bomb Wall 
+	},	--]]
+    -- [[ Bomb Secret - Second Side Bomb Wall 
 	[12] = {
         tag = "bomb_eagle_2",
 		group = "secret",
@@ -402,8 +403,8 @@ triggers =
 				sprite_src_y		= 80
 			},
 		}
-	},
-    -- Locked Door - 3
+	},--]]
+    -- [[ Locked Door - 3
     [13] = {
         tag = "door_eagle_3",
         group = "trigger",
@@ -437,8 +438,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Locked Door - 4
+    },--]]
+    -- [[ Locked Door - 4
     [14] = {
         tag = "door_eagle_4",
         group = "trigger",
@@ -472,8 +473,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Locked Door - 5
+    },--]]
+    -- [[ Locked Door - 5
     [15] = {
         tag = "door_eagle_5",
         group = "trigger",
@@ -507,8 +508,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-        -- Locked Door - 6
+    },--]]
+    -- [[ Locked Door - 6
     [16] = {
         tag = "door_eagle_6",
         group = "trigger",
@@ -542,8 +543,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Locked Door - 7
+    },--]]
+    -- [[Locked Door - 7
     [17] = {
         tag = "door_eagle_7",
         group = "trigger",
@@ -577,8 +578,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Locked Door - 8
+    },--]]
+    -- [[Locked Door - 8
     [18] = {
         tag = "door_eagle_8",
         group = "trigger",
@@ -612,8 +613,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Locked Door - 9
+    },--]]
+    -- [[Locked Door - 9
     [19] = {
         tag = "door_eagle_9",
         group = "trigger",
@@ -647,8 +648,8 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
-    -- Locked Door - 10
+    },--]]
+    -- [[Locked Door - 10
     [20] = {
         tag = "door_eagle_10",
         group = "trigger",
@@ -682,5 +683,5 @@ triggers =
                 offset = {x = 0,y = 0}
             }
         }
-    },
+    },--]]
 }

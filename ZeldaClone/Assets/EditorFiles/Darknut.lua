@@ -15,13 +15,13 @@ darknut = {
             src_offset  = { x = 0, y = 0 }
         },
         box_collider = {
-            width       = 16,
-            height      = 16,
-            offset      = { x = 0, y = 0 }
+            width       = 10,
+            height      = 10,
+            offset      = { x = 10, y = 10 }
         },
         health = {
-            health_percentage = 9,
-            max_hearts = 3
+            health_percentage = 2,
+            max_hearts = 1
         },
         rigid_body = {
             velocity = { x = 75, y = 0}
@@ -33,9 +33,6 @@ darknut = {
             looped = true,
             frame_offset = 0
         }, 
-        projectile_emitter = {
-			
-        },
         ai_component = {
                 enemy_pos = { x = 0,  y = 0},
                 enemy_type = "darknut",

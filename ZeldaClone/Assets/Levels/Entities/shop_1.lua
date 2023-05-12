@@ -216,7 +216,7 @@ level = {
 		components = {
 			caption = {
 				captions = "Buy Somethin' will ya!",
-				x_pos = 200,
+				x_pos = 150,
 				y_pos = 135,
 				num_frames = 21,
 			},
@@ -228,6 +228,7 @@ level = {
 		components = {
 			caption = {
 				captions = "130",
+				is_number = true,
 				scrollable = false,
 				x_pos = 284,
 				y_pos = 400,
@@ -240,6 +241,7 @@ level = {
 		components = {
 			caption = {
 				captions = "20",
+				is_number = true,
 				scrollable = false,
 				x_pos = 480,
 				y_pos = 400,
@@ -252,6 +254,7 @@ level = {
 		components = {
 			caption = {
 				captions = "80",
+				is_number = true,
 				scrollable = false,
 				x_pos = 660,
 				y_pos = 400,
@@ -265,10 +268,9 @@ level = {
 			caption = {
 				captions = "X",
 				scrollable = false,
-				numbers = false,
+				is_number = false,
 				x_pos = 212,
 				y_pos = 400,
-				num_frames = 1,
 			},
 		}
 	},

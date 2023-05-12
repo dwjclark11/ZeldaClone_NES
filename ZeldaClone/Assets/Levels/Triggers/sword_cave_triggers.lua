@@ -20,13 +20,13 @@ triggers = {
 			trigger_box  = { 
 				trigger_type		= "scene_change", 
 				transport_offset 	= { x = 7394, y = 4765 },
-				camera_offset 		= { x = 7168, y = 4416 },
+				camera_offset 		= { x = 7168, y = 4448 }, -- {x = 8, y = 7},  
 			},
 			scene_change = {
 				level_music			= "Overworld",
 				asset_file			= "game_state_assets",
-				enemy_file			= "overworld_enemies_1",
-				collider_file		= "overworld_colliders_1", 
+				enemy_file			= "overworld_enemies_2",
+				collider_file		= "Test_Colliders",--"overworld_colliders_1", 
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "map",
 				entity_file			= "no_file",

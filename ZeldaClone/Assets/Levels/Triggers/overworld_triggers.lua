@@ -20,7 +20,7 @@ triggers = {
 			trigger_box  = { 
 				trigger_type		= "scene_change",
 				transport_offset 	= { x = 450, y = 500 },
-				camera_offset 		= { x = 0, y = -288 },
+				camera_offset 		= { x = 0, y = -288 }, --{x = 1, y = 1},  
 			},
 			scene_change = {
 				level_music			= "stop",
@@ -70,42 +70,8 @@ triggers = {
 			},
 		}
 	},
-	-- Eagle Level Entrance
-	[3] = {
-		group = "trigger",
-		components = {
-			transform = {
-				position = { x = 7616, y = 2275},
-				scale    = { x = 4, y = 4 },
-				rotation = 0
-			},
-			box_collider = {
-				width 	 = 16,
-				height 	 = 8,
-				offset 	 = { x = 0, y = 0 }
-			},
-			trigger_box  = { 
-				trigger_type		= "scene_change",
-				transport_offset 	= { x = 2505, y = 4545 },
-				camera_offset 		= { x = 2048, y = 3744 },
-			},
-			scene_change = {
-				level_music			= "dungeon",
-				asset_file			= "no_file",
-				enemy_file			= "Level1_enemies",
-				collider_file		= "Test_Colliders", 
-				tilemap_name 		= "Level_1_tiles_2",
-				tilemap_image   	= "level_1",
-				map_image   		= "Dungeon_Tiles",
-				entity_file			= "level_1_entities",
-				trigger_file		= "level_1_trigger_test",
-				image_width			= 1536,
-				image_height		= 1184
-			},
-		}
-	},	
 	-- Bomb Secret --> Rupees + 30
-	[4] = {
+	[3] = {
 		group = "secret",
 		components = {
 			transform = {
@@ -144,6 +110,40 @@ triggers = {
 				sprite_height		= 16,
 				sprite_src_x		= 64,
 				sprite_src_y		= 16
+			},
+		}
+	},	
+	-- Eagle Level Entrance
+	[4] = {
+		group = "trigger",
+		components = {
+			transform = {
+				position = { x = 7616, y = 2275},
+				scale    = { x = 4, y = 4 },
+				rotation = 0
+			},
+			box_collider = {
+				width 	 = 16,
+				height 	 = 8,
+				offset 	 = { x = 0, y = 0 }
+			},
+			trigger_box  = { 
+				trigger_type		= "scene_change",
+				transport_offset 	= { x = 2505, y = 4545 },
+				camera_offset 		= { x = 2048, y = 3776 }, --{x = 3, y = 5},
+			},
+			scene_change = {
+				level_music			= "dungeon",
+				asset_file			= "no_file",
+				enemy_file			= "Level1_enemies",
+				collider_file		= "Test_Colliders", 
+				tilemap_name 		= "Level_1_tiles_2",
+				tilemap_image   	= "level_1",
+				map_image   		= "Dungeon_Tiles",
+				entity_file			= "level_1_entities",
+				trigger_file		= "level_1_trigger_test",
+				image_width			= 1536,
+				image_height		= 1184
 			},
 		}
 	},	
@@ -230,7 +230,7 @@ triggers = {
 		}
 	},	
 	[7] = {
-        group = "triggers",
+        group = "trigger",
         components = {
             transform = {
                 position = { x = 9789, y = 5025},

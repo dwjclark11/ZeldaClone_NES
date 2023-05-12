@@ -14,13 +14,13 @@ leever = {
             src_offset  = { x = 0, y = 0 }
         },
         box_collider = {
-            width       = 32,
-            height      = 32,
+            width       = 16,
+            height      = 16,
             offset      = { x = 0, y = 0 }
         },
         health = {
-            health_percentage = 9,
-            max_hearts = 3
+            health_percentage = 4,
+            max_hearts = 2
         },
         rigid_body = {
             velocity = { x = 50, y = 0}
@@ -32,9 +32,6 @@ leever = {
             looped = true,
             frame_offset = 0
         }, 
-        projectile_emitter = {
-    
-        },
         ai_component = {
                 enemy_pos = { x = 0,  y = 0},
                 enemy_type = "leever",

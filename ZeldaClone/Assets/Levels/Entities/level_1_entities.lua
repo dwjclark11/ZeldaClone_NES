@@ -156,13 +156,25 @@ level = {
 			},
 			trigger_box = {
 				trigger_type = "collect_item", -- Collect Item -- Need to convert to enum 
-				transport_offset = { x = 0, y = 0},
-				camera_offset = {x = 0, y = 0},
+				transport_offset 	= { x = 7616, y = 2344 },
+				camera_offset 		= { x = 7168, y = 1728 },
 			},
+            scene_change = {
+				level_music			= "Overworld",
+				asset_file			= "game_state_assets",
+				enemy_file			= "overworld_enemies_2",
+				collider_file		= "overworld_colliders_1", 
+				tilemap_name 		= "no_file",
+				tilemap_image   	= "map",
+				entity_file			= "no_file",
+				trigger_file		= "overworld_triggers",
+				image_width			= 4096,
+				image_height		= 1344
+            },
 			item = {
 				item_type = "default",
 				special = "triforce_piece"
-			}
+			},
 		}
 	},
 	-- Key outside of boss room

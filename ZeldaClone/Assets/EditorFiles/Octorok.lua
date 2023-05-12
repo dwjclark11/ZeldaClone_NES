@@ -15,13 +15,13 @@ octorok_red = {
             src_offset  = { x = 0, y = 0 }
         },
         box_collider = {
-            width       = 16,
-            height      = 16,
-            offset      = { x = 0, y = 0 }
+            width       = 10,
+            height      = 10,
+            offset      = { x = 10, y = 10 }
         },
         health = {
-            health_percentage = 9,
-            max_hearts = 3
+            health_percentage = 1,
+            max_hearts = 1
         },
         rigid_body = {
             velocity = { x = 10, y = 0}

@@ -49,6 +49,7 @@ Assets =
 	{type = "soundFX", id = "special_item", 			file =   "./Assets/sounds/Special_Item.wav"}, 
 	{type = "soundFX", id = "door_unlock", 				file =   "./Assets/sounds/Door_Unlock.wav"}, 
 	{type = "soundFX", id = "refill_hearts", 			file =   "./Assets/sounds/Refill_Loop.wav"}, 
+	{type = "music",   id = "triforce_fanfare", 		file =   "./Assets/sounds/triforce_fanfare.mp3"}, 
 	{type = "music",   id = "dungeon", 					file = "./Assets/Music/Dungeon_Theme.mp3"},
 	{type = "music",   id = "Overworld", 				file = "./Assets/Music/Overworld_Theme.mp3"},
 	

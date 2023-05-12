@@ -1,12 +1,12 @@
 ----------------------------------------------------------
--- Save file#: 1
+-- Save file#: 0
 ----------------------------------------------------------
 
 player_data = {
     [1] = {
         menu_shared_values = {
-            name = "DUSTIN",
-            num_hearts = 6,
+            name = "DONNIE",
+            num_hearts = 3,
             blue_ring = false,
             red_ring = false
         },
@@ -15,19 +15,19 @@ player_data = {
                 position = { x = 7615, y = 5060}}
         },
         items = {
-            boomerang = true,
+            boomerang = false,
             magic_boomerang = false,
-            wood_sword = true,
-            steel_sword = true,
+            wood_sword = false,
+            steel_sword = false,
             magic_sword = false,
             magic_rod = false,
-            candle = true,
+            candle = false,
             bombs = false,
             food = false,
             flute = false,
-            raft = true,
-            ladder = true,
-            wood_bow = false,
+            raft = false,
+            ladder = false,
+            bow_wood = false,
             magic_shield = false,
             power_braclet = false,
             map = false,
@@ -35,9 +35,9 @@ player_data = {
             red_potion = false,
             master_key = false},
         inventory = {
-            num_rupees = 100,
-            num_bombs = 5,
-            num_keys = 5
+            num_rupees = 0,
+            num_bombs = 0,
+            num_keys = 0
         }
     }
 }

@@ -42,7 +42,11 @@ enemies = {
         frame_offset = 0
       }, 
       projectile_emitter = {
-
+        velocity = { x = 200, y = 200}
+        repeat_frequency = 0,
+        projectile_duration = 6000,
+        hit_percent_damage = 1,
+        is_friendly = false
       },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
@@ -89,7 +93,11 @@ enemies = {
         frame_offset = 0
       }, 
       projectile_emitter = {
-
+        velocity = { x = 200, y = 200}
+        repeat_frequency = 0,
+        projectile_duration = 6000,
+        hit_percent_damage = 1,
+        is_friendly = false
       },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
@@ -136,7 +144,11 @@ enemies = {
         frame_offset = 0
       }, 
       projectile_emitter = {
-
+        velocity = { x = 200, y = 200}
+        repeat_frequency = 0,
+        projectile_duration = 6000,
+        hit_percent_damage = 1,
+        is_friendly = false
       },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
@@ -183,7 +195,11 @@ enemies = {
         frame_offset = 0
       }, 
       projectile_emitter = {
-
+        velocity = { x = 200, y = 200}
+        repeat_frequency = 0,
+        projectile_duration = 6000,
+        hit_percent_damage = 1,
+        is_friendly = false
       },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
@@ -230,7 +246,11 @@ enemies = {
         frame_offset = 0
       },
       projectile_emitter = {
-
+        velocity = { x = 200, y = 200}
+        repeat_frequency = 0,
+        projectile_duration = 6000,
+        hit_percent_damage = 1,
+        is_friendly = false
       },
       ai_component = {
         enemy_pos = { x = 0,  y = 0},
@@ -276,9 +296,6 @@ enemies = {
         looped = true,
         frame_offset = 0
       }, 
-    --  projectile_emitter = {
-
-  --    },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
             enemy_type = "leever",
@@ -324,10 +341,11 @@ enemies = {
         frame_offset = 0
       },
       projectile_emitter = {
-            repeat_frequency = 0,
-            projectile_duration = 6000,
-            hit_percent_damage = 2,
-            is_friendly = false
+        velocity = { x = 200, y = 200}
+        repeat_frequency = 0,
+        projectile_duration = 6000,
+        hit_percent_damage = 1,
+        is_friendly = false
       },
       ai_component = {
             enemy_pos = { x = 0,  y = 0},
