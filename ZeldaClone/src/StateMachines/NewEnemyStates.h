@@ -1,6 +1,7 @@
 #pragma once
 #include "NewState.h"
-
+#include <memory>
+#include "../Utilities/RNG.h"
 class Timer;
 class Entity;
 
@@ -24,7 +25,10 @@ public:
 
 class PatrolState : public States
 {
+private:
+	
 public:
+	PatrolState();
 	virtual ~PatrolState() {};
 	void OnEnter(class Entity& entity) override;
 	void OnExit (class Entity& entity) override;

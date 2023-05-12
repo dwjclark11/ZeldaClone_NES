@@ -2,14 +2,18 @@
 #include "../ECS/ECS.h"
 
 #include "../Game/Game.h"
+#include "../Game/Player.h"
 #include "../Utilities/Timer.h"
 #include "../Systems/SoundFXSystem.h"
 #include "../Systems/GameSystems/RenderHealthSystem.h"
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/TriggerBoxComponent.h"
+#include "../Components/BoxColliderComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/AnimationComponent.h"
+#include "../Components/GameComponent.h"
+#include "../Components/SceneChangeComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/ItemComponent.h"
@@ -17,6 +21,8 @@
 #include "../Components/AIComponent.h"
 #include "../States/GameOverState.h" 
 #include "../States/GameState.h"
+#include "../Utilities/GameData.h"
+#include "../Utilities/Camera.h"
 
 Timer timer;
 Game& game = Game::Instance();
@@ -24,6 +30,7 @@ Game& game = Game::Instance();
 void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 {
 	auto& health = player.GetComponent<HealthComponent>();
+	auto& gameData = GameData::GetInstance();
 
 	switch (special)
 	{
@@ -31,15 +38,15 @@ void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 		break;
 
 	case ItemComponent::SpecialItemType::WOOD_SWORD:
-		game.GetGameItems().woodSword = true;
+		gameData.AddItem(GameData::GameItems::WOOD_SWORD);
 		break;
 
 	case ItemComponent::SpecialItemType::STEEL_SWORD:
-		game.GetGameItems().steelSword = true;
+		gameData.AddItem(GameData::GameItems::SILVER_SWORD);
 		break;
 
 	case ItemComponent::SpecialItemType::MAGIC_SWORD:
-		game.GetGameItems().magicSword = true;
+		gameData.AddItem(GameData::GameItems::MAGIC_SWORD);
 		break;
 
 	case ItemComponent::SpecialItemType::FULL_HEART:
@@ -47,29 +54,35 @@ void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 		break;
 	
 	case ItemComponent::SpecialItemType::RAFT:
-		game.GetGameItems().raft = true;
+		gameData.AddItem(GameData::GameItems::RAFT);
 		break;
 	case ItemComponent::SpecialItemType::POWER_BRACLET:
-		game.GetGameItems().powerBraclet = true;
+		gameData.AddItem(GameData::GameItems::POWER_BRACLET);
 		break;
 	case ItemComponent::SpecialItemType::RED_CANDLE:
-		game.GetGameItems().candle = true;
+		gameData.AddItem(GameData::GameItems::CANDLE);
 		break;
 	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
-		game.GetGameItems().woodBoomerang = true;
+		gameData.AddItem(GameData::GameItems::BOOMERANG);
 		break;
 	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
-		game.GetGameItems().magicBoomerang = true;
+		gameData.AddItem(GameData::GameItems::MAGIC_BOOMERANG);
 		break;
 	case ItemComponent::SpecialItemType::LADDER:
-		game.GetGameItems().ladder = true;
+		gameData.AddItem(GameData::GameItems::LADDER);
+		break;
+	case ItemComponent::SpecialItemType::ARROWS:
+		gameData.AddItem(GameData::GameItems::WOOD_ARROWS);
+		break;
+	case ItemComponent::SpecialItemType::MAGIC_ARROWS:
+		gameData.AddItem(GameData::GameItems::MAGIC_ARROWS);
 		break;
 	case ItemComponent::SpecialItemType::WOOD_BOW:
-		game.GetGameItems().bow = true;
+		gameData.AddItem(GameData::GameItems::BOW);
 		break;
 	case ItemComponent::SpecialItemType::TRIFORCE_PIECE:
 	{
-		GameState::totalTriforcePieces++;
+		gameData.AddTriforcePieces(1);
 		break;
 	}
 	default:
@@ -79,10 +92,11 @@ void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 
 void SetItemCollect(ItemComponent::ItemCollectType type)
 {
+	auto& gameData = GameData::GetInstance();
 	switch (type)
 	{
 	case ItemComponent::ItemCollectType::BOMBS:
-		GameState::totalBombs += 4;
+		gameData.AddBombs(4);
 		break;
 	}
 }
@@ -95,7 +109,7 @@ void CheckItem(ItemComponent::ItemCollectType type)
 // Player Idle State definitions
 void IdleState::OnEnter(Entity& entity)
 {
-	game.SetPlayerItem(false);
+	
 }
 
 void IdleState::OnExit(Entity& entity)
@@ -105,25 +119,22 @@ void IdleState::OnExit(Entity& entity)
 
 void IdleState::Update(Entity& entity)
 {
-	glm::vec2 playerSpeed = glm::vec2(0);
-	auto player = entity;
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	const auto& player = entity;
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 	auto& playerHealth = player.GetComponent<HealthComponent>();
-
-	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
-	{
-		sm.AddState(std::make_unique<MoveState>());
-		sm.ChangeState(entity);
-	}
-	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
-	{
-		sm.AddState(std::make_unique<MoveState>());
-		sm.ChangeState(entity);
-	}
+	
 	// If the player is hurt while in Idle state --> Switch to hurt state
 	if (playerHealth.isHurt)
 	{
 		sm.AddState(std::make_unique<PlayerHurtState>());
+		sm.ChangeState(entity);
+	}
+
+	auto& rigidbody = player.GetComponent<RigidBodyComponent>();
+
+	if (rigidbody.velocity.x != 0 || rigidbody.velocity.y != 0)
+	{
+		sm.AddState(std::make_unique<MoveState>());
 		sm.ChangeState(entity);
 	}
 }
@@ -156,32 +167,24 @@ void MoveState::OnExit(Entity& entity)
 void MoveState::Update(Entity& entity)
 {
 	glm::vec2 playerSpeed = glm::vec2(0);
-	auto player = entity;// Registry::Instance().GetEntityByTag("player");
+	auto player = entity;
 
 	auto& playerHealth = player.GetComponent<HealthComponent>();
 	auto& playerTransform = player.GetComponent<TransformComponent>();
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
+	const auto& camera = game.GetCamera();
+	//Logger::Log("X: " + std::to_string(playerTransform.position.x) + "Y: " + std::to_string(playerTransform.position.y));
+	Logger::Log("CAM_X: " + std::to_string(camera.GetCameraPos().x) + "CAM_Y: " + std::to_string(camera.GetCameraPos().y));
 
-	//Logger::Log("X: " + std::to_string(playerTransform.position.x) + ", Y: " + std::to_string(playerTransform.position.y));
-	//Logger::Log("X: " + std::to_string(game.GetPlayerPos().x) + ", Y: " + std::to_string(game.GetPlayerPos().y));
-
-	if (player.GetComponent<RigidBodyComponent>().velocity.x != 0)
-	{
-		//Logger::Log("Player Moving");
-	}
-	else if (player.GetComponent<RigidBodyComponent>().velocity.y != 0)
-	{
-		//Logger::Log("Player Moving");
-	}
-	else
+	if (player.GetComponent<RigidBodyComponent>().velocity.x == 0 && 
+		player.GetComponent<RigidBodyComponent>().velocity.y == 0)
 	{
 		sm.AddState(std::make_unique<IdleState>());
 		sm.ChangeState(entity);
 	}
 		
-
 	// If the player is collecting a special Item --> Move to the Collect Item State
-	if (game.GetPlayerItem())
+	if (game.GetPlayer()->GetPlayerItem())
 	{
 		sm.AddState(std::make_unique<CollectItemState>());
 		sm.ChangeState(entity);	
@@ -195,8 +198,7 @@ void MoveState::Update(Entity& entity)
 		sm.ChangeState(entity);
 	}
 		
-
-	if (game.GetPlayerOnStairs())
+	if (game.GetPlayer()->GetPlayerOnStairs())
 	{
 		sm.AddState(std::make_unique<PlayerStairsState>());
 		sm.ChangeState(entity);
@@ -206,77 +208,140 @@ void MoveState::Update(Entity& entity)
 void CollectItemState::OnEnter(Entity& entity)
 {
 	timer.Start();
+	if (game.GetPlayer()->ObtainedTriforcePiece())
+	{
+		game.GetCamera().StartScreenFlash();
+	}
 }
 
 void CollectItemState::Update(Entity& entity)
 {
+	// Get the Game data
+	auto& gameData = GameData::GetInstance();
 	// Get the player components that are needed
-	auto& playerSprite = Registry::Instance().GetEntityByTag("player").GetComponent<SpriteComponent>();
-	auto& playerRigidBody = Registry::Instance().GetEntityByTag("player").GetComponent<RigidBodyComponent>();
-	auto& playerTransform = Registry::Instance().GetEntityByTag("player").GetComponent<TransformComponent>();
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	const auto& player = entity;
+	auto& playerSprite = player.GetComponent<SpriteComponent>();
+	auto& playerRigidBody = player.GetComponent<RigidBodyComponent>();
+	auto& playerTransform = player.GetComponent<TransformComponent>();
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
+	auto& camera = game.GetCamera();
 	// Stop player movement!
 	playerRigidBody = glm::vec2(0);
-
-	// Set the sprite to the proper position based on the item collected
-	// If the green tunic
-	if (!game.GetGameItems().blueRing && !game.GetGameItems().redRing)
-	{
-		playerSprite.srcRect.x = playerSprite.width * 0;
-		playerSprite.srcRect.y = playerSprite.height * 8;
-	}
-	else if (game.GetGameItems().blueRing && !game.GetGameItems().redRing) // Blue Tunic
-	{
-		playerSprite.srcRect.x = playerSprite.width * 4;
-		playerSprite.srcRect.y = playerSprite.height * 8;
-	}
-	else if (game.GetGameItems().redRing) // Red Tunic
-	{
-		playerSprite.srcRect.x = playerSprite.width * 8;
-		playerSprite.srcRect.y = playerSprite.height * 8;
-	}
-
+	bool obtained_triforce = game.GetPlayer()->ObtainedTriforcePiece();
+	int time =  obtained_triforce ? 9000 : 2000;
+	
 	for (auto& trigger : Registry::Instance().GetEntitiesByGroup("trigger"))
 	{
 		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 
-		if (trig.active)
+		if (!trig.active || !trigger.HasComponent<ItemComponent>())
+			continue;
+
+		const auto& special = trigger.GetComponent<ItemComponent>();
+		if (special.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
 		{
-			if (trigger.HasComponent<ItemComponent>())
-			{
-				const auto& special = trigger.GetComponent<ItemComponent>();
-
-				if (special.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
-				{
-					SetSpecialItem(special.special, entity);
-				}
-
-				if (special.type != ItemComponent::ItemCollectType::DEFAULT)
-					SetItemCollect(special.type);
-
-				auto& transform = trigger.GetComponent<TransformComponent>();
-
-				trig.collectedTimer.Start();
-				transform.position.x = playerTransform.position.x;
-				transform.position.y = playerTransform.position.y - 64;
-				trig.active = false;
-				trig.collected = true;
-				break;
-			}
+			SetSpecialItem(special.special, entity);
 		}
+
+		if (special.type != ItemComponent::ItemCollectType::DEFAULT)
+			SetItemCollect(special.type);
+
+		auto& transform = trigger.GetComponent<TransformComponent>();
+
+		trig.collectedTimer.Start();
+		transform.position.x = playerTransform.position.x + 32;
+		transform.position.y = playerTransform.position.y - 64;
+		trig.active = false;
+		trig.collected = true;
+
+		if (obtained_triforce)
+		{
+			gameData.SetTriggerBoxValues(trig);
+			if (trigger.HasComponent<SceneChangeComponent>())
+				gameData.SetScengeChangeValues(trigger.GetComponent<SceneChangeComponent>());
+		}
+		break;
+	}
+
+	// Set the sprite to the proper position based on the item collected
+	// If the green tunic
+	if (!gameData.HasItem(GameData::GameItems::BLUE_RING) &&
+		!gameData.HasItem(GameData::GameItems::RED_RING))
+	{
+		playerSprite.srcRect.x = playerSprite.width * (obtained_triforce ? 1 : 0);
+		playerSprite.srcRect.y = playerSprite.height * 8;
+	}
+	else if (gameData.HasItem(GameData::GameItems::RED_RING))
+	{
+		playerSprite.srcRect.x = playerSprite.width * (obtained_triforce ? 9 : 8);
+		playerSprite.srcRect.y = playerSprite.height * 8;
+	}
+	else if (gameData.HasItem(GameData::GameItems::BLUE_RING))
+	{
+		playerSprite.srcRect.x = playerSprite.width * (obtained_triforce ? 5 : 4);
+		playerSprite.srcRect.y = playerSprite.height * 8;
 	}
 
 	// Wait for 2 seconds then change back to idle State
-	if (timer.GetTicks() > 2000)
+	if (timer.GetTicks() > time)
 	{
-		sm.AddState(std::make_unique<IdleState>());
-		sm.ChangeState(entity);
+		if (!obtained_triforce)
+		{
+			sm.AddState(std::make_unique<IdleState>());
+			sm.ChangeState(entity);
+			return;
+		}
+		
+		if (camera.CurtainClosed())
+		{
+			const auto& trigger_component = gameData.GetTrigger();
+			const auto& scene_component = gameData.GetScene();
+			auto newSceneTrigger = Registry::Instance().CreateEntity();
+			newSceneTrigger.Group("trigger");
+			newSceneTrigger.AddComponent<BoxColliderComponent>(16, 16);
+			
+			newSceneTrigger.AddComponent<TransformComponent>(
+				glm::vec2{ 
+					playerTransform.position.x, 
+					playerTransform.position.y + 80 }, 
+				glm::vec2{ 
+					playerTransform.scale.x, 
+					playerTransform.scale.y}
+			);
+
+			newSceneTrigger.AddComponent<TriggerBoxComponent>(
+				TriggerBoxComponent::TriggerType::SCENE_CHANGE,
+				glm::vec2{
+					trigger_component.transportOffset.x,
+					trigger_component.transportOffset.y
+				},
+				glm::vec2{
+					trigger_component.cameraOffset.x,
+					trigger_component.cameraOffset.x }
+				);
+			newSceneTrigger.AddComponent<SceneChangeComponent>(
+				scene_component.levelMusic, scene_component.assetFile,
+				scene_component.enemyFile, scene_component.colliderFile, 
+				scene_component.tileMapName, scene_component.tileImageName, 
+				scene_component.mapImageName, scene_component.entityFileName, 
+				scene_component.triggerFile, scene_component.imageWidth, 
+				scene_component.imageHeight
+				);
+			newSceneTrigger.AddComponent<GameComponent>();
+
+			sm.AddState(std::make_unique<IdleState>());
+			sm.ChangeState(entity);
+		}
+		else
+		{
+			camera.StartCurtainClose();
+		}
 	}
 }
 
 void CollectItemState::OnExit(Entity& entity)
 {
-
+	timer.Stop();
 }
 
 void PlayerHurtState::OnEnter(Entity& entity)
@@ -285,7 +350,7 @@ void PlayerHurtState::OnEnter(Entity& entity)
 	auto& playerHealth = player.GetComponent<HealthComponent>();
 	auto& animation = player.GetComponent<AnimationComponent>();
 	auto& sprite = player.GetComponent<SpriteComponent>();
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 
 	// Start hurt Invincibility Timer
 	playerHealth.hurtTimer.Start();
@@ -302,7 +367,7 @@ void PlayerHurtState::Update(Entity& entity)
 	auto& playerHealth = player.GetComponent<HealthComponent>();
 	auto& animation = player.GetComponent<AnimationComponent>();
 	auto& sprite = player.GetComponent<SpriteComponent>();
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 
 	// Check to see if the hurt timer is beyond the given setpoint
 	if (playerHealth.hurtTimer.GetTicks() > 1000) // This time may need to be changed --> Create a constant?
@@ -340,7 +405,7 @@ void PlayerDeathState::OnEnter(Entity& entity)
 	auto& animation = entity.GetComponent<AnimationComponent>();
 
 	health.deathTimer.Start();
-	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "link_die", 0, -1);
+	Game::Instance().GetSoundPlayer().PlaySoundFX("link_die", 0, SoundChannel::ANY);
 	animation.frameOffset = 0;
 	animation.numFrames = 4;
 	animation.frameSpeedRate = 10;
@@ -351,9 +416,9 @@ void PlayerDeathState::Update(Entity& entity)
 	auto& health = entity.GetComponent <HealthComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 
-	game.SetPlayerDead(true);
+	game.GetPlayer()->SetPlayerDead(true);
 
 	if (health.deathTimer.GetTicks() > 3000)
 	{
@@ -367,9 +432,9 @@ void PlayerDeathState::Update(Entity& entity)
 
 		if (health.deathTimer.GetTicks() > 3500)
 		{
-			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "text_slow", 0, -1);
+			Game::Instance().GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::ANY);
 			Registry::Instance().GetSystem<RenderHUDSystem>().OnExit();
-			Registry::Instance().GetSystem<RenderHealthSystem>().OnExit();
+			//Registry::Instance().GetSystem<RenderHealthSystem>().OnExit();
 			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(new GameOverState());
 
@@ -396,13 +461,13 @@ void PlayerStairsState::OnEnter(Entity& entity)
 	timer.Start();
 
 	// Play the stairs soundFX
-	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "stairs", 0, -1);
+	Game::Instance().GetSoundPlayer().PlaySoundFX("stairs", 0, SoundChannel::ANY);
 }
 
 void PlayerStairsState::Update(Entity& entity)
 {
 	auto& playerSprite = entity.GetComponent<SpriteComponent>();
-	auto& sm = Game::Instance().GetPlayerStateMachine();
+	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 	// increment the steps based on time
 	if (timer.GetTicks() >= 300 * steps)
 	{
@@ -421,6 +486,6 @@ void PlayerStairsState::Update(Entity& entity)
 void PlayerStairsState::OnExit(Entity& entity)
 {
 	steps = 0;
-	game.SetPlayerOnStairs(false);
-	game.SetStairsFinished(true);
+	game.GetPlayer()->SetPlayerOnStairs(false);
+	game.GetPlayer()->SetStairsFinished(true);
 }

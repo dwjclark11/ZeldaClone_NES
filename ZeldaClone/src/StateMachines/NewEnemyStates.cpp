@@ -1,4 +1,5 @@
 #include "NewEnemyStates.h"
+#include "UpdateEnemies.h"
 #include "../ECS/ECS.h"
 
 #include "../Components/TransformComponent.h"
@@ -13,96 +14,65 @@
 #include "../Components/RupeeGameComponent.h"
 #include "../Components/GameComponent.h"
 
+#include "../Game/Game.h"
+#include "../Game/Player.h"
 
 // IdleState
 void EnemyIdleState::OnEnter(Entity& entity)
 {
-	auto& ai = entity.GetComponent<AIComponent>();
+	//auto& ai = entity.GetComponent<AIComponent>();
 
-	if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-	{
-		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-		if (projEmitter.shotTriggered)
-			projEmitter.timer.Start();
-	}
-	else
-	{
-		ai.leeverTimer.Start();
-	}
-
+	//if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	//{
+	//	auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+	//	if (projEmitter.shotTriggered)
+	//		projEmitter.timer.Start();
+	//}
 }
+
 void EnemyIdleState::OnExit(Entity& entity)
 {
-	//Logger::Log("Leaving Idle State");
+
 }
 
 void EnemyIdleState::Update(Entity& entity)
 {
-	auto& rigid = entity.GetComponent<RigidBodyComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& sprite = entity.GetComponent<SpriteComponent>();
-	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 
-	if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	if (ai.IsABoss())
+		return;
+
+	switch (ai.GetEnemyType())
 	{
-		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-
-		if (projEmitter.timer.GetTicks() > 1000)
-		{
-			projEmitter.shotTriggered = false;
-			projEmitter.shotFired = false;
-			projEmitter.timer.Stop();
-		}
-
-		if (!projEmitter.shotTriggered)
-		{
-			if (rigid.down)
-				rigid.velocity = glm::vec2(0, 150);
-
-			if (rigid.up)
-				rigid.velocity = glm::vec2(0, -150);
-
-			if (rigid.right)
-				rigid.velocity = glm::vec2(150, 0);
-
-			if (rigid.left)
-				rigid.velocity = glm::vec2(-150, 0);
-		}
-		if (rigid.velocity != glm::vec2(0, 0))
-		{
-			esm.AddState(std::make_unique<PatrolState>());
-			esm.ChangeState(entity);
-		}
-	}
-	else
-	{
-		rigid.velocity = glm::vec2(0);
-
-		if (ai.leeverTimer.GetTicks() > 1500 && ai.leeverTimer.GetTicks() < 1600)
-		{
-			sprite.srcRect.y = 16;
-		}
-
-		if (ai.leeverTimer.GetTicks() > 2000 && ai.leeverTimer.GetTicks() < 2100)
-		{
-			sprite.srcRect.y = 32;
-		}
-
-		if (ai.leeverTimer.GetTicks() > 2500 && ai.leeverTimer.GetTicks() < 2600)
-		{
-			sprite.srcRect.y = 48;
-		}
-		if (ai.leeverTimer.GetTicks() > 3000 && ai.leeverTimer.GetTicks() < 3100)
-		{
-			sprite.srcRect.y = 64;
-			animation.numFrames = 2;
-			animation.frameSpeedRate = 12;
-			animation.frameOffset = 64;
-			rigid.velocity = glm::vec2(50, 0);
-			esm.AddState(std::make_unique<PatrolState>());
-			esm.ChangeState(entity);
-		}
+	case AIComponent::EnemyType::OCTOROK:
+	case AIComponent::EnemyType::MOBLIN:
+		IdleUpdateOctoMoblin(entity);
+		break;
+	case AIComponent::EnemyType::DARKNUT:
+		break;
+	case AIComponent::EnemyType::LEEVER:
+		IdleUpdateLever(entity);
+		break;
+	case AIComponent::EnemyType::TEKTITE:
+		break;
+	case AIComponent::EnemyType::PEAHAT:
+		break;
+	case AIComponent::EnemyType::ARMOS:
+		break;
+	case AIComponent::EnemyType::KEESE:
+		break;
+	case AIComponent::EnemyType::BLADE_TRAP:
+		IdleUpdateBladeTrap(entity);
+		return;
+	case AIComponent::EnemyType::GEL:
+		break;
+	case AIComponent::EnemyType::STALFOS:
+		break;
+	case AIComponent::EnemyType::GORIYA:
+		break;
+	case AIComponent::EnemyType::NO_TYPE:
+		__debugbreak();
+		return;
 	}
 }
 
@@ -125,170 +95,74 @@ void EnemyAttackState::OnExit(Entity& entity)
 }
 
 // PatrolState
+PatrolState::PatrolState()
+{
+	
+	
+}
+
 void PatrolState::OnEnter(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 	ai.aiTimer.Start();
+
+
+	if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	{
+		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+		if (!projEmitter.shotTriggered)
+		{
+			projEmitter.timer.Start();
+		}
+	}
 }
 void PatrolState::OnExit(Entity& entity)
 {
+	//if (!entity.HasComponent<ProjectileEmitterComponent>())
+	//	return;
 
+	//auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
+	//projEmitter.timer.Stop();
 }
 
 void PatrolState::Update(Entity& entity)
 {
-	auto player = Registry::Instance().GetEntityByTag("player");
-	auto& playerTransform = player.GetComponent<TransformComponent>();
-
-	auto& transform = entity.GetComponent<TransformComponent>();
-	auto& rigid = entity.GetComponent<RigidBodyComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& enemyHealth = entity.GetComponent<HealthComponent>();
-	auto& sprite = entity.GetComponent<SpriteComponent>();
-	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 
-	int sign = 1;
+	if (ai.IsABoss())
+		return;
 
-	if (entity.HasComponent<ProjectileEmitterComponent>())
+	switch (ai.GetEnemyType())
 	{
-		auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
-
-		if (!projectileEmitter.shootDown && rigid.down && playerTransform.position.x < transform.position.x + 32
-			&& playerTransform.position.x > transform.position.x - 32
-			&& playerTransform.position.y < transform.position.y + 256
-			&& playerTransform.position.y > transform.position.y + 64)
-		{
-			rigid = glm::vec2(0, 0);
-			projectileEmitter.shootDown = true;
-			projectileEmitter.shotTriggered = true;
-
-		}
-		else if (!projectileEmitter.shootUp && rigid.up && playerTransform.position.x < transform.position.x + 32
-			&& playerTransform.position.x > transform.position.x - 32
-			&& playerTransform.position.y < transform.position.y - 64
-			&& playerTransform.position.y > transform.position.y - 256)
-		{
-			rigid = glm::vec2(0, 0);
-			projectileEmitter.shootUp = true;
-			projectileEmitter.shotTriggered = true;
-		}
-		else if (!projectileEmitter.shootRight && rigid.right && playerTransform.position.x < transform.position.x + 256
-			&& playerTransform.position.x > transform.position.x + 64
-			&& playerTransform.position.y < transform.position.y + 32
-			&& playerTransform.position.y > transform.position.y - 32)
-		{
-			rigid = glm::vec2(0, 0);
-			projectileEmitter.shootRight = true;
-			projectileEmitter.shotTriggered = true;
-		}
-		else if (!projectileEmitter.shootLeft && rigid.left && playerTransform.position.x > transform.position.x - 256
-			&& playerTransform.position.x < transform.position.x - 64
-			&& playerTransform.position.y < transform.position.y + 32
-			&& playerTransform.position.y > transform.position.y - 32)
-		{
-			rigid = glm::vec2(0, 0);
-			projectileEmitter.shootLeft = true;
-			projectileEmitter.shotTriggered = true;
-		}
-
-		if (projectileEmitter.shootDown || projectileEmitter.shootUp || projectileEmitter.shootLeft || projectileEmitter.shootRight)
-		{
-			esm.AddState(std::make_unique<EnemyIdleState>());
-			esm.ChangeState(entity);
-		}
-	}
-
-	if (ai.aiTimer.GetTicks() > 2000)
-	{
-		srand(time(NULL));
-		int num = rand() % 2 + 1;
-
-		sign = num > 1 ? 1 : -1;
-
-		// Set the direction of the enemy randomly
-	/*	if (num > 1)
-			sign = 1;
-		else
-			sign = -1;*/
-
-		if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-		{
-			if (rigid.down)
-				rigid.velocity = glm::vec2(sign * 150, 0);
-			else if (rigid.up)
-				rigid.velocity = glm::vec2(sign * 150, 0);
-			else if (rigid.left)
-				rigid.velocity = glm::vec2(0, sign * 150);
-			else if (rigid.right)
-				rigid.velocity = glm::vec2(0, sign * 150);
-		}
-		else
-		{
-			if (ai.leeverTimer.GetTicks() > 3000 && ai.leeverTimer.GetTicks() < 10000)
-			{
-				if (rigid.down)
-					rigid.velocity = glm::vec2(sign * 50, 0);
-				else if (rigid.up)
-					rigid.velocity = glm::vec2(sign * 50, 0);
-				else if (rigid.left)
-					rigid.velocity = glm::vec2(0, sign * 50);
-				else if (rigid.right)
-					rigid.velocity = glm::vec2(0, sign * 50);
-			}
-		}
-
-		ai.aiTimer.Stop();
-	}
-
-	if (!ai.aiTimer.isStarted())
-	{
-		ai.aiTimer.Start();
-	}
-
-	if (enemyHealth.isHurt)
-	{
-		esm.AddState(std::make_unique<HurtState>());
-		esm.ChangeState(entity);
-	}
-	else if (rigid.velocity == glm::vec2(0) && ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
-	{
-		esm.AddState(std::make_unique<EnemyIdleState>());
-		esm.ChangeState(entity);
-	}
-	
-	if (ai.GetStunned())
-	{
-		esm.AddState(std::make_unique<EnemyStunnedState>());
-		esm.ChangeState(entity);
-	}
-		
-	if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
-	{
-		if (ai.leeverTimer.GetTicks() > 10000 && ai.leeverTimer.GetTicks() < 10100)
-		{
-			rigid.velocity = glm::vec2(0);
-			sprite.srcRect.y = 96;
-		}
-		if (ai.leeverTimer.GetTicks() > 10500 && ai.leeverTimer.GetTicks() < 10600)
-			sprite.srcRect.y = 112;
-
-		if (ai.leeverTimer.GetTicks() > 11000 && ai.leeverTimer.GetTicks() < 11100)
-			sprite.srcRect.y = 128;
-
-		if (ai.leeverTimer.GetTicks() > 11500 && ai.leeverTimer.GetTicks() < 11600)
-		{
-			sprite.srcRect.y = 0;
-
-			animation.numFrames = 1;
-			animation.frameSpeedRate = 1;
-			animation.frameOffset = 0;
-
-			ai.leeverTimer.Stop();
-
-			esm.AddState(std::make_unique<EnemyIdleState>());
-			esm.ChangeState(entity);
-		}
+	case AIComponent::EnemyType::OCTOROK:
+	case AIComponent::EnemyType::MOBLIN:
+		PatrolUpdateOctoMoblin(entity);
+		break;
+	case AIComponent::EnemyType::DARKNUT:
+		break;
+	case AIComponent::EnemyType::LEEVER:
+		PatrolUpdateLever(entity);
+		break;
+	case AIComponent::EnemyType::TEKTITE:
+		break;
+	case AIComponent::EnemyType::PEAHAT:
+		break;
+	case AIComponent::EnemyType::ARMOS:
+		break;
+	case AIComponent::EnemyType::KEESE:
+		break;
+	case AIComponent::EnemyType::BLADE_TRAP:
+		PatrolUpdateBladeTrap(entity);
+		return;
+	case AIComponent::EnemyType::GEL:
+		break;
+	case AIComponent::EnemyType::STALFOS:
+		break;
+	case AIComponent::EnemyType::GORIYA:
+		break;
+	case AIComponent::EnemyType::NO_TYPE:
+		__debugbreak();
+		return;
 	}
 }
 
@@ -366,8 +240,6 @@ void EnemyDeathState::OnEnter(Entity& entity)
 	animation.frameSpeedRate = 20;
 	animation.isLooped = false;
 	animation.vertical = false;
-	//Timer time;
-	//time.Start();
 
 	srand(SDL_GetTicks());
 
@@ -382,9 +254,8 @@ void EnemyDeathState::Update(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 
-	if (ai.deathTimer.GetTicks() > 500)
+	if (ai.deathTimer.GetTicks() > 1000)
 	{
-
 		entity.Kill();
 		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
 	}
@@ -419,15 +290,13 @@ void EnemyStunnedState::Update(Entity& entity)
 		ai.stunTimer.Stop();
 		esm.AddState(std::make_unique<EnemyIdleState>());
 		esm.ChangeState(entity);
-		
 	}
 
 	if (enemyHealth.isHurt)
 	{
 		esm.AddState(std::make_unique<HurtState>());
 		esm.ChangeState(entity);
-	}
-		
+	}	
 }
 
 void EnemyDeathState::ItemDrop(Entity& enemy)
@@ -436,49 +305,38 @@ void EnemyDeathState::ItemDrop(Entity& enemy)
 	auto& pos = enemyTransform.position;
 	int chance = rand();
 	
+	if (chance % 7 != 0 && chance % 5 != 0 && chance %3 != 0 && chance % 2 != 0)
+		return;
+
+	Entity item = Registry::Instance().CreateEntity();
+	item.Group("items");
+	item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
+	item.AddComponent<BoxColliderComponent>(16, 16);
+	item.AddComponent<GameComponent>();
+
 	if (chance % 7 == 0)
 	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::BOMBS);
 		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
+
 	}
 	else if (chance % 5 == 0)
 	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::BLUE_RUPEE);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
-		//item.AddComponent<RupeeTypeComponent>(RupeeType::BLUE);
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
+
 	}
 	else if (chance % 3 == 0)
 	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::HEARTS);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<AnimationComponent>(2, 10, false, true, 0);
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
 	}
 	else if (chance % 2 == 0)
 	{
-		Entity item = Registry::Instance().CreateEntity();
-		item.Group("items");
 		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::YELLOW_RUPEE);
 		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
-		item.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
 		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
-		//item.AddComponent<RupeeTypeComponent>(RupeeType::YELLOW);
-		item.AddComponent<BoxColliderComponent>(16, 16);
-		item.AddComponent<GameComponent>();
 	}
 }
