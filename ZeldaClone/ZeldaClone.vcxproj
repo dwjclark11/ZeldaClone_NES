@@ -164,6 +164,10 @@
     <ClCompile Include="libs\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Components\AIComponent.cpp" />
+    <ClCompile Include="src\Game\Player.cpp" />
+    <ClCompile Include="src\inputs\Button.cpp" />
+    <ClCompile Include="src\inputs\InputManager.cpp" />
+    <ClCompile Include="src\inputs\Keyboard.cpp" />
     <ClCompile Include="src\StateMachines\BossStates.cpp" />
     <ClCompile Include="src\StateMachines\NewEnemyStates.cpp" />
     <ClCompile Include="src\StateMachines\NewPlayerStates.cpp" />
@@ -175,6 +179,7 @@
     <ClCompile Include="src\Game\LevelLoader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\StateMachines\UpdateEnemies.cpp" />
     <ClCompile Include="src\States\EditorState.cpp" />
     <ClCompile Include="src\States\GameOverState.cpp" />
     <ClCompile Include="src\States\GameState.cpp" />
@@ -195,9 +200,7 @@
     <ClCompile Include="src\Systems\GameSystems\CollectItemSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\CollisionSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\DamageSystem.cpp" />
-    <ClCompile Include="src\Systems\GameSystems\GamePadSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\HealthSystem.cpp" />
-    <ClCompile Include="src\Systems\GameSystems\KeyboardControlSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\MovementSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\ProjectileEmitterSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\ProjectileLifeCycleSystem.cpp" />
@@ -218,8 +221,12 @@
     <ClCompile Include="src\Systems\RenderTextSystem.cpp" />
     <ClCompile Include="src\Systems\RenderTitleSystem.cpp" />
     <ClCompile Include="src\Systems\SoundFXSystem.cpp" />
+    <ClCompile Include="src\Utilities\Camera.cpp" />
     <ClCompile Include="src\Utilities\FileManagerUtils.cpp" />
+    <ClCompile Include="src\Utilities\GameData.cpp" />
+    <ClCompile Include="src\inputs\Gamepad.cpp" />
     <ClCompile Include="src\Utilities\LuaTableWriter.cpp" />
+    <ClCompile Include="src\Utilities\RNG.cpp" />
     <ClCompile Include="src\Utilities\Timer.cpp" />
     <ClCompile Include="src\Utilities\Utility.cpp" />
   </ItemGroup>
@@ -483,6 +490,13 @@
     <ClInclude Include="src\Components\SceneChangeComponent.h" />
     <ClInclude Include="src\Components\SecretComponent.h" />
     <ClInclude Include="src\Components\SettingsComponent.h" />
+    <ClInclude Include="src\Game\Player.h" />
+    <ClInclude Include="src\inputs\Button.h" />
+    <ClInclude Include="src\inputs\Gamepad.h" />
+    <ClInclude Include="src\inputs\GPButtons.h" />
+    <ClInclude Include="src\inputs\InputManager.h" />
+    <ClInclude Include="src\inputs\Keyboard.h" />
+    <ClInclude Include="src\inputs\Keys.h" />
     <ClInclude Include="src\StateMachines\BossStates.h" />
     <ClInclude Include="src\StateMachines\NewEnemyStates.h" />
     <ClInclude Include="src\StateMachines\NewPlayerStates.h" />
@@ -527,6 +541,7 @@
     <ClInclude Include="src\Game\Game.h" />
     <ClInclude Include="src\Game\LevelLoader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
+    <ClInclude Include="src\StateMachines\UpdateEnemies.h" />
     <ClInclude Include="src\States\EditorState.h" />
     <ClInclude Include="src\States\GameOverState.h" />
     <ClInclude Include="src\States\GameState.h" />
@@ -549,9 +564,7 @@
     <ClInclude Include="src\Systems\GameSystems\CollectItemSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\CollisionSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\DamageSystem.h" />
-    <ClInclude Include="src\Systems\GameSystems\GamePadSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\HealthSystem.h" />
-    <ClInclude Include="src\Systems\GameSystems\KeyboardControlSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\MovementSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\ProjectileEmitterSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\ProjectileLifeCycleSystem.h" />
@@ -573,8 +586,11 @@
     <ClInclude Include="src\Systems\RenderTextSystem.h" />
     <ClInclude Include="src\Systems\RenderTitleSystem.h" />
     <ClInclude Include="src\Systems\SoundFXSystem.h" />
+    <ClInclude Include="src\Utilities\Camera.h" />
     <ClInclude Include="src\Utilities\FileManagerUtils.h" />
+    <ClInclude Include="src\Utilities\GameData.h" />
     <ClInclude Include="src\Utilities\LuaTableWriter.h" />
+    <ClInclude Include="src\Utilities\RNG.h" />
     <ClInclude Include="src\Utilities\Timer.h" />
     <ClInclude Include="src\Utilities\Utility.h" />
   </ItemGroup>
