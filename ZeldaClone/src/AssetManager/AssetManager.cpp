@@ -94,7 +94,7 @@ void AssetManager::RemoveFont(const std::string& assetID)
 
 void AssetManager::AddMusic(const std::string& assetID, const std::string& filePath)
 {
-	if (fonts.find(assetID) == fonts.end())
+	if (music.find(assetID) == music.end())
 		music.emplace(assetID, Mix_LoadMUS(filePath.c_str()));
 	else
 		Logger::Err("ASSET_MANAGER: MUSIC: __LINE__86: [" + assetID + "] ALREADY EXISTS");
@@ -128,7 +128,7 @@ void AssetManager::RemoveMusic(const std::string& assetID)
 
 void AssetManager::AddSoundFX(const std::string& assetID, const std::string& filePath)
 {
-	if (fonts.find(assetID) == fonts.end())
+	if (soundFX.find(assetID) == soundFX.end())
 		soundFX.emplace(assetID, Mix_LoadWAV(filePath.c_str()));
 	else
 		Logger::Err("ASSET_MANAGER: SOUNDFX: __LINE__106: [" + assetID + "] ALREADY EXISTS");
