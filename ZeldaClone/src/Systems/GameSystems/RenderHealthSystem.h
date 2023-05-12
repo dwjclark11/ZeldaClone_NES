@@ -6,7 +6,7 @@ class RenderHealthSystem : public System
 public:
 
 	RenderHealthSystem();
-	void Update(struct SDL_Renderer* renderer, struct SDL_Rect& camera);
+	void Update(struct SDL_Renderer* renderer, const class Camera& camera);
 	void OnExit();
 };
 

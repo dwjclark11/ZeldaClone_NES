@@ -14,7 +14,7 @@ private:
 public:
 	RenderTileSystem();
 
-	void Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, SDL_Rect& camera);
+	void Update();
 			
 	void OnExit();
 

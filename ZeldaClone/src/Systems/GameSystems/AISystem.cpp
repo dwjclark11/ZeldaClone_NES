@@ -9,6 +9,7 @@
 #include "../../Logger/Logger.h"
 #include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
+#include "../../Game/Player.h"
 #include <string>
 #include <SDL.h>
 
@@ -23,8 +24,6 @@ void AISystem::Update()
 	for (auto& entity : GetSystemEntities())
 	{
 		auto& stateMachine = entity.GetComponent<AIComponent>();
-		auto& rigidBody = entity.GetComponent<RigidBodyComponent>();
-
 		// If the AI state machine is nullptr, create one!
 		if (!stateMachine.StateMachineCreated() && !stateMachine.IsCreated())
 		{
@@ -32,19 +31,13 @@ void AISystem::Update()
 			stateMachine.GetEnemyStateMachine().ChangeState(entity);
 		}
 			
-
 		// If the AI state machine has been created, update the entity AI
 		if (stateMachine.StateMachineCreated())
 		{
 			// If the enemy is in the same screen panel as the player --> Update 
-			if (stateMachine.GetEnemyPos() == game.GetPlayerPos())
+			if (stateMachine.GetEnemyPos() == game.GetPlayer()->GetPlayerPos())
 			{
 				stateMachine.GetEnemyStateMachine().GetCurrentState()->Update(entity);
-			}
-			else
-			{
-				// Stop enemy movement if not on the same panel is player
-				rigidBody.velocity = glm::vec2(0);
 			}
 		}
 	}

@@ -7,6 +7,8 @@ class RenderHUDSystem : public System
 {
 private:
 	class Game& game;
+	class GameData& gameData;
+
 public:
 	bool pause;
 	bool gamePlay;

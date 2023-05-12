@@ -6,7 +6,7 @@
 #include "../../Components/TransformComponent.h"
 #include "../../Components/AIComponent.h"
 #include "../../Game/Game.h"
-
+#include "../../Game/Player.h"
 #include <SDL.h>
 
 AnimationSystem::AnimationSystem()
@@ -24,7 +24,7 @@ void AnimationSystem::Update()
 		
 		if (Game::Instance().GetStateMachine()->GetCurrentState() == "GAMESTATE")
 		{
-			auto& playerPos = Game::Instance().GetPlayerPos();
+			auto& playerPos = Game::Instance().GetPlayer()->GetPlayerPos();
 			int entX = transform.position.x / 1024;
 			int entY = transform.position.y / 672;
 
@@ -66,7 +66,7 @@ void AnimationSystem::Update()
 					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 				}
 			}
-			else if (health.isHurt) // If the enemy is hurt use this frame
+			else if (health.isHurt || health.healthPercentage <= 0) // If the enemy is hurt use this frame
 				sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 		}
 		else
@@ -84,7 +84,7 @@ void AnimationSystem::Update()
 				{
 					sprite.srcRect.y = animation.currentFrame * sprite.height;
 				}
-				else if (health.isHurt) // If the enemy is hurt use this frame
+				else if (health.isHurt || health.healthPercentage <= 0) // If the enemy is hurt use this frame
 					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 			}
 			else if (animation.vertical && !playerTag)

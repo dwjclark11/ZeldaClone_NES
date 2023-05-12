@@ -1,6 +1,7 @@
 #include "RenderHealthSystem.h"
 
 #include "../../Components/BoxColliderComponent.h"
+#include "../../Components/PlayerComponent.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/SpriteComponent.h"
@@ -8,7 +9,7 @@
 #include "../../Game/Game.h"
 #include "../../States/GameState.h"
 #include <glm/glm.hpp>
-
+#include "../../Utilities/Camera.h"
 #include <SDL.h>
 
 
@@ -17,11 +18,16 @@ RenderHealthSystem::RenderHealthSystem()
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<HealthComponent>();
+	RequiredComponent<PlayerComponent>();
 }
 
 
-void RenderHealthSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
+void RenderHealthSystem::Update(SDL_Renderer* renderer, const Camera& camera)
 {
+	const auto& cameraPos = camera.GetCameraPos();
+	const auto& cameraHeight = camera.GetCameraHeight();
+	const auto& cameraWidth = camera.GetCameraWidth();
+
 	for (const auto& entity : GetSystemEntities())
 	{
 		if (entity.HasTag("player"))
@@ -31,8 +37,8 @@ void RenderHealthSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
 
 			// Draw All Hearts
 			const SDL_Rect srcRect = {
-				transform.position.x + collider.offset.x - camera.x,
-				transform.position.y + collider.offset.y - camera.y,
+				transform.position.x + collider.offset.x - cameraPos.x,
+				transform.position.y + collider.offset.y - cameraPos.y,
 				collider.width * transform.scale.x,
 				collider.height * transform.scale.y
 			};
@@ -44,8 +50,10 @@ void RenderHealthSystem::OnExit()
 {
 	for (auto& entity : GetSystemEntities())
 	{
-		if (!entity.HasTag("player"))
-			entity.Kill();
+		if (entity.HasComponent<PlayerComponent>())
+			continue;
+
+		entity.Kill();
 	}
 }
 

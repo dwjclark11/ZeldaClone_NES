@@ -8,6 +8,12 @@ class MovementSystem : public System
 {
 private:
 	class Game& game;
+	
+	void UpdateBoomerang(const double& deltaTime);
+	void UpdateEnemies(const double& deltaTime);
+	void UpdatePlayer(const double& deltaTime);
+	void UpdateProjectiles(const double& deltaTime);
+	void SetDirection(class RigidBodyComponent& rigidBody);
 public:
 	MovementSystem();
 

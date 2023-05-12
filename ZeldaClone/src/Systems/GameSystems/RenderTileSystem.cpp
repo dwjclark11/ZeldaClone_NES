@@ -1,11 +1,12 @@
 #include "RenderTileSystem.h"
-
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/TileComponent.h"
 #include "../../AssetManager/AssetManager.h"
-
 #include "../../Game/Game.h"
+#include "../../Game/Player.h"
+#include "../../Utilities/Camera.h"
+
 #include <SDL.h>
 #include <algorithm>
 #include <vector>
@@ -18,8 +19,12 @@ RenderTileSystem::RenderTileSystem()
 	RequiredComponent<TileComponent>();
 }
 
-void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, SDL_Rect& camera)
+void RenderTileSystem::Update()
 {
+	const auto& camera = game.GetCamera();
+	const auto& cameraPos = camera.GetCameraPos();
+	const auto& cameraHeight = camera.GetCameraHeight();
+	const auto& cameraWidth = camera.GetCameraWidth();
 	// Create a temporary struct to help sort the entities
 	struct RenderableEntity
 	{
@@ -43,10 +48,10 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 			// There is no need to render entities that we cannot see on the screen.
 
 			bool isEntityOutsideCameraView = (
-				renderableEntity.transformComponent.position.x + (renderableEntity.transformComponent.scale.x * renderableEntity.spriteComponent.width) < camera.x ||
-				renderableEntity.transformComponent.position.x > camera.x + camera.w ||
-				renderableEntity.transformComponent.position.y + (renderableEntity.transformComponent.scale.y * renderableEntity.spriteComponent.height) < camera.y ||
-				renderableEntity.transformComponent.position.y > camera.y + camera.h
+				renderableEntity.transformComponent.position.x + (renderableEntity.transformComponent.scale.x * renderableEntity.spriteComponent.width) < cameraPos.x ||
+				renderableEntity.transformComponent.position.x > cameraPos.x + cameraWidth ||
+				renderableEntity.transformComponent.position.y + (renderableEntity.transformComponent.scale.y * renderableEntity.spriteComponent.height) < cameraPos.y ||
+				renderableEntity.transformComponent.position.y > cameraPos.y + cameraHeight
 				);
 
 			// Bypass Rendering entities, if we are outside the camera view and are not fixed sprites
@@ -76,14 +81,14 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 			// Set the destination rect with the x, y position to be rendered
 			SDL_Rect dstRect = {
-				static_cast<int>(transform.position.x - (sprite.isFixed ? 0 : camera.x)), // If the sprite is fixed, subtract 0
-				static_cast<int>(transform.position.y - (sprite.isFixed ? 0 : camera.y)),
+				static_cast<int>(transform.position.x - (sprite.isFixed ? 0 : cameraPos.x)), // If the sprite is fixed, subtract 0
+				static_cast<int>(transform.position.y - (sprite.isFixed ? 0 : cameraPos.y)),
 				static_cast<int>(sprite.width * transform.scale.x),
 				static_cast<int>(sprite.height * transform.scale.y)
 			};
-
+			auto& assetManager = game.GetAssetManager();
 			// If the player is dead change the background tile color to red
-			if (game.GetPlayerDead())
+			if (game.GetPlayer()->GetPlayerDead())
 			{
 				SDL_SetTextureColorMod(assetManager->GetTexture(sprite.assetID), 255, 0, 0);
 			}
@@ -92,10 +97,10 @@ void RenderTileSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 			SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 			SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-			SDL_SetTextureAlphaMod(tex, Game::Instance().GetFadeAlpha());
+			SDL_SetTextureAlphaMod(tex, Game::Instance().GetCamera().GetFadeAlpha());
 
 			SDL_RenderCopyEx(
-				renderer,
+				game.GetRenderer(),
 				tex,
 				&srcRect,
 				&dstRect,

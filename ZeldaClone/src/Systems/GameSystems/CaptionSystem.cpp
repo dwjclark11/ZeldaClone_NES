@@ -8,9 +8,12 @@
 #include "../../Components/GameComponent.h"
 #include "../../Systems/SoundFXSystem.h"
 #include "../../Game/Game.h"
-
+#include "../../Game/Player.h"
+#include "../../Utilities/GameData.h"
+#include "../../Utilities/Utility.h"
 #include <SDL.h>
 
+// This is a hack, I have made an improved version that works much better
 int CaptionSystem::NextLine(std::string& str)
 {
 	for (int i = 0; i < str.length(); i++)
@@ -32,23 +35,26 @@ CaptionSystem::CaptionSystem()
 void CaptionSystem::AddCaption(const Entity& entity, int& spaceX, int& spaceY, char letter)
 {
 	auto& caption = entity.GetComponent<CaptionComponent>();
-	std::string newLetterStr(1, letter);
+	std::string newLetterStr{ letter };
 	Entity newCaption = Registry::Instance().CreateEntity();
 	newCaption.Group("caption");
 	// Does the std::move make sense hear?
-	newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos + spaceX, caption.yPos + spaceY), std::move(newLetterStr), "game_font", SDL_Color{ 255,255,255,255 }, false);
+	newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos + spaceX, caption.yPos + spaceY), newLetterStr, "game_font", SDL_Color{ 255,255,255,255 }, false);
 	newCaption.AddComponent<GameComponent>();
 }
 
 void CaptionSystem::Update(const float& dt)
 {
+	bool add_space{false};
+	int nextLine = -1;
+
 	for (const auto& entity : GetSystemEntities())
 	{
 		auto& caption = entity.GetComponent<CaptionComponent>();
 		int xPos = caption.xPos / 1024;
 		int yPos = caption.yPos / 672;
 		
-		const auto& playerPos = Game::Instance().GetPlayerPos();
+		const auto& playerPos = Game::Instance().GetPlayer()->GetPlayerPos();
 
 		// Check to see if the caption has already Finished
 		if (caption.finished)
@@ -58,6 +64,11 @@ void CaptionSystem::Update(const float& dt)
 		{
 			if (caption.scrollable)
 			{
+				if (nextLine == -1)
+				{
+					nextLine = NextLine(caption.caption);
+				}
+
 				if (!caption.started)
 				{
 					caption.started = true;
@@ -75,24 +86,29 @@ void CaptionSystem::Update(const float& dt)
 
 					if (caption.caption[caption.currentFrame] != ' ')
 						letter = std::toupper(caption.caption[caption.currentFrame]);
+					if (letter == ' ')
+					{
+						add_space = true;
+						++caption.currentFrame;
+						continue;
+					}
 
-					int nextLine = NextLine(caption.caption);
-
+					
 					if (caption.currentFrame > nextLine)
 					{
 						// This starts it back at zero for the next row
 						spaceX = (caption.currentFrame - nextLine) * LETTER_SPACE; 
 						spaceY = LETTER_SPACE; 
 					}
-
-					AddCaption(entity, spaceX, spaceY, letter);
-
+					
+					// AddCaption(entity, spaceX, spaceY, letter);
+					ConvertLetter(letter, caption.xPos + spaceX + (add_space ? 24 : 0), caption.yPos + spaceY);
 					// increase the frame index
 					caption.currentFrame++;
 
 					// play the text scroll sound
 					Mix_Volume(6, 10);
-					Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "text_slow", 1, 6);
+					Game::Instance().GetSoundPlayer().PlaySoundFX("text_slow", 1, SoundChannel::TEXT);
 
 					// Check completion
 					if (caption.currentFrame == caption.caption.length())
@@ -101,6 +117,7 @@ void CaptionSystem::Update(const float& dt)
 						caption.scrollTimer.Stop();
 						continue;
 					}
+					
 				}
 			}
 			else // This is for numbers or anything that does not require scrolling
@@ -108,12 +125,21 @@ void CaptionSystem::Update(const float& dt)
 				auto& caption = entity.GetComponent<CaptionComponent>();
 				if (!caption.started)
 				{
-					Entity newCaption = Registry::Instance().CreateEntity();
-					newCaption.Group("caption");
+					if (caption.is_number)
+					{
+						ConvertNumber(caption.caption, caption.xPos, caption.yPos);
+					}
+					else
+					{
+						ConvertName(caption.caption, caption.xPos, caption.yPos);
+					}
 
-					// Does the std::move make sense here?
-					newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos, caption.yPos), caption.caption, "game_font", SDL_Color{ 255,255,255,255 }, false);
-					newCaption.AddComponent<GameComponent>();
+					//Entity newCaption = Registry::Instance().CreateEntity();
+					//newCaption.Group("caption");
+
+					//// Does the std::move make sense here?
+					//newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos, caption.yPos), caption.caption, "game_font", SDL_Color{ 255,255,255,255 }, false);
+					//newCaption.AddComponent<GameComponent>();
 					caption.started = true;
 				}
 			}

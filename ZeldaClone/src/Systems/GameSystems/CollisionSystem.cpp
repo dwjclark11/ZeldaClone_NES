@@ -1,24 +1,15 @@
 #include "CollisionSystem.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/TransformComponent.h"
-#include "../../Components/HealthComponent.h"
-#include "../../Components/AnimationComponent.h"
-#include "../../Components/SoundComponent.h"
-#include "../../Components/RigidBodyComponent.h"
-#include "../../Components/RupeeGameComponent.h"
+#include "../../Components/TriggerBoxComponent.h"
 #include "../../Components/ColliderComponent.h"
-#include "../../Components/PlayerComponent.h"
 #include "../../Events/EventManager.h"
 #include "../../Events/CollisionEvent.h"
-#include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
-#include "TriggerSystem.h"
-
-#include <future>
-#include <thread>
-#include <exception>
+#include "../../Game/Player.h"
 
 CollisionSystem::CollisionSystem()
+	: m_Game(Game::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
@@ -26,6 +17,7 @@ CollisionSystem::CollisionSystem()
 
 void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 {
+	//auto& entities = GetSystemEntities();
 	auto entities = GetSystemEntities();
 	// Loop all the entities that the system is interested in
 	for (auto i = entities.begin(); i != entities.end(); i++)
@@ -33,10 +25,13 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 		Entity& a = *i;
 
 		auto& aTransform = a.GetComponent<TransformComponent>();
+		bool a_has_collider = a.HasComponent<ColliderComponent>();
+		bool a_has_trigger = a.HasComponent<TriggerBoxComponent>();
+
 		const int checkAX = aTransform.position.x / 1024;
 		const int checkAY = aTransform.position.y / 672;
 
-		const auto& playerPos = Game::Instance().GetPlayerPos();
+		const auto& playerPos = m_Game.GetPlayer()->GetPlayerPos();
 
 		// Check to see if the collider is in the same panel as the player, if not skip the check
 		if (checkAX != playerPos.x || checkAY != playerPos.y)
@@ -50,23 +45,6 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 			if (a == b)
 				continue;
 
-			if (a.HasComponent<ColliderComponent>() && b.HasComponent<ColliderComponent>())
-				continue;
-
-			if (a.HasComponent<ColliderComponent>() && b.HasComponent<TriggerBoxComponent>())
-			{
-				// Check to see if the trigger is a collider
-				if (!b.GetComponent<TriggerBoxComponent>().collider)
-					continue;
-			}
-
-			if (a.HasComponent<TriggerBoxComponent>() && b.HasComponent<ColliderComponent>())
-			{
-				// Check to see if the trigger is a collider
-				if (!a.GetComponent<TriggerBoxComponent>().collider)
-					continue;
-			}
-
 			auto& bTransform = b.GetComponent<TransformComponent>();
 			const int checkBX = bTransform.position.x / 1024;
 			const int checkBY = bTransform.position.y / 672;
@@ -74,6 +52,23 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 			// Check to see if the collider is in the same panel as the player, if not skip the check
 			if (checkBX != playerPos.x || checkBY != playerPos.y)
 				continue;
+
+			if (a_has_collider && b.HasComponent<ColliderComponent>())
+				continue;
+
+			if (a_has_collider && b.HasComponent<TriggerBoxComponent>())
+			{
+				// Check to see if the trigger is a collider
+				if (!b.GetComponent<TriggerBoxComponent>().collider)
+					continue;
+			}
+
+			if (a_has_trigger && b.HasComponent<ColliderComponent>())
+			{
+				// Check to see if the trigger is a collider
+				if (!a.GetComponent<TriggerBoxComponent>().collider)
+					continue;
+			}
 
 			const auto& aCollider = a.GetComponent<BoxColliderComponent>();
 			const auto& bCollider = b.GetComponent<BoxColliderComponent>();

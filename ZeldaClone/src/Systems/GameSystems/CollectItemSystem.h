@@ -8,6 +8,8 @@ class CollectItemSystem : public System
 {
 private:
 	class Game& game;
+	class GameData& m_GameData;
+
 	class Registry& reg;
 
 public:
@@ -19,7 +21,6 @@ public:
 		Such as rupees, bombs, etc. Those particular items do not require any
 		animation change while obtaining.
 	*/
-	
 	CollectItemSystem();
 
 	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager);

@@ -5,6 +5,7 @@
 #include "../../Components/AnimationComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/ProjectileComponent.h"
+#include "../../Components/PlayerComponent.h"
 #include "../../Components/RupeeGameComponent.h"
 #include "../../Components/ItemComponent.h"
 #include "../../Components/SpriteComponent.h"
@@ -12,11 +13,13 @@
 #include "../../Events/EventManager.h"
 #include "../../Events/CollisionEvent.h"
 #include "../../Game/Game.h"
+#include "../../Game/Player.h"
+#include "../../Utilities/GameData.h"
 #include "../SoundFXSystem.h"
 #include "../../States/GameState.h"
 
 CollectItemSystem::CollectItemSystem()
-	: game(Game::Instance()), reg(Registry::Instance())
+	: game(Game::Instance()), m_GameData(GameData::GetInstance()), reg(Registry::Instance())
 {
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<TriggerBoxComponent>();
@@ -35,12 +38,12 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 	Entity a = event.a;
 	Entity b = event.b;
 
-	if (a.BelongsToGroup("items") && b.HasTag("player")) OnPlayerGetsItem(a, b);
-	if (b.BelongsToGroup("items") && a.HasTag("player")) OnPlayerGetsItem(b, a);
+	if (a.HasComponent<ItemComponent>() && b.HasComponent<PlayerComponent>()) OnPlayerGetsItem(a, b);
+	if (b.HasComponent<ItemComponent>() && a.HasComponent<PlayerComponent>()) OnPlayerGetsItem(b, a);
 	
 	// Test for boomerang retrieving items
-	if (a.BelongsToGroup("items") && b.BelongsToGroup("boomerang")) OnBoomerangGetsItem(a, b);
-	if (b.BelongsToGroup("items") && a.BelongsToGroup("boomerang")) OnBoomerangGetsItem(b, a);
+	if (a.HasComponent<ItemComponent>() && b.HasTag("boomerang")) OnBoomerangGetsItem(a, b);
+	if (b.HasComponent<ItemComponent>() && a.HasTag("boomerang")) OnBoomerangGetsItem(b, a);
 }
 
 void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
@@ -49,18 +52,18 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 
 	if (type == ItemComponent::ItemCollectType::YELLOW_RUPEE)
 	{
-		GameState::scrollRupees += 1;
+		m_GameData.AddRupees(1);
 		item.Kill();
 	}
 	else if (type == ItemComponent::ItemCollectType::BLUE_RUPEE)
 	{
-		GameState::scrollRupees += 5;
+		m_GameData.AddRupees(5);
 		item.Kill();
 	}
 	else if (type == ItemComponent::ItemCollectType::BOMBS)
 	{
-		GameState::totalBombs += 3;
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		m_GameData.AddBombs(3);
+		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
 		item.Kill();
 	}
 	else if (type == ItemComponent::ItemCollectType::HEARTS)
@@ -72,13 +75,13 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 		if (health.healthPercentage >= health.maxHearts * 2)
 			health.healthPercentage = health.maxHearts * 2;
 
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
 		item.Kill();
 	}
 	else if (type == ItemComponent::ItemCollectType::KEYS)
 	{
-		GameState::totalKeys++;
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_item", 0, 1);
+		m_GameData.AddKeys(1);
+		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
 		item.Kill();
 	}
 }
@@ -97,9 +100,19 @@ void CollectItemSystem::Update()
 	for (auto& entity : GetSystemEntities())
 	{
 		auto& trigger = entity.GetComponent<TriggerBoxComponent>();
-		if (trigger.collected && trigger.collectedTimer.GetTicks() > 2000)
+		int time = 2000;
+		if (entity.HasComponent<ItemComponent>())
+		{
+			auto& item = entity.GetComponent<ItemComponent>();
+			if (item.special == ItemComponent::SpecialItemType::TRIFORCE_PIECE)
+			{
+				time = 9000;
+			}
+		}
+		if (trigger.collected && trigger.collectedTimer.GetTicks() > time)
 		{
 			entity.Kill();
+			game.GetPlayer()->SetPlayerItem(false);
 		}
 		else
 			continue;

@@ -1,6 +1,5 @@
 #include "ProjectileEmitterSystem.h"
 #include "../../Events/EventManager.h"
-
 #include "../../Events/GamePadButtonPressedEvent.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/TransformComponent.h"
@@ -12,83 +11,100 @@
 #include "../../Components/ProjectileEmitterComponent.h"
 #include "../../Components/GameComponent.h"
 #include "../../Components/AIComponent.h"
-#include "../GameSystems/KeyboardControlSystem.h"
 #include "../GameSystems/ProjectileLifeCycleSystem.h"
 #include "../../States/GameState.h"
-#include <SDL.h>
 #include "../../Systems/SoundFXSystem.h"
-#include "GamePadSystem.h"
+#include "../../Utilities/GameData.h"
+#include "../../Game/Game.h"
+#include "../../Game/Player.h"
+#include "../../inputs/InputManager.h"
+#include "../../inputs/Gamepad.h"
 #include <map>
+#include <SDL.h>
+
+#ifdef _DEBUG
+
+void ProjectileEmitterSystem::ClearItemMap()
+{
+	if (projectileAttributeMap.size() > 0)
+		projectileAttributeMap.clear();
+
+	if (projectileAttributeMap.size() == 0)
+		Logger::Log("Item Map Cleared");
+}
+
+void ProjectileEmitterSystem::ReloadItemMap()
+{
+	if (projectileAttributeMap.size() == 0)
+	{
+		LoadMapAttributes(Game::Instance().GetLuaState());
+		Logger::Log("Item Map Reloaded!");
+	}
+	else
+		Logger::Err("Please Empty the item Map");
+}
+
+#endif
+
 
 void ProjectileEmitterSystem::ItemUsed()
 {
-	auto player = Registry::Instance().GetEntityByTag("player");
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
 
-	auto& rigid = player.GetComponent<RigidBodyComponent>();
+	auto& rigid = playerEnt.GetComponent<RigidBodyComponent>();
 
 	rigid.velocity = glm::vec2(0);
-
-	if (Game::mSelectedItem == Game::ItemType::WOOD_BOW ||
-		Game::mSelectedItem == Game::ItemType::MAGIC_BOW)
+	switch (gameData.GetSelectedItem())
 	{
+	case GameData::ItemType::BOW:
 		// Bow uses rupees, must be greater than zero!
-		if (GameState::totalRupees > 0)
+		if (gameData.GetTotalRupees() > 0)
 		{
 			UseItem(projectileAttributeMap.at("bow"));
 
 			// Play the arrow sound!
-			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
+			game.GetSoundPlayer().PlaySoundFX("boomerang_arrow", 0, SoundChannel::ANY);
 			// Subtract from the total rupees when using the bow!
-			GameState::totalRupees--;
+			gameData.UseArrow();
 		}
-
-		KeyboardControlSystem::keyDown = true;
-	}
-	else if (Game::mSelectedItem == Game::ItemType::BOMB)
-	{
-		if (GameState::totalBombs > 0)
+		break;
+	case GameData::ItemType::BOMB:
+		if (gameData.GetTotalBombs() > 0)
 		{
 			UseItem(projectileAttributeMap.at("bomb"));
-			GameState::totalBombs--;
-			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "bomb_drop", 0, 1);
+			gameData.UseBomb();
+			game.GetSoundPlayer().PlaySoundFX("bomb_drop", 0, SoundChannel::ANY);
 		}
-
-		KeyboardControlSystem::keyDown = true;
-	}
-	else if (Game::mSelectedItem == Game::ItemType::CANDLE)
-	{
+		break;
+	case GameData::ItemType::CANDLE:
 		UseItem(projectileAttributeMap.at("candle"));
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "candle", 0, 1);
-		KeyboardControlSystem::keyDown = true;
-	}
-	else if (Game::mSelectedItem == Game::ItemType::BOOMERANG)
-	{
-		if (!boomerangReturned)
-		{
-			UseItem(projectileAttributeMap.at("boomerang"));
-			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "boomerang_arrow", 0, 1);
-			KeyboardControlSystem::keyDown = true;
-		}
-	}
-	else if (Game::mSelectedItem == Game::ItemType::MAGIC_ROD)
-	{
-		UseMagicWand();
+		game.GetSoundPlayer().PlaySoundFX("candle", 0, SoundChannel::ANY);
+		break;
+	case GameData::ItemType::BOOMERANG:
+		if (Registry::Instance().DoesTagExist("boomerang"))
+			return;
 
+		UseItem(projectileAttributeMap.at("boomerang"));
+		game.GetSoundPlayer().PlaySoundFX("boomerang_arrow", 0, SoundChannel::ANY);
+		break;
+	case GameData::ItemType::MAGIC_ROD:
+		UseMagicWand();
 		UseItem(projectileAttributeMap.at("magic_rod"));
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "magic_rod", 0, 1);
-		KeyboardControlSystem::keyDown = true;
+		game.GetSoundPlayer().PlaySoundFX("magic_rod", 0, SoundChannel::ANY);
+		break;
 	}
 }
 
 void ProjectileEmitterSystem::SwordUsed()
 {
-	auto player = Registry::Instance().GetEntityByTag("player");
-
-	auto& rigid = player.GetComponent<RigidBodyComponent>();
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
+	auto& rigid = playerEnt.GetComponent<RigidBodyComponent>();
 
 	rigid.velocity = glm::vec2(0);
 	// Do not use the sword if we do not have a sword
-	if (game.HasSword())
+	if (gameData.HasSword())
 	{
 		UseSword();
 		// If the player life is full, allow sword beam projectile
@@ -97,62 +113,59 @@ void ProjectileEmitterSystem::SwordUsed()
 			// Create Sword beam projectile
 			UseItem(projectileAttributeMap.at("beam"));
 
-			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_shoot", 0, 1);
+			game.GetSoundPlayer().PlaySoundFX("sword_shoot", 0, SoundChannel::ANY);
 		}
 		else
-			Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "sword_slash", 0, 1);
+			game.GetSoundPlayer().PlaySoundFX("sword_slash", 0, SoundChannel::ANY);
 
 		swordTimer.Start();
-		KeyboardControlSystem::keyDown = true;
 	}
 }
 
 ProjectileEmitterSystem::ProjectileEmitterSystem()
 	: game(Game::Instance())
+	, gameData(GameData::GetInstance())
+	, inputManager(InputManager::GetInstance())
+	, registry(Registry::Instance())
+	, fullLife{false}
+	, swordTimer{}
 {
 	RequiredComponent<ProjectileEmitterComponent>();
 	RequiredComponent<TransformComponent>();
-
-	boomerangReturned = false;
-	magicBeam = false;
-	fullLife = false;
-	swordTimer.Stop();
-
 	LoadMapAttributes(game.GetLuaState(), "ProjectileAttributes");
+	swordTimer.Stop();
 }
 
+void ProjectileEmitterSystem::SubscribeKeyToEvents(std::unique_ptr<EventManager>& eventManager)
+{
+	eventManager->SubscribeToEvent<KeyPressedEvent>(this, &ProjectileEmitterSystem::OnKeyPressed);
+}
 void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 {
-	auto player = Registry::Instance().GetEntityByTag("player");
-
-	auto& projectileEmitter = player.GetComponent<ProjectileEmitterComponent>();
-	const auto& transform = player.GetComponent<TransformComponent>();
-	const auto& rigidbody = player.GetComponent<RigidBodyComponent>();
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
+	auto& projectileEmitter = playerEnt.GetComponent<ProjectileEmitterComponent>();
+	const auto& transform =   playerEnt.GetComponent<TransformComponent>();
+	const auto& rigidbody =   playerEnt.GetComponent<RigidBodyComponent>();
+	const auto& sprite = playerEnt.GetComponent<SpriteComponent>();
 
 	// If the entity has a sprite --> Position the projectile in the center
 	glm::vec2 projectilePosition = transform.position;
-
-	const auto& sprite = player.GetComponent<SpriteComponent>();
 	projectilePosition.x += (transform.scale.x * sprite.width / 2);
 	projectilePosition.y += (transform.scale.y * sprite.height / 2);
 
-	glm::vec2 projectileVelocity = projectileEmitter.projectileVelocity;
+	glm::vec2 projectileVelocity{ projectileEmitter.projectileVelocity };
 	glm::vec2 BoxOffset = glm::vec2(0, 0);
 	glm::vec2 BoxSize = glm::vec2(0, 0);
-
-	// If the duration is not put in, default duration 
-	if (attrib.duration == 0)
-	{
-		//attrib.duration = projectileEmitter.projectileDuration;
-	}
 
 	// Create direction variables the change the velocity direction based on which way we are facing
 	int directionX = 0;
 	int directionY = 0;
 
 	// Use the fire ahead of the player in the direction the player is facing
-	if (KeyboardControlSystem::dir == UP)
+	switch (rigidbody.dir)
 	{
+	case RigidBodyComponent::Dir::UP:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = (transform.position.x + attrib.transOffsetUp.x);
@@ -168,9 +181,8 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxSize = attrib.boxSizeUp;
 		BoxOffset = attrib.upOffset;
 		directionY = -1;
-	}
-	if (KeyboardControlSystem::dir == RIGHT)
-	{
+		break;
+	case RigidBodyComponent::Dir::RIGHT:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = ((transform.position.x + attrib.transOffsetRight.x) + sprite.width * 3);
@@ -185,9 +197,8 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxSize = attrib.boxSizeRight;
 		BoxOffset = attrib.rightOffset;
 		directionX = 1;
-	}
-	if (KeyboardControlSystem::dir == DOWN)
-	{
+		break;
+	case RigidBodyComponent::Dir::DOWN:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = (transform.position.x + attrib.transOffsetDown.x);
@@ -202,9 +213,8 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxSize = attrib.boxSizeDown;
 		BoxOffset = attrib.downOffset;
 		directionY = 1;
-	}
-	if (KeyboardControlSystem::dir == LEFT)
-	{
+		break;
+	case RigidBodyComponent::Dir::LEFT:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = ((transform.position.x + attrib.transOffsetLeft.x) - sprite.width * 3);
@@ -219,11 +229,12 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxSize = attrib.boxSizeLeft;
 		BoxOffset = attrib.leftOffset;
 		directionX = -1;
+		break;
 	}
-
+		
+	
 	// Create new projectile entity and add it to the world
-	Entity newItem = player.registry->CreateEntity();
-	newItem.Group(attrib.group);
+	Entity newItem = playerEnt.registry->CreateEntity();
 	newItem.AddComponent<TransformComponent>(projectilePosition, glm::vec2(attrib.scale.x, attrib.scale.y), 0.0);
 
 	if (attrib.group != "bomber")
@@ -231,91 +242,94 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		// Set the projectile velocity based on the direction 
 		projectileVelocity.x = projectileEmitter.projectileVelocity.x * directionX;
 		projectileVelocity.y = projectileEmitter.projectileVelocity.y * directionY;
-		newItem.AddComponent<RigidBodyComponent>(projectileVelocity);
+		newItem.AddComponent<RigidBodyComponent>(projectileVelocity, rigidbody.dir);
 		newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
 	}
 	// Does the projectile have an animation component?
 	if (attrib.animation)
 	{
 		// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
-		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 10, attrib.vertical, true);
+		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 15, attrib.vertical, true);
 	}
 	projectileEmitter.isFriendly = true;
 	newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
-	newItem.AddComponent<ProjectileEmitterComponent>(projectileEmitter.projectileVelocity, 0, attrib.duration, projectileEmitter.hitPercentDamage, projectileEmitter.isFriendly);
-	newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration);
+	newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration, static_cast<ProjectileComponent::Dir>(rigidbody.dir));
 	newItem.AddComponent<GameComponent>();
 
 	if (attrib.group == "boomerang")
 	{
 		auto& boomerTimer = newItem.GetComponent<ProjectileComponent>();
 		boomerTimer.boomTimer.Start();
+		newItem.Tag(attrib.group);
+	}
+	else
+	{
+		newItem.Group(attrib.group);
 	}
 }
 
 void ProjectileEmitterSystem::UseSword()
 {
-	auto player = Registry::Instance().GetEntityByTag("player");
-	auto& playerSprite = player.GetComponent<SpriteComponent>();
-	auto& playerCollider = player.GetComponent<BoxColliderComponent>();
-	const auto& playerHealth = player.GetComponent<HealthComponent>();
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
 
-	auto sword = Registry::Instance().GetEntityByTag("the_sword");
+	auto& playerSprite = playerEnt.GetComponent<SpriteComponent>();
+	auto& playerCollider = playerEnt.GetComponent<BoxColliderComponent>();
+	const auto& playerHealth = playerEnt.GetComponent<HealthComponent>();
+	const auto& rigidbody = playerEnt.GetComponent<RigidBodyComponent>();
+
+	const auto& sword = player->GetSword();
 	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
-
-	auto shield = Registry::Instance().GetEntityByTag("the_shield");
+	
+	const auto& shield = player->GetShield();
 	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
 
-	if (KeyboardControlSystem::dir == UP)
+	switch (rigidbody.dir)
 	{
+	case RigidBodyComponent::Dir::UP:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.y = 60;
 
-		swordCollider.height = 40;
-		swordCollider.width = 10;
+		swordCollider.height = 60;
+		swordCollider.width = 20;
 		swordCollider.offset.x = 60;
 		swordCollider.offset.y = 12;
 
 		shieldCollider.offset.y = 60;
-	}
-
-	if (KeyboardControlSystem::dir == RIGHT)
-	{
+		break;
+	case RigidBodyComponent::Dir::RIGHT:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.x = 30;
 
-		swordCollider.height = 10;
-		swordCollider.width = 40;
+		swordCollider.height = 20;
+		swordCollider.width = 60;
 		swordCollider.offset.x = 78;
 		swordCollider.offset.y = 58;
 
 		shieldCollider.offset.x = 70;
-	}
-
-	if (KeyboardControlSystem::dir == DOWN)
-	{
+		break;
+	case RigidBodyComponent::Dir::DOWN:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.y = 30;
 
-		swordCollider.height = 40;
-		swordCollider.width = 10;
+		swordCollider.height = 60;
+		swordCollider.width = 20;
 		swordCollider.offset.x = 64;
 		swordCollider.offset.y = 74;
 
 		shieldCollider.offset.y = 60;
-	}
-
-	if (KeyboardControlSystem::dir == LEFT)
-	{
+		break;
+	case RigidBodyComponent::Dir::LEFT:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.x = 60;
 
-		swordCollider.height = 10;
-		swordCollider.width = 40;
+		swordCollider.height = 20;
+		swordCollider.width = 60;
 		swordCollider.offset.x = 12;
 		swordCollider.offset.y = 56;
 
 		shieldCollider.offset.x = 64;
+		break;
 	}
 
 	// Check to see if health is full for sword beam
@@ -325,16 +339,14 @@ void ProjectileEmitterSystem::UseSword()
 
 void ProjectileEmitterSystem::UseMagicWand()
 {
-	auto player = Registry::Instance().GetEntityByTag("player");
-
-	const auto& health = player.GetComponent<HealthComponent>();
-	auto& sprite = player.GetComponent<SpriteComponent>();
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
+	auto& sprite = playerEnt.GetComponent<SpriteComponent>();
 	sprite.srcRect.y = sprite.height * 6;
 }
 
 void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::string& fileName)
 {
-
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
@@ -450,17 +462,25 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 	}
 }
 
+void ProjectileEmitterSystem::SubscribeBtnToEvents(std::unique_ptr<EventManager>& eventManager)
+{
+	eventManager->SubscribeToEvent<GamePadButtonPressedEvent>(this, &ProjectileEmitterSystem::OnBtnPressed);
+}
 void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 {
 	if (!game.PlayerHold())
 	{
-		if (event.symbol == game.GetKeyBindings().at(Game::Action::USE_ITEM) && !KeyboardControlSystem::keyDown)
+		auto& keyboard = inputManager.GetKeyboard();
+		auto& gamepad = inputManager.GetGamepad();
+		if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_X))
 		{
 			ItemUsed();
+			inputManager.SetAttack(true);
 		}
-		else if (event.symbol == game.GetKeyBindings().at(Game::Action::ATTACK) && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
+		else if ((keyboard.IsKeyJustPressed(KEY_RSHIFT) || gamepad.IsButtonJustPressed(GP_BTN_A)) && swordTimer.GetTicks() == 0)
 		{
 			SwordUsed();
+			inputManager.SetAttack(true);
 		}
 	}
 }
@@ -469,26 +489,22 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 {
 	if (!game.PlayerHold())
 	{
-		if (event.button == game.GetBtnBindings().at(Game::Action::USE_ITEM) && !KeyboardControlSystem::keyDown)
+		if (event.button == inputManager.GetBtnCode(InputManager::Action::USE_ITEM))
 		{
 			ItemUsed();
 			
 		}
-		else if (event.button == game.GetBtnBindings().at(Game::Action::ATTACK) && !KeyboardControlSystem::keyDown && swordTimer.GetTicks() == 0)
+		else if (event.button == inputManager.GetBtnCode(InputManager::Action::ATTACK) && swordTimer.GetTicks() == 0)
 		{
 			SwordUsed();
 		}
 	}
 }
 
-void ProjectileEmitterSystem::Update(Registry& registry)
+void ProjectileEmitterSystem::Update()
 {
 	for (auto& entity : GetSystemEntities())
 	{
-		// Update the boomerang position
-		if (entity.BelongsToGroup("boomerang"))
-			UpdateBoomerang(entity);
-
 		// This is the wait time for the player sword 
 		if (swordTimer.GetTicks() > 250)
 			swordTimer.Stop();
@@ -537,14 +553,22 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 			// Set the srcRect for the projectile sprite
 			srcRectY = 4 * 16;
 			scale = 4;
-			if (projectileEmitter.shootUp)
+			switch (rigid.dir)
+			{
+			case RigidBodyComponent::Dir::UP:
 				srcRectX = 0 * 16;
-			else if (projectileEmitter.shootRight)
+				break;
+			case RigidBodyComponent::Dir::RIGHT:
 				srcRectX = 1 * 16;
-			else if (projectileEmitter.shootDown)
+				break;
+			case RigidBodyComponent::Dir::DOWN:
 				srcRectX = 2 * 16;
-			else if (projectileEmitter.shootLeft)
+				break;
+			case RigidBodyComponent::Dir::LEFT:
 				srcRectX = 3 * 16;
+				break;
+			}
+
 			break;
 
 		case AIComponent::EnemyType::ZORA:
@@ -557,48 +581,38 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 
 		// Set the velocity and direction of the projectile based on when it 
 		// was triggered
-		if (projectileEmitter.shootUp)
+		switch (rigid.dir)
 		{
-			projectileEmitter.projectileVelocity = glm::vec2(0, -200);
-			projectileEmitter.shootUp = false;
-			rigid.up = true;
+		case RigidBodyComponent::Dir::UP:
+			projectileEmitter.projectileVelocity = glm::vec2(0, -400);
 			offsetX = 20;
 			offsetY = 0;
-
-		}
-		else if (projectileEmitter.shootRight)
-		{
-			projectileEmitter.projectileVelocity = glm::vec2(200, 0);
-			projectileEmitter.shootRight = false;
-			rigid.right = true;
+			break;
+		case RigidBodyComponent::Dir::RIGHT:
+			projectileEmitter.projectileVelocity = glm::vec2(400, 0);
 			offsetX = 0;
 			offsetY = 20;
-		}
-		else if (projectileEmitter.shootDown)
-		{
-			projectileEmitter.projectileVelocity = glm::vec2(0, 200);
-			projectileEmitter.shootDown = false;
-			rigid.down = true;
+			break;
+		case RigidBodyComponent::Dir::DOWN:
+			projectileEmitter.projectileVelocity = glm::vec2(0, 400);
 			offsetX = 20;
 			offsetY = 0;
-		}
-		else if (projectileEmitter.shootLeft)
-		{
-			projectileEmitter.projectileVelocity = glm::vec2(-200, 0);
-			projectileEmitter.shootLeft = false;
-			rigid.left = true;
+			break;
+		case RigidBodyComponent::Dir::LEFT:
+			projectileEmitter.projectileVelocity = glm::vec2(-400, 0);
 			offsetX = 0;
 			offsetY = 20;
+			break;
 		}
 
 		enemyProjectile.AddComponent<TransformComponent>(glm::vec2(projectileTransform.position.x + offsetX, projectileTransform.position.y + offsetY), glm::vec2(scale, scale), 0.0);
 
-		enemyProjectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity);
+		enemyProjectile.AddComponent<RigidBodyComponent>(projectileEmitter.projectileVelocity, rigid.dir);
 		enemyProjectile.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
 		projectileEmitter.isFriendly = false;
 		enemyProjectile.AddComponent<SpriteComponent>("items", 16, 16, 2, false, srcRectX, srcRectY);
-		enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+		enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration, static_cast<ProjectileComponent::Dir>(rigid.dir));
 		enemyProjectile.AddComponent<GameComponent>();
 
 		projectileEmitter.shotFired = true;
@@ -607,9 +621,9 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 
 void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 {
-	// Player variables
-	auto player = Registry::Instance().GetEntityByTag("player");
-	auto& playerPos = player.GetComponent<TransformComponent>();
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
+	const auto& playerPos = playerEnt.GetComponent<TransformComponent>();
 
 	// Boss Variables
 	auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
@@ -665,63 +679,7 @@ void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 			enemyProjectile3.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
 			enemyProjectile3.AddComponent<GameComponent>();
 
-
-
 			projectileEmitter.shotFired = true;
-		}
-	}
-}
-
-void ProjectileEmitterSystem::UpdateBoomerang(Entity& entity)
-{
-	// Player variables
-	auto player = Registry::Instance().GetEntityByTag("player");
-	auto& playerPos = player.GetComponent<TransformComponent>();
-
-	// Boomerang variables
-	auto& rigidbody = entity.GetComponent<RigidBodyComponent>();
-	auto& proj = entity.GetComponent<ProjectileComponent>();
-	auto& transform = entity.GetComponent<TransformComponent>();
-
-	// Have the boomerang change direction based on the player position
-	glm::vec2 direction = glm::normalize(playerPos.position - transform.position);
-
-	if (proj.boomTimer.GetTicks() > 300) // TODO: Change the time based on type of boomerang-->wood/magic
-	{
-		rigidbody.velocity.x = direction.x * 500; // Changed from 300
-		rigidbody.velocity.y = direction.y * 500; // Changed from 300
-		boomerangReturned = true;
-	}
-	if (boomerangReturned)
-	{
-		bool setKill = false;
-
-		// If the boomerang position is within any of these given parameters --> Kill it
-		if (rigidbody.velocity.x > 0 && rigidbody.velocity.y > 0 &&
-			transform.position.x >= playerPos.position.x - 32 && transform.position.y >= playerPos.position.y - 32)
-			setKill = true;
-		else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y > 0 &&
-			transform.position.x <= playerPos.position.x + 32 && transform.position.y >= playerPos.position.y - 32)
-			setKill = true;
-		else if (rigidbody.velocity.x > 0 && rigidbody.velocity.y < 0 &&
-			transform.position.x >= playerPos.position.x - 32 && transform.position.y <= playerPos.position.y + 32)
-			setKill = true;
-		else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y < 0 &&
-			transform.position.x <= playerPos.position.x + 32 && transform.position.y <= playerPos.position.y + 32)
-			setKill = true;
-		else if (rigidbody.velocity.x > 0 && rigidbody.velocity.y == 0 && transform.position.x >= playerPos.position.x - 32)
-			setKill = true;
-		else if (rigidbody.velocity.x < 0 && rigidbody.velocity.y == 0 && transform.position.x <= playerPos.position.x + 32)
-			setKill = true;
-		else if (rigidbody.velocity.x == 0 && rigidbody.velocity.y > 0 && transform.position.y >= playerPos.position.y - 32)
-			setKill = true;
-		else if (rigidbody.velocity.x == 0 && rigidbody.velocity.y < 0 && transform.position.y <= playerPos.position.y + 32)
-			setKill = true;
-
-		if (setKill)
-		{
-			entity.Kill();
-			boomerangReturned = false;
 		}
 	}
 }

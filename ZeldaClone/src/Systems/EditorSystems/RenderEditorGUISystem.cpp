@@ -4,14 +4,15 @@
 #include "../../Components/SecretComponent.h"
 
 #include "../../Utilities/FileManagerUtils.h"
+#include "../../Utilities/Camera.h"
 #include "../../States/MenuState.h"
 #include "../../Game/LevelLoader.h"
 #include <filesystem>
 
 // Variable Declarations
 int RenderEditorGUISystem::zIndex = 0;
-int RenderEditorGUISystem::scaleX = Game::gameScale;
-int RenderEditorGUISystem::scaleY = Game::gameScale;
+int RenderEditorGUISystem::scaleX = 4;
+int RenderEditorGUISystem::scaleY = 4;
 int RenderEditorGUISystem::mouseRectX = 16;
 int RenderEditorGUISystem::mouseRectY = 16;
 int RenderEditorGUISystem::boxColliderWidth = 0;
@@ -131,11 +132,14 @@ void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetMan
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid X: %d", static_cast<int>(Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().x) / MouseControlSystem::gridSize);
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid Y : %d", static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().y) / MouseControlSystem::gridSize);
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid X: %d", static_cast<int>(Game::Instance().GetMouseBox().x + 
+			Game::Instance().GetCamera().GetCameraPos().x) / MouseControlSystem::gridSize);
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Grid Y : %d", static_cast<int>(Game::Instance().GetMouseBox().y + 
+			Game::Instance().GetCamera().GetCameraPos().y) / MouseControlSystem::gridSize);
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "[Mouse X: %d", static_cast<int>(Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().x));
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Mouse Y : %d]", static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().y));
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "[Mouse X: %d", static_cast<int>(Game::Instance().GetMouseBox().x +
+			Game::Instance().GetCamera().GetCameraPos().x));
+		ImGui::TextColored(ImVec4(0, 255, 0, 1), "Mouse Y : %d]", static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().GetCameraPos().y));
 		
 
 		// Put Above this
@@ -201,7 +205,7 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 	{
 		if (!GetSystemEntities().empty())
 		{
-			for (auto entity : GetSystemEntities())
+			for (auto& entity : GetSystemEntities())
 			{
 				entity.Kill();
 				imageName = "";
@@ -320,6 +324,29 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 			}
 		}
 	}
+
+
+	if (MouseControlSystem::createEnemy)
+	{
+		if (ImGui::MenuItem("Open Enemy Map", "Ctrl+O"))
+		{
+			LevelLoader load;
+			fileName = dialog.OpenFile();
+
+			std::string extension = std::filesystem::path(fileName).extension().string();
+			std::string stem = std::filesystem::path(fileName).stem().string();
+
+			loader.SetFileName(fileName);
+
+			// Check to see if the String is Empty!!
+			if (!fileName.empty() && extension == ".lua")
+			{
+				load.LoadEnemiesFromLuaTable(game.GetLuaState(), stem);
+				fileLoaded = true;
+			}
+		}
+	}
+
 
 	if (ImGui::MenuItem("Save", "Ctrl+S"))
 	{

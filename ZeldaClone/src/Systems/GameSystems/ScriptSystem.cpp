@@ -11,18 +11,16 @@
 
 std::tuple<double, double> GetEntityPosition(Entity entity)
 {
+	if (entity.HasComponent<TransformComponent>())
 	{
-		if (entity.HasComponent<TransformComponent>())
-		{
-			const auto& transform = entity.GetComponent<TransformComponent>();
-			return std::make_tuple(transform.position.x, transform.position.y);
-		}
-		else
-		{
-			Logger::Err("Trying to get the position of an entity that has no Transform Component");
-			return std::make_tuple(0.0, 0.0);
-		}
+		const auto& transform = entity.GetComponent<TransformComponent>();
+		return std::make_tuple(transform.position.x, transform.position.y);
 	}
+	else
+	{
+		Logger::Err("Trying to get the position of an entity that has no Transform Component");
+		return std::make_tuple(0.0, 0.0);
+	}	
 }
 
 std::tuple<double, double> GetEntityVelocity(Entity entity)

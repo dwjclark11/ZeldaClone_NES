@@ -3,6 +3,7 @@
 #include "../../Components/TransformComponent.h"
 
 #include "../../Game/Game.h"
+#include "../../Utilities/Camera.h"
 
 int MouseControlSystem::mouseRectX = 0;
 int MouseControlSystem::mouseRectY = 0;
@@ -81,8 +82,10 @@ void MouseControlSystem::CreateTile(const std::unique_ptr<AssetManager>& assetMa
 	MouseBox(assetManager, renderer, mouseBox, camera);
 
 	// This is a test
-	int posX = static_cast<int>(Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().x) / MouseControlSystem::gridSize;
-	int posY = static_cast<int>(Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().y) / MouseControlSystem::gridSize;
+	int posX = static_cast<int>(Game::Instance().GetMouseBox().x + 
+		Game::Instance().GetCamera().GetCameraPos().x) / MouseControlSystem::gridSize;															  
+	int posY = static_cast<int>(Game::Instance().GetMouseBox().y + 
+		Game::Instance().GetCamera().GetCameraPos().y) / MouseControlSystem::gridSize;
 
 	if (event.type == SDL_MOUSEBUTTONDOWN || leftPressed)
 	{
