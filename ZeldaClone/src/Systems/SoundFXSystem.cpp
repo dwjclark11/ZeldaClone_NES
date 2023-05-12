@@ -1,16 +1,22 @@
 #include "SoundFXSystem.h"
+#include "../AssetManager/AssetManager.h"
+#include "../Logger/Logger.h"
 
-SoundFXSystem::SoundFXSystem()
+SoundFX::SoundFX(AssetManager& assetManager)
+	: m_AssetManager(assetManager)
 {
 
 }
 
-SoundFXSystem::~SoundFXSystem()
+SoundFX::~SoundFX()
 {
 
 }
 
-void SoundFXSystem::PlaySoundFX(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops, int channel)
+void SoundFX::PlaySoundFX(const std::string& assetID, int loops, int channel)
 {
-	Mix_PlayChannel(channel, assetManager->GetSoundFX(assetID), loops);
+	if (Mix_PlayChannel(channel, m_AssetManager.GetSoundFX(assetID), loops) == -1)
+	{
+		Logger::Err("PROBLEMS!");
+	}
 }
