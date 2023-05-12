@@ -21,6 +21,7 @@
 #include "../Components/ProjectileEmitterComponent.h"
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/SceneChangeComponent.h"
+#include "../Components/EditorComponent.h"
 #include "../Components/ItemComponent.h"
 #include "../States/NameState.h"
 #include "../States/MenuState.h"
@@ -34,9 +35,10 @@
 #include <fstream>
 #include <filesystem>
 #include <SDL.h>
+#include "../Utilities/GameData.h"
 
 LevelLoader::LevelLoader()
-	: game(Game::Instance()), reg(Registry::Instance())
+	: game(Game::Instance()), gameData(GameData::GetInstance()), reg(Registry::Instance())
 {
 }
 
@@ -231,8 +233,8 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 		{
 			if (fileName == "save1")
 			{
-				MenuState::player1Name = player["menu_shared_values"]["name"];
-				ConvertName(MenuState::player1Name, 400, 220);
+				gameData.SetPlayer1Name(player["menu_shared_values"]["name"] );
+				ConvertName(gameData.GetPlayer1Name(), 400, 220);
 				transformX = 550;
 				transformY = 200;
 				entityTag = "first_menu_slot";
@@ -240,16 +242,16 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 			}
 			if (fileName == "save2")
 			{
-				MenuState::player2Name = player["menu_shared_values"]["name"];
-				ConvertName(MenuState::player2Name, 400, 320);
+				gameData.SetPlayer2Name(player["menu_shared_values"]["name"] );
+				ConvertName(gameData.GetPlayer2Name(), 400, 320);
 				transformX = 550;
 				transformY = 300;
 				entityTag = "second_menu_slot";
 			}
 			if (fileName == "save3")
 			{
-				MenuState::player3Name = player["menu_shared_values"]["name"];
-				ConvertName(MenuState::player3Name, 400, 420);
+				gameData.SetPlayer3Name(player["menu_shared_values"]["name"] );
+				ConvertName(gameData.GetPlayer3Name(), 400, 420);
 				transformX = 550;
 				transformY = 400;
 				entityTag = "third_menu_slot";
@@ -290,7 +292,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileNa
 	i = 1;
 }
 
-void LevelLoader::EliminatePlayerToDefault(int slotNum, std::string& name)
+void LevelLoader::EliminatePlayerToDefault(int slotNum, const std::string& name)
 {
 	// Completly Delete the player
 	for (auto& nameImage : reg.GetEntitiesByGroup(name))
@@ -300,7 +302,7 @@ void LevelLoader::EliminatePlayerToDefault(int slotNum, std::string& name)
 		playerHearts.Kill();
 
 	// Play Eliminate Sound
-	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "Eliminate", 0, 1);
+	game.GetSoundPlayer().PlaySoundFX("Eliminate", 0, SoundChannel::ANY);
 }
 
 bool LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
@@ -329,7 +331,6 @@ void LevelLoader::ReadBoxColliderComponent(sol::table& table, Entity& entity)
 	sol::optional<sol::table> boxCollider = table["components"]["box_collider"];
 	if (boxCollider != sol::nullopt)
 	{
-		//Logger::Err("Has Box Collider Component");
 		entity.AddComponent<BoxColliderComponent>(
 			table["components"]["box_collider"]["width"],
 			table["components"]["box_collider"]["height"],
@@ -606,9 +607,10 @@ void LevelLoader::LoadColliders(const std::string& filename)
 	if (!mapFile.is_open())
 	{
 		Logger::Err("Unable to open file");
+		return;
 	}
 
-	while (true)
+	while (!mapFile.eof())
 	{
 		int tranX = 0;
 		int tranY = 0;
@@ -627,10 +629,10 @@ void LevelLoader::LoadColliders(const std::string& filename)
 		// Create a new entity for each tile
 		Entity boxCollider = reg.CreateEntity();
 		boxCollider.Group(group);
-		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
-		boxCollider.AddComponent<GameComponent>();
 		boxCollider.AddComponent<ColliderComponent>();
 		boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
+		boxCollider.AddComponent<TransformComponent>(glm::vec2{ tranX, tranY }, glm::vec2{ colliderScaleX, colliderScaleY }, 0.0);
+		boxCollider.AddComponent<GameComponent>();
 	}
 	mapFile.close();
 }
@@ -695,8 +697,8 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 		return AIComponent::EnemyType::ZORA;
 	else if (enemyType == "keese")
 		return AIComponent::EnemyType::KEESE;
-	else if (enemyType == "trap")
-		return AIComponent::EnemyType::TRAP;
+	else if (enemyType == "blade_trap")
+		return AIComponent::EnemyType::BLADE_TRAP;
 	else if (enemyType == "stalfos")
 		return AIComponent::EnemyType::STALFOS;
 	else if (enemyType == "goriya")
@@ -745,7 +747,10 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 		{
 			break;
 		}
-
+		if (i == 17)
+		{
+			int here = 0;
+		}
 		sol::table trigger = triggers[i];
 
 		Entity newTrigger = reg.CreateEntity();
@@ -756,14 +761,15 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 
 		if (tag != sol::nullopt)
 		{
+
 			std::string tagName = trigger["tag"];
+
+			//if (reg.DoesTagExist(tagName))
+			//	__debugbreak();
+			//else
+			//	Logger::Log("NOPE");
+
 			newTrigger.Tag(tagName);
-
-
-			if (reg.DoesTagExist(tagName))
-				Logger::Log("Exists");
-			else
-				Logger::Log("NOPE");
 		}
 		
 		// Group
@@ -873,7 +879,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	m_writer.WriteDeclareTable("player_data", file);
 
 	// Get the player so we can get their stats
-	auto entity = reg.GetEntityByTag("player");
+	const auto& entity = reg.GetEntityByTag("player");
 	// Player Transform
 	const auto& transform = entity.GetComponent<TransformComponent>();
 	int numHearts = entity.GetComponent<HealthComponent>().maxHearts;//RenderHealthSystem::numHearts;
@@ -883,18 +889,21 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 	m_writer.WriteStartTable(1, false, file);
 
 	// Get the name of the player to save to the File --> Add this to the game class
-	if (saveNum == "1") name = MenuState::player1Name;
-	if (saveNum == "2") name = MenuState::player2Name;
-	if (saveNum == "3") name = MenuState::player3Name;
+	if (saveNum == "1") name = gameData.GetPlayer1Name();
+	if (saveNum == "2") name = gameData.GetPlayer2Name();
+	if (saveNum == "3") name = gameData.GetPlayer3Name();
 
 
 	m_writer.WriteDeclareTable("menu_shared_values", file);
 	m_writer.WriteKeyAndQuotedValue("name", name, file);
 	m_writer.WriteKeyAndUnquotedValue("num_hearts", numHearts, file);
 
-	if (game.GetGameItems().blueRing) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
+	// Get the game data
+	auto& gameData = GameData::GetInstance();
+
+	if (gameData.HasItem(GameData::GameItems::BLUE_RING)) m_writer.WriteKeyAndUnquotedValue("blue_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("blue_ring", "false", file);
-	if (game.GetGameItems().redRing) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
+	if (gameData.HasItem(GameData::GameItems::RED_RING)) m_writer.WriteKeyAndUnquotedValue("red_ring", "true", file);
 	else m_writer.WriteKeyAndUnquotedValue("red_ring", "false", file);
 	m_writer.WriteEndTable(false, file);
 
@@ -913,92 +922,92 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 
 	// Write if we currently have these items in our inventory
 	// Boomerang
-	if (game.GetGameItems().woodBoomerang)
+	if (gameData.HasItem(GameData::GameItems::BOOMERANG))
 		m_writer.WriteKeyAndUnquotedValue("boomerang", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("boomerang", "false", file);
 	// Magic Boomerang
-	if (game.GetGameItems().magicBoomerang)
+	if (gameData.HasItem(GameData::GameItems::MAGIC_BOOMERANG))
 		m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_boomerang", "false", file);
 	// Wood Sword
-	if (game.GetGameItems().woodSword)
+	if (gameData.HasItem(GameData::GameItems::WOOD_SWORD))
 		m_writer.WriteKeyAndUnquotedValue("wood_sword", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("wood_sword", "false", file);
 	// Steel Sword
-	if (game.GetGameItems().steelSword)
+	if (gameData.HasItem(GameData::GameItems::SILVER_SWORD))
 		m_writer.WriteKeyAndUnquotedValue("steel_sword", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("steel_sword", "false", file);
 	// Magic Sword
-	if (game.GetGameItems().magicSword)
+	if (gameData.HasItem(GameData::GameItems::MAGIC_SWORD))
 		m_writer.WriteKeyAndUnquotedValue("magic_sword", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_sword", "false", file);
 	// Magic Rod
-	if (game.GetGameItems().magicRod)
+	if (gameData.HasItem(GameData::GameItems::MAGIC_ROD))
 		m_writer.WriteKeyAndUnquotedValue("magic_rod", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_rod", "false", file);
 	// Bombs
-	if (game.GetGameItems().bombs)
+	if (gameData.HasItem(GameData::GameItems::BOMB))
 		m_writer.WriteKeyAndUnquotedValue("bombs", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("bombs", "false", file);
 	// Food
-	if (game.GetGameItems().food)
+	if (gameData.HasItem(GameData::GameItems::FOOD))
 		m_writer.WriteKeyAndUnquotedValue("food", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("food", "false", file);
 	// Flute
-	if (game.GetGameItems().flute)
+	if (gameData.HasItem(GameData::GameItems::FLUTE))
 		m_writer.WriteKeyAndUnquotedValue("flute", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("flute", "false", file);
 	// Raft
-	if (game.GetGameItems().raft)
+	if (gameData.HasItem(GameData::GameItems::RAFT))
 		m_writer.WriteKeyAndUnquotedValue("raft", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("raft", "false", file);
 	// Ladder
-	if (game.GetGameItems().ladder)
+	if (gameData.HasItem(GameData::GameItems::LADDER))
 		m_writer.WriteKeyAndUnquotedValue("ladder", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("ladder", "false", file);
 	// Bow
-	if (game.GetGameItems().bow)
+	if (gameData.HasItem(GameData::GameItems::BOW))
 		m_writer.WriteKeyAndUnquotedValue("bow_wood", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("bow_wood", "false", file);
 	// Magic Shield
-	if (game.GetGameItems().magicShield)
+	if (gameData.HasItem(GameData::GameItems::MAGIC_SHIELD))
 		m_writer.WriteKeyAndUnquotedValue("magic_shield", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("magic_shield", "false", file);
 	// Power Braclet
-	if (game.GetGameItems().powerBraclet)
+	if (gameData.HasItem(GameData::GameItems::POWER_BRACLET))
 		m_writer.WriteKeyAndUnquotedValue("power_braclet", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("power_braclet", "false", file);
 	// Map
-	if (game.GetGameItems().map)
+	if (gameData.HasItem(GameData::GameItems::MAP))
 		m_writer.WriteKeyAndUnquotedValue("map", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("map", "false", file);
 	// Blue Potion
-	if (game.GetGameItems().bluePotion)
+	if (gameData.HasItem(GameData::GameItems::BLUE_POTION))
 		m_writer.WriteKeyAndUnquotedValue("blue_potion", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("blue_potion", "false", file);
 	// Red Potion
-	if (game.GetGameItems().redPotion)
+	if (gameData.HasItem(GameData::GameItems::RED_POTION))
 		m_writer.WriteKeyAndUnquotedValue("red_potion", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("red_potion", "false", file);
 	// Master Key
-	if (game.GetGameItems().masterKey)
+	if (gameData.HasItem(GameData::GameItems::MASTER_KEY))
 		m_writer.WriteKeyAndUnquotedValue("master_key", "true", file);
 	else
 		m_writer.WriteKeyAndUnquotedValue("master_key", "false", file);
@@ -1008,10 +1017,9 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 
 	// Write the numbered values of current inventory and life hearts
 	m_writer.WriteDeclareTable("inventory", file);
-	m_writer.WriteKeyAndUnquotedValue("num_rupees", GameState::totalRupees, file);
-	m_writer.WriteKeyAndUnquotedValue("num_bombs", GameState::totalBombs, file);
-	//m_writer.WriteKeyAndUnquotedValue("num_arrows", numArrows, file);
-	m_writer.WriteKeyAndUnquotedValue("num_keys", GameState::totalKeys, file);
+	m_writer.WriteKeyAndUnquotedValue("num_rupees", gameData.GetTotalRupees(), file);
+	m_writer.WriteKeyAndUnquotedValue("num_bombs", gameData.GetTotalBombs(), file);
+	m_writer.WriteKeyAndUnquotedValue("num_keys", gameData.GetTotalKeys(), file);
 	// Close the remaining tables
 	m_writer.WriteEndTable(false, file);
 	m_writer.WriteEndTable(false, file);
@@ -1194,7 +1202,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 			ReadProjectileEmitterComponent(player, entity);
 			// Keyboard Control Component 
 			ReadKeyboardControlComponent(player, entity);
-			if (entity.HasTag("player"))
+			if (entity.HasTag("player") || entity.HasTag("the_shield") || entity.HasTag("the_sword"))
 			{
 				entity.AddComponent<CameraFollowComponent>();
 				entity.AddComponent<PlayerComponent>();
@@ -1203,6 +1211,15 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 		}
 		i++;
 	}
+
+	auto player = reg.GetEntityByTag("player");
+	auto shield = reg.GetEntityByTag("the_shield");
+	auto sword = reg.GetEntityByTag("the_sword");
+	if (!game.CreateNewPlayer(player, sword, shield))
+	{
+		Logger::Err("LevelLoader -- Unable to create player!");
+	}
+
 }
 
 void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName, int slotNum)
@@ -1224,10 +1241,12 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 	sol::table data = lua["player_data"];
 
 	int i = 1;
+	// Get the Game data
+	auto& gameData = GameData::GetInstance();
 
 	while (true)
 	{
-		auto entity = reg.GetEntityByTag("player");
+		const auto& entity = reg.GetEntityByTag("player");
 
 		auto& transform = entity.GetComponent<TransformComponent>();
 
@@ -1260,35 +1279,99 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 		sol::optional<sol::table> hasItems = player["items"];
 		if (hasItems != sol::nullopt)
 		{
-			game.GetGameItems().woodBoomerang = player["items"]["boomerang"].get_or(false);
-			game.GetGameItems().magicBoomerang = player["items"]["magic_boomerang"].get_or(false);
-			game.GetGameItems().woodSword = player["items"]["wood_sword"].get_or(false);
-			game.GetGameItems().steelSword = player["items"]["steel_sword"].get_or(false);
-			game.GetGameItems().magicSword = player["items"]["magic_sword"].get_or(false);
-			game.GetGameItems().magicRod = player["items"]["magic_rod"].get_or(false);
-			game.GetGameItems().bombs = player["items"]["bombs"].get_or(false);
-			game.GetGameItems().food = player["items"]["food"].get_or(false);
-			game.GetGameItems().flute = player["items"]["flute"].get_or(false);
-			game.GetGameItems().raft = player["items"]["raft"].get_or(false);
-			game.GetGameItems().ladder = player["items"]["ladder"].get_or(false);
-			game.GetGameItems().bow = player["items"]["bow_wood"].get_or(false);
-			game.GetGameItems().magicBow = player["items"]["bow_magic"].get_or(false);
-			game.GetGameItems().shield = player["items"]["shield"].get_or(false);
-			game.GetGameItems().magicShield = player["items"]["magic_shield"].get_or(false);
-			game.GetGameItems().powerBraclet = player["items"]["power_braclet"].get_or(false);
-			game.GetGameItems().map = player["items"]["map"].get_or(false);
-			game.GetGameItems().bluePotion = player["items"]["blue_potion"].get_or(false);
-			game.GetGameItems().redPotion = player["items"]["red_potion"].get_or(false);
-			game.GetGameItems().masterKey = player["items"]["master_key"].get_or(false);
-			game.GetGameItems().candle = player["items"]["candle"].get_or(false);
+			auto wood_boomerang = player["items"]["boomerang"].get_or(false);
+			if (wood_boomerang)
+				gameData.AddItem(GameData::GameItems::BOOMERANG);
+
+			auto magic_boomerang = player["items"]["magic_boomerang"].get_or(false);
+			if (magic_boomerang)
+				gameData.AddItem(GameData::GameItems::BOOMERANG);
+
+			auto wood_sword = player["items"]["wood_sword"].get_or(false);
+			if (wood_sword)
+				gameData.AddItem(GameData::GameItems::WOOD_SWORD);
+
+			auto steel_sword = player["items"]["steel_sword"].get_or(false);
+			if (steel_sword)
+				gameData.AddItem(GameData::GameItems::SILVER_SWORD);
+
+			auto magic_sword = player["items"]["magic_sword"].get_or(false);
+			if (magic_sword)
+				gameData.AddItem(GameData::GameItems::MAGIC_SWORD);
+
+			auto magic_rod = player["items"]["magic_rod"].get_or(false);
+			if (magic_rod)
+				gameData.AddItem(GameData::GameItems::MAGIC_ROD);
+
+			auto bombs = player["items"]["bombs"].get_or(false);
+			if (bombs)
+				gameData.AddItem(GameData::GameItems::BOMB);
+
+			auto food = player["items"]["food"].get_or(false);
+			if (food)
+				gameData.AddItem(GameData::GameItems::FOOD);
+
+			auto flute = player["items"]["flute"].get_or(false);
+			if (flute)
+				gameData.AddItem(GameData::GameItems::FLUTE);
+
+			auto raft = player["items"]["raft"].get_or(false);
+			if (raft)
+				gameData.AddItem(GameData::GameItems::RAFT);
+
+			auto ladder = player["items"]["ladder"].get_or(false);
+			if (ladder)
+				gameData.AddItem(GameData::GameItems::LADDER);
+
+			auto bow = player["items"]["bow_wood"].get_or(false);
+			if (bow)
+				gameData.AddItem(GameData::GameItems::BOW);
+
+			auto magic_bow = player["items"]["bow_magic"].get_or(false);
+			if (magic_bow)
+				gameData.AddItem(GameData::GameItems::MAGIC_ARROWS);
+
+			auto shield = player["items"]["shield"].get_or(false);
+			if (shield)
+				gameData.AddItem(GameData::GameItems::SHIELD);
+
+			auto magic_shield = player["items"]["magic_shield"].get_or(false);
+			if (magic_bow)
+				gameData.AddItem(GameData::GameItems::MAGIC_SHIELD);
+
+			auto power_braclet = player["items"]["power_braclet"].get_or(false);
+			if (power_braclet)
+				gameData.AddItem(GameData::GameItems::POWER_BRACLET);
+
+			auto map = player["items"]["map"].get_or(false);
+			if (map)
+				gameData.AddItem(GameData::GameItems::MAP);
+
+			auto blue_potion = player["items"]["blue_potion"].get_or(false);
+			if (blue_potion)
+				gameData.AddItem(GameData::GameItems::BLUE_POTION);
+
+			auto red_potion = player["items"]["red_potion"].get_or(false);
+			if (red_potion)
+				gameData.AddItem(GameData::GameItems::RED_POTION);
+
+			auto master_key = player["items"]["master_key"].get_or(false);
+			if (master_key)
+				gameData.AddItem(GameData::GameItems::MASTER_KEY);
+
+			auto candle = player["items"]["candle"].get_or(false);
+			
+			if (candle)
+				gameData.AddItem(GameData::GameItems::CANDLE);
+
 		}
 		// Inventory
 		sol::optional<sol::table> inventory = player["inventory"];
 		if (inventory != sol::nullopt)
 		{
-			GameState::totalRupees = player["inventory"]["num_rupees"].get_or(0);
-			GameState::totalBombs = player["inventory"]["num_bombs"].get_or(0);
-			GameState::totalKeys = player["inventory"]["num_keys"].get_or(0);
+			gameData.AddRupees(player["inventory"]["num_rupees"].get_or(0));
+			gameData.AddBombs(player["inventory"]["num_bombs"].get_or(0));
+			gameData.AddKeys(player["inventory"]["num_keys"].get_or(0));
 		}
 		i++;
 	}
@@ -1371,8 +1454,43 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
 					entity["components"]["ai_component"]["is_boss"].get_or(false)
 					);
 			}
-			newEntity.AddComponent<GameComponent>();
-			newEntity.AddComponent<EnemyComponent>();
+			
+			// Add Render Component based on the current Application State
+			if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE")
+				newEntity.AddComponent<GameComponent>();
+			else if (game.GetStateMachine()->GetCurrentState() == "EDITOR")
+				newEntity.AddComponent<EditorComponent>();
+
+			sol::optional<sol::table>enemy_component = entity["components"]["enemy_component"];
+			if (enemy_component != sol::nullopt)
+			{
+
+				std::string move_dir = entity["components"]["enemy_component"]["move_dir"];
+				EnemyComponent::MoveDir moveDir = EnemyComponent::MoveDir::NO_MOVE;
+				if (move_dir == "up")
+					moveDir = EnemyComponent::MoveDir::UP;
+				else if (move_dir == "right")
+					moveDir = EnemyComponent::MoveDir::RIGHT;
+				else if (move_dir == "down")
+					moveDir = EnemyComponent::MoveDir::DOWN;
+				else if (move_dir == "left")
+					moveDir = EnemyComponent::MoveDir::LEFT;
+				else
+					moveDir = EnemyComponent::MoveDir::NO_MOVE;
+
+				newEntity.AddComponent<EnemyComponent>(
+						entity["components"]["enemy_component"]["max_move_distance"].get_or(0),
+						moveDir,
+					glm::vec2(
+						entity["components"]["enemy_component"]["start_pos"]["x"].get_or(0),
+						entity["components"]["enemy_component"]["start_pos"]["y"].get_or(0)
+						)
+					);
+			}
+			else
+			{
+				newEntity.AddComponent<EnemyComponent>();
+			}
 		}
 		i++;
 	}
@@ -1382,7 +1500,9 @@ void LevelLoader::SaveSecrets()
 {
 	LuaTableWriter writer;
 	std::fstream file;
-	file.open("./Assets/SavedFiles/slot_" + std::to_string(game.GetPlayerNum()) + "/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua", std::ios::out);
+	auto& gameData = GameData::GetInstance();
+	auto playerNum = gameData.PlayerNum();
+	file.open("./Assets/SavedFiles/slot_" + std::to_string(playerNum) + "/GameSecrets_" + std::to_string(playerNum) + ".lua", std::ios::out);
 	writer.WriteStartDocument();
 	writer.WriteCommentSeparation(file);
 	writer.WriteCommentLine("Game Secrets", file);
@@ -1390,7 +1510,7 @@ void LevelLoader::SaveSecrets()
 
 	writer.WriteDeclareTable("secrets", file);
 	int i = 1;
-	for (auto& secret : game.GetGameSecrets())
+	for (auto& secret : gameData.GetGameSecrets())
 	{
 
 		std::string found = "";
@@ -1412,7 +1532,9 @@ void LevelLoader::SaveSecrets()
 
 void LevelLoader::ReadInSecrets(sol::state& lua)
 {
-	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(game.GetPlayerNum()) + "/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
+	auto& gameData = GameData::GetInstance();
+	auto playerNum = gameData.PlayerNum();
+	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(playerNum) + "/GameSecrets_" + std::to_string(playerNum) + ".lua");
 
 	if (!script.valid())
 	{
@@ -1423,7 +1545,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 	}
 
 	// Execute the script
-	lua.script_file("./Assets/SavedFiles/slot_"+ std::to_string(game.GetPlayerNum()) + "/GameSecrets_" + std::to_string(game.GetPlayerNum()) + ".lua");
+	lua.script_file("./Assets/SavedFiles/slot_"+ std::to_string(playerNum) + "/GameSecrets_" + std::to_string(playerNum) + ".lua");
 	sol::table data = lua["secrets"];
 
 	int i = 1;
@@ -1436,15 +1558,18 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 		}
 
 		sol::table secrets = data[i];
-		game.AddGameSecrets(secrets["location"], secrets["found"].get_or(false));
+		gameData.AddGameSecrets(secrets["location"], secrets["found"].get_or(false));
 
 		i++;
 	}
 
+	if (!Registry::Instance().DoesGroupExist("secret"))
+		return;
+
 	for (auto& entity : Registry::Instance().GetEntitiesByGroup("secret"))
 	{
 		auto& secret = entity.GetComponent<SecretComponent>();
-		if (game.IsSecretFound(secret.locationID))
+		if (gameData.IsSecretFound(secret.locationID))
 		{
 			entity.GetComponent<SecretComponent>().found = true;
 			// Call the Trigger Function
@@ -1635,44 +1760,21 @@ ItemComponent::SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::strin
 
 bool LevelLoader::CheckForItemInInventory(ItemComponent::SpecialItemType& type)
 {
+	auto& gameData = GameData::GetInstance();
 	switch (type)
 	{
 	case ItemComponent::SpecialItemType::WOOD_SWORD:
-		if (game.GetGameItems().woodSword)
-			return true;
-		else
-			return false;
-		break;
+		return gameData.HasItem(GameData::GameItems::WOOD_SWORD);
 	case ItemComponent::SpecialItemType::LADDER:
-		if (game.GetGameItems().ladder)
-			return true;
-		else
-			return false;
-		break;
+		return gameData.HasItem(GameData::GameItems::LADDER);
 	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
-		if (game.GetGameItems().woodBoomerang)
-			return true;
-		else
-			return false;
-		break;
+		return gameData.HasItem(GameData::GameItems::BOOMERANG);
 	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
-		if (game.GetGameItems().magicBoomerang)
-			return true;
-		else
-			return false;
-		break;
+		return gameData.HasItem(GameData::GameItems::MAGIC_BOOMERANG);
 	case ItemComponent::SpecialItemType::STEEL_SWORD:
-		if (game.GetGameItems().steelSword)
-			return true;
-		else
-			return false;
-		break;
+		return gameData.HasItem(GameData::GameItems::SILVER_SWORD);
 	case ItemComponent::SpecialItemType::WOOD_BOW:
-		if (game.GetGameItems().bow)
-			return true;
-		else
-			return false;
-		break;
+		return gameData.HasItem(GameData::GameItems::BOW);
 	default:
 		return false;
 	}
@@ -1803,8 +1905,29 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 					lvlData["components"]["caption"]["captions"],
 					lvlData["components"]["caption"]["scrollable"].get_or(true),
 					lvlData["components"]["caption"]["x_pos"].get_or(0),
-					lvlData["components"]["caption"]["y_pos"].get_or(0)
+					lvlData["components"]["caption"]["y_pos"].get_or(0),
+					lvlData["components"]["caption"]["is_number"].get_or(false)
 					);
+			}
+
+			// Scene Change component
+			sol::optional<sol::table> scene = lvlData["components"]["scene_change"];
+
+			// Check if the trigger has a scene component
+			if (scene != sol::nullopt)
+			{
+				newLvlObject.AddComponent<SceneChangeComponent>(
+					lvlData["components"]["scene_change"]["level_music"].get_or(std::string("stop")),
+					lvlData["components"]["scene_change"]["asset_file"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["enemy_file"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["collider_file"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["tilemap_name"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["tilemap_image"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["map_image"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["entity_file"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["trigger_file"].get_or(std::string("no_file")),
+					lvlData["components"]["scene_change"]["image_width"].get_or(0),
+					lvlData["components"]["scene_change"]["image_height"].get_or(0));
 			}
 		}
 		i++;
@@ -1812,7 +1935,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 }
 
 // This is a letter parser to deal with the SDL_Text issues
-void LevelLoader::ConvertName(std::string name, int x, int y)
+void LevelLoader::ConvertName(const std::string& name, int x, int y)
 {
 	int num = name.length();
 	// Clamp Num at 7
@@ -1829,7 +1952,7 @@ void LevelLoader::ConvertName(std::string name, int x, int y)
 		Entity nameEnt = reg.CreateEntity();
 
 		nameEnt.Group(name);
-		nameEnt.AddComponent<SpriteComponent>("caption_letters", 16, 16, 0, true, 0, 0);
+		nameEnt.AddComponent<SpriteComponent>("caption_letters", 16, 16, 0, false, 0, 0);
 		nameEnt.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
 		nameEnt.AddComponent<MenuComponent>();
 

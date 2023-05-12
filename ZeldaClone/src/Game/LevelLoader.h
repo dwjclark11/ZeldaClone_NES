@@ -20,6 +20,7 @@ private:
 	};
 
 	class Game& game;
+	class GameData& gameData;
 	class Registry& reg;
 
 	// Helper Functions
@@ -28,7 +29,7 @@ private:
 	
 	ItemComponent::ItemCollectType ConvertLuaStringToItem(std::string& type);
 	bool CheckForItemInInventory(ItemComponent::SpecialItemType& type);
-	void ConvertName(std::string name, int x, int y);
+	void ConvertName(const std::string& name, int x, int y);
 	bool ReadSpriteComponent(sol::table& table, Entity& entity);
 	void ReadBoxColliderComponent(sol::table& table, Entity& entity);
 	void ReadAnimationComponent(sol::table& table, Entity& entity);
@@ -64,7 +65,7 @@ public:
 	void LoadAssetsFromLuaTable(sol::state& lua, std::string fileName);
 	void LoadEntitiesFromLuaTable(sol::state& lua, std::string filename);
 
-	void EliminatePlayerToDefault(int slotNum, std::string& name);
+	void EliminatePlayerToDefault(int slotNum, const std::string& name);
 
 	void SaveSecrets();
 	void ReadInSecrets(sol::state& lua);
