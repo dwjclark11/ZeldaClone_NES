@@ -1,16 +1,12 @@
 #pragma once
 #include <string>
+#include <glm/glm.hpp>
 
 class SecretComponent
 {
 public:
-	std::string locationID;
-	std::string newTrigger;
-	std::string newSpriteAssetID;
-	int spriteWidth;
-	int spriteHeight;
-	int spriteSrcX;
-	int spriteSrcY;
+	std::string locationID, newTrigger, newSpriteAssetID;
+	int spriteWidth, spriteHeight, spriteSrcX, spriteSrcY;
 	
 	glm::vec2 startPos;
 	bool found;
@@ -19,19 +15,10 @@ public:
 	bool moveUp;
 
 	SecretComponent(std::string locationID = "none", std::string newTrigger = "none", std::string newSpriteAssetID = "none", int spriteWidth = 0, int spriteHeight = 0, int spriteSrcX = 0, int spriteSrcY = 0, glm::vec2 startPos = glm::vec2(0), bool moveUp = false, bool moveDown = false)
+		: locationID{locationID}, newTrigger{newTrigger}, newSpriteAssetID{newSpriteAssetID}
+		, spriteWidth{spriteWidth}, spriteHeight{spriteHeight}, spriteSrcX{spriteSrcX}, spriteSrcY{spriteSrcY}
+		, startPos{startPos}, found{false}, moveUp{moveUp}, moveDown{moveDown}
 	{
-		this->locationID = locationID;
-		this->newTrigger = newTrigger;
-		this->newSpriteAssetID = newSpriteAssetID;
-		this->spriteWidth = spriteWidth;
-		this->spriteHeight = spriteHeight;
-		this->spriteSrcX = spriteSrcX;
-		this->spriteSrcY = spriteSrcY;
-		this->startPos = startPos;
 		
-		found = false;
-		
-		this->moveDown = moveDown;
-		this->moveUp = moveUp;
 	}
 };

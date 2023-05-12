@@ -10,39 +10,23 @@ public:
 	
 	enum class EnemyType
 	{
-		OCTOROK = 0,
-		MOBLIN,
-		DARKNUT,
-		LEEVER,
-		TEKTITE,
-		PEAHAT,
-		ARMOS,
-		GHINI,
-		LYNEL,
-		ZORA,
-		KEESE,
-		TRAP,
-		GEL,
-		STALFOS,
-		GORIYA,
+		OCTOROK = 0, MOBLIN, DARKNUT,
+		LEEVER, TEKTITE, PEAHAT,
+		ARMOS, GHINI, LYNEL,
+		ZORA, KEESE, BLADE_TRAP,
+		GEL, STALFOS, GORIYA,
 		NO_TYPE,
 	};
 	
 	enum class EnemyBossType
 	{
-		NOT_A_BOSS = 0,
-		AQUAMENTUS,
-		DODONGO,
-		MANHANDLA,
-		GLEEOK,
-		DIGDOGGER,
-		GOHMA,
-		GANON
+		NOT_A_BOSS = 0, AQUAMENTUS, DODONGO,
+		MANHANDLA, GLEEOK, DIGDOGGER,
+		GOHMA, GANON
 	};
 
 private:
 	StateMachine* esm;
-	//std::unique_ptr<StateMachine> esm;
 	glm::vec2 enemyPos;
 	EnemyType enemyType;
 	EnemyBossType bossType;
@@ -60,11 +44,12 @@ public:
 	
 	
 	AIComponent(glm::vec2 enemyPos = glm::vec2(0, 0), EnemyType enemyType = EnemyType::OCTOROK, EnemyBossType = EnemyBossType::NOT_A_BOSS, bool boss = false);
-	inline void GarbageCollect() { delete esm; esm = nullptr; }
-	
+
+	inline void GarbageCollect() { delete esm; esm = nullptr; }	
 	inline StateMachine& GetEnemyStateMachine() { return *esm; }
 	
-	inline glm::vec2& GetEnemyPos() { return enemyPos; }
+	inline const glm::vec2& GetEnemyPos() { return enemyPos; }
+	inline void SetEmemyPos(glm::vec2 pos) { enemyPos = pos; }
 	inline void SetStunned(bool stun) { stunned = stun; }
 	inline const bool GetStunned() { return stunned; }
 	inline const EnemyType GetEnemyType() const { return enemyType; }

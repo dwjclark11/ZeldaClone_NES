@@ -4,20 +4,16 @@
 class HealthComponent
 {
 public:
-	int healthPercentage;
-	int maxHearts;
-	bool isHurt;
-	bool addHeart;
+	int healthPercentage, maxHearts;
+	bool isHurt, addHeart;
 
-	Timer hurtTimer;
-	Timer lowHeathTimer;
-	Timer deathTimer;
-	
-	HealthComponent(int healthPercentage = 6, int maxHearts = 3, bool addHeart = false, bool isHurt = false)
+	Timer hurtTimer, lowHeathTimer, deathTimer;
+
+	HealthComponent(int healthPercentage = 6, int maxHearts = 3)
+		: healthPercentage{ healthPercentage }, maxHearts{ maxHearts }
+		, isHurt{ false }, addHeart{ false }
+		, hurtTimer{}, lowHeathTimer{}, deathTimer{}
 	{
-		this->healthPercentage = healthPercentage;
-		this->maxHearts = maxHearts;
-		this->addHeart = addHeart;
-		this->isHurt = isHurt;
+		
 	}
 };

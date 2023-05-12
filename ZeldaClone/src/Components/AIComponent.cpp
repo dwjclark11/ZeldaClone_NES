@@ -5,16 +5,15 @@
 #include "../Logger/Logger.h"
 
 AIComponent::AIComponent(glm::vec2 enemyPos, EnemyType enemyType, EnemyBossType bossType, bool boss)
+	: esm{nullptr}
+	, enemyPos{enemyPos}
+	, enemyType{enemyType}
+	, bossType{bossType}
+	, created{false}
+	, stunned{false}
+	, boss{boss}
 {
-	esm = nullptr;
-	this->enemyPos = enemyPos;
-	this->enemyType = enemyType;
-	this->bossType = bossType;
-	this->boss = boss;
-	this->created = false;
-	this->stunned = false;
 }
-
 
 const bool AIComponent::StateMachineCreated() 
 {

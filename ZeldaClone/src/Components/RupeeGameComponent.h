@@ -7,7 +7,8 @@ public:
 	int locationID;
 
 	RupeeGameComponent(int locationID)
+		: locationID{locationID}
 	{
-		this->locationID = locationID;
+		
 	}
 };

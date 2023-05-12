@@ -7,17 +7,13 @@ class TextLabelComponent
 {
 public:
 	glm::vec2 position;
-	std::string text; 
-	std::string assetID;
+	std::string text, assetID;
 	SDL_Color color;
 	bool isFixed;
 
-	TextLabelComponent(glm::vec2 position = glm::vec2(0), std::string text = "", std::string assetID = "", const SDL_Color color = { 255, 255, 255, 255}, bool isFixed = true)
+	TextLabelComponent(glm::vec2 position = glm::vec2(0), const std::string& text = "", const std::string& assetID = "", const SDL_Color color = { 255, 255, 255, 255}, bool isFixed = true)
+		: position{position}, text{text}, assetID{assetID}, color{color}, isFixed{isFixed}
 	{
-		this->position = position;
-		this->text = text;
-		this->assetID = assetID;
-		this->color = color;
-		this->isFixed = isFixed;
+		
 	}
 };

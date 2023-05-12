@@ -10,14 +10,15 @@ public:
 	int hitPercentDamage;
 	int duration;
 	int startTime;
+	enum class Dir{ UP = 0, RIGHT, DOWN, LEFT, NO_DIR };
+	Dir dir;
 
 	Timer boomTimer;
 
-	ProjectileComponent(bool isFriendly = false, int hitPercentDamage = 1, int duration = 0)
+	ProjectileComponent(bool isFriendly = false, int hitPercentDamage = 1, int duration = 0, Dir dir = Dir::NO_DIR)
+		: isFriendly{isFriendly}, hitPercentDamage{hitPercentDamage}, duration{duration}
+		, startTime{static_cast<int>(SDL_GetTicks())}, dir{dir}
 	{
-		this->isFriendly 			= isFriendly;
-		this->hitPercentDamage 		= hitPercentDamage;
-		this->duration 				= duration;
-		this->startTime 			= SDL_GetTicks();
+
 	}
 };

@@ -4,16 +4,9 @@
 class SoundComponent
 {
 public:
-	std::string attackSound;
-	std::string hitSound;
-	std::string deathSound;
-	std::string movementSound;
+	std::string attackSound, hitSound, deathSound, movementSound;
 
 	SoundComponent(std::string attackSound = "", std::string hitSound = "", std::string deathSound = "", std::string movementSound = "")
-	{
-		this->attackSound 		= attackSound;
-		this->hitSound 			= hitSound;
-		this->deathSound 		= deathSound;
-		this->movementSound 	= movementSound;
-	}
+		: attackSound{attackSound}, hitSound{hitSound}, deathSound{deathSound}, movementSound{movementSound}
+	{ }
 };

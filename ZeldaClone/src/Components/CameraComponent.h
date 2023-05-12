@@ -7,7 +7,8 @@ public:
 	SDL_Rect camera;
 
 	CameraComponent(SDL_Rect camera = { 0,0, 1024, 960 })
+		: camera{camera}
 	{
-		this->camera = camera;
+		
 	}
 };
