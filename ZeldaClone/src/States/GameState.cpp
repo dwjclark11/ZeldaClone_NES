@@ -11,7 +11,6 @@
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/GameSystems/CaptionSystem.h"
 #include "../Systems/GameSystems/RenderHealthSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/RenderTileSystem.h"
 #include "../Systems/GameSystems/RenderGameOverTextSystem.h"
 #include "../Systems/GameSystems/RenderGameOverSystem.h"
@@ -29,10 +28,12 @@
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/AnimationComponent.h"
 #include "../Components/BoxColliderComponent.h"
+#include "../Components/KeyboardControlComponent.h"
 #include "../Components/TriggerBoxComponent.h"
 #include "../Components/ProjectileComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Components/RupeeGameComponent.h"
+#include "../Components/EnemyComponent.h"
 #include "../Components/SecretComponent.h"
 #include "../Components/GameComponent.h"
 #include "../Components/ItemComponent.h"
@@ -42,30 +43,167 @@
 #include "../Events/EventManager.h"
 #include "../Events/TriggerEvent.h"
 #include "../Game/LevelLoader.h"
-#include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Utilities/Utility.h"
 #include "../StateMachines/NewPlayerStates.h"
 #include "../Systems/SoundFXSystem.h"
 
+#include "../Utilities/GameData.h"
+#include "../Utilities/Camera.h"
+#include "../Inputs/InputManager.h"
+#include "../Inputs/Gamepad.h"
+#include "../Game/Player.h"
 
 // Set the values of the statics
 const std::string GameState::gameID = "GAMESTATE";
 
 bool GameState::firstEntered = false;
-bool GameState::unpause = false;
-bool GameState::buyItem = false;
 
-int GameState::scrollRupees = 0;
-int GameState::totalRupees = 0;
-int GameState::totalPrevRupees = 0;
-int GameState::totalBombs = 0;
-int GameState::totalPrevBombs = 0;
-int GameState::totalKeys = 0;
-int GameState::totalPrevKeys = 0;
-int GameState::totalTriforcePieces = 0;
+void GameState::UpdatePlayerKeys()
+{
+	const auto& player = game.GetPlayer();
+	const auto& playerEnt = player->GetPlayer();
+	auto& playerRigidbody = playerEnt.GetComponent<RigidBodyComponent>();
+
+	auto shield = player->GetShield();
+	auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
+
+	auto sword = player->GetSword();
+	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
+
+	if (game.GetCamera().GetFadeAlpha() != 255 || game.PlayerHold())
+	{
+		playerRigidbody.velocity = glm::vec2(0);
+		shieldRigidbody.velocity = glm::vec2(0);
+		swordRigidbody.velocity = glm::vec2(0);
+		return;
+	}
+
+	auto& playerTransform = playerEnt.GetComponent<TransformComponent>();
+	auto& playerCollider = playerEnt.GetComponent<BoxColliderComponent>();
+	auto& playerSprite = playerEnt.GetComponent<SpriteComponent>();
+	auto& playerControl = playerEnt.GetComponent<KeyboardControlComponent>();
+	auto& shieldTransform = shield.GetComponent<TransformComponent>();
+	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
+	auto& swordTransform = sword.GetComponent<TransformComponent>();
+	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
+
+	const auto& keyboard = inputManager.GetKeyboard();
+	const auto& gamepad = inputManager.GetGamepad();
+
+	if (keyboard.IsKeyHeld(KEY_W) || gamepad.IsButtonHeld(GP_BTN_DPAD_UP))
+	{
+		playerRigidbody.velocity = playerControl.upVelocity;
+		playerSprite.srcRect.x = playerSprite.width * 2;
+
+		shieldTransform.position = playerTransform.position;
+		shieldCollider.height = 2;
+		shieldCollider.width = 24;
+		shieldCollider.offset = glm::vec2(48, 32);
+		shieldRigidbody = playerRigidbody;
+
+		swordTransform.position = playerTransform.position;
+		swordCollider.height = 2;
+		swordCollider.width = 2;
+		swordCollider.offset = glm::vec2(64, 60);
+		swordRigidbody = playerRigidbody;
+
+		playerRigidbody.dir = RigidBodyComponent::Dir::UP;
+	}
+
+	if (keyboard.IsKeyHeld(KEY_D) || gamepad.IsButtonHeld(GP_BTN_DPAD_RIGHT))
+	{
+		playerSprite.srcRect.x = playerSprite.width * 3;
+		playerRigidbody.velocity = playerControl.rightVelocity;
+
+		shieldTransform.position = playerTransform.position;
+		shieldCollider.height = 30;
+		shieldCollider.width = 2;
+		shieldCollider.offset = glm::vec2(90, 56);
+		shieldRigidbody = playerRigidbody;
+
+		swordTransform.position = playerTransform.position;
+		swordCollider.height = 2;
+		swordCollider.width = 2;
+		swordCollider.offset = glm::vec2(64, 60);
+		swordRigidbody = playerRigidbody;
+
+		playerRigidbody.dir = RigidBodyComponent::Dir::RIGHT;
+	}
+
+	if (keyboard.IsKeyHeld(KEY_S) || gamepad.IsButtonHeld(GP_BTN_DPAD_DOWN))
+	{
+		playerRigidbody.velocity = playerControl.downVelocity;
+		playerSprite.srcRect.x = playerSprite.width * 0;
+
+		shieldTransform.position = playerTransform.position;
+		shieldCollider.height = 2;
+		shieldCollider.width = 24;
+		shieldCollider.offset = glm::vec2(40, 84);
+		shieldRigidbody = playerRigidbody;
+
+		swordTransform.position = playerTransform.position;
+		swordCollider.height = 2;
+		swordCollider.width = 2;
+		swordCollider.offset = glm::vec2(64, 60);
+		swordRigidbody = playerRigidbody;
+
+		playerRigidbody.dir = RigidBodyComponent::Dir::DOWN;
+	}
+
+	if (keyboard.IsKeyHeld(KEY_A) || gamepad.IsButtonHeld(GP_BTN_DPAD_LEFT))
+	{
+		playerRigidbody.velocity = playerControl.leftVelocity;
+		playerSprite.srcRect.x = playerSprite.width * 1;
+
+		shieldTransform.position = playerTransform.position;
+		shieldCollider.height = 30;
+		shieldCollider.width = 2;
+		shieldCollider.offset = glm::vec2(30, 50);
+		shieldRigidbody = playerRigidbody;
+
+		swordTransform.position = playerTransform.position;
+		swordCollider.height = 2;
+		swordCollider.width = 2;
+		swordCollider.offset = glm::vec2(64, 60);
+		swordRigidbody = playerRigidbody;
+
+		playerRigidbody.dir = RigidBodyComponent::Dir::LEFT;
+	}
+}
+void GameState::UpdatePauseContol()
+{
+	const auto& keyboard = inputManager.GetKeyboard();
+	const auto& gamepad = inputManager.GetGamepad();
+
+	// Set to paused
+	if (keyboard.IsKeyJustReleased(KEY_P) || gamepad.IsButtonJustReleased(GP_BTN_Y))
+	{
+		game.GetCamera().SetFadeFinished(false);
+		game.GetCamera().StartFadeOut(true);
+		game.GetCamera().StartFadeIn(false);
+		inputManager.SetPaused(true);
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_C) || gamepad.IsButtonHeld(GP_BTN_BACK))
+	{
+		if (!game.IsDebugging())
+			game.SetDebug(true);
+		else
+			game.SetDebug(false);
+	}
+
+	if (keyboard.IsKeyJustReleased(KEY_SPACE) || keyboard.IsKeyJustReleased(KEY_RSHIFT) || 
+		gamepad.IsButtonJustReleased(GP_BTN_A) || gamepad.IsButtonJustReleased(GP_BTN_X))
+	{
+		inputManager.SetAttack(false);
+	}
+}
 
 GameState::GameState()
-	: game(Game::Instance()), reg(Registry::Instance()), cameraOffset(glm::vec2(0)), index(0)
+	: game(Game::Instance()), reg(Registry::Instance())
+	, inputManager(InputManager::GetInstance()), cameraOffset(glm::vec2(0))
+	, gameData(GameData::GetInstance())
+	, hudRect{ 0, 0, game.GetWindowWidth(), 256}
+	
 {
 }
 
@@ -75,159 +213,135 @@ GameState::GameState(glm::vec2 cameraOffset)
 	: GameState()
 {
 	this->cameraOffset = cameraOffset;
-	game.GetCamera().x = this->cameraOffset.x;
-	game.GetCamera().y = this->cameraOffset.y;
+	game.GetCamera().SetCameraPosition(cameraOffset.x, cameraOffset.y);
 }
 
 void GameState::Update(const float& deltaTime)
 {
-	if (GamePadSystem::GetPaused() && game.GetFadeAlpha() == 0)
+	auto& camera = game.GetCamera();
+	if (inputManager.IsPaused() && camera.GetFadeAlpha() == 0)
 	{
-		game.SetFadeFinished(true);
-		game.StartFadeOut(false);
-
+		camera.SetFadeFinished(true);
+		camera.StartFadeOut(false);
 		game.GetStateMachine()->PushState(new PauseState());
 	}
 
 	// Check to see if level music has been paused
-	if (!GamePadSystem::GetPaused() && unpause)
+	if (!inputManager.IsPaused() && !camera.FadeOutStarted())
 	{
 		// Turn music volume up
 		Mix_VolumeMusic(10);
-
-		game.StartFadeIn(true);
-		unpause = false;
+		camera.StartFadeIn(true);
 	}
 
 	// Reset the event manager queue
 	game.GetEventManager()->Reset();
-
 	Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
-	
 	Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<TriggerSystem>().Update(deltaTime);
 
 	// Update the registry values
 	reg.Update();
 
 	// Update all Game systems
-	auto player = reg.GetEntityByTag("player");
-	
-	game.GetPlayerStateMachine().GetCurrentState()->Update(player);
+	game.GetPlayer()->UpdateStateMachine();
 
 	Registry::Instance().GetSystem<CollectItemSystem>().Update();
 	Registry::Instance().GetSystem<AnimationSystem>().Update();
-
-	Registry::Instance().GetSystem<ProjectileEmitterSystem>().Update(Registry::Instance());
-	
-	
 	Registry::Instance().GetSystem<MovementSystem>().Update(deltaTime);
-	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
+	Registry::Instance().GetSystem<ProjectileEmitterSystem>().Update();
+	Registry::Instance().GetSystem<CameraMovementSystem>().UpdatePlayerCam(game.GetCamera(), deltaTime);
 
 	Registry::Instance().GetSystem<ProjectileLifeCycleSystem>().Update();
-	Registry::Instance().GetSystem<CollisionSystem>().Update(game.GetEventManager());
 
 	Registry::Instance().GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
+	
 	Registry::Instance().GetSystem<AISystem>().Update();
 	Registry::Instance().GetSystem<CaptionSystem>().Update(deltaTime);
-	Registry::Instance().GetSystem<TriggerSystem>().Update(deltaTime);
+	
+	Registry::Instance().GetSystem<CollisionSystem>().Update(game.GetEventManager());
 
-	// Update the rupeeScroll 
-	if (scrollRupees > 0)
-		RupeeScroll();
-
-	if (totalBombs != totalPrevBombs || totalKeys != totalPrevKeys || totalRupees != totalPrevRupees)
-		ConvertHUDNumbers();
-
+	// Update the registry values
+	reg.Update();
 }
 
 void GameState::Render()
 {
-	auto player = reg.GetEntityByTag("player");
-	auto& playerTransform = player.GetComponent<TransformComponent>();
-	// Create the HUD rect --> black rectangle that all the HUD items are on
-	SDL_Rect hudRect = { 0, 0, game.windowWidth, game.windowHeight / 6 + (game.tilePixels * game.gameScale) + 64 };
-	SDL_Rect greyRect = { 0, 0, game.windowWidth, game.windowHeight };
-	SDL_Rect whiteRect = { playerTransform.position.x, playerTransform.position.y, 64, 64};
-
-	Registry::Instance().GetSystem<RenderTileSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-
-	// Update all other render systems
-	Registry::Instance().GetSystem<RenderSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	auto& camera = game.GetCamera();
+	Registry::Instance().GetSystem<RenderTileSystem>().Update();
+	camera.UpdateScreenFlash();
+	Registry::Instance().GetSystem<RenderSystem>().Update();
 	
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
 	SDL_RenderFillRect(game.GetRenderer(), &hudRect);
 	SDL_RenderDrawRect(game.GetRenderer(), &hudRect);
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+	
+	camera.UpdateCurtain();
 
 	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
-
 	Registry::Instance().GetSystem<HealthSystem>().Update();
-	Registry::Instance().GetSystem<RenderHealthSystem>().Update(game.GetRenderer(), game.GetCamera());
 
 	// If the game is in debug mode, render the collision system
-	if (Game::isDebug)
+	if (game.IsDebugging())
 	{
-		Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
+		Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), camera.GetCameraRect());
 	}
 }
 
 bool GameState::OnEnter()
 {
 	LevelLoader loader;
-
+	auto& camera = game.GetCamera();
 	if (!firstEntered)
 	{
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
-		if (game.GetCamera().x != 7168 && game.GetCamera().x != 4416)
+		if (camera.GetCameraPos().x != 7168 && camera.GetCameraPos().x != 6720)
 		{
-			game.GetCamera().x = 7168;
-			game.GetCamera().y = 4416;
+			camera.SetCameraPosition(7168, 6720);
 		}
+		camera.StartCurtainOpen();
 
 		// Open the lua libraries into the game
 		game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 		
 		// Make sure the game is not in debug mode!!
-		Game::isDebug = false;
+		game.SetDebug(false);
 		
 		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
 		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
-		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies_1");
+		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies_2");
 		loader.LoadEntitiesFromLuaTable(game.GetLuaState(), "over_world_entities");
 		loader.LoadColliders("overworld_colliders_1");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
 
-		// =============================================================================================================================
+		// ===============================================================================================
 		// Add all necessary systems to the registry if they are not yet registered
-		// =============================================================================================================================
-		if (!reg.HasSystem<RenderHUDSystem>())			reg.AddSystem<RenderHUDSystem>();
-		if (!reg.HasSystem<ProjectileEmitterSystem>()) reg.AddSystem<ProjectileEmitterSystem>();
-		if (!reg.HasSystem<ProjectileLifeCycleSystem>()) reg.AddSystem<ProjectileLifeCycleSystem>();
-		if (!reg.HasSystem<DamageSystem>())				reg.AddSystem<DamageSystem>();
-		if (!reg.HasSystem<RenderHealthSystem>())		reg.AddSystem<RenderHealthSystem>();
-		if (!reg.HasSystem<RenderTileSystem>())			reg.AddSystem<RenderTileSystem>();
-		if (!reg.HasSystem<HealthSystem>())				reg.AddSystem<HealthSystem>();
-		if (!reg.HasSystem<CollisionSystem>())			reg.AddSystem<CollisionSystem>();
-		if (!reg.HasSystem<MovementSystem>())			reg.AddSystem<MovementSystem>();
-		if (!reg.HasSystem<TriggerSystem>())			reg.AddSystem<TriggerSystem>();
-		if (!reg.HasSystem<CollectItemSystem>())		reg.AddSystem<CollectItemSystem>();
+		// ===============================================================================================
+		reg.AddSystem<RenderHUDSystem>();
+		reg.AddSystem<ProjectileEmitterSystem>();
+		reg.AddSystem<ProjectileLifeCycleSystem>();
+		reg.AddSystem<DamageSystem>();
+		reg.AddSystem<RenderHealthSystem>();
+		reg.AddSystem<RenderTileSystem>();
+		reg.AddSystem<HealthSystem>();
+		reg.AddSystem<CollisionSystem>();
+		reg.AddSystem<MovementSystem>();
+		reg.AddSystem<TriggerSystem>();
+		reg.AddSystem<CollectItemSystem>();
 	
-		if (!reg.HasSystem<RenderTextSystem>())			reg.AddSystem<RenderTextSystem>();
-		if (!reg.HasSystem<GamePadSystem>()) 			reg.AddSystem<GamePadSystem>();
-		if (!reg.HasSystem<ScriptSystem>()) 			reg.AddSystem<ScriptSystem>();
-		if (!reg.HasSystem<AISystem>()) 				reg.AddSystem<AISystem>();
-		if (!reg.HasSystem<CaptionSystem>()) 			reg.AddSystem<CaptionSystem>();
-		// =============================================================================================================================
+		reg.AddSystem<RenderTextSystem>();
+		reg.AddSystem<ScriptSystem>();
+		reg.AddSystem<AISystem>();
+		reg.AddSystem<CaptionSystem>();
+		// =================================================================================================
 
-		Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Overworld", -1);
+		game.GetMusicPlayer().PlayMusic("Overworld", -1);
 
 		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
@@ -236,11 +350,12 @@ bool GameState::OnEnter()
 		Registry::Instance().GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
 	}
 
-	if (!game.GetPlayerCreated())
+	if (!game.GetPlayer())
 	{
 		loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
 		// Load the player file based on the selected slot
-		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(game.GetPlayerNum()), game.GetPlayerNum());
+		auto playerNum = GameData::GetInstance().PlayerNum();
+		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(playerNum), playerNum);
 
 		auto player = Registry::Instance().GetEntityByTag("player");
 		// Reset the player health after pressing continue [Game Over]
@@ -250,12 +365,11 @@ bool GameState::OnEnter()
 		{
 			playerHealth.healthPercentage = 2 * playerHealth.maxHearts;
 		}
-		ConvertHUDNumbers();
-		game.SetPlayerCreated(true);
 
+		game.GetPlayer()->SetPlayerCreated(true);
 		{
-			game.GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
-			game.GetPlayerStateMachine().ChangeState(player);
+			game.GetPlayer()->GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
+			game.GetPlayer()->GetPlayerStateMachine().ChangeState(player);
 		}
 	}
 
@@ -263,14 +377,9 @@ bool GameState::OnEnter()
 	loader.ReadInSecrets(game.GetLuaState());
 
 	// Remove the menu/Game over system for it is not needed in the game state
-	if (reg.HasSystem<RenderMainMenuSystem>()) 
-		reg.RemoveSystem<RenderMainMenuSystem>();
-	if (reg.HasSystem<RenderGameOverTextSystem>())
-		reg.RemoveSystem<RenderGameOverTextSystem>();
-	if (reg.HasSystem<RenderGameOverSystem>())
-		reg.RemoveSystem<RenderGameOverSystem>();
-	
+	reg.RemoveSystem<RenderMainMenuSystem>();	
 	game.GetAssetManager()->AddFonts("game_font", "./Assets/Fonts/prstart.ttf", 30);
+	game.GetAssetManager()->AddTextures(game.GetRenderer(), "simple_enemies", "./Assets/EnemySprites/simple_enemies.png");
 
 	return true;
 }
@@ -286,114 +395,20 @@ bool GameState::OnExit()
 
 void GameState::ProcessEvents(SDL_Event& event)
 {
-	
-}
+	UpdatePlayerKeys();
+	UpdatePauseContol();
 
-void GameState::OnKeyDown(SDL_Event* event)
-{
-	// Toggle Collisions to show for debugging
-	if (event->key.keysym.sym == SDLK_c)
+	// CAMERA TEST!
+	if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_O))
 	{
-		Game::isDebug = !Game::isDebug;
+		Game::Instance().GetCamera().StartCurtainClose();
 	}
-}
-
-void GameState::OnKeyUp(SDL_Event* event)
-{
-	// Set to paused
-	if (event->key.keysym.sym == game.GetKeyBindings().at(Game::Action::PAUSE))
+	else if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_I))
 	{
-		game.SetFadeFinished(false);
-		game.StartFadeOut(true);
-		game.StartFadeIn(false);
-		GamePadSystem::SetPaused(true);
+		Game::Instance().GetCamera().StartCurtainOpen();
 	}
-
-	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
-	KeyboardControlSystem::keyDown = false;
-}
-
-void GameState::OnBtnDown(SDL_Event* event)
-{
-
-}
-
-void GameState::OnBtnUp(SDL_Event* event)
-{
-	if (event->cbutton.button == game.GetBtnBindings().at(Game::Action::PAUSE))
+	else if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_U))
 	{
-		game.SetFadeFinished(false);
-		game.StartFadeOut(true);
-		game.StartFadeIn(false);
-		GamePadSystem::SetPaused(true);
-	}
-
-	reg.GetSystem<KeyboardControlSystem>().UpdatePlayer();
-	KeyboardControlSystem::keyDown = false;
-}
-
-
-void GameState::ConvertHUDNumbers()
-{
-	if (totalRupees != totalPrevRupees || !game.GetPlayerCreated())
-	{
-		ConvertNumberParser("rupee_hundreds", totalRupees, 2);
-		ConvertNumberParser("rupee_tens", totalRupees, 1);
-		ConvertNumberParser("rupee_ones", totalRupees, 0);
-		totalPrevRupees = totalRupees;
-	}
-
-	if (totalKeys != totalPrevKeys || !game.GetPlayerCreated())
-	{
-		ConvertNumberParser("keys_tens", totalKeys, 1);
-		ConvertNumberParser("keys_ones", totalKeys, 0);
-		totalPrevKeys = totalKeys;
-	}
-
-	if (totalBombs != totalPrevBombs || !game.GetPlayerCreated())
-	{
-		ConvertNumberParser("bombs_tens", totalBombs, 1);
-		ConvertNumberParser("bombs_ones", totalBombs, 0);
-		totalPrevBombs = totalBombs;
-	}
-}
-
-void GameState::RupeeScroll()
-{
-	// Check to see if the rupee scoll timer has started
-	if (!rupeeTimer.isStarted())
-		rupeeTimer.Start();
-
-	if (rupeeTimer.GetTicks() >= 50 * index)
-	{
-		// if we are buying an item, decrement from total Rupees
-		if (buyItem)
-		{
-			if (scrollRupees > 0 && totalRupees >= scrollRupees)
-				totalRupees--;
-		}
-		else // If we collect rupees, increment total rupees the desired amount!
-		{
-			// Do not go over the max amount of rupees
-			if (scrollRupees > 0 && totalRupees < MAX_RUPEES)
-				totalRupees++;
-		}
-		// Play the collect rupee sound
-		Mix_Volume(8, 10);
-		reg.GetSystem<SoundFXSystem>().PlaySoundFX(game.GetAssetManager(), "get_rupee", 0, 8);
-		scrollRupees--;
-
-		// Check for money scroll completion
-		if (scrollRupees <= 0)
-		{
-			rupeeTimer.Stop();
-			buyItem = false;
-			index = 0;
-			scrollRupees = 0;
-		}
-		else
-		{
-			index++;
-		}
+		Game::Instance().GetCamera().StartScreenFlash();
 	}
 }

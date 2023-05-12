@@ -8,30 +8,32 @@
 
 #include "../Components/KeyboardControlComponent.h"
 #include "../Systems/RenderTextSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/RenderSystem.h"
-#include "../Systems/GameSystems/GamePadSystem.h"
 
 #include "MenuState.h"
 #include "../Game/Game.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Logger/Logger.h"
 #include <string>
+#include "../inputs/InputManager.h"
+#include "../inputs/Keyboard.h"
+#include "../inputs/Gamepad.h"
+#include "../utilities/Camera.h"
+#include "../utilities/GameData.h"
+
 std::string SettingsState::settingsID = "SETTINGS";
 int SettingsState::mActionIndex = 0;
 bool SettingsState::mEnterKey = false;
 
 SettingsState::SettingsState()
+	: inputManager(InputManager::GetInstance())
+	, game(Game::Instance()), gameData(GameData::GetInstance())
 {
 }
 
 void SettingsState::Update(const float& deltaTime)
 {
 	Game::Instance().GetEventManager()->Reset();
-
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(Game::Instance().GetEventManager());
-	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(Game::Instance().GetEventManager());
-
 	Registry::Instance().Update();
 }
 
@@ -53,9 +55,8 @@ void SettingsState::Render()
 	SDL_RenderDrawRect(Game::Instance().GetRenderer(), &KeyRectOutline);
 	SDL_RenderDrawRect(Game::Instance().GetRenderer(), &BtnRectOutline);
 
-	Registry::Instance().GetSystem<RenderTextSystem>().Update(Game::Instance().GetRenderer(), 
-		Game::Instance().GetAssetManager(), Game::Instance().GetCamera());
-	Registry::Instance().GetSystem<RenderSystem>().Update(Game::Instance().GetRenderer(), Game::Instance().GetAssetManager(), Game::Instance().GetCamera());
+	Registry::Instance().GetSystem<RenderTextSystem>().Update();
+	Registry::Instance().GetSystem<RenderSystem>().Update();
 }
 
 bool SettingsState::OnEnter()
@@ -64,19 +65,21 @@ bool SettingsState::OnEnter()
 	Game::Instance().GetAssetManager()->AddSoundFX("bomb_drop", "./Assets/sounds/Bomb_Drop.wav");
 	Game::Instance().GetAssetManager()->AddSoundFX("get_item", "./Assets/sounds/Get_Item.wav");
 
-	std::string attackKey = std::string(SDL_GetKeyName(Game::Instance().GetKeyBindings().at(Game::Action::ATTACK)));
-	std::string moveUpKey = std::string(SDL_GetKeyName(Game::Instance().GetKeyBindings().at(Game::Action::MOVE_UP)));
-	std::string moveDownKey = std::string(SDL_GetKeyName(Game::Instance().GetKeyBindings().at(Game::Action::MOVE_DOWN)));
-	std::string moveLeftKey = std::string(SDL_GetKeyName(Game::Instance().GetKeyBindings().at(Game::Action::MOVE_LEFT)));
-	std::string moveRightKey = std::string(SDL_GetKeyName(Game::Instance().GetKeyBindings().at(Game::Action::MOVE_RIGHT)));
-	std::string useItemKey = std::string(SDL_GetKeyName(Game::Instance().GetKeyBindings().at(Game::Action::USE_ITEM)));
+	std::string attackKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::ATTACK)));
+	std::string moveUpKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_UP)));
+	std::string moveDownKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_DOWN)));
+	std::string moveLeftKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_LEFT)));
+	std::string moveRightKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_RIGHT)));
+	std::string useItemKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::USE_ITEM)));
 
-	std::string attackBtn = std::string(SDL_GameControllerGetStringForButton(Game::Instance().GetBtnBindings().at(Game::Action::ATTACK)));
-	std::string moveUpBtn = std::string(SDL_GameControllerGetStringForButton(Game::Instance().GetBtnBindings().at(Game::Action::MOVE_UP)));
-	std::string moveDownBtn = std::string(SDL_GameControllerGetStringForButton(Game::Instance().GetBtnBindings().at(Game::Action::MOVE_DOWN)));
-	std::string moveLeftBtn = std::string(SDL_GameControllerGetStringForButton(Game::Instance().GetBtnBindings().at(Game::Action::MOVE_LEFT)));
-	std::string moveRightBtn = std::string(SDL_GameControllerGetStringForButton(Game::Instance().GetBtnBindings().at(Game::Action::MOVE_RIGHT)));
-	std::string useItemBtn = std::string(SDL_GameControllerGetStringForButton(Game::Instance().GetBtnBindings().at(Game::Action::USE_ITEM)));
+	std::string attackBtn = 
+		std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::ATTACK)));
+	std::string moveUpBtn = 
+		std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_UP)));
+	std::string moveDownBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_DOWN)));
+	std::string moveLeftBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_LEFT)));
+	std::string moveRightBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_RIGHT)));
+	std::string useItemBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::USE_ITEM)));
 
 
 	auto action = Registry::Instance().CreateEntity();
@@ -198,7 +201,89 @@ bool SettingsState::OnExit()
 
 void SettingsState::ProcessEvents(SDL_Event& event)
 {
+//	auto selector = Registry::Instance().GetEntityByTag("settings_selector");
+//	auto& selectTransform = selector.GetComponent<TransformComponent>();
+//
+//
+//	if (!SettingsState::mEnterKey)
+//	{
+//		if (event.symbol == SDLK_RETURN)
+//		{
+//			SettingsState::mEnterKey = true;
+//			game.GetSoundPlayer().PlaySoundFX("bomb_drop", 0, SoundChannel::ANY);
+//			break;
+//
+//		}
+//		else if (event.symbol == SDLK_UP)
+//		{
+//			selectTransform.position.y -= 75;
+//			SettingsState::mActionIndex--;
+//
+//			if (selectTransform.position.y < 225)
+//			{
+//				selectTransform.position.y = 600;
+//				SettingsState::mActionIndex = 5;
+//			}
+//			game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+//		}
+//		else if (event.symbol == SDLK_DOWN)
+//		{
+//			selectTransform.position.y += 75;
+//			SettingsState::mActionIndex++;
+//
+//			if (selectTransform.position.y > 600)
+//			{
+//				selectTransform.position.y = 225;
+//				SettingsState::mActionIndex = 0;
+//			}
+//			game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+//		}
+//	}
+//	else
+//	{
+//		inputManager.ChangeKeyBinding(static_cast<InputManager::Action>(SettingsState::mActionIndex), event.symbol);
+//		std::string keyPressed = std::string(SDL_GetKeyName(event.symbol));
+//		if (entity.HasComponent<TextLabelComponent>())
+//		{
+//
+//			if (settings.index == SettingsState::mActionIndex && settings.input == SettingsComponent::Input::KEY)
+//			{
+//				Logger::Log(keyPressed);
+//				auto& text = entity.GetComponent<TextLabelComponent>();
+//				text.text = keyPressed;
+//				game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::ANY);
+//				SettingsState::mEnterKey = false;
+//				break;
+//			}
+//		}
+//	}
+//}
+//		else
+//		continue;
+//	}
+//
+//	auto& selectText = selector.GetComponent<TextLabelComponent>();
+//	if (SettingsState::mEnterKey)
+//	{
+//		switch (SettingsState::mActionIndex)
+//		{
+//		case 0: selectText.text = "Changing Move Up Key"; break;
+//		case 1: selectText.text = "Changing Move Down Key"; break;
+//		case 2: selectText.text = "Changing Move Left Key"; break;
+//		case 3: selectText.text = "Changing Move Right Key"; break;
+//		case 4: selectText.text = "Changing Attack Key"; break;
+//		case 5: selectText.text = "Changing Use Item Key"; break;
+//		default: break;
+//		}
+//	}
+//	else
+//		selectText.text = "Choose an Action to Change!";
 
+	if (inputManager.GetKeyboard().IsKeyJustPressed(KEY_BACKSPACE) || inputManager.GetGamepad().IsButtonJustPressed(GP_BTN_B))
+	{
+		Game::Instance().GetStateMachine()->PopState();
+		Game::Instance().GetStateMachine()->PushState(new MenuState());
+	}
 }
 
 void SettingsState::OnKeyDown(SDL_Event* event)
@@ -208,20 +293,12 @@ void SettingsState::OnKeyDown(SDL_Event* event)
 
 void SettingsState::OnKeyUp(SDL_Event* event)
 {
-	if (event->key.keysym.sym == Game::Instance().GetKeyBindings().at(Game::Action::CANCEL) && !mEnterKey)
-	{
-		Game::Instance().GetStateMachine()->PopState();
-		Game::Instance().GetStateMachine()->PushState(new MenuState());
-	}
+
 }
 
 void SettingsState::OnBtnDown(SDL_Event* event)
 {
-	if (event->cbutton.button == Game::Instance().GetBtnBindings().at(Game::Action::CANCEL) && !mEnterKey)
-	{
-		Game::Instance().GetStateMachine()->PopState();
-		Game::Instance().GetStateMachine()->PushState(new MenuState());
-	}
+
 }
 
 void SettingsState::OnBtnUp(SDL_Event* event)

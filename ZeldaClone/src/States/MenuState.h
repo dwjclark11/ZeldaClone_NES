@@ -5,16 +5,21 @@
 
 class MenuState : public State
 {
+private:
+	static const std::string menuID;
+	unsigned int slot1, slot2, slot3;
+	sol::state lua;
+	bool m_bEliminate, m_bFull, m_bSlotsFull;
+
+	class Game& game;
+	class GameData& m_GameData;
+	class InputManager& m_InputManager;
+	class Registry& reg;
+
+	void EliminateKeys();
+	void SelectorKeys();
+
 public:
-	static std::string player1Name;
-	static std::string player2Name;
-	static std::string player3Name;
-
-	static bool slotsFull;
-	static bool eliminate;
-
-
-
 	MenuState();
 	virtual ~MenuState() { Logger::Err(GetStateID() + " was Destroyed!"); };
 
@@ -25,21 +30,5 @@ public:
 	virtual bool OnExit() override;
 
 	virtual void ProcessEvents(SDL_Event& event) override;
-	virtual void OnKeyDown(SDL_Event* event) override;
-	virtual void OnKeyUp(SDL_Event* event) override;
-	virtual void OnBtnDown(SDL_Event* event) override;
-	virtual void OnBtnUp(SDL_Event* event) override;
 	virtual std::string GetStateID() const { return menuID;} 
-
-private:
-	bool full;
-	static const std::string menuID;
-	unsigned int slot1;
-	unsigned int slot2;
-	unsigned int slot3;
-	sol::state lua;
-
-	class Game& game;
-	class Registry& reg;
-
 };

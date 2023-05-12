@@ -14,6 +14,7 @@ RenderCollisionSystem::RenderCollisionSystem()
 
 void RenderCollisionSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
 {
+	//auto& entities = GetSystemEntities();
 	auto entities = GetSystemEntities();
 	for (const auto& entity : entities)
 	{

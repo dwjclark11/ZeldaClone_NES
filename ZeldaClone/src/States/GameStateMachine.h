@@ -8,6 +8,9 @@ class State;
 
 class GameStateMachine
 {
+private:
+	std::vector<State*> states;
+
 public:
 	GameStateMachine() {}
 	~GameStateMachine() {}
@@ -21,13 +24,5 @@ public:
 	void ClearStates();
 
 	std::string GetCurrentState();
-
-	void ProcessEvents(SDL_Event& event);
-	void OnKeyDown(SDL_Event* event);
-	void OnKeyUp(SDL_Event* event);
-	void OnBtnDown(SDL_Event* event);
-	void OnBtnUp(SDL_Event* event);
-	
-private:
-	std::vector<State*> states;
+	void ProcessEvents(SDL_Event& event);	
 };

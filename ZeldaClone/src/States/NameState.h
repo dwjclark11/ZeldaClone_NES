@@ -3,12 +3,18 @@
 
 class NameState : public State
 {
-public:
-	static std::string name;
-	static int slot;
-	static int row;
-	static int col;
+private:
+	static const std::string nameID;
+	std::string m_sName;
+	int m_Slot, m_Row, m_Col;
+	bool m_bEditor, m_bKeyDown;
 
+	class Game& game;
+	class GameData& m_GameData;
+	class Registry& reg;
+	class InputManager& m_InputManager;
+
+public:
 	NameState();
 	~NameState() {}
 
@@ -19,18 +25,5 @@ public:
 	virtual bool OnExit() override;
 
 	virtual void ProcessEvents(SDL_Event& event) override;
-
-	virtual void OnKeyDown(SDL_Event* event) override;
-	virtual void OnKeyUp(SDL_Event* event) override;
-	virtual void OnBtnDown(SDL_Event* event) override;
-	virtual void OnBtnUp(SDL_Event* event) override;
 	virtual std::string GetStateID() const override{ return nameID; }
-private:
-	bool editor;
-	bool keyDown;
-	static const std::string nameID;
-
-	class Game& game;
-	class Registry& reg;
-	
 };

@@ -6,33 +6,93 @@
 #include "../Systems/PauseSystems/RenderPauseSystem.h"
 #include "../Systems/GameSystems/RenderHUDSystem.h"
 #include "../Systems/RenderTextSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Game/LevelLoader.h"
-#include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Components/KeyboardControlComponent.h"
 #include "../Components/GamePadComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/PauseComponent.h"
+#include "../Utilities/Camera.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Keyboard.h"
+#include "../inputs/Gamepad.h"
 
 const std::string PauseState::pauseID = "PAUSE";
 bool PauseState::firstEnter = false;
 
+void PauseState::UpdateSelectedItemSprite()
+{
+	if (m_SelectedItem == gameData.GetSelectedItem())
+		return;
+
+	const auto& selectedItem = reg.GetEntityByTag("selectedItem");
+	auto& sprite = selectedItem.GetComponent<SpriteComponent>();
+
+	switch (gameData.GetSelectedItem())
+	{
+	case GameData::ItemType::BOOMERANG:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.x += sprite.width * 0;
+		sprite.srcRect.y += sprite.height * 7;
+		break;
+	case GameData::ItemType::BOMB:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.x += sprite.width * 4;
+		sprite.srcRect.y += sprite.height * 7;
+		break;
+
+	case GameData::ItemType::BOW:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.x += sprite.width * 4;
+		break;
+
+	case GameData::ItemType::CANDLE:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.y += sprite.height * 3;
+		break;
+
+	case GameData::ItemType::FOOD:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.x += sprite.width * 7;
+		sprite.srcRect.y += sprite.height * 1;
+		break;
+
+	case GameData::ItemType::POTION_RED:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.x += sprite.width * 2;
+		sprite.srcRect.y += sprite.height * 2;
+		break;
+
+	case GameData::ItemType::MAGIC_ROD:
+		sprite.srcRect.x = 0;
+		sprite.srcRect.y = 0;
+		sprite.srcRect.x += sprite.width * 4;
+		sprite.srcRect.y += sprite.height * 5;
+		break;
+	}
+}
+
 PauseState::PauseState()
-	: bombs(false), game(Game::Instance()), reg(Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
+	, gameData(GameData::GetInstance())
+	, m_InputManager(InputManager::GetInstance())
+	, m_SelectedItem{GameData::ItemType::EMPTY }
 {
 }
 
 void PauseState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
 	
 
-	if (GameState::totalBombs > 0 && !game.GetGameItems().bombs)
+	if (gameData.GetTotalBombs() > 0 && !gameData.HasItem(GameData::GameItems::BOMB))
 	{
 		Entity bombItem = reg.CreateEntity();
 		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
@@ -41,26 +101,28 @@ void PauseState::Update(const float& deltaTime)
 		bombItem.Tag("bombItem");
 		bombItem.Group("pause");
 
-		game.GetGameItems().bombs = true;
+		gameData.AddItem(GameData::GameItems::BOMB);
 	}
 
-	if (game.GetFadeAlpha() == 0 && !game.FadeFinished())
+	if (game.GetCamera().GetFadeAlpha() == 0 && !game.GetCamera().FadeFinished())
 	{
-		GameState::unpause = true;
-		GamePadSystem::SetPaused(false);
-		game.SetFadeFinished(true);
-		game.StartFadeOut(false);
+		m_InputManager.SetPaused(false);
+		game.GetCamera().SetFadeFinished(true);
+		game.GetCamera().StartFadeOut(false);
 		game.GetStateMachine()->PopState();
 	}
 
-	if (GameState::totalBombs == 0 && game.GetGameItems().bombs) game.GetGameItems().bombs = false;
+	if (gameData.GetTotalBombs() == 0 && gameData.HasItem(GameData::GameItems::BOMB))
+		gameData.RemoveItem(GameData::GameItems::BOMB);
+
+	UpdateSelectedItemSprite();
 }
 
 void PauseState::Render()
 {
 	Registry::Instance().GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderTextSystem>().Update();
 }
 
 bool PauseState::OnEnter()
@@ -68,7 +130,7 @@ bool PauseState::OnEnter()
 	// Turn music volume down while paused
 	Mix_VolumeMusic(3);
 
-	game.StartFadeIn(true);
+	game.GetCamera().StartFadeIn(true);
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
 	// =============================================================================================================================
@@ -111,12 +173,12 @@ bool PauseState::OnEnter()
 
 	Entity triforce = reg.CreateEntity();
 
-	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, GameState::totalTriforcePieces * 96, 0);
+	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, gameData.GetTotalTriforce() * 96, 0);
 	triforce.AddComponent<TransformComponent>(glm::vec2(325, 400), glm::vec2(4, 4), 0.0);
 	triforce.AddComponent<PauseComponent>();
 
 	// Top Row Items
-	if (game.GetGameItems().woodBoomerang)
+	if (gameData.HasItem(GameData::GameItems::BOOMERANG))
 	{
 		Entity boomerang = reg.CreateEntity();
 		boomerang.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 112);
@@ -125,7 +187,7 @@ bool PauseState::OnEnter()
 		boomerang.Group("pause");
 	}
 
-	if (GameState::totalBombs > 0 && game.GetGameItems().bombs)
+	if (gameData.GetTotalBombs() > 0 && gameData.HasItem(GameData::GameItems::BOMB))
 	{
 		Entity bombs = reg.CreateEntity();
 		bombs.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
@@ -135,7 +197,7 @@ bool PauseState::OnEnter()
 		bombs.Group("pause");
 	}
 
-	if (game.GetGameItems().bow)
+	if (gameData.HasItem(GameData::GameItems::BOW))
 	{
 		Entity bow = reg.CreateEntity();
 		bow.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 0);
@@ -144,7 +206,7 @@ bool PauseState::OnEnter()
 		bow.Group("pause");
 	}
 
-	if (game.GetGameItems().candle)
+	if (gameData.HasItem(GameData::GameItems::CANDLE))
 	{
 		Entity candle = reg.CreateEntity();
 		candle.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 48);
@@ -154,7 +216,7 @@ bool PauseState::OnEnter()
 	}
 
 	// Bottom Row Items
-	if (game.GetGameItems().flute)
+	if (gameData.HasItem(GameData::GameItems::FLUTE))
 	{
 		Entity flute = reg.CreateEntity();
 		flute.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 16);
@@ -163,7 +225,7 @@ bool PauseState::OnEnter()
 		flute.Group("pause");
 	}
 
-	if (game.GetGameItems().food)
+	if (gameData.HasItem(GameData::GameItems::FOOD))
 	{
 		Entity meat = reg.CreateEntity();
 		meat.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 112, 16);
@@ -172,7 +234,7 @@ bool PauseState::OnEnter()
 		meat.Group("pause");
 	}
 
-	if (game.GetGameItems().redPotion)
+	if (gameData.HasItem(GameData::GameItems::RED_POTION))
 	{
 		Entity potion = reg.CreateEntity();
 		potion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 32, 32);
@@ -181,7 +243,7 @@ bool PauseState::OnEnter()
 		potion.Group("pause");
 	}
 
-	if (game.GetGameItems().magicRod)
+	if (gameData.HasItem(GameData::GameItems::MAGIC_ROD))
 	{
 		Entity magicalRod = reg.CreateEntity();
 		magicalRod.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 80);
@@ -201,40 +263,83 @@ bool PauseState::OnExit()
 
 void PauseState::ProcessEvents(SDL_Event& event)
 {
-	
-}
+	const auto& selector = reg.GetEntityByTag("pauseSelector");
+	auto& sprite = selector.GetComponent<SpriteComponent>();
+	auto& transform = selector.GetComponent<TransformComponent>();
+	auto& keyboard = m_InputManager.GetKeyboard();
+	auto& gamepad = m_InputManager.GetGamepad();
 
-void PauseState::OnKeyDown(SDL_Event* event)
-{
-
-	// Open the save Screen!
-	if (event->key.keysym.sym == SDLK_m)
+	if (keyboard.IsKeyJustPressed(KEY_W) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_UP))
 	{
+		transform.position.y -= ((sprite.height * transform.scale.y) + 6);
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.y < 190) 
+			transform.position.y = 260;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_S) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_DOWN))
+	{
+		transform.position.y += ((sprite.height * transform.scale.y) + 6);
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.y > 260) 
+			transform.position.y = 190;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_A) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_LEFT))
+	{
+		transform.position.x -= 100;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.x < 386)
+			transform.position.x = 686;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_D) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_RIGHT))
+	{
+		transform.position.x += 100;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.x > 686) 
+			transform.position.x = 386;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
+	{
+		if (transform.position.x == 386 && transform.position.y == 190 && gameData.HasItem(GameData::GameItems::BOOMERANG))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::BOOMERANG);
+		}
+		else if ((transform.position.x == 486 && transform.position.y == 190) && gameData.GetTotalBombs() > 0 && gameData.HasItem(GameData::GameItems::BOMB))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::BOMB);
+		}
+		else if (transform.position.x == 586 && transform.position.y == 190 && gameData.HasItem(GameData::GameItems::BOW))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::BOW);
+		}
+		else if (transform.position.x == 686 && transform.position.y == 190 && gameData.HasItem(GameData::GameItems::CANDLE))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::CANDLE);
+		}
+		else if (transform.position.x == 386 && transform.position.y == 260)
+		{
+
+		}
+		else if (transform.position.x == 486 && transform.position.y == 260 && gameData.HasItem(GameData::GameItems::FOOD))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::FOOD);
+		}
+		else if (transform.position.x == 586 && transform.position.y == 260 && gameData.HasItem(GameData::GameItems::RED_POTION))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::POTION_RED);
+		}
+		else if (transform.position.x == 686 && transform.position.y == 260 && gameData.HasItem(GameData::GameItems::MAGIC_ROD))
+		{
+			gameData.SetSelectedItem(GameData::ItemType::MAGIC_ROD);
+		}
+	}
+	else if (keyboard.IsKeyJustReleased(KEY_P) || gamepad.IsButtonJustReleased(GP_BTN_Y))
+	{
+		game.GetCamera().SetFadeFinished(false);
+		game.GetCamera().StartFadeOut(true);
+	}
+	else if (keyboard.IsKeyJustReleased(KEY_M) || gamepad.IsButtonJustReleased(GP_BTN_START))
+	{
+		// Open the save Screen!
 		game.GetStateMachine()->PushState(new SaveGameState());
 	}
 }
-
-void PauseState::OnKeyUp(SDL_Event* event)
-{
-	if (event->key.keysym.sym == SDLK_q)
-	{
-		game.SetFadeFinished(false);
-		game.StartFadeOut(true);
-	}
-}
-
-void PauseState::OnBtnDown(SDL_Event* event)
-{
-
-}
-
-void PauseState::OnBtnUp(SDL_Event* event)
-{
-	if (event->cbutton.button == game.GetBtnBindings().at(Game::Action::PAUSE))
-	{
-		game.SetFadeFinished(false);
-		game.StartFadeOut(true);
-	}
-}
-
-

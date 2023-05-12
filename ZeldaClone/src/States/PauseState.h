@@ -1,8 +1,19 @@
 #pragma once
 #include "State.h"
-
+#include "../Utilities/GameData.h"
 class PauseState : public State
 {
+private:
+	bool static firstEnter;
+	static const std::string pauseID;
+
+	class Game& game;
+	class Registry& reg;
+	class InputManager& m_InputManager;
+	GameData& gameData;
+	GameData::ItemType m_SelectedItem;
+	void UpdateSelectedItemSprite();
+
 public:
 
 	PauseState();
@@ -15,19 +26,5 @@ public:
 	virtual bool OnExit() override;
 	virtual void ProcessEvents(SDL_Event& event) override;
 
-	virtual void OnKeyDown(SDL_Event* event) override;
-	virtual void OnKeyUp(SDL_Event* event) override;
-	virtual void OnBtnDown(SDL_Event* event) override;
-	virtual void OnBtnUp(SDL_Event* event) override;
-
-
 	virtual std::string GetStateID() const { return pauseID; }
-private:
-	bool bombs;
-
-	bool static firstEnter;
-	static const std::string pauseID;
-
-	class Game& game;
-	class Registry& reg;
 };

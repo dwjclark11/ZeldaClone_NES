@@ -3,8 +3,6 @@
 #include "../Systems/GameSystems/RenderSystem.h"
 #include "../Systems/NameSystems/RenderNameStateTextSystem.h"
 #include "../Systems/NameSystems/RenderNameSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
-#include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Components/RegisterNameComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/TextLabelComponent.h"
@@ -13,32 +11,34 @@
 #include "../States/MenuState.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Game/Game.h"
+#include "../Game/LevelLoader.h"
+#include "../Utilities/Camera.h"
+#include "../Utilities/GameData.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Gamepad.h"
+
+#include <SDL.h>
 
 const std::string NameState::nameID = "NAME";
-std::string NameState::name = "";
-
-int NameState::slot = 0;
-int NameState::row = 0;
-int NameState::col = 0;
 
 NameState::NameState()
-	: editor(false), keyDown(false), game(Game::Instance()), reg(Registry::Instance())
+	: game(Game::Instance()), reg(Registry::Instance())
+	, m_InputManager(InputManager::GetInstance()), m_GameData(GameData::GetInstance())
+	, m_Slot{0}, m_Row{0}, m_Col{0}
+	, m_bEditor{ false }, m_bKeyDown {false}
 {
 }
 
 void NameState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
 	reg.Update();
 }
 
 void NameState::Render()
 {
 	Registry::Instance().GetSystem<RenderNameSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	Registry::Instance().GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderNameStateTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera().GetCameraRect());
 }
 
 bool NameState::OnEnter()
@@ -75,26 +75,104 @@ bool NameState::OnExit()
 
 void NameState::ProcessEvents(SDL_Event& event)
 {
+	auto& keyboard = m_InputManager.GetKeyboard();
+	auto& gamepad = m_InputManager.GetGamepad();
 
+	if (m_GameData.GetPlayer1Name().size() == 0)
+		m_Slot = 1;
+	else if (m_GameData.GetPlayer2Name().size() == 0)
+		m_Slot = 2;
+	else if (m_GameData.GetPlayer1Name().size() == 0)
+		m_Slot = 3;
+
+	auto entity = Registry::Instance().GetEntityByTag("box");
+
+	const auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& transform = entity.GetComponent<TransformComponent>();
+	auto& text = entity.GetComponent<TextLabelComponent>();
+
+	if (keyboard.IsKeyJustPressed(KEY_W) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_UP))
+	{
+
+		transform.position.y -= sprite.height * transform.scale.y * 2;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Row--;
+		if (transform.position.y < 200)
+		{
+			transform.position.y = 584;
+			m_Row = 3;
+		}
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_S) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_DOWN))
+	{
+		transform.position.y += sprite.height * transform.scale.y * 2;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Row++;
+		if (transform.position.y > 584)
+		{
+			transform.position.y = 200;
+			m_Row = 0;
+		}
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_D) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_RIGHT))
+	{
+		transform.position.x += sprite.width * transform.scale.x;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Col++;
+		if (transform.position.x > 708)
+		{
+			transform.position.x = 260;
+			m_Row = 0;
+		}
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_A) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_LEFT))
+	{
+		transform.position.x -= sprite.width * transform.scale.x;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Col--;
+		if (transform.position.x < 260)
+		{
+			transform.position.x = 708;
+			m_Row = 7;
+		}
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
+	{
+		if (text.text.size() < 6)
+		{
+			bool valid = true;
+			// Make sure that the row and col have a valid letter based on the 
+			// name-letters sprite
+			if (m_Row == 3 && m_Col > 1)
+			{
+				valid = false;
+			}
+
+			// Create a new char based on ASCII Upper characters and the letter position
+			// on the sprite
+			char newChar = (m_Row * 8) + m_Col + 65; // 65 is 'A'
+
+			if (valid)
+				text.text += newChar;
+		}
+
+		if (transform.position.x == 452 && transform.position.y == 584)
+		{
+			if (text.text.size() > 0)
+				text.text.erase(text.text.size() - 1);
+		}
+
+		if (transform.position.x == 580 && transform.position.y == 584)
+		{
+			LevelLoader loader;
+			m_sName = text.text.c_str();
+
+			// Reset the column and the row after name is entered
+			m_Row = 0;
+			m_Col = 0;
+			loader.SavePlayerNameToLuaTable(std::to_string(m_Slot), m_sName);
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new MenuState());
+		}
+	}
 }
-
-void NameState::OnKeyDown(SDL_Event* event)
-{
-
-}
-
-void NameState::OnKeyUp(SDL_Event* event)
-{
-
-}
-
-void NameState::OnBtnDown(SDL_Event* event)
-{
-
-}
-
-void NameState::OnBtnUp(SDL_Event* event)
-{
-}
-
-

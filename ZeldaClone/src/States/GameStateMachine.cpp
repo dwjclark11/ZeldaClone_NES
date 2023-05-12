@@ -77,36 +77,3 @@ void GameStateMachine::ProcessEvents(SDL_Event& event)
 		states.back()->ProcessEvents(event);
 	}
 }
-
-void GameStateMachine::OnKeyDown(SDL_Event* event)
-{
-	if (!states.empty())
-	{
-		states.back()->OnKeyDown(event);
-	}
-}
-
-void GameStateMachine::OnKeyUp(SDL_Event* event)
-{
-	if (!states.empty())
-	{
-		states.back()->OnKeyUp(event);
-	}
-}
-
-void GameStateMachine::OnBtnDown(SDL_Event* event)
-{
-	if (!states.empty())
-	{
-		states.back()->OnBtnDown(event);
-	}
-}
-
-void GameStateMachine::OnBtnUp(SDL_Event* event)
-{
-	if (!states.empty())
-	{
-		states.back()->OnBtnUp(event);
-	}
-}
-

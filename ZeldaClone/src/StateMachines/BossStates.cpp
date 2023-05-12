@@ -1,6 +1,6 @@
 #include "BossStates.h"
 #include "../ECS/ECS.h"
-
+#include "../Utilities/GameData.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
 #include "../Components/ProjectileEmitterComponent.h"
@@ -15,6 +15,7 @@
 
 #include "../Systems/SoundFXSystem.h"
 #include "../Game/Game.h"
+#include "../Game/Player.h"
 #include "../Components/TriggerBoxComponent.h"
 
 void BossIdleState::OnEnter(Entity& entity)
@@ -39,24 +40,30 @@ void BossIdleState::Update(Entity& entity)
 	{
 		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 		
-		if (rigid.velocity == glm::vec2(0))
+		//if (rigid.velocity == glm::vec2(0))
+		//{
+		//	rigid.velocity = glm::vec2(-50, 0);
+		//	rigid.dir = RigidBodyComponent::Dir::LEFT;
+		//}
+
+		switch (rigid.dir)
 		{
-			rigid.velocity = glm::vec2(-50, 0);
-			rigid.left = true;
-		}
-
-		if (rigid.down)
-			rigid.velocity = glm::vec2(0, 50);
-
-		if (rigid.up)
+		case RigidBodyComponent::Dir::UP:
 			rigid.velocity = glm::vec2(0, -50);
-
-		if (rigid.right)
+			break;
+		case RigidBodyComponent::Dir::RIGHT:
 			rigid.velocity = glm::vec2(50, 0);
-
-		if (rigid.left)
+			break; 
+		case RigidBodyComponent::Dir::DOWN:
+			rigid.velocity = glm::vec2(0, 50);
+			break;
+		case RigidBodyComponent::Dir::LEFT:
 			rigid.velocity = glm::vec2(-50, 0);
-		
+			break;
+		default:
+			break;
+		}
+			
 		if (rigid.velocity != glm::vec2(0, 0))
 		{
 			esm.AddState(std::make_unique<BossPatrolState>());
@@ -94,10 +101,11 @@ void BossPatrolState::OnExit (class Entity& entity)
 
 void BossPatrolState::Update (class Entity& entity)
 {
+	const auto& player = Game::Instance().GetPlayer();
 	bool transition = false;
 
-	auto player = Registry::Instance().GetEntityByTag("player");
-	auto& playerTransform = player.GetComponent<TransformComponent>();
+	const auto& playerEnt = player->GetPlayer();
+	auto& playerTransform = playerEnt.GetComponent<TransformComponent>();
 
 	auto& transform = entity.GetComponent<TransformComponent>();
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
@@ -109,33 +117,20 @@ void BossPatrolState::Update (class Entity& entity)
 	
 	auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 
-	if (transform.position.x <= startPos.x - 100)
+	if (walkTimer.GetTicks() > 1000)
 	{
-		if (rigid.left)
+		if (rigid.dir == RigidBodyComponent::Dir::LEFT)
 		{
-			rigid.down = false;
-			rigid.right = true;
-			rigid.up = false;
-			rigid.left = false;
-
+			rigid.dir = RigidBodyComponent::Dir::RIGHT;
 			transition = true;
 		}
-
-
-	}
-	else if (transform.position.x >= startPos.x)
-	{
-		if (rigid.right)
+		else if (rigid.dir == RigidBodyComponent::Dir::RIGHT)
 		{
-			rigid.down = false;
-			rigid.right = false;
-			rigid.up = false;
-			rigid.left = true;
-
+			rigid.dir = RigidBodyComponent::Dir::LEFT;
 			transition = true;
 		}
 	}
-
+	
 	if (playerTransform.position.x > transform.position.x - 400 && playerTransform.position.x < transform.position.x + 400 &&
 		playerTransform.position.y > transform.position.y - 400 && playerTransform.position.y < transform.position.y + 400 && !projectileEmitter.timer.isStarted())
 	{
@@ -151,11 +146,9 @@ void BossPatrolState::Update (class Entity& entity)
 		projectileEmitter.shotFired = false;
 	}
 
-
-
 	if (transition)
 	{
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "boss_scream_1", 0, -1);
+		Game::Instance().GetSoundPlayer().PlaySoundFX("boss_scream_1", 0, SoundChannel::ANY);
 
 		ai.GetEnemyStateMachine().AddState(std::make_unique<BossIdleState>());
 		ai.GetEnemyStateMachine().ChangeState(entity);
@@ -166,8 +159,6 @@ void BossPatrolState::Update (class Entity& entity)
 		esm.AddState(std::make_unique<BossHurtState>());
 		esm.ChangeState(entity);
 	}
-
-
 }
 
 void BossHurtState::OnEnter(class Entity& entity)
@@ -190,7 +181,7 @@ void BossHurtState::OnEnter(class Entity& entity)
 	animation.frameSpeedRate = 20;
 	animation.vertical = true;
 
-	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "boss_hit", 0, -1);
+	Game::Instance().GetSoundPlayer().PlaySoundFX("boss_hit", 0, SoundChannel::ANY);
 
 } 
 
@@ -267,7 +258,7 @@ void BossDeathState::OnEnter(class Entity& entity)
 	{
 		auto trapDoor = Registry::Instance().GetEntityByTag("level1Door");
 		// Play door open sound
-		Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "door_unlock", 0, 1);
+		Game::Instance().GetSoundPlayer().PlaySoundFX("door_unlock", 0, SoundChannel::ANY);
 		trapDoor.Kill();
 	}
 
@@ -303,7 +294,7 @@ void BossDeathState::DropHeart(Entity& entity)
 	fullHeart.AddComponent<BoxColliderComponent>(16, 16);
 	fullHeart.AddComponent<TriggerBoxComponent>(TriggerBoxComponent::TriggerType::COLLECT_ITEM);
 	fullHeart.AddComponent<GameComponent>();
-	Registry::Instance().GetSystem<SoundFXSystem>().PlaySoundFX(Game::Instance().GetAssetManager(), "special_item", 0, -1);
+	Game::Instance().GetSoundPlayer().PlaySoundFX("special_item", 0, SoundChannel::ANY);
 }
 
 void BossStunnedState::OnEnter(class Entity& entity)

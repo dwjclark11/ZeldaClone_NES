@@ -3,6 +3,12 @@
 
 class SettingsState : public State
 {
+private:
+	static std::string settingsID;
+	class Game& game;
+	class GameData& gameData;
+	class InputManager& inputManager;
+
 public:
 	static int mActionIndex;
 	static bool mEnterKey;
@@ -23,6 +29,5 @@ public:
 	virtual void OnBtnUp(SDL_Event* event);
 
 	virtual std::string GetStateID() const override { return settingsID; }
-private:
-	static std::string settingsID;
+
 };

@@ -2,18 +2,23 @@
 #include "../ECS/ECS.h"
 #include "../Systems/EditorSystems/RenderEditorGUISystem.h"
 #include "../Systems/EditorSystems/RenderEditorSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
 #include "../Systems/RenderCollisionSystem.h"
 #include "../Game/Game.h"
 #include "../Game/LevelLoader.h"
 #include "../Systems/EditorSystems/MouseControlSystem.h"
+#include "../Utilities/Camera.h"
+#include "../Utilities/GameData.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Keyboard.h"
+#include "../inputs/Gamepad.h"
 
 const std::string EditorState::editorID = "EDITOR";
 
 EditorState::EditorState()
-	: editor(false), keyDown(false), game(Game::Instance()), reg(Registry::Instance())
+	: editor(false), keyDown(false), game(Game::Instance()), gameData(GameData::GetInstance())
+	, inputManager(InputManager::GetInstance()), reg(Registry::Instance())
 {
 
 }
@@ -21,18 +26,17 @@ EditorState::EditorState()
 void EditorState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-
 	reg.Update();
-	Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
+	Registry::Instance().GetSystem<CameraMovementSystem>().UpdateEditorCam(game.GetCamera(), deltaTime);
 	//Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
 
 void EditorState::Render()
 {
+	const auto& camera = game.GetCamera();
 	//// Create the HUD rect that each tilemap screen will be inside
-	SDL_Rect hudRectTop = { 0, -1080 - game.GetCamera().y, game.GetCamera().w, 1080 };
-	SDL_Rect hudRectLeft = { -game.GetCamera().w - game.GetCamera().x, 0, game.GetCamera().w, 1080 };
+	SDL_Rect hudRectTop = { 0, -1080 - camera.GetCameraPos().y, camera.GetCameraWidth(), 1080};
+	SDL_Rect hudRectLeft = { -camera.GetCameraWidth() - camera.GetCameraPos().x, 0, camera.GetCameraWidth(), 1080};
 	SDL_Rect panelRect = {448, 348, 1024, 672 };
 	SDL_Rect hudRect = { 448, 60, 1024, 288 };
 	SDL_SetRenderDrawColor(game.GetRenderer(), 70, 70, 70, 70);
@@ -42,14 +46,14 @@ void EditorState::Render()
 	for (int i = 0; i < yNum; i++)
 		for (int j = 0; j < xNum; j++)
 		{
-			SDL_Rect newRect = { (j * MouseControlSystem::gridSize) - game.GetCamera().x, i * MouseControlSystem::gridSize - game.GetCamera().y, 64, 64 };
+			SDL_Rect newRect = { (j * MouseControlSystem::gridSize) - camera.GetCameraPos().x, i * MouseControlSystem::gridSize - camera.GetCameraPos().y, 64, 64};
 			SDL_RenderDrawRect(game.GetRenderer(), &newRect);
 		}
 
-	Registry::Instance().GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderEditorSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera().GetCameraRect());
 	Registry::Instance().GetSystem<MouseControlSystem>().Update(game.GetAssetManager(), game.GetRenderer(),
-		game.GetMouseBox(), game.GetEvent(), game.GetCamera());
-	Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera());
+		game.GetMouseBox(), game.GetEvent(), game.GetCamera().GetCameraRect());
+	Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), game.GetCamera().GetCameraRect());
 	Registry::Instance().GetSystem<RenderEditorGUISystem>().Update(game.GetAssetManager(), game.GetRenderer());
 
 	// Draw The Editor Boundries
@@ -83,10 +87,9 @@ bool EditorState::OnEnter()
 	SDL_SetWindowResizable(game.GetWindow(), SDL_TRUE);
 	
 	// Set the Camera Position
-	game.GetCamera().x = 0;
-	game.GetCamera().y = 0;
-	game.GetCamera().w = 1920;
-	game.GetCamera().h = 1080;
+	game.GetCamera().SetCameraPosition(0, 0);
+	game.GetCamera().SetCameraWidth(1920);
+	game.GetCamera().SetCameraHeight(1080);
 
 	// Initialize IMGUI context
 	ImGui::CreateContext();
@@ -97,8 +100,7 @@ bool EditorState::OnEnter()
 	if (!reg.HasSystem<RenderEditorGUISystem>()) reg.AddSystem<RenderEditorGUISystem>();
 	if (!reg.HasSystem<RenderEditorSystem>()) 	reg.AddSystem<RenderEditorSystem>();
 	if (!reg.HasSystem<MouseControlSystem>()) 	reg.AddSystem<MouseControlSystem>();
-	//if (!reg.HasSystem<EditorKeyboardControlSystem>()) reg.AddSystem<EditorKeyboardControlSystem>();
-
+	
 	loader.LoadAssetsFromLuaTable(game.GetLuaState(), "editor_assets");
 	// Assign values to varialbes
 	editor = false;
@@ -111,8 +113,9 @@ bool EditorState::OnExit()
 	// Delete the editor entities
 	Registry::Instance().GetSystem<RenderEditorSystem>().OnExit();
 
-	game.GetCamera().w = game.windowWidth;
-	game.GetCamera().h = game.windowHeight;
+	// Set the Camera Position
+	game.GetCamera().SetCameraWidth(game.GetWindowWidth());
+	game.GetCamera().SetCameraHeight(game.GetWindowHeight());
 
 	// Set the Window Size/Position to the desired Game Window Size and position
 	SDL_SetWindowSize(game.GetWindow(), 256 * 4, 240 * 4);
@@ -122,70 +125,40 @@ bool EditorState::OnExit()
 	// We do not want the Game to be resizable!
 	SDL_SetWindowResizable(game.GetWindow(), SDL_FALSE);
 	
-	if (!Game::isDebug) Game::isDebug = true;
+	if (!game.IsDebugging()) 
+		game.SetDebug(true);
+
 	return true;
 }
 
 void EditorState::ProcessEvents(SDL_Event& event)
 {
+	auto& camera = game.GetCamera();
+	const auto& camera_pos = camera.GetCameraPos();
+	auto& keyboard = inputManager.GetKeyboard();
 
+		// Move the camera UP
+	if (keyboard.IsKeyHeld(KEY_W))
+	{
+		camera.SetCameraPosition(camera_pos.x, camera_pos.y - 32);
+	}
+	else if (keyboard.IsKeyHeld(KEY_D))
+	{
+		camera.SetCameraPosition(camera_pos.x + 64, camera_pos.y);
+	}
+	else if (keyboard.IsKeyHeld(KEY_S))
+	{
+		camera.SetCameraPosition(camera_pos.x, camera_pos.y + 32);
+	}
+	else if (keyboard.IsKeyHeld(KEY_A))
+	{
+		camera.SetCameraPosition(camera_pos.x - 64, camera_pos.y);
+	}
+		
+	// Clamps for Game Camera and Image Src Rec!! --> This needs to be investigated further
+	if (camera.GetCameraPos().x < -1000)
+		camera.SetCameraPosition(-1000, camera_pos.y);
+	if (camera.GetCameraPos().y < -1000)
+		camera.SetCameraPosition(camera_pos.x, -1000);;
 }
 
-void EditorState::OnKeyDown(SDL_Event* event)
-{
-	//if (game.GetEvent().type == SDL_KEYDOWN && !keyDown)
-	//{
-	//	const Uint8* state = SDL_GetKeyboardState(NULL);
-	//	
-	//	if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_O])
-	//	{
-	//		if (!RenderEditorGUISystem::imageName.empty())
-	//		{
-	//			//FileDialogs dialog;
-	//			RenderEditorGUISystem::fileName = dialog.OpenFile();
-
-	//			loader.SetFileName(RenderEditorGUISystem::fileName);
-
-	//			// Check to see if the String is Empty!!
-	//			if (!RenderEditorGUISystem::fileName.empty())
-	//			{
-	//				loader.LoadTilemap(game.GetAssetManager(), game.GetRenderer());
-	//				RenderEditorGUISystem::fileLoaded = true;
-	//			}
-	//		}
-	//	}
-
-	//	if (state[SDL_SCANCODE_LCTRL] && state[SDL_SCANCODE_S])
-	//	{
-	//		if (MouseControlSystem::createTile)
-	//		{
-	//			if (!RenderEditorGUISystem::fileName.empty())
-	//			{
-	//				loader.SaveTilemap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
-	//				RenderEditorGUISystem::fileLoaded = true;
-	//			}
-	//		}
-
-	//		if (MouseControlSystem::createObstacles)
-	//		{
-	//			if (!RenderEditorGUISystem::fileName.empty())
-	//			{
-	//				loader.SaveObjectMap(RenderEditorGUISystem::fileName, game.GetAssetManager(), game.GetRenderer());
-	//				RenderEditorGUISystem::fileLoaded = true;
-	//			}
-	//		}
-	//	}
-
-	//	if (event->key.keysym.sym == SDLK_SPACE)
-	//	{
-	//		game.GetCamera().x = 0;
-	//		game.GetCamera().y = 0;
-	//	}
-	//	keyDown = true;
-	//}
-}
-
-void EditorState::OnKeyUp(SDL_Event* event)
-{
-	keyDown = false;
-}

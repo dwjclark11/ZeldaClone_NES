@@ -1,16 +1,20 @@
 #include "MenuState.h"
+#include "NameState.h"
+#include "SettingsState.h"
 #include "GameState.h"
 #include "EditorState.h"
 #include "../Game/Game.h"
+#include "../Utilities/GameData.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Keyboard.h"
+#include "../inputs/Gamepad.h"
 #include "GameStateMachine.h"
 #include "../Game/LevelLoader.h"
 #include "../Components/TextLabelComponent.h"
 #include "../Components/MenuComponent.h"
 #include "../Components/KeyboardControlComponent.h"
 #include "../Systems/RenderTextSystem.h"
-#include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Systems/MenuSystems/RenderMainMenuSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/EditorSystems/MouseControlSystem.h"
 #include "../Systems/EditorSystems/RenderEditorGUISystem.h"
 #include "../Systems/EditorSystems/RenderEditorSystem.h"
@@ -20,25 +24,203 @@ namespace fs = std::filesystem;
 
 // Define all static variables
 const std::string MenuState::menuID = "MENU";
-std::string MenuState::player1Name = "";
-std::string MenuState::player2Name = "";
-std::string MenuState::player3Name = "";
 
-bool MenuState::slotsFull = false;
-bool MenuState::eliminate = false;
+void MenuState::EliminateKeys()
+{
+	auto& keyboard = m_InputManager.GetKeyboard();
+	auto& gamepad = m_InputManager.GetGamepad();
+	const auto& entity = Registry::Instance().GetEntityByTag("selector");
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& transform = entity.GetComponent<TransformComponent>();
+
+	if (keyboard.IsKeyJustPressed(KEY_W) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_UP))
+	{
+		transform.position.y -= sprite.height * 6;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+
+		if (transform.position.y < 200)
+			transform.position.y = 392;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_S) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_DOWN))
+	{
+		transform.position.y += sprite.height * 6;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+
+		if (transform.position.y > 392)
+			transform.position.y = 200;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
+	{
+		if (transform.position.y == 200)
+		{
+
+			if (m_GameData.GetPlayer1Name().size() != 0)
+			{
+				// Remove file from Saved files
+				const std::string save1File = "./Assets/SavedFiles/slot_1/save1.lua";
+				if (std::filesystem::remove(save1File))
+				{
+					Logger::Log("Player: " + m_GameData.GetPlayer1Name() + " was eliminated");
+					LevelLoader loader;
+					loader.EliminatePlayerToDefault(1, m_GameData.GetPlayer1Name());
+					m_GameData.SetPlayer1Name("");
+					m_bEliminate = false;
+					std::filesystem::remove("./Assets/SavedFiles/slot_1/GameSecrets_1.lua");
+				}
+				else
+					Logger::Err("Error, File could not be deleted");
+			}
+		}
+		else if (transform.position.y == 296)
+		{
+
+			if (m_GameData.GetPlayer2Name().size() != 0)
+			{
+				// Remove file from Saved files
+				const std::string save2File = "./Assets/SavedFiles/slot_2/save2.lua";
+				if (std::filesystem::remove(save2File))
+				{
+					Logger::Log("Player: " + m_GameData.GetPlayer2Name() + " was eliminated");
+					LevelLoader loader;
+					loader.EliminatePlayerToDefault(2, m_GameData.GetPlayer2Name());
+					m_GameData.SetPlayer2Name("");
+					m_bEliminate = false;
+					std::filesystem::remove("./Assets/SavedFiles/slot_2/GameSecrets_2.lua");
+				}
+				else
+					Logger::Err("Error, File could not be deleted");
+			}
+
+		}
+		else if (transform.position.y == 392)
+		{
+			if (m_GameData.GetPlayer3Name().size() != 0)
+			{
+				// Remove file from Saved files
+				const std::string save3File = "./Assets/SavedFiles/slot_3/save3.lua";
+				if (std::filesystem::remove(save3File))
+				{
+					Logger::Log("Player: " + m_GameData.GetPlayer3Name() + " was eliminated");
+					LevelLoader loader;
+					loader.EliminatePlayerToDefault(3, m_GameData.GetPlayer3Name());
+					m_GameData.SetPlayer3Name("");
+					m_bEliminate = false;
+					std::filesystem::remove("./Assets/SavedFiles/slot_3/GameSecrets_3.lua");
+				}
+				else
+					Logger::Err("Error, File could not be deleted");
+			}
+		}
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_BACKSPACE) || gamepad.IsButtonJustPressed(GP_BTN_B))
+	{
+		m_bEliminate = false;
+	}
+}
+void MenuState::SelectorKeys()
+{
+	auto& keyboard = m_InputManager.GetKeyboard();
+	auto& gamepad = m_InputManager.GetGamepad();
+	const auto& entity = Registry::Instance().GetEntityByTag("selector");
+	auto& sprite = entity.GetComponent<SpriteComponent>();
+	auto& transform = entity.GetComponent<TransformComponent>();
+
+	if (keyboard.IsKeyJustPressed(KEY_W) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_UP))
+	{
+		transform.position.y -= sprite.height * 6;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.y < 200)
+		{
+			transform.position.y = game.IsDebugging() ? 776 : 584;
+		}
+
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_S) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_DOWN))
+	{
+		transform.position.y += sprite.height * 6;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.y > (game.IsDebugging() ? 776 : 584))
+		{
+			transform.position.y = 200;
+		}
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_D) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_RIGHT))
+	{
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_A) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_LEFT))
+	{
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
+	{
+		if (transform.position.y == 200)
+		{
+			if (m_GameData.GetPlayer1Name().size() != 0)
+			{
+				m_GameData.SetPlayerNum(1);
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
+			}
+		}
+		else if (transform.position.y == 296)
+		{
+			if (m_GameData.GetPlayer2Name().size() != 0)
+			{
+				m_GameData.SetPlayerNum(2);
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new GameState());
+			}
+		}
+		else if (transform.position.y == 392)
+		{
+			if (m_GameData.GetPlayer3Name().size() != 0)
+			{
+				m_GameData.SetPlayerNum(3);
+				game.GetStateMachine()->PopState();
+				game.GetStateMachine()->PushState(new GameState());
+			}
+		}
+		else if (transform.position.y == 488)
+		{
+			if (m_GameData.GetPlayer1Name().size() != 0 && m_GameData.GetPlayer2Name().size() != 0 && m_GameData.GetPlayer3Name().size() != 0)
+			{
+				m_bSlotsFull = true;
+				return;
+			}
+
+			game.GetStateMachine()->PushState(new NameState());
+		}
+		else if (transform.position.y == 584)
+		{
+			Logger::Log("Eliminate");
+			if (m_GameData.GetPlayer1Name().size() != 0 || m_GameData.GetPlayer2Name().size() != 0 || m_GameData.GetPlayer3Name().size() != 0)
+			{
+				m_bEliminate = !m_bEliminate;
+				transform.position.y = 200;
+			}
+		}
+		else if (transform.position.y == 680)
+		{
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new SettingsState());
+		}
+		else if (transform.position.y == 776)
+		{
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new EditorState());
+		}
+	}
+}
 
 MenuState::MenuState()
-	: full(false), slot1(1), slot2(2), slot3(3), game(Game::Instance()), reg(Registry::Instance())
+	: m_bFull(false), m_bEliminate{false}, slot1(1), slot2(2), slot3(3)
+	, game(Game::Instance()), m_GameData(GameData::GetInstance())
+	, m_InputManager(InputManager::GetInstance()), reg(Registry::Instance())
 {
 }
 
 void MenuState::Update(const float& deltaTime)
 {
 	game.GetEventManager()->Reset();
-	
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<GamePadSystem>().SubscribeToEvents(game.GetEventManager());
-	
 	reg.Update();
 }
 
@@ -52,7 +234,7 @@ bool MenuState::OnEnter()
 {
 	reg.Update();
 	LevelLoader loader;
-	full = false;
+	m_bFull = false;
 
 	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
 	if (!reg.HasSystem<RenderSystem>()) reg.AddSystem<RenderSystem>();
@@ -66,7 +248,7 @@ bool MenuState::OnEnter()
 	if (!game.GetAssetManager()->HasFont("charriot-font-60"))
 		game.GetAssetManager()->AddFonts("charriot-font-60", "./Assets/Fonts/charriot.ttf", 60);
 
-	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
+	game.GetMusicPlayer().PlayMusic("Main_Menu", -1);
 
 	// Check to see if the save file exists, if it does call the loader function
 	fs::path saves("./Assets/SavedFiles/slot_1/save1.lua");
@@ -84,14 +266,6 @@ bool MenuState::OnEnter()
 	if (!selector.HasComponent<KeyboardControlComponent>())
 		selector.AddComponent<KeyboardControlComponent>();
 
-	// If we were in the editor system remove these for they are only needed there!
-	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<RenderEditorGUISystem>();
-	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<RenderEditorSystem>();
-	if (reg.HasSystem<RenderEditorGUISystem>()) reg.RemoveSystem<MouseControlSystem>();
-
-	// Remove the Render Title System since we are not using it!
-	if (reg.HasSystem<RenderTitleSystem>()) reg.RemoveSystem<RenderTitleSystem>();
-
 	return true;
 }
 
@@ -102,8 +276,7 @@ bool MenuState::OnExit()
 	// Remove Unsued Textures
 	game.GetAssetManager()->RemoveTexture("menu_box");
 	game.GetAssetManager()->RemoveTexture("main_menu_gui");
-	// Remove Unused Music
-	game.GetAssetManager()->RemoveMusic("Main_Menu");
+	
 	// Remove Unused SoundFXs
 	game.GetAssetManager()->RemoveSoundFX("Eliminate");
 	// Remove Fonts
@@ -114,26 +287,12 @@ bool MenuState::OnExit()
 
 void MenuState::ProcessEvents(SDL_Event& event)
 {
-	
+	if (!m_bEliminate)
+	{
+		SelectorKeys();
+	}
+	else
+	{
+		EliminateKeys();
+	}
 }
-
-void MenuState::OnKeyDown(SDL_Event* event)
-{
-
-}
-
-void MenuState::OnKeyUp(SDL_Event* event)
-{
-}
-
-void MenuState::OnBtnDown(SDL_Event* event)
-{
-
-}
-
-void MenuState::OnBtnUp(SDL_Event* event)
-{
-
-}
-
-

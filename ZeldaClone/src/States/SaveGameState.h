@@ -3,6 +3,13 @@
 
 class SaveGameState : public State
 {
+private:
+	static const std::string saveID;
+	class Game& game;
+	class GameData& m_GameData;
+	class InputManager& m_InputManager;
+	class Registry& reg;
+
 public:
 	SaveGameState();
 	~SaveGameState() {}
@@ -14,15 +21,5 @@ public:
 	virtual bool OnExit() override;
 
 	virtual void ProcessEvents(SDL_Event& event) override;
-
-	virtual void OnKeyDown(SDL_Event* event) override;
-	virtual void OnKeyUp(SDL_Event* event) override;
-	virtual void OnBtnDown(SDL_Event* event) override;
-	virtual void OnBtnUp(SDL_Event* event) override;
 	virtual std::string GetStateID() const override{ return saveID; }
-private:
-
-	static const std::string saveID;
-	class Game& game;
-	class Registry& reg;
 };

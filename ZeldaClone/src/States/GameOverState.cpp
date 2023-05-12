@@ -1,20 +1,29 @@
 #include "GameOverState.h"
+#include "MenuState.h"
+
 #include "../ECS/ECS.h"
 #include "../Components/TextLabelComponent.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/KeyboardControlComponent.h"
 #include "../Components/SpriteComponent.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/GameSystems/RenderGameOverSystem.h"
 #include "../Systems/GameSystems/RenderGameOverTextSystem.h"
 #include "../Systems/GameSystems/RenderSystem.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Game/Game.h"
+#include "../Game/Player.h"
+#include "../Utilities/Camera.h"
+#include "../Utilities/GameData.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Keyboard.h"
+#include "../inputs/Gamepad.h"
 
 const std::string GameOverState::gameOverID = "GAMEOVER";
 
 GameOverState::GameOverState()
 	: game(Game::Instance())
+	, m_GameData(GameData::GetInstance())
+	, m_InputManager(InputManager::GetInstance())
 {
 }
 
@@ -22,14 +31,13 @@ void GameOverState::Update(const float& deltaTime)
 {
 	
 	game.GetEventManager()->Reset();
-
-	Registry::Instance().GetSystem<KeyboardControlSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().Update();
 }
 
 void GameOverState::Render()
 {
-	Registry::Instance().GetSystem<RenderGameOverTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	Registry::Instance().GetSystem<RenderGameOverTextSystem>().Update(
+		game.GetRenderer(), game.GetAssetManager(), game.GetCamera().GetCameraRect());
 	Registry::Instance().GetSystem<RenderGameOverSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
@@ -40,7 +48,7 @@ bool GameOverState::OnEnter()
 	if (!Registry::Instance().HasSystem<RenderGameOverSystem>()) 
 		Registry::Instance().AddSystem<RenderGameOverSystem>();
 
-	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Main_Menu", -1);
+	game.GetMusicPlayer().PlayMusic("Main_Menu", -1);
 	
 	game.GetAssetManager()->AddTextures(game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png");
 
@@ -81,29 +89,49 @@ bool GameOverState::OnExit()
 	Registry::Instance().GetSystem<RenderGameOverTextSystem>().OnExit();
 	Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
 	Logger::Log("Exiting Game Over State");
-	game.SetPlayerDead(false);
+	game.GetPlayer()->SetPlayerDead(false);
 	return true;
 }
 
 void GameOverState::ProcessEvents(SDL_Event& event)
 {
-	//Registry::Instance().GetSystem<GamePadSystem>().UpdateOtherStates(event);
-}
-
-void GameOverState::OnKeyDown(SDL_Event* event)
-{
-
-}
-
-void GameOverState::OnKeyUp(SDL_Event* event)
-{
-
-}
-
-void GameOverState::OnBtnDown(SDL_Event* event)
-{
-}
-
-void GameOverState::OnBtnUp(SDL_Event* event)
-{
+	const auto& selector = Registry::Instance().GetEntityByTag("gameOverSelector");
+	auto& sprite = selector.GetComponent<SpriteComponent>();
+	auto& transform = selector.GetComponent<TransformComponent>();
+	auto& keyboard = m_InputManager.GetKeyboard();
+	auto& gamepad = m_InputManager.GetGamepad();
+	
+	if (keyboard.IsKeyJustPressed(KEY_W) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_UP))
+	{
+		transform.position.y -= 100;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.y < 475) transform.position.y = 675;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_S) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_DOWN))
+	{
+		transform.position.y += 100;
+		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		if (transform.position.y > 675) transform.position.y = 475;
+	}
+	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
+	{
+		if (transform.position.y == 475)
+		{
+			game.GetPlayer()->SetPlayerCreated(false);
+			game.GetPlayer()->SetPlayerDead(false);
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new GameState());
+		}
+		else if (transform.position.y == 575)
+		{
+			m_GameData.PlayerNum();
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new GameState());
+		}
+		else if (transform.position.y == 675)
+		{
+			game.GetStateMachine()->PopState();
+			game.GetStateMachine()->PushState(new MenuState());
+		}
+	}
 }

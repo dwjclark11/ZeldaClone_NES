@@ -1,5 +1,6 @@
 #include "TitleState.h"
 #include "../Game/Game.h"
+#include "../AssetManager/AssetManager.h"
 #include "MenuState.h"
 #include "../ECS/ECS.h"
 #include "../Components/AnimationComponent.h"
@@ -8,10 +9,12 @@
 #include "../Components/SpriteComponent.h"
 #include "../Components/BackgroundImageComponent.h"
 #include "../Systems/CameraMovementSystem.h"
-#include "../Systems/GameSystems/GamePadSystem.h"
 #include "../Systems/GameSystems/AnimationSystem.h"
-#include "../Systems/GameSystems/KeyboardControlSystem.h"
 #include "../Systems/SoundFXSystem.h"
+#include "../Utilities/Camera.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Gamepad.h"
+#include "../inputs/Keyboard.h"
 
 const std::string TitleState::titleID = "TITLESTATE";
 
@@ -40,7 +43,7 @@ void TitleState::Update(const float& deltaTime)
 		if (!scroll)
 		{
 			Entity scrollSheet = reg.CreateEntity();
-			scrollSheet.AddComponent<SpriteComponent>("title_scroll", 256, 1920, 2, false);
+			scrollSheet.AddComponent<SpriteComponent>("title_scroll", 256, 1920, 5, false);
 			scrollSheet.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(4,4));
 			scrollSheet.AddComponent<BackgroundImageComponent>(glm::vec2(0,0), glm::vec2(4,4));
 			scrollSheet.AddComponent<RigidBodyComponent>(glm::vec2(0));
@@ -50,7 +53,7 @@ void TitleState::Update(const float& deltaTime)
 			scroll = true;
 		}
 		// Start the camera Movement System to Scroll the screen down
-		Registry::Instance().GetSystem<CameraMovementSystem>().Update(game.GetCamera(), deltaTime);
+		Registry::Instance().GetSystem<CameraMovementSystem>().UpdateTitleCam(game.GetCamera(), deltaTime);
 		
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
 		if (Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished())
@@ -73,16 +76,8 @@ bool TitleState::OnEnter()
 	scroll = false;
 	timer = 0;
 	
-	if (!reg.HasSystem<GamePadSystem>()) 	
-		reg.AddSystem<GamePadSystem>();
-	if (!reg.HasSystem<KeyboardControlSystem>()) 	
-		reg.AddSystem<KeyboardControlSystem>();
-
 	// Turn music volume down
 	Mix_VolumeMusic(10);
-
-	// Initialize the Game Pad
-	Registry::Instance().GetSystem<GamePadSystem>().Init();
 
 	// Add Assets to the Asset Manager
 	game.GetAssetManager()->AddMusic("Title", "Assets/Music/Title_Theme.mp3");
@@ -94,7 +89,7 @@ bool TitleState::OnEnter()
 		game.GetAssetManager()->AddTextures(game.GetRenderer(), "waterfall", "./Assets/Backgrounds/waterfall.png");
 	
 	// Start the Title Screen Music
-	Registry::Instance().GetSystem<MusicPlayerSystem>().PlayMusic(game.GetAssetManager(), "Title", -1);
+	game.GetMusicPlayer().PlayMusic("Title", -1);
 	
 	// Create the Title Screen Entity
 	Entity titleScreen = reg.CreateEntity();
@@ -132,33 +127,10 @@ bool TitleState::OnExit()
 
 void TitleState::ProcessEvents(SDL_Event& event)
 {
-	
-}
-
-void TitleState::OnKeyDown(SDL_Event* event)
-{
-	if (event->key.keysym.sym == SDLK_RETURN)
+	if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_SPACE) || 
+		InputManager::GetInstance().GetGamepad().IsButtonJustPressed(GP_BTN_A))
 	{
 		game.GetStateMachine()->PopState();
 		game.GetStateMachine()->PushState(new MenuState());
 	}
-}
-
-void TitleState::OnKeyUp(SDL_Event* event)
-{
-
-}
-
-void TitleState::OnBtnDown(SDL_Event* event)
-{
-	if (event->cbutton.button == SDL_CONTROLLER_BUTTON_START)
-	{
-		game.GetStateMachine()->PopState();
-		game.GetStateMachine()->PushState(new MenuState());
-	}
-}
-
-void TitleState::OnBtnUp(SDL_Event* event)
-{
-
 }
