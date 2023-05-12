@@ -46,7 +46,7 @@ void RenderNameSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 
 void RenderNameSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		entity.Kill();
 	}

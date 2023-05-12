@@ -8,7 +8,7 @@ private:
 public: 
 	RenderTextSystem();
 	
-	void Update(struct SDL_Renderer* renderer, std::unique_ptr<class AssetManager>& assetManager, const struct SDL_Rect& camera);
+	void Update();
 	void OnExit();
 	void OnExitSettings();
 };

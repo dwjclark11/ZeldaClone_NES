@@ -5,6 +5,7 @@
 #include "../States/GameState.h"
 #include "../Game/Game.h"
 #include "../Utilities/Utility.h"
+#include "../Utilities/Camera.h"
 #include <SDL.h>
 
 RenderTextSystem::RenderTextSystem()
@@ -13,21 +14,26 @@ RenderTextSystem::RenderTextSystem()
 	RequiredComponent<TextLabelComponent>();
 }
 
-void RenderTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const SDL_Rect& camera)
+void RenderTextSystem::Update()
 {
+	const auto& camera = game.GetCamera();
+	const auto& cameraPos = camera.GetCameraPos();
+	const auto& cameraHeight = camera.GetCameraHeight();
+	const auto& cameraWidth = camera.GetCameraWidth();
+
 	for (const auto& entity : GetSystemEntities())
 	{
 		auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
-		SDL_SetRenderDrawColor(renderer, textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
-
+		SDL_SetRenderDrawColor(game.GetRenderer(), textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
+		
 		SDL_Surface* surface = TTF_RenderText_Blended(
-			assetManager->GetFont(textLabel.assetID),
+			game.GetAssetManager()->GetFont(textLabel.assetID),
 			textLabel.text.c_str(),
 			textLabel.color
 		);
 
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(game.GetRenderer(), surface);
 
 		// As soon as we create a texture we can free the surface
 		SDL_FreeSurface(surface);
@@ -38,13 +44,13 @@ void RenderTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManag
 		SDL_QueryTexture(texture, NULL, NULL, &labelWidth, &labelHeight);
 
 		SDL_Rect dstRect = {
-			(textLabel.position.x - (textLabel.isFixed ? 0 : camera.x)),
-			(textLabel.position.y - (textLabel.isFixed ? 0 : camera.y)),
+			(textLabel.position.x - (textLabel.isFixed ? 0 : cameraPos.x)),
+			(textLabel.position.y - (textLabel.isFixed ? 0 : cameraPos.y)),
 			labelWidth,
 			labelHeight
 		};
 
-		SDL_RenderCopy(renderer, texture, NULL, &dstRect);
+		SDL_RenderCopy(game.GetRenderer(), texture, NULL, &dstRect);
 
 		SDL_DestroyTexture(texture);
 	}

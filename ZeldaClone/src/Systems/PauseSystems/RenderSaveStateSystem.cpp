@@ -20,7 +20,7 @@ RenderSaveStateSystem::RenderSaveStateSystem()
 void RenderSaveStateSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
 {
 	// Loop all entities that the system is interested in
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		const auto& transform = entity.GetComponent<TransformComponent>();
 		const auto& sprite = entity.GetComponent<SpriteComponent>();
@@ -50,7 +50,7 @@ void RenderSaveStateSystem::Update(SDL_Renderer* renderer, std::unique_ptr<Asset
 
 void RenderSaveStateSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		entity.Kill();
 	}

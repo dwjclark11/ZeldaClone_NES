@@ -5,10 +5,11 @@
 #include "../../AssetManager/AssetManager.h"
 
 #include "../../States/MenuState.h"
-
+#include "../../Utilities/GameData.h"
 #include <SDL.h>
 
 RenderMainMenuSystem::RenderMainMenuSystem()
+	: m_GameData(GameData::GetInstance())
 {
 	// All Systems need a required component to help separate what entities need to 
 	// use that system
@@ -23,11 +24,11 @@ void RenderMainMenuSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetM
 	for (const auto& entity : GetSystemEntities())
 	{
 		// Do not draw the link avatar if there is no save file associated with it
-		if (entity.HasTag("first_menu_slot") && MenuState::player1Name.size() == 0)
+		if (entity.HasTag("first_menu_slot") && m_GameData.GetPlayer1Name().size() == 0)
 			continue;
-		if (entity.HasTag("second_menu_slot") && MenuState::player2Name.size() == 0)
+		if (entity.HasTag("second_menu_slot") && m_GameData.GetPlayer2Name().size() == 0)
 			continue;
-		if (entity.HasTag("third_menu_slot") && MenuState::player3Name.size() == 0)
+		if (entity.HasTag("third_menu_slot") && m_GameData.GetPlayer3Name().size() == 0)
 			continue;
 		
 		const auto& transform = entity.GetComponent<TransformComponent>();

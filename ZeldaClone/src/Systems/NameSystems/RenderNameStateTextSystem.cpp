@@ -12,7 +12,7 @@ RenderNameStateTextSystem::RenderNameStateTextSystem()
 
 void RenderNameStateTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, const SDL_Rect& camera)
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
@@ -50,7 +50,7 @@ void RenderNameStateTextSystem::Update(SDL_Renderer* renderer, std::unique_ptr<A
 
 void RenderNameStateTextSystem::OnExit()
 {
-	for (auto entity : GetSystemEntities())
+	for (auto& entity : GetSystemEntities())
 	{
 		entity.Kill();
 	}

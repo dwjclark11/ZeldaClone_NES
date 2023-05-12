@@ -1,16 +1,19 @@
 #pragma once
-#include "../ECS/ECS.h"
 #include <memory>
+#include <string>
 
 class AssetManager;
 
-class MusicPlayerSystem : public System
+class MusicPlayer 
 {
-public:
-	MusicPlayerSystem();	
-	~MusicPlayerSystem();
+private:
+	AssetManager& m_AssetManager;
 
-	void PlayMusic(std::unique_ptr<AssetManager>& assetManager, const std::string& assetID, int loops);
+public:
+	MusicPlayer(AssetManager& assetManager);	
+	~MusicPlayer();
+
+	void PlayMusic(const std::string& assetID, int loops);
 	void PauseMusic();
 	void ResumeMusic();
 	void StopMusic();

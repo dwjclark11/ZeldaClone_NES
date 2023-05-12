@@ -4,6 +4,8 @@
 
 class RenderMainMenuSystem : public System
 {
+private:
+	class GameData& m_GameData;
 public:
 
 	RenderMainMenuSystem();

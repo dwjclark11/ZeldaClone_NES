@@ -5,6 +5,7 @@
 #include "../../AssetManager/AssetManager.h"
 #include "../../States/GameState.h"
 #include "../../Game/Game.h"
+#include "../../Utilities/Camera.h"
 
 #include <SDL.h>
 
@@ -36,11 +37,11 @@ void RenderPauseSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetMana
 			static_cast<int>(sprite.width * transform.scale.x),
 			static_cast<int>(sprite.height * transform.scale.y)
 		};
-		Game::Instance().FadeScreen();
+		Game::Instance().GetCamera().FadeScreen();
 
 		SDL_Texture* tex = assetManager->GetTexture(sprite.assetID);
 		SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
-		SDL_SetTextureAlphaMod(tex, Game::Instance().GetFadeAlpha());
+		SDL_SetTextureAlphaMod(tex, Game::Instance().GetCamera().GetFadeAlpha());
 
 		SDL_RenderCopyEx(
 			renderer,
