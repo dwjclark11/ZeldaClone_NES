@@ -1,41 +1,36 @@
 #include "Game.h"
+#include "Player.h"
 #include "../States/TitleState.h"
 #include "../Logger/Logger.h"
 #include <SDL_ttf.h>
 #include "../Utilities/Timer.h"
+#include "../Utilities/Camera.h"
+#include "../Utilities/GameData.h"
 #include "../States/GameState.h"
 #include "../States/EditorState.h"
 #include "../Events/KeyPressedEvent.h"
+#include "../Systems/CameraMovementSystem.h"
+#include "../Systems/SoundFXSystem.h"
+#include "../inputs/InputManager.h"
+#include "../inputs/Gamepad.h"
 
 // Initialize all static variables
 std::unique_ptr<Game> Game::mInstance = nullptr;
 
-Game::ItemType Game::mSelectedItem = Game::ItemType::EMPTY;
-
-int Game::gameScale = 4;
-int Game::tilePixels = 16;
-int Game::windowWidth = 256 * Game::gameScale;
-int Game::windowHeight = 240 * Game::gameScale;
-bool Game::isDebug = true;
-
 // Constructor 
 Game::Game()
-	: mIsRunning(true)
-	, mWindow(nullptr)
-	, mRenderer(nullptr)
-	, gameStateMachine(nullptr)
+	: m_bIsRunning(true)
+	, m_pWindow(nullptr)
+	, m_pRenderer(nullptr)
+	, m_pGameStateMachine(nullptr)
 	, milliSecondsPerFrame(0)
-	, attack(false)
-	, keydown(false)
-	, deltaTime(0.0f)
-	, gamePlayerNum(0)
-	, playerCreated(false)
-	, cameraMoving(false)
-	, mLevelWidth(16)
-	, mLevelHeight(8)
+	, m_DeltaTime(0.0f)
+	, m_Camera{nullptr}
+	, m_pPlayer{nullptr}
+	, m_InputManager(InputManager::GetInstance())
 {
-	assetManager = std::make_unique<AssetManager>();
-	eventManager = std::make_unique<EventManager>();
+	m_pAssetManager = std::make_unique<AssetManager>();
+	m_pEventManager = std::make_unique<EventManager>();
 }
 // Destructor
 Game::~Game()
@@ -45,11 +40,12 @@ Game::~Game()
 
 Game& Game::Instance()
 {
-	if (mInstance == nullptr)
+	if (!mInstance)
 	{
 		Logger::Log("Creating new Game instance!\n");
 		mInstance.reset(new Game());
 	}
+
 	return *mInstance;
 }
 
@@ -71,37 +67,47 @@ void Game::Initialize()
 	}
 	
 	// Allocate channels and control the volume of the music
-	Mix_AllocateChannels(16);
+	auto num_channels = Mix_AllocateChannels(16);
+	auto num_reserved_channels = Mix_ReserveChannels(4);
 	Mix_Volume(1, MIX_MAX_VOLUME / 4);
-
+	Logger::Log("Num Channels: " + std::to_string(num_channels));
+	Logger::Log("Reserved Channels: " + std::to_string(num_reserved_channels));
+	// Turn music volume down
+	Mix_VolumeMusic(10);
 	/* Use SDL to grab the displays Resolution */
 	SDL_DisplayMode displayMode;
 	SDL_GetCurrentDisplayMode(0, &displayMode);
 	
+	m_GameScale = 4;
+	m_TilePixels = 16;
+	m_WindowWidth = 256 * m_GameScale;
+	m_WindowHeight = 240 * m_GameScale;
+	m_bDebug = true;
+
 	// Create the window
-	mWindow = SDL_CreateWindow(
+	m_pWindow = SDL_CreateWindow(
 		"Zelda Clone",
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
-		windowWidth,
-		windowHeight,
+		m_WindowWidth,
+		m_WindowHeight,
 		SDL_WINDOW_OPENGL // | SDL_WINDOW_RESIZABLE // We don't want resizable in game
 	);
 	
 	// Check to see if the window creation worked correctly
-	if (!mWindow)
+	if (!m_pWindow)
 	{
 		Logger::Err("Failed to Create Window: " + *SDL_GetError());
 	}
 	
 	// Create the Renderer
-	mRenderer = SDL_CreateRenderer(
-		mWindow,
+	m_pRenderer = SDL_CreateRenderer(
+		m_pWindow,
 		-1,
-		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC // Added!!
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC 
 	);
 	// Check if the renderer was created correctly
-	if (!mRenderer)
+	if (!m_pRenderer)
 	{
 		Logger::Err("Failed to create renderer: " + *SDL_GetError());
 		return;
@@ -112,43 +118,32 @@ void Game::Initialize()
 	
 	// Initialize IMGUI context
 	ImGui::CreateContext();
-	ImGuiSDL::Initialize(mRenderer, windowWidth, windowHeight);
-
+	ImGuiSDL::Initialize(m_pRenderer, m_WindowWidth, m_WindowHeight);
 
 	// Add the required systems that are needed at the beginning
 	Registry::Instance().AddSystem<RenderSystem>();
 	Registry::Instance().AddSystem<RenderTitleSystem>();
 	Registry::Instance().AddSystem<RenderCollisionSystem>();
 	Registry::Instance().AddSystem<AnimationSystem>();
-	
-	// Initialize Camera
-	camera.x = 7168;
-	camera.y = 4704;
-	camera.w = windowWidth;
-	camera.h = windowHeight;
+	Registry::Instance().AddSystem<CameraMovementSystem>();
 
+	m_Camera = std::make_unique<Camera>(7168, 4448, m_WindowWidth, m_WindowHeight);
+	m_pMusicPlayer = std::make_unique<MusicPlayer>(*m_pAssetManager);
+	m_pSoundPlayer = std::make_unique<SoundFX>(*m_pAssetManager);
+	
 	// Initialize Mouse Box for Editor State
 	mouseBox.w = 1;
 	mouseBox.h = 1;
 	
 	// Add the needed sounds, textures, and fonts to the asset manager 
-	assetManager->AddSoundFX("text_slow", "./Assets/sounds/Text_Slow.wav");
-	assetManager->AddTextures(mRenderer, "map", "./Assets/Backgrounds/entire_worldmap_single_image.png");
-
-	// Set Initial Fade Alpha
-	fadeAlpha = 255;
-	fadeFinished = true;
-	startFadeIn = false;
-	startFadeOut = false;
-
-	CreateDefaultKeyBindings();
-	CreateDefaultBtnBindings();
+	m_pAssetManager->AddSoundFX("text_slow", "./Assets/sounds/Text_Slow.wav");
+	m_pAssetManager->AddTextures(m_pRenderer, "map", "./Assets/Backgrounds/entire_worldmap_single_image.png");
 
 	// Create the finite Game State Machine
-	gameStateMachine = std::make_unique<GameStateMachine>();
+	m_pGameStateMachine = std::make_unique<GameStateMachine>();
 	
 	// Push the title screen
-	gameStateMachine->PushState(new TitleState());
+	m_pGameStateMachine->PushState(new TitleState());
 
 	// Change to the state you want to work on
 	//gameStateMachine->PushState(new EditorState());
@@ -156,7 +151,6 @@ void Game::Initialize()
 
 void Game::Update()
 {
-
 	// If we are too fast, waste some time until we reach the desired time per frame.
 	int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - milliSecondsPerFrame);
 
@@ -166,13 +160,19 @@ void Game::Update()
 	}
 
 	// The difference in ticks since the last frame, converted to seconds
-	deltaTime = (SDL_GetTicks() - milliSecondsPreviousFrame) / 1000.0f;
+	m_DeltaTime = (SDL_GetTicks() - milliSecondsPreviousFrame) / 1000.0f;
 
 	// Store the current time frame
 	milliSecondsPreviousFrame = SDL_GetTicks();
 
-	gameStateMachine->Update(deltaTime);
-	//Logger::Err(std::to_string(milliSecondsPreviousFrame));
+	m_pGameStateMachine->Update(m_DeltaTime);
+	m_InputManager.GetKeyboard().Update();
+	m_InputManager.GetGamepad().Update();
+	
+	if (m_pPlayer)
+		m_pPlayer->UpdatePlayer();
+	
+	GameData::GetInstance().UpdateGameData();
 }
 
 void Game::ProcessEvents()
@@ -180,10 +180,10 @@ void Game::ProcessEvents()
 	// Update the Game Controller 
 	SDL_GameControllerUpdate();
 
-	while (SDL_PollEvent(&sdlEvent))
+	while (SDL_PollEvent(&m_SdlEvent))
 	{
 		// ImGui SDL input
-		ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+		ImGui_ImplSDL2_ProcessEvent(&m_SdlEvent);
 		ImGuiIO& io = ImGui::GetIO();
 
 		int mouseX, mouseY;
@@ -194,29 +194,27 @@ void Game::ProcessEvents()
 		io.MouseDown[0] = buttons & SDL_BUTTON(SDL_BUTTON_LEFT);
 		io.MouseDown[1] = buttons & SDL_BUTTON(SDL_BUTTON_RIGHT);
 		
-		gameStateMachine->ProcessEvents(sdlEvent);
 
 		// Handle Core SDL Events
-		switch (sdlEvent.type)
+		switch (m_SdlEvent.type)
 		{
 			case SDL_QUIT:
-			mIsRunning = false;
+			m_bIsRunning = false;
 			break;
 
 			case SDL_KEYDOWN:
-				
-				eventManager->EmitEvent<KeyPressedEvent>(sdlEvent.key.keysym.sym);
+				if (m_SdlEvent.key.keysym.sym == SDLK_ESCAPE) m_bIsRunning = false;
 
-				if (sdlEvent.key.keysym.sym == SDLK_ESCAPE) mIsRunning = false;
-
-				if(sdlEvent.key.keysym.sym)
-					gameStateMachine->OnKeyDown(&sdlEvent);
+				m_InputManager.GetKeyboard().OnKeyDown(m_SdlEvent.key.keysym.sym);
+				m_pEventManager->EmitEvent<KeyPressedEvent>(m_SdlEvent.key.keysym.sym);
 				break;
 				
 			case SDL_KEYUP:
+				m_InputManager.GetKeyboard().OnKeyUp(m_SdlEvent.key.keysym.sym);
+				
+				if (m_pPlayer)
+					m_pPlayer->UpdatePlayerColliders();
 
-				if (sdlEvent.key.keysym.sym)
-					gameStateMachine->OnKeyUp(&sdlEvent);
 				break;
 
 			case SDL_MOUSEMOTION:
@@ -227,61 +225,36 @@ void Game::ProcessEvents()
 			}
 			case SDL_CONTROLLERBUTTONDOWN:
 			{
-				eventManager->EmitEvent<GamePadButtonPressedEvent>(sdlEvent.cbutton.button);
-				
-				gameStateMachine->OnBtnDown(&sdlEvent);
-				
+				m_InputManager.GetGamepad().OnButtonDown(m_SdlEvent.cbutton.button);
+				m_pEventManager->EmitEvent<KeyPressedEvent>(m_SdlEvent.cbutton.button);
 				break;
 			}
 			
 			case SDL_CONTROLLERBUTTONUP:
 			{
-				
-				gameStateMachine->OnBtnUp(&sdlEvent);
-				
+				m_InputManager.GetGamepad().OnButtonUp(m_SdlEvent.cbutton.button);
+				if (m_pPlayer)
+					m_pPlayer->UpdatePlayerColliders();
 				break;
 			}
 		default:
 			break;
 		}
 	}
+
+	m_pGameStateMachine->ProcessEvents(m_SdlEvent);
 }
 
 void Game::Draw()
 {
-	SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-	SDL_RenderClear(mRenderer);
+	SDL_SetRenderDrawColor(m_pRenderer, 0, 0, 0, 255);
+	SDL_RenderClear(m_pRenderer);
 
-	gameStateMachine->Render();
+	m_pGameStateMachine->Render();
 
-	SDL_RenderPresent(mRenderer);
+	SDL_RenderPresent(m_pRenderer);
 }
 
-void Game::CreateDefaultBtnBindings()
-{
-	AddBtnToMap(Action::MOVE_UP, SDL_CONTROLLER_BUTTON_DPAD_UP);
-	AddBtnToMap(Action::MOVE_RIGHT, SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-	AddBtnToMap(Action::MOVE_DOWN, SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-	AddBtnToMap(Action::MOVE_LEFT, SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-	AddBtnToMap(Action::ATTACK, SDL_CONTROLLER_BUTTON_A);
-	AddBtnToMap(Action::USE_ITEM, SDL_CONTROLLER_BUTTON_X);
-	AddBtnToMap(Action::PAUSE, SDL_CONTROLLER_BUTTON_START);
-	AddBtnToMap(Action::SELECT, SDL_CONTROLLER_BUTTON_A);
-	AddBtnToMap(Action::CANCEL, SDL_CONTROLLER_BUTTON_B);
-}
-
-void Game::CreateDefaultKeyBindings()
-{
-	AddKeyToMap(Action::MOVE_UP, SDLK_w);
-	AddKeyToMap(Action::MOVE_RIGHT, SDLK_d);
-	AddKeyToMap(Action::MOVE_DOWN, SDLK_s);
-	AddKeyToMap(Action::MOVE_LEFT, SDLK_a);
-	AddKeyToMap(Action::ATTACK, SDLK_RSHIFT);
-	AddKeyToMap(Action::USE_ITEM, SDLK_SPACE);
-	AddKeyToMap(Action::PAUSE, SDLK_q);
-	AddKeyToMap(Action::SELECT, SDLK_SPACE);
-	AddKeyToMap(Action::CANCEL, SDLK_BACKSPACE);
-}
 void Game::Shutdown()
 {
 	// Shutdown ImGui
@@ -289,8 +262,8 @@ void Game::Shutdown()
 	ImGui::DestroyContext();
 
 	// Shutdown SDL
-	SDL_DestroyRenderer(mRenderer);
-	SDL_DestroyWindow(mWindow);
+	SDL_DestroyRenderer(m_pRenderer);
+	SDL_DestroyWindow(m_pWindow);
 	SDL_Quit();
 }
 
@@ -300,7 +273,7 @@ void Game::Run()
 	Initialize();
 	
 	// while game is running
-	while (mIsRunning)
+	while (m_bIsRunning)
 	{
 		ProcessEvents();
 		Update();
@@ -308,21 +281,6 @@ void Game::Run()
 	}
 }
 
-// Definitions of the Getters and Setters
-SDL_Rect& Game::GetCamera()
-{
-	return this->camera;
-}
-
-void Game::SetCameraY(int change)
-{
-	this->camera.y += change;
-}
-
-void Game::SetCameraX(int change)
-{
-	this->camera.x += change;
-}
 
 SDL_Rect& Game::GetMouseBox()
 {
@@ -331,121 +289,20 @@ SDL_Rect& Game::GetMouseBox()
 
 SDL_Event& Game::GetEvent()
 {
-	return sdlEvent;
+	return m_SdlEvent;
 }
 
-const bool Game::HasSword() const 
+std::unique_ptr<Player>& Game::CreateNewPlayer(Entity& player, Entity& sword, Entity& shield)
 {
-	if (mGameItems.woodSword || mGameItems.steelSword || mGameItems.magicSword)
-		return true;
-
-	return false;
+	return m_pPlayer = std::make_unique<Player>(player, sword, shield);
 }
 
 const bool Game::PlayerHold() const 
 {
-	if (playerDead || onStairs || playerItem || startFadeOut || startFadeIn || onRaft)
+	if (m_pPlayer->GetPlayerDead() || m_pPlayer->GetPlayerOnStairs() || 
+		m_pPlayer->GetPlayerItem() || m_Camera->FadeOutStarted() || m_Camera->FadeInStarted() || 
+		m_pPlayer->GetRaft() || m_Camera->IsCameraMoving() || m_InputManager.IsAttacking())
 		return true;
 	else
 		return false;
 }
-
-bool& Game::GetAttack()
-{
-	return attack;
-}
-
-void Game::FadeScreen()
-{
-	if (startFadeIn)
-	{
-		if (fadeAlpha < 255)
-		{
-			fadeAlpha += 15;
-		}
-		else
-		{
-			startFadeIn = false;
-		}
-	}
-
-	if (startFadeOut)
-	{
-		if (fadeAlpha > 0)
-		{
-			fadeAlpha -= 15;
-		}
-		else
-		{
-			startFadeOut = false;
-		}
-	}
-}
-
-const unsigned& Game::GetPlayerNum() const 
-{
-	return gamePlayerNum;
-}
-
-void Game::AddGameSecrets(const std::string& locationID, bool found)
-{
-	if (gameSecrets.find(locationID) == gameSecrets.end())
-	{
-		gameSecrets.emplace(locationID, found);
-	}
-}
-
-bool Game::HasSecret(const std::string& locationID)
-{
-	if (gameSecrets.find(locationID) != gameSecrets.end())
-		return true;
-
-	// If the location is not in the map return false
-	return false;
-}
-
-bool Game::IsSecretFound(const std::string& locationID)
-{
-	if (gameSecrets.find(locationID) != gameSecrets.end())
-	{
-		return gameSecrets[locationID];
-	}
-
-	return false;
-}
-
-void Game::SetSecretFound(const std::string& locationID, bool found)
-{
-	if (gameSecrets.find(locationID) != gameSecrets.end())
-	{
-		gameSecrets[locationID] = found;
-	}
-}
-
-void Game::AddKeyToMap(Action action, SDL_Keycode key)
-{
-	if (mMappedKeys.find(action) == mMappedKeys.end())
-	{
-		mMappedKeys.emplace(action, key);
-	}
-}
-
-void Game::ChangeKeyBinding(Action action, SDL_Keycode key)
-{
-	if (mMappedKeys.find(action) != mMappedKeys.end())
-		mMappedKeys[action] = key;
-}
-void Game::AddBtnToMap(Action action, SDL_GameControllerButton button)
-{
-	if (mMappedButtons.find(action) == mMappedButtons.end())
-	{
-		mMappedButtons.emplace(action, button);
-	}
-}
-
-void Game::ChangeBtnBinding(Action action, SDL_GameControllerButton button)
-{
-	if (mMappedButtons.find(action) != mMappedButtons.end())
-		mMappedButtons[action] = button;
-}
-
