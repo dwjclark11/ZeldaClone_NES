@@ -110,13 +110,14 @@ GameData& GameData::GetInstance()
 
 const bool GameData::HasItem(GameItems item)
 {
-	if (m_mapGameItems.find(item) == m_mapGameItems.end())
+	auto gameItemItr = m_mapGameItems.find(item);
+	if (gameItemItr == m_mapGameItems.end())
 	{
 		Logger::Err("GameData -- Trying to access items that do not exist!");
 		return false;
 	}
 		
-	return m_mapGameItems[item];
+	return gameItemItr->second;
 }
 
 bool GameData::AddItem(GameItems item) 
@@ -172,9 +173,10 @@ bool GameData::HasSecret(const std::string& locationID)
 
 bool GameData::IsSecretFound(const std::string& locationID)
 {
-	if (m_mapGameSecrets.find(locationID) != m_mapGameSecrets.end())
+	auto gameSecretsItr = m_mapGameSecrets.find(locationID);
+	if (gameSecretsItr != m_mapGameSecrets.end())
 	{
-		return m_mapGameSecrets[locationID];
+		return gameSecretsItr->second;
 	}
 
 	return false;
@@ -182,9 +184,10 @@ bool GameData::IsSecretFound(const std::string& locationID)
 
 void GameData::SetSecretFound(const std::string& locationID, bool found)
 {
-	if (m_mapGameSecrets.find(locationID) != m_mapGameSecrets.end())
+	auto gameSecretsItr = m_mapGameSecrets.find(locationID);
+	if (gameSecretsItr != m_mapGameSecrets.end())
 	{
-		m_mapGameSecrets[locationID] = found;
+		gameSecretsItr->second = found;
 	}
 }
 

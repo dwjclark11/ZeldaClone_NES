@@ -163,10 +163,11 @@ public:
 
 	void Set(int entityID, T object)
 	{
-		if (entityIDToIndex.find(entityID) != entityIDToIndex.end())
+		auto entityIndexItr = entityIDToIndex.find(entityID);
+		if (entityIndexItr != entityIDToIndex.end())
 		{
 			// If the element already exists, simply replace the component ogject
-			int index = entityIDToIndex[entityID];
+			int index = entityIndexItr->second;
 			data[index] = object;
 		}
 		else

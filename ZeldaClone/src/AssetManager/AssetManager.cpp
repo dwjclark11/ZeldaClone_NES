@@ -33,10 +33,6 @@ void AssetManager::AddTextures(SDL_Renderer* renderer, const std::string& assetI
 		// Add the Textures to the map
 		textures.emplace(assetID, std::move(texture));
 	}
-	//else
-	//{
-	//	Logger::Log("New texture ID: " + assetID + " already exists");
-	//}
 }
 
 SDL_Texture* AssetManager::GetTexture(const std::string& assetID)
@@ -55,12 +51,11 @@ bool AssetManager::HasTexture(const std::string& assetID)
 
 void AssetManager::RemoveTexture(const std::string& assetID)
 {
-	if (textures.find(assetID) != textures.end())
+	auto it = textures.find(assetID);
+	if (it != textures.end())
 	{
-		auto it = textures.find(assetID);
-		SDL_DestroyTexture(textures.at(assetID));
+		SDL_DestroyTexture(it->second);
 		textures.erase(it);
-		//Logger::Log("Texture: " + assetID + " has been destroyed!");
 	}
 	else
 		Logger::Log("ASSET_MANAGER: TEXTURE: __LINE__66: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
@@ -114,16 +109,15 @@ bool AssetManager::HasMusic(const std::string& assetID)
 
 void AssetManager::RemoveMusic(const std::string& assetID)
 {
-	if (music.find(assetID) != music.end())
+	auto it = music.find(assetID);
+	if (it != music.end())
 	{
-		auto it = music.find(assetID);
-		Mix_FreeMusic(music.at(assetID));
+		
+		Mix_FreeMusic(it->second);
 		music.erase(it);
-		//Logger::Log("Music: " + assetID + " has been destroyed!");
 	}
 	else
 		Logger::Log("ASSET_MANAGER: MUSIC: __LINE__123: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
-	
 }
 
 void AssetManager::AddSoundFX(const std::string& assetID, const std::string& filePath)
@@ -148,12 +142,11 @@ bool AssetManager::HasSoundFX(const std::string& assetID)
 
 void AssetManager::RemoveSoundFX(const std::string& assetID)
 {
-	if (soundFX.find(assetID) != soundFX.end())
+	auto it = soundFX.find(assetID);
+	if (it != soundFX.end())
 	{
-		auto it = soundFX.find(assetID);
-		Mix_FreeChunk(soundFX.at(assetID));
+		Mix_FreeChunk(it->second);
 		soundFX.erase(it);
-		//Logger::Log("SoundFX: " + assetID + " has been destroyed!");
 	}
 	else
 		Logger::Log("ASSET_MANAGER: SOUNDFX: __LINE__159: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");

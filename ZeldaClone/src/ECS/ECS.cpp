@@ -226,16 +226,24 @@ bool Registry::DoesTagExist(const std::string& tag) const
 
 Entity Registry::GetEntityByTag(const std::string& tag) const
 {
-	return entityPerTag.at(tag);
+	auto tagItr = entityPerTag.find(tag);
+	if (tagItr == entityPerTag.end())
+	{
+		Logger::Log("Entity with tag [" + tag + "] - Does not exist!");
+		return -1;
+	}
+
+	return tagItr->second;
 }
 
 void Registry::RemoveEntityTag(Entity entity)
 {
 
 	const auto& entID = entity.GetID();
-	if (tagPerEntity.find(entID) != tagPerEntity.end())
+	auto tagItr = tagPerEntity.find(entID);
+	if (tagItr != tagPerEntity.end())
 	{
-		for (const auto& tagName : tagPerEntity[entID])
+		for (const auto& tagName : tagItr->second)
 		{
 			auto taggedEntity = entityPerTag.find(tagName);
 			if (taggedEntity != entityPerTag.end())
@@ -258,16 +266,14 @@ void Registry::GroupEntity(Entity entity, const std::string& group)
 bool Registry::EntityBelongsToGroup(Entity entity, const std::string& group) const
 {
 	// Error checking and Validation
-
-	if (entitiesPerGroup.find(group) == entitiesPerGroup.end())
+	auto groupItr = entitiesPerGroup.find(group);
+	if (groupItr == entitiesPerGroup.end())
 	{
 		//Logger::Err("The Group [" + group + "]  Does Not Exist");
 		return false;
 	}
 
-	const auto& groupEntities = entitiesPerGroup.at(group);
-
-	return groupEntities.find(entity.GetID()) != groupEntities.end();
+	return groupItr->second.find(entity.GetID()) != groupItr->second.end();
 }
 
 std::vector<Entity> Registry::GetEntitiesByGroup(const std::string& group) const
@@ -290,9 +296,10 @@ void Registry::RemoveEntityGroup(Entity entity)
 {
 
 	const auto& entID = entity.GetID();
-	if (groupPerEntity.find(entID) != groupPerEntity.end())
+	auto groupItr = groupPerEntity.find(entID);
+	if (groupItr != groupPerEntity.end())
 	{
-		for (const auto& groupName : groupPerEntity[entID])
+		for (const auto& groupName : groupItr->second)
 		{
 			auto group = entitiesPerGroup.find(groupName);
 			if (group != entitiesPerGroup.end())
@@ -306,7 +313,6 @@ void Registry::RemoveEntityGroup(Entity entity)
 		}
 		groupPerEntity.erase(entID);
 	}
-
 }
 
 Registry& Registry::Instance()
