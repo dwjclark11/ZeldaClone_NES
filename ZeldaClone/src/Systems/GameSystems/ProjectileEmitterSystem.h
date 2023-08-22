@@ -86,8 +86,8 @@ private:
 public:
 
 	ProjectileEmitterSystem();
-	void SubscribeKeyToEvents(std::unique_ptr<EventManager>& eventManager);
-	void SubscribeBtnToEvents(std::unique_ptr<EventManager>& eventManager);
+	void SubscribeKeyToEvents(EventManager& eventManager);
+	void SubscribeBtnToEvents(EventManager& eventManager);
 	void OnKeyPressed(KeyPressedEvent& event);
 	void OnBtnPressed(GamePadButtonPressedEvent& event);
 	void Update();

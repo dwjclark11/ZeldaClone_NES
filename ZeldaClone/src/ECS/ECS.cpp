@@ -324,14 +324,3 @@ Registry& Registry::Instance()
 	}
 	return *instance;
 }
-
-Entity Registry::GetEntityFromID(int id)
-{
-	for (const auto& entity : entities)
-	{
-		if (entity.GetID() == id)
-			return entity;
-	}
-	return Entity(-1);
-}
-

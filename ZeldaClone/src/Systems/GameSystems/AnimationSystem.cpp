@@ -71,12 +71,8 @@ void AnimationSystem::Update()
 		}
 		else
 		{
-			auto playerTag = false;
-			if (Registry::Instance().DoesTagExist("player"))
-			{
-				playerTag = entity.HasTag("player");
-			}
-				
+			auto playerTag = entity.HasTag("player");
+			
 			// If the animation is a vertical scroll use this
 			if (animation.vertical && playerTag)
 			{

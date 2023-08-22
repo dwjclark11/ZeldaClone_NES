@@ -31,7 +31,6 @@ NameState::NameState()
 
 void NameState::Update(const float& deltaTime)
 {
-	game.GetEventManager()->Reset();
 	reg.Update();
 }
 

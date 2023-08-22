@@ -8,14 +8,14 @@
 #include "../../Game/Game.h"
 #include "../../Game/Player.h"
 
-CollisionSystem::CollisionSystem()
-	: m_Game(Game::Instance())
+CollisionSystem::CollisionSystem(EventManager& eventManager)
+	: m_Game(Game::Instance()), m_EventManager(eventManager)
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
 }
 
-void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
+void CollisionSystem::Update()
 {
 	//auto& entities = GetSystemEntities();
 	auto entities = GetSystemEntities();
@@ -87,7 +87,7 @@ void CollisionSystem::Update(std::unique_ptr<EventManager>& eventManager)
 
 			if (collisionHappened)
 			{
-				eventManager->EmitEvent<CollisionEvent>(a, b);
+				m_EventManager.EmitEvent<CollisionEvent>(a, b);
 			}
 			else
 			{

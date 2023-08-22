@@ -5,7 +5,13 @@
 #include "../States/SaveGameState.h"
 #include "../Systems/PauseSystems/RenderPauseSystem.h"
 #include "../Systems/GameSystems/RenderHUDSystem.h"
+#include "../Systems/GameSystems/TriggerSystem.h"
+#include "../Systems/GameSystems/CollectItemSystem.h"
+#include "../Systems/GameSystems/MovementSystem.h"
+#include "../Systems/GameSystems/ProjectileEmitterSystem.h"
+#include "../Systems/GameSystems/DamageSystem.h"
 #include "../Systems/RenderTextSystem.h"
+
 #include "../Game/LevelLoader.h"
 #include "../Components/KeyboardControlComponent.h"
 #include "../Components/GamePadComponent.h"
@@ -88,10 +94,8 @@ PauseState::PauseState()
 
 void PauseState::Update(const float& deltaTime)
 {
-	game.GetEventManager()->Reset();
 	reg.Update();
 	
-
 	if (gameData.GetTotalBombs() > 0 && !gameData.HasItem(GameData::GameItems::BOMB))
 	{
 		Entity bombItem = reg.CreateEntity();
@@ -129,7 +133,7 @@ bool PauseState::OnEnter()
 {
 	// Turn music volume down while paused
 	Mix_VolumeMusic(3);
-
+	game.GetEventManager().Reset();
 	game.GetCamera().StartFadeIn(true);
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
@@ -257,6 +261,12 @@ bool PauseState::OnEnter()
 
 bool PauseState::OnExit()
 {
+	Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
+	Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<RenderPauseSystem>().OnExit();
 	return true;
 }

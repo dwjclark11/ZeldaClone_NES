@@ -25,9 +25,9 @@ DamageSystem::DamageSystem()
 }
 
 
-void DamageSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
+void DamageSystem::SubscribeToEvents(EventManager& eventManager)
 {
-	eventManager->SubscribeToEvent<CollisionEvent>(this, &DamageSystem::OnCollision);
+	eventManager.SubscribeToEvent<CollisionEvent>(this, &DamageSystem::OnCollision);
 }
 
 void DamageSystem::OnCollision(CollisionEvent& event)

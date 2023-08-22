@@ -136,9 +136,9 @@ ProjectileEmitterSystem::ProjectileEmitterSystem()
 	swordTimer.Stop();
 }
 
-void ProjectileEmitterSystem::SubscribeKeyToEvents(std::unique_ptr<EventManager>& eventManager)
+void ProjectileEmitterSystem::SubscribeKeyToEvents(EventManager& eventManager)
 {
-	eventManager->SubscribeToEvent<KeyPressedEvent>(this, &ProjectileEmitterSystem::OnKeyPressed);
+	eventManager.SubscribeToEvent<KeyPressedEvent>(this, &ProjectileEmitterSystem::OnKeyPressed);
 }
 void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 {
@@ -462,9 +462,9 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 	}
 }
 
-void ProjectileEmitterSystem::SubscribeBtnToEvents(std::unique_ptr<EventManager>& eventManager)
+void ProjectileEmitterSystem::SubscribeBtnToEvents(EventManager& eventManager)
 {
-	eventManager->SubscribeToEvent<GamePadButtonPressedEvent>(this, &ProjectileEmitterSystem::OnBtnPressed);
+	eventManager.SubscribeToEvent<GamePadButtonPressedEvent>(this, &ProjectileEmitterSystem::OnBtnPressed);
 }
 void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 {

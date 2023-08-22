@@ -220,7 +220,6 @@ MenuState::MenuState()
 
 void MenuState::Update(const float& deltaTime)
 {
-	game.GetEventManager()->Reset();
 	reg.Update();
 }
 

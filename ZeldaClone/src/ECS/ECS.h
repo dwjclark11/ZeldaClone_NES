@@ -271,8 +271,8 @@ private:
 	//static Registry* instance;
 	static std::unique_ptr<Registry> instance;
 
-	// My test entities
-	std::vector<Entity> entities;
+	//// My test entities
+	//std::vector<Entity> entities;
 
 
 	void AddEntities();
@@ -283,7 +283,7 @@ public:
 	Registry() : mEntityID(1)
 	{
 		Logger::Log("Registry Constructor Called");
-		entities.reserve(5000);
+		//entities.reserve(5000);
 	}
 	~Registry()
 	{
@@ -324,8 +324,6 @@ public:
 	std::set<Entity> GetEntitiesToBeKilled() const { return entitiesToBeKilled; }
 
 	static Registry& Instance();
-
-	Entity GetEntityFromID(int id);
 
 	// Component Management Functions
 	// Function template to add a componenet of type T to a given entity
@@ -403,7 +401,7 @@ bool Registry::HasComponent(Entity entity) const
 	const auto componentID = Component<TComponent>::GetID();
 	const auto entityID = entity.GetID();
 
-	return entityComponentSignatures[entityID].test(componentID); // Bitset.test will look at the component ID
+	return entityComponentSignatures[entityID].test(componentID); 
 }
 
 template<typename TComponent>
@@ -421,11 +419,6 @@ inline TComponent& Registry::GetComponent(Entity entity) const
 template<typename TSystem>
 inline bool Registry::HasSystem()
 {
-	/*
-		Find for the key and the pointer is different than the last end pointer
-		Than this is the key
-	*/
-
 	return systems.find(std::type_index(typeid(TSystem))) != systems.end();
 }
 
@@ -435,15 +428,21 @@ inline void Registry::AddSystem(TArgs && ...args)
 	if (HasSystem<TSystem>())
 		return;
 
-	std::shared_ptr<TSystem> newSystem = std::make_shared<TSystem>(std::forward_as_tuple<TArgs>(args)...);
-	systems.insert(std::make_pair(std::type_index(typeid(TSystem)), newSystem)); // Adding a new Key value to the sytem data structure
+	std::shared_ptr<TSystem> newSystem = std::make_shared<TSystem>(std::forward<TArgs>(args)...);
+	systems.insert(std::make_pair(std::type_index(typeid(TSystem)), newSystem)); 
 }
 
 template<typename TSystem>
 inline void Registry::RemoveSystem()
 {
-	auto system = systems.find(std::type_index(typeid(TSystem))); // Find a system!!
-	systems.erase(system); // remove that system
+	auto system = systems.find(std::type_index(typeid(TSystem))); 
+	if (system == systems.end())
+	{
+		// TODO: LOG ERROR
+		return;
+	}
+
+	systems.erase(system); 
 }
 
 
@@ -451,12 +450,7 @@ inline void Registry::RemoveSystem()
 template<typename TSystem>
 inline TSystem& Registry::GetSystem() const
 {
-	/*
-		In a map, if you use map.first()   --> It will get you the Key
-				  If you use map.second()  --> It will get you the value!
-	*/
 	auto system = systems.find(std::type_index(typeid(TSystem)));
-
 	return *(std::static_pointer_cast<TSystem>(system->second));
 }
 

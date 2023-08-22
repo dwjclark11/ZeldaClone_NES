@@ -201,9 +201,6 @@
     <ClCompile Include="src\Systems\SoundFXSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Systems\GameSystems\ScriptSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Systems\EditorSystems\RenderEditorSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1209,9 +1206,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utilities\LuaTableWriter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Systems\GameSystems\ScriptSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Components\ScriptComponent.h">

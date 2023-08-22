@@ -209,7 +209,6 @@
     <ClCompile Include="src\Systems\GameSystems\RenderHUDSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\RenderTileSystem.cpp" />
-    <ClCompile Include="src\Systems\GameSystems\ScriptSystem.cpp" />
     <ClCompile Include="src\Systems\GameSystems\TriggerSystem.cpp" />
     <ClCompile Include="src\Systems\MenuSystems\RenderMainMenuSystem.cpp" />
     <ClCompile Include="src\Systems\MusicPlayerSystem.cpp" />
@@ -574,7 +573,6 @@
     <ClInclude Include="src\Systems\GameSystems\RenderHUDSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\RenderSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\RenderTileSystem.h" />
-    <ClInclude Include="src\Systems\GameSystems\ScriptSystem.h" />
     <ClInclude Include="src\Systems\GameSystems\TriggerSystem.h" />
     <ClInclude Include="src\Systems\MenuSystems\RenderMainMenuSystem.h" />
     <ClInclude Include="src\Systems\MusicPlayerSystem.h" />

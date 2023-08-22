@@ -3,8 +3,6 @@
 #include <sol/sol.hpp>
 #include <glm/glm.hpp>
 #include "Timer.h"
-
-
 /*
 *  Simple Camera class that gets bound to a lua usertype. This allows the user to
 *  Get a reference to the main engine camera and move and use the camera accoriding
@@ -38,43 +36,42 @@ public:
 	*  GetCameraWidth() returns the width of the SDL_Rect mCamera
 	*  as a const int&
 	*/
-	const int& GetCameraWidth() const { return mCamera.w; }
+	inline const int& GetCameraWidth() const { return mCamera.w; }
 
 	/*
 	*  GetCameraHeight() returns the height of the SDL_Rect mCamera
 	*  as a const int&
 	*/
-	const int& GetCameraHeight() const { return mCamera.h; }
+	inline const int& GetCameraHeight() const { return mCamera.h; }
 
 	/*
 	*  GetCameraPosition() returns a glm::vec2 to give both
 	*  your x and y coordinates of the mCamera SDL_Rect
 	*/
-	glm::vec2 GetCameraPos() const;
-
+	inline glm::vec2 GetCameraPos() const { return glm::vec2(mCamera.x, mCamera.y); }
 	/*
 	*  GetCameraRect() returns a reference to the actual
 	*  mCamera SDL_Rect
 	*/
-	SDL_Rect& GetCameraRect() { return mCamera; }
+	inline SDL_Rect& GetCameraRect() { return mCamera; }
 
 	/*
 	*  Sets the width of the camera
 	*  @param - It takes an integer value width
 	*/
-	void SetCameraWidth(int width) { mCamera.w = width; }
+	inline void SetCameraWidth(int width) { mCamera.w = width; }
 
 	/*
 	*  Sets the height of the camera
 	*  @param - It takes an integer value height
 	*/
-	void SetCameraHeight(int height) { mCamera.h = height; }
+	inline void SetCameraHeight(int height) { mCamera.h = height; }
 
 	/*
 	*  This function allows the user to adjust or set the camera position
 	*  @param - It taks two integer values for the x and y coordinates
 	*/
-	void SetCameraPosition(int x, int y) { mCamera.x = x; mCamera.y = y; }
+	inline void SetCameraPosition(int x, int y) { mCamera.x = x; mCamera.y = y; }
 	void SetCameraPosFromSceneChange(int x, int y);
 	
 	/*
@@ -88,7 +85,7 @@ public:
 	*	@param float zoom -- Sets the zoom of the camera --> Affects all entities / Shapes etc
 	*	Unless those objects are fixed. Zoom is used in the draw functions
 	*/
-	void SetZoom(float zoom);
+	inline void SetZoom(float zoom) { mZoom = zoom; }
 	void FadeScreen();
 	void UpdateCurtain();
 	void UpdateScreenFlash();

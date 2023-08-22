@@ -26,7 +26,6 @@ SaveGameState::SaveGameState()
 
 void SaveGameState::Update(const float& deltaTime)
 {
-	game.GetEventManager()->Reset();
 	reg.Update();
 	Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
@@ -38,9 +37,7 @@ void SaveGameState::Render()
 
 bool SaveGameState::OnEnter()
 {	
-	
 	reg.AddSystem<RenderSaveStateSystem>();
-
 	game.GetAssetManager()->AddTextures(game.GetRenderer(), "save_gui", "./Assets/HUDSprites/save_state_GUI.png");
 
 
@@ -70,8 +67,6 @@ bool SaveGameState::OnEnter()
 
 bool SaveGameState::OnExit()
 {
-	Logger::Err("Exiting Save State");
-	
 	return true;
 }
 

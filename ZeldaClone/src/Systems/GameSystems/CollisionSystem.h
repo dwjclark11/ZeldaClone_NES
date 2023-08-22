@@ -7,10 +7,11 @@ class CollisionSystem : public System
 {
 private:
 	class Game& m_Game;
+	EventManager& m_EventManager;
 
 	bool CheckAABBCollision(double aX, double aY, double aWidth, double aHeight,
 		double bX, double bY, double bWidth, double bHeight);
 public:
-	CollisionSystem();
-	void Update(std::unique_ptr<EventManager>& eventManager);
+	CollisionSystem(EventManager& eventManager);
+	void Update();
 };

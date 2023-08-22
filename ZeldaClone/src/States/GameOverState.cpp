@@ -29,8 +29,6 @@ GameOverState::GameOverState()
 
 void GameOverState::Update(const float& deltaTime)
 {
-	
-	game.GetEventManager()->Reset();
 	Registry::Instance().Update();
 }
 

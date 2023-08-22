@@ -37,9 +37,10 @@ private:
 
 public:
 	EventCallback(TOwner* ownerInstance, CallbackFunction callbackFunction)
+		: ownerInstance{ownerInstance}, callbackFunction{callbackFunction}
 	{
-		this->ownerInstance = ownerInstance;
-		this->callbackFunction = callbackFunction;
+		//this->ownerInstance = ownerInstance;
+		//this->callbackFunction = callbackFunction;
 	}
 
 	virtual ~EventCallback() override = default;
@@ -78,7 +79,7 @@ public:
 	template <typename TEvent, typename TOwner>
 	void SubscribeToEvent(TOwner* ownerInstance, void(TOwner::* callbackFunction)(TEvent&))
 	{
-		if (!subscribers[typeid(TEvent)].get())
+		if (!subscribers[typeid(TEvent)])
 		{
 			subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
 		}
@@ -98,16 +99,13 @@ public:
 	void EmitEvent(TArgs&& ...args)
 	{
 		auto handlers = subscribers[typeid(TEvent)].get();
+		if (!handlers)
+			return;
 		
-		if (handlers)
+		for (const auto& handler : *handlers)
 		{
-			for (auto it = handlers->begin(); it != handlers->end(); it++)
-			{
-				auto handler = it->get();
-				TEvent event(std::forward<TArgs>(args)...);
-				handler->Execute(event);
-			}
+			TEvent event(std::forward<TArgs>(args)...);
+			handler->Execute(event);
 		}
 	}
-
 };

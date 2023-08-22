@@ -25,10 +25,8 @@ EditorState::EditorState()
 
 void EditorState::Update(const float& deltaTime)
 {
-	game.GetEventManager()->Reset();
 	reg.Update();
 	Registry::Instance().GetSystem<CameraMovementSystem>().UpdateEditorCam(game.GetCamera(), deltaTime);
-	//Registry::Instance().GetSystem<AnimationSystem>().Update();
 }
 
 void EditorState::Render()

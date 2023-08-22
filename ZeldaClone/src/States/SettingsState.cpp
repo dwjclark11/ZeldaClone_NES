@@ -33,7 +33,6 @@ SettingsState::SettingsState()
 
 void SettingsState::Update(const float& deltaTime)
 {
-	Game::Instance().GetEventManager()->Reset();
 	Registry::Instance().Update();
 }
 

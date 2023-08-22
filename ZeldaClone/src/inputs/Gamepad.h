@@ -11,11 +11,7 @@ private:
 	Button buttons[GP_BTN_LAST];
 	int mBtnPressed;
 	std::string mBtnString;
-	/*
-	*  Register the defined	buttons to lua using sol::set()
-	*  so they can be accessed by name in lua script
-	*/
-	static void RegisterLuaGPBtnNames(sol::state& lua);
+	
 	Controller mController;
 
 public:
@@ -66,5 +62,5 @@ public:
 	*/
 	const bool IsGamepadPresent() const;
 
-	Controller& GetController() { return mController; }
+	inline Controller& GetController() { return mController; }
 };

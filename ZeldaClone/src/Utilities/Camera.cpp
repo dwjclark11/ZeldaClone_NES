@@ -45,16 +45,6 @@ void Camera::SetCameraPosFromSceneChange(int x, int y)
 	mCamera.y = mCamera.h * (y - 1);
 }
 
-glm::vec2 Camera::GetCameraPos() const
-{
-	return glm::vec2(mCamera.x, mCamera.y);
-}
-
-void Camera::SetZoom(float zoom)
-{
-	mZoom = zoom; /*mCamera.h *= zoom; mCamera.w *= zoom*/
-}
-
 void Camera::FadeScreen()
 {
 	if (m_bStartFadeIn)

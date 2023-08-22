@@ -93,7 +93,7 @@ public:
 	inline const int GetWindowHeight() const { return m_WindowHeight; }
 
 	inline std::unique_ptr<AssetManager>& GetAssetManager() { return m_pAssetManager; }
-	inline std::unique_ptr<EventManager>& GetEventManager() { return m_pEventManager; }
+	inline EventManager& GetEventManager() { return *m_pEventManager; }
 	inline std::unique_ptr<GameStateMachine>& GetStateMachine() { return m_pGameStateMachine; }
 	MusicPlayer& GetMusicPlayer() { return *m_pMusicPlayer; }
 	SoundFX& GetSoundPlayer() { return *m_pSoundPlayer; }

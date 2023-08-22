@@ -12,7 +12,7 @@ public:
 	
 	DamageSystem();
 
-	void SubscribeToEvents(std::unique_ptr<EventManager>& eventManager);
+	void SubscribeToEvents(EventManager& eventManager);
 
 	void OnCollision(CollisionEvent& event);
 

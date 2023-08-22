@@ -28,9 +28,9 @@ CollectItemSystem::CollectItemSystem()
 	blueCollected = false;
 }
 
-void CollectItemSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
+void CollectItemSystem::SubscribeToEvents(EventManager& eventManager)
 {
-	eventManager->SubscribeToEvent<CollisionEvent>(this, &CollectItemSystem::OnCollision);
+	eventManager.SubscribeToEvent<CollisionEvent>(this, &CollectItemSystem::OnCollision);
 }
 
 void CollectItemSystem::OnCollision(CollisionEvent& event)

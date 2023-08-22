@@ -21,7 +21,6 @@
 #include "../Systems/GameSystems/ProjectileEmitterSystem.h"
 #include "../Systems/GameSystems/ProjectileLifeCycleSystem.h"
 #include "../Systems/GameSystems/AISystem.h"
-#include "../Systems/GameSystems/ScriptSystem.h"
 #include "../Systems/MenuSystems/RenderMainMenuSystem.h"
 #include "../Components/SpriteComponent.h"
 #include "../Components/TransformComponent.h"
@@ -233,15 +232,6 @@ void GameState::Update(const float& deltaTime)
 		Mix_VolumeMusic(10);
 		camera.StartFadeIn(true);
 	}
-
-	// Reset the event manager queue
-	game.GetEventManager()->Reset();
-	Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
 	Registry::Instance().GetSystem<TriggerSystem>().Update(deltaTime);
 
 	// Update the registry values
@@ -258,12 +248,10 @@ void GameState::Update(const float& deltaTime)
 
 	Registry::Instance().GetSystem<ProjectileLifeCycleSystem>().Update();
 
-	Registry::Instance().GetSystem<ScriptSystem>().Update(deltaTime, SDL_GetTicks());
-	
 	Registry::Instance().GetSystem<AISystem>().Update();
 	Registry::Instance().GetSystem<CaptionSystem>().Update(deltaTime);
 	
-	Registry::Instance().GetSystem<CollisionSystem>().Update(game.GetEventManager());
+	Registry::Instance().GetSystem<CollisionSystem>().Update();
 
 	// Update the registry values
 	reg.Update();
@@ -330,24 +318,28 @@ bool GameState::OnEnter()
 		reg.AddSystem<RenderHealthSystem>();
 		reg.AddSystem<RenderTileSystem>();
 		reg.AddSystem<HealthSystem>();
-		reg.AddSystem<CollisionSystem>();
+		reg.AddSystem<CollisionSystem>(game.GetEventManager());
 		reg.AddSystem<MovementSystem>();
 		reg.AddSystem<TriggerSystem>();
 		reg.AddSystem<CollectItemSystem>();
 	
 		reg.AddSystem<RenderTextSystem>();
-		reg.AddSystem<ScriptSystem>();
 		reg.AddSystem<AISystem>();
 		reg.AddSystem<CaptionSystem>();
 		// =================================================================================================
 
 		game.GetMusicPlayer().PlayMusic("Overworld", -1);
-
 		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
 
+		Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
+		Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
+		Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
+		Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
+		Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
+		Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
+
 		firstEntered = true;
-		Registry::Instance().GetSystem<ScriptSystem>().CreateLuaBindings(game.GetLuaState());
 	}
 
 	if (!game.GetPlayer())
@@ -386,6 +378,7 @@ bool GameState::OnEnter()
 
 bool GameState::OnExit()
 {
+	game.GetEventManager().Reset();
 	reg.GetSystem<RenderCollisionSystem>().OnExit();
 	reg.GetSystem<RenderSystem>().OnExit();
 	reg.GetSystem<RenderTileSystem>().OnExit();
@@ -397,18 +390,4 @@ void GameState::ProcessEvents(SDL_Event& event)
 {
 	UpdatePlayerKeys();
 	UpdatePauseContol();
-
-	// CAMERA TEST!
-	if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_O))
-	{
-		Game::Instance().GetCamera().StartCurtainClose();
-	}
-	else if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_I))
-	{
-		Game::Instance().GetCamera().StartCurtainOpen();
-	}
-	else if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_U))
-	{
-		Game::Instance().GetCamera().StartScreenFlash();
-	}
 }

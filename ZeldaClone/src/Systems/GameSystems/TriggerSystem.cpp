@@ -784,9 +784,9 @@ TriggerSystem::TriggerSystem()
 }
 
 
-void TriggerSystem::SubscribeToEvents(std::unique_ptr<EventManager>& eventManager)
+void TriggerSystem::SubscribeToEvents(EventManager& eventManager)
 {
-	eventManager->SubscribeToEvent<CollisionEvent>(this, &TriggerSystem::OnTrigger);
+	eventManager.SubscribeToEvent<CollisionEvent>(this, &TriggerSystem::OnTrigger);
 }
 
 void TriggerSystem::OnTrigger(CollisionEvent& event)

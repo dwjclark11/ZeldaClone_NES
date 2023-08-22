@@ -7,9 +7,7 @@ class ProjectileComponent
 public:
 	// Component Variables
 	bool isFriendly;
-	int hitPercentDamage;
-	int duration;
-	int startTime;
+	int hitPercentDamage, duration, startTime;
 	enum class Dir{ UP = 0, RIGHT, DOWN, LEFT, NO_DIR };
 	Dir dir;
 

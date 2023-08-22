@@ -18,7 +18,7 @@ public:
 	MovementSystem();
 
 	void Update(const double& deltaTime);
-	void SubscribeToEvents(const std::unique_ptr<class EventManager>& eventManager);
+	void SubscribeToEvents(class EventManager& eventManager);
 	void OnCollision(class CollisionEvent& colEvent);
 	void OnEnemyHitsObstacle(Entity enemy, Entity obstacle);
 	void OnPlayerHitsObstacle(Entity obstacle, Entity player);

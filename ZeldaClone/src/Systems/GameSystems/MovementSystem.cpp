@@ -247,9 +247,9 @@ void MovementSystem::Update(const double& deltaTime)
 	UpdateProjectiles(deltaTime);
 }
 
-void MovementSystem::SubscribeToEvents(const std::unique_ptr<EventManager>& eventManager)
+void MovementSystem::SubscribeToEvents(EventManager& eventManager)
 {
-	eventManager->SubscribeToEvent<CollisionEvent>(this, &MovementSystem::OnCollision);
+	eventManager.SubscribeToEvent<CollisionEvent>(this, &MovementSystem::OnCollision);
 }
 
 void MovementSystem::OnCollision(CollisionEvent& colEvent)
