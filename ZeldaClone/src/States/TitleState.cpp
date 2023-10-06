@@ -59,8 +59,7 @@ void TitleState::Update(const float& deltaTime)
 		if (Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished())
 		{
 			Registry::Instance().GetSystem<CameraMovementSystem>().SetScrollFinished(false);
-			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new TitleState());
+			game.GetStateMachine()->PushState(std::make_unique<TitleState>());
 		}
 	}
 }
@@ -130,7 +129,6 @@ void TitleState::ProcessEvents(SDL_Event& event)
 	if (InputManager::GetInstance().GetKeyboard().IsKeyJustPressed(KEY_SPACE) || 
 		InputManager::GetInstance().GetGamepad().IsButtonJustPressed(GP_BTN_A))
 	{
-		game.GetStateMachine()->PopState();
-		game.GetStateMachine()->PushState(new MenuState());
+		game.GetStateMachine()->PushState(std::make_unique<MenuState>());
 	}
 }

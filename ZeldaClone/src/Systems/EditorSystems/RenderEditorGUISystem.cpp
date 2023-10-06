@@ -426,8 +426,7 @@ void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& as
 	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 	if (ImGui::MenuItem("Play Game!!"))
 	{
-		game.GetStateMachine()->PopState();
-		game.GetStateMachine()->PushState(new MenuState());
+		game.GetStateMachine()->PushState(std::make_unique<MenuState>());
 	}
 
 	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();

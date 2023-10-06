@@ -198,20 +198,17 @@ void GameState::UpdatePauseContol()
 }
 
 GameState::GameState()
-	: game(Game::Instance()), reg(Registry::Instance())
-	, inputManager(InputManager::GetInstance()), cameraOffset(glm::vec2(0))
-	, gameData(GameData::GetInstance())
-	, hudRect{ 0, 0, game.GetWindowWidth(), 256}
-	
+	: GameState(glm::vec2{0.f})
 {
 }
 
-GameState::~GameState() {}
-
 GameState::GameState(glm::vec2 cameraOffset)
-	: GameState()
+	: game(Game::Instance()), reg(Registry::Instance())
+	, inputManager(InputManager::GetInstance()), cameraOffset(cameraOffset)
+	, gameData(GameData::GetInstance())
+	, hudRect{ 0, 0, game.GetWindowWidth(), 256 }
+
 {
-	this->cameraOffset = cameraOffset;
 	game.GetCamera().SetCameraPosition(cameraOffset.x, cameraOffset.y);
 }
 
@@ -222,7 +219,7 @@ void GameState::Update(const float& deltaTime)
 	{
 		camera.SetFadeFinished(true);
 		camera.StartFadeOut(false);
-		game.GetStateMachine()->PushState(new PauseState());
+		game.GetStateMachine()->PushState(std::make_unique<PauseState>(), false);
 	}
 
 	// Check to see if level music has been paused

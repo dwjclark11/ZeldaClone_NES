@@ -434,9 +434,7 @@ void PlayerDeathState::Update(Entity& entity)
 		{
 			Game::Instance().GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::ANY);
 			Registry::Instance().GetSystem<RenderHUDSystem>().OnExit();
-			//Registry::Instance().GetSystem<RenderHealthSystem>().OnExit();
-			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new GameOverState());
+			game.GetStateMachine()->PushState(std::make_unique<GameOverState>());
 
 			sm.AddState(std::make_unique<IdleState>());
 			sm.ChangeState(entity);

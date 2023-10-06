@@ -12,7 +12,7 @@ private:
 
 public:
 	SaveGameState();
-	~SaveGameState() {}
+	~SaveGameState() = default;
 
 	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;

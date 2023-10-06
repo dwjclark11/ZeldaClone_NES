@@ -1,6 +1,6 @@
 #include "GameStateMachine.h"
 
-void GameStateMachine::Update(const float& deltaTime)
+void GameStateMachine::Update(const float deltaTime)
 {
 	if (!states.empty())
 	{
@@ -16,30 +16,15 @@ void GameStateMachine::Render()
 	}
 }
 
-void GameStateMachine::PushState(State* state)
+void GameStateMachine::PushState(std::unique_ptr<State> state, bool bReplace)
 {
-	states.push_back(state);
-	states.back()->OnEnter();
-}
-
-void GameStateMachine::ChangeState(State* state)
-{
-	if (!states.empty())
+	if (!states.empty() && bReplace)
 	{
-		if (states.back()->GetStateID() == state->GetStateID())
-		{
-			return;
-		}
+		states.back()->OnExit();
+		states.erase(states.end() - 1);
 	}
-	states.push_back(state);
 
-	if (!states.empty())
-	{
-		if (states.back()->OnExit())
-		{
-			states.erase(states.end() - 2);
-		}
-	}
+	states.push_back(std::move(state));
 	states.back()->OnEnter();
 }
 
@@ -49,8 +34,6 @@ void GameStateMachine::PopState()
 	{
 		if (states.back()->OnExit())
 		{
-			//delete states.back();
-			//states.back() = nullptr;
 			states.erase(states.end() - 1);
 		}
 	}

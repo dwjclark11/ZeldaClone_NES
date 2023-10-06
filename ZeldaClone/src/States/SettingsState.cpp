@@ -280,8 +280,7 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 
 	if (inputManager.GetKeyboard().IsKeyJustPressed(KEY_BACKSPACE) || inputManager.GetGamepad().IsButtonJustPressed(GP_BTN_B))
 	{
-		Game::Instance().GetStateMachine()->PopState();
-		Game::Instance().GetStateMachine()->PushState(new MenuState());
+		Game::Instance().GetStateMachine()->PushState(std::make_unique<MenuState>());
 	}
 }
 

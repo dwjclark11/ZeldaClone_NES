@@ -238,8 +238,7 @@ class Registry
 {
 private:
 	// Keep track of how many entities were added to the scene
-	int numEntities = 0;
-	int mEntityID;
+	int numEntities{0}, mEntityID{1};
 	std::set<Entity> entitiesToBeAdded; // Entities awaitng creation in the next Registry Update()
 	std::set<Entity> entitiesToBeKilled; // Entities awaitng destruction in the next Registry Update()
 
@@ -265,31 +264,19 @@ private:
 
 	// Entiy groups (a set of entities per group name)
 	std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
-
 	std::unordered_map<int, std::vector<std::string>> groupPerEntity;;
 
 	//static Registry* instance;
 	static std::unique_ptr<Registry> instance;
-
-	//// My test entities
-	//std::vector<Entity> entities;
-
 
 	void AddEntities();
 	void RemoveEntities();
 
 public:
 	// Management of entities, systems, and components
-	Registry() : mEntityID(1)
-	{
-		Logger::Log("Registry Constructor Called");
-		//entities.reserve(5000);
-	}
-	~Registry()
-	{
-		Logger::Log("Registry Destructor Called");
-	}
-
+	Registry() = default;
+	~Registry() = default;
+	
 	// Entity Management
 	Entity CreateEntity();
 	void KillEntity(Entity entity);

@@ -20,18 +20,6 @@ Gamepad::Gamepad()
 			Logger::Err("Unable to open game controller!");
 		}
 	}
-	//auto mappings = SDL_GameControllerAddMappingsFromFile("./Engine/Inputs/gamecontrollerdb.txt");
-
-	//if (mappings == -1)
-	//{
-	//	std::string error = SDL_GetError();
-	//	JADE_ERR("UNABLE TO LOAD CONTROLLER MAPPINGS - " + error);
-	//}
-	//else
-	//{
-	//	JADE_LOG("NUMBER OF MAPPINGS: " + std::to_string(mappings));
-	//}
-
 }
 
 Gamepad::~Gamepad()

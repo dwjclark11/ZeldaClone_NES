@@ -170,8 +170,7 @@ void NameState::ProcessEvents(SDL_Event& event)
 			m_Row = 0;
 			m_Col = 0;
 			loader.SavePlayerNameToLuaTable(std::to_string(m_Slot), m_sName);
-			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new MenuState());
+			game.GetStateMachine()->PushState(std::make_unique <MenuState>());
 		}
 	}
 }

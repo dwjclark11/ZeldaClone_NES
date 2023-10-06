@@ -14,7 +14,7 @@ private:
 
 public:
 	TitleState();
-	~TitleState() { Logger::Err(GetStateID() + " was Destroyed!"); };
+	~TitleState() = default;
 
 	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;

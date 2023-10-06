@@ -3,23 +3,22 @@
 #include <vector>
 #include <SDL.h>
 #include "State.h"
-
+#include <memory>
 class State;
 
 class GameStateMachine
 {
 private:
-	std::vector<State*> states;
+	std::vector<std::unique_ptr<State>> states;
 
 public:
 	GameStateMachine() {}
 	~GameStateMachine() {}
 
-	void Update(const float& deltaTime);
+	void Update(const float deltaTime);
 	void Render();
 
-	void PushState(State* state);
-	void ChangeState(State* state);
+	void PushState(std::unique_ptr<State> state, bool bReplace = true);
 	void PopState();
 	void ClearStates();
 

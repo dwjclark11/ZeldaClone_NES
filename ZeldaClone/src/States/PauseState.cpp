@@ -114,6 +114,7 @@ void PauseState::Update(const float& deltaTime)
 		game.GetCamera().SetFadeFinished(true);
 		game.GetCamera().StartFadeOut(false);
 		game.GetStateMachine()->PopState();
+		return;
 	}
 
 	if (gameData.GetTotalBombs() == 0 && gameData.HasItem(GameData::GameItems::BOMB))
@@ -350,6 +351,6 @@ void PauseState::ProcessEvents(SDL_Event& event)
 	else if (keyboard.IsKeyJustReleased(KEY_M) || gamepad.IsButtonJustReleased(GP_BTN_START))
 	{
 		// Open the save Screen!
-		game.GetStateMachine()->PushState(new SaveGameState());
+		game.GetStateMachine()->PushState(std::make_unique<SaveGameState>());
 	}
 }

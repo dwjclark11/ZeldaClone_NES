@@ -70,8 +70,6 @@ void Game::Initialize()
 	auto num_channels = Mix_AllocateChannels(16);
 	auto num_reserved_channels = Mix_ReserveChannels(4);
 	Mix_Volume(1, MIX_MAX_VOLUME / 4);
-	Logger::Log("Num Channels: " + std::to_string(num_channels));
-	Logger::Log("Reserved Channels: " + std::to_string(num_reserved_channels));
 	// Turn music volume down
 	Mix_VolumeMusic(10);
 	/* Use SDL to grab the displays Resolution */
@@ -143,10 +141,10 @@ void Game::Initialize()
 	m_pGameStateMachine = std::make_unique<GameStateMachine>();
 	
 	// Push the title screen
-	m_pGameStateMachine->PushState(new TitleState());
+	m_pGameStateMachine->PushState(std::make_unique<TitleState>());
 
 	// Change to the state you want to work on
-	//gameStateMachine->PushState(new EditorState());
+	//gameStateMachine->PushState(std::make_unique<EditorState>());
 }
 
 void Game::Update()

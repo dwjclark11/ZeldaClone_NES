@@ -157,8 +157,7 @@ void MenuState::SelectorKeys()
 			if (m_GameData.GetPlayer1Name().size() != 0)
 			{
 				m_GameData.SetPlayerNum(1);
-				game.GetStateMachine()->PopState();
-				game.GetStateMachine()->PushState(new GameState(glm::vec2(7168, 4416)));
+				game.GetStateMachine()->PushState(std::make_unique<GameState>(glm::vec2(7168, 4416)));
 			}
 		}
 		else if (transform.position.y == 296)
@@ -167,7 +166,7 @@ void MenuState::SelectorKeys()
 			{
 				m_GameData.SetPlayerNum(2);
 				game.GetStateMachine()->PopState();
-				game.GetStateMachine()->PushState(new GameState());
+				game.GetStateMachine()->PushState(std::make_unique<GameState>());
 			}
 		}
 		else if (transform.position.y == 392)
@@ -176,7 +175,7 @@ void MenuState::SelectorKeys()
 			{
 				m_GameData.SetPlayerNum(3);
 				game.GetStateMachine()->PopState();
-				game.GetStateMachine()->PushState(new GameState());
+				game.GetStateMachine()->PushState(std::make_unique<GameState>());
 			}
 		}
 		else if (transform.position.y == 488)
@@ -187,7 +186,7 @@ void MenuState::SelectorKeys()
 				return;
 			}
 
-			game.GetStateMachine()->PushState(new NameState());
+			game.GetStateMachine()->PushState(std::make_unique <NameState>());
 		}
 		else if (transform.position.y == 584)
 		{
@@ -201,12 +200,12 @@ void MenuState::SelectorKeys()
 		else if (transform.position.y == 680)
 		{
 			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new SettingsState());
+			game.GetStateMachine()->PushState(std::make_unique <SettingsState>());
 		}
 		else if (transform.position.y == 776)
 		{
 			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new EditorState());
+			game.GetStateMachine()->PushState(std::make_unique<EditorState>());
 		}
 	}
 }
@@ -225,7 +224,6 @@ void MenuState::Update(const float& deltaTime)
 
 void MenuState::Render()
 {
-	// Registry::Instance().GetSystem<RenderTextSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 	Registry::Instance().GetSystem<RenderMainMenuSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 

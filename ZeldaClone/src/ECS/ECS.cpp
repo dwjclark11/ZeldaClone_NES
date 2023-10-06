@@ -217,11 +217,7 @@ std::vector<std::string> Registry::GetEntityGroups(const Entity& entity)
 
 bool Registry::DoesTagExist(const std::string& tag) const
 {
-	// If the group exists
-	if (entityPerTag.find(tag) != entityPerTag.end())
-		return true;
-
-	return false;
+	return entityPerTag.find(tag) != entityPerTag.end();
 }
 
 Entity Registry::GetEntityByTag(const std::string& tag) const

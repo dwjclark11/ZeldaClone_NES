@@ -21,7 +21,7 @@ private:
 
 public:
 	MenuState();
-	virtual ~MenuState() { Logger::Err(GetStateID() + " was Destroyed!"); };
+	~MenuState() = default; 
 
 	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;

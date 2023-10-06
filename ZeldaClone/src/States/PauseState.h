@@ -17,7 +17,7 @@ private:
 public:
 
 	PauseState();
-	~PauseState() {}
+	~PauseState() = default;
 
 	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;

@@ -54,14 +54,8 @@ private:
 	std::map<std::type_index, std::unique_ptr<HandlerList>> subscribers;
 
 public:
-	EventManager()
-	{
-
-	}
-	~EventManager()
-	{
-
-	}
+	EventManager() = default;
+	~EventManager() = default;
 
 	// Clears the subscriber list
 	void Reset()

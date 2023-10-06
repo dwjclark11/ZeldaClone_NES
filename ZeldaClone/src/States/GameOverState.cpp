@@ -117,19 +117,16 @@ void GameOverState::ProcessEvents(SDL_Event& event)
 		{
 			game.GetPlayer()->SetPlayerCreated(false);
 			game.GetPlayer()->SetPlayerDead(false);
-			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new GameState());
+			game.GetStateMachine()->PushState(std::make_unique<GameState>());
 		}
 		else if (transform.position.y == 575)
 		{
 			m_GameData.PlayerNum();
-			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new GameState());
+			game.GetStateMachine()->PushState(std::make_unique <GameState>());
 		}
 		else if (transform.position.y == 675)
 		{
-			game.GetStateMachine()->PopState();
-			game.GetStateMachine()->PushState(new MenuState());
+			game.GetStateMachine()->PushState(std::make_unique<MenuState>());
 		}
 	}
 }
