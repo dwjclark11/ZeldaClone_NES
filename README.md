@@ -102,7 +102,11 @@ Some of the desired changes are:
 Some of the bugs are as follows:
 * Sometimes the player/enemies go through colliders/walls after getting hit.
 * Enemies can leave the screen the player is on 
-    *  Maybe create an enemy collider that reflects them in the opposite direction? 
+    *  Maybe create an enemy collider that reflects them in the opposite direction?
+* Sometimes dropped items are not picked up correctly.
+    *  For instance hearts picked up but not healing, bombs picked up but not adding
+* The sword can hurt enemies when not attacking
+    *  Currently the sword moves around on the player in the center. Need to add check if attacking or not. Or recreate the sword on all attacks...       
 
 ## Dustin 
 
