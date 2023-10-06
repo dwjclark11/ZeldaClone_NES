@@ -165,7 +165,6 @@ void MenuState::SelectorKeys()
 			if (m_GameData.GetPlayer2Name().size() != 0)
 			{
 				m_GameData.SetPlayerNum(2);
-				game.GetStateMachine()->PopState();
 				game.GetStateMachine()->PushState(std::make_unique<GameState>());
 			}
 		}
@@ -174,7 +173,6 @@ void MenuState::SelectorKeys()
 			if (m_GameData.GetPlayer3Name().size() != 0)
 			{
 				m_GameData.SetPlayerNum(3);
-				game.GetStateMachine()->PopState();
 				game.GetStateMachine()->PushState(std::make_unique<GameState>());
 			}
 		}
@@ -190,7 +188,6 @@ void MenuState::SelectorKeys()
 		}
 		else if (transform.position.y == 584)
 		{
-			Logger::Log("Eliminate");
 			if (m_GameData.GetPlayer1Name().size() != 0 || m_GameData.GetPlayer2Name().size() != 0 || m_GameData.GetPlayer3Name().size() != 0)
 			{
 				m_bEliminate = !m_bEliminate;
@@ -199,19 +196,17 @@ void MenuState::SelectorKeys()
 		}
 		else if (transform.position.y == 680)
 		{
-			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(std::make_unique <SettingsState>());
 		}
 		else if (transform.position.y == 776)
 		{
-			game.GetStateMachine()->PopState();
 			game.GetStateMachine()->PushState(std::make_unique<EditorState>());
 		}
 	}
 }
 
 MenuState::MenuState()
-	: m_bFull(false), m_bEliminate{false}, slot1(1), slot2(2), slot3(3)
+	: slot1(1), slot2(2), slot3(3), m_bFull(false), m_bEliminate{ false }, m_bSlotsFull{false}
 	, game(Game::Instance()), m_GameData(GameData::GetInstance())
 	, m_InputManager(InputManager::GetInstance()), reg(Registry::Instance())
 {
