@@ -45,34 +45,34 @@ public:
 	LevelLoader();
 	~LevelLoader();
 
-	void LoadMap(std::string mapName, int image_width, int image_height, bool offset = false);
-	void LoadTilemap(std::string fileName, std::string imageName);
+	void LoadMap(const std::string& mapName, int image_width, int image_height, bool offset = false);
+	void LoadTilemap(const std::string& fileName, const std::string& imageName);
 	void LoadLevelAssets(std::unique_ptr<AssetManager>& assetManager, const std::string& fileName);
 
 	void LoadLevel(const std::string& level);
 	void LoadColliders(const std::string& filename);
 	void LoadTriggers(sol::state& lua, const std::string& fileName);
 
-	void SavePlayerDataToLuaTable(std::string saveNum);
-	void SavePlayerNameToLuaTable(std::string saveNum, std::string& name);
+	void SavePlayerDataToLuaTable(const std::string& saveNum);
+	void SavePlayerNameToLuaTable(const std::string& saveNum, std::string& name);
 
 	void CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName, int slotNum);
-	void LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName, int slotNum);
-	void LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadHUDFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadAssetsFromLuaTable(sol::state& lua, std::string fileName);
-	void LoadEntitiesFromLuaTable(sol::state& lua, std::string filename);
+	void LoadPlayerDataFromLuaTable(sol::state& lua, const std::string& fileName, int slotNum);
+	void LoadMenuScreenFromLuaTable(sol::state& lua, const std::string& fileName, int slotNum);
+	void LoadMenuUIFromLuaTable(sol::state& lua, const std::string& fileName);
+	void LoadEnemiesFromLuaTable(sol::state& lua, const std::string& fileName);
+	void LoadHUDFromLuaTable(sol::state& lua, const std::string& fileName);
+	void LoadAssetsFromLuaTable(sol::state& lua, const std::string& fileName);
+	void LoadEntitiesFromLuaTable(sol::state& lua, const std::string& filename);
 
 	void EliminatePlayerToDefault(int slotNum, const std::string& name);
 
 	void SaveSecrets();
 	void ReadInSecrets(sol::state& lua);
 
-	TriggerBoxComponent::TriggerType ConvertStringToTriggerType(std::string type);
+	TriggerBoxComponent::TriggerType ConvertStringToTriggerType(const std::string& type);
 
-	AIComponent::EnemyType ConvertStringToEnemyType(std::string enemyType);
-	AIComponent::EnemyBossType ConvertStringToEnemyBossType(std::string bossType);
+	AIComponent::EnemyType ConvertStringToEnemyType(const std::string& enemyType);
+	AIComponent::EnemyBossType ConvertStringToEnemyBossType(const std::string& bossType);
 
 };

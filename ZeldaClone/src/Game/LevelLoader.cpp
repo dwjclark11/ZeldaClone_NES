@@ -46,7 +46,7 @@ LevelLoader::~LevelLoader()
 {
 }
 
-void LevelLoader::LoadMap(std::string mapName, int image_width, int image_height, bool offset)
+void LevelLoader::LoadMap(const std::string& mapName, int image_width, int image_height, bool offset)
 {
 	int x = 0;
 	int y = 0;
@@ -60,7 +60,7 @@ void LevelLoader::LoadMap(std::string mapName, int image_width, int image_height
 	secret.Group("map");
 }
 
-void LevelLoader::LoadTilemap(std::string fileName, std::string imageName)
+void LevelLoader::LoadTilemap(const std::string& fileName, const std::string& imageName)
 {
 	// Adding Textures to the asset Manager
 	std::string assetID = imageName;
@@ -186,7 +186,7 @@ LevelLoader::AssetType LevelLoader::ConvertToAssetType(std::string& type)
 		return LevelLoader::AssetType::MUSIC;
 }
 
-void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, std::string fileName, int slotNum)
+void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, const std::string& fileName, int slotNum)
 {
 	bool valid = false;
 	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/" + fileName + ".lua");
@@ -497,7 +497,7 @@ void LevelLoader::CreateNewGameSecretsFile(int slotNum)
 	file.close();
 }
 
-void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
+void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, const std::string& fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
 	// Check the syntax of the Lua script 
@@ -636,7 +636,7 @@ void LevelLoader::LoadColliders(const std::string& filename)
 	mapFile.close();
 }
 
-TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::string type)
+TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(const std::string& type)
 {
 	if (type == "no_trigger")
 		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
@@ -672,7 +672,7 @@ TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(std::st
 		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
 }
 
-AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyType)
+AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(const std::string& enemyType)
 {
 	if (enemyType == "octorok")
 		return AIComponent::EnemyType::OCTOROK;
@@ -707,7 +707,7 @@ AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(std::string enemyTy
 }
 
 
-AIComponent::EnemyBossType LevelLoader::ConvertStringToEnemyBossType(std::string bossType)
+AIComponent::EnemyBossType LevelLoader::ConvertStringToEnemyBossType(const std::string& bossType)
 {
 	if (bossType == "aquamentus")
 		return AIComponent::EnemyBossType::AQUAMENTUS;
@@ -861,7 +861,7 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 	}
 }
 
-void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
+void LevelLoader::SavePlayerDataToLuaTable(const std::string& saveNum)
 {
 	LuaTableWriter m_writer;
 	std::fstream file;
@@ -1028,7 +1028,7 @@ void LevelLoader::SavePlayerDataToLuaTable(std::string saveNum)
 }
 
 // This is for a new player -->Default values for items
-void LevelLoader::SavePlayerNameToLuaTable(std::string saveNum, std::string& newName)
+void LevelLoader::SavePlayerNameToLuaTable(const std::string& saveNum, std::string& newName)
 {
 	LuaTableWriter m_writer;
 	
@@ -1221,7 +1221,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable(sol::state& lua, std::string fi
 
 }
 
-void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileName, int slotNum)
+void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, const std::string& fileName, int slotNum)
 {
 	sol::load_result script = lua.load_file("./Assets/SavedFiles/slot_" + std::to_string(slotNum) + "/" + fileName + ".lua");
 
@@ -1376,7 +1376,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable(sol::state& lua, std::string fileNa
 	}
 }
 
-void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, std::string fileName)
+void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, const std::string& fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/Enemies/" + fileName + ".lua");
 	// This checks the syntax of our script, but it does not execute the script
@@ -1582,7 +1582,7 @@ void LevelLoader::ReadInSecrets(sol::state& lua)
 	}
 }
 
-void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
+void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, const std::string& fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
 
@@ -1652,7 +1652,7 @@ void LevelLoader::LoadHUDFromLuaTable(sol::state& lua, std::string fileName)
 	}
 }
 
-void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, std::string fileName)
+void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, const std::string& fileName)
 {
 	sol::load_result script = lua.load_file("./Assets/LuaFiles/" + fileName + ".lua");
 
@@ -1779,7 +1779,7 @@ bool LevelLoader::CheckForItemInInventory(ItemComponent::SpecialItemType& type)
 	}
 }
 
-void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename)
+void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& filename)
 {
 	sol::load_result script = lua.load_file("./Assets/Levels/Entities/" + filename + ".lua");
 

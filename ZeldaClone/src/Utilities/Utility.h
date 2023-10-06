@@ -53,6 +53,7 @@ typedef std::unique_ptr<SDL_Texture, SDL_Wrappers::SDL_Destroyer>			Texture;
 typedef std::unique_ptr<SDL_GameController, SDL_Wrappers::SDL_Destroyer>	Controller;
 
 
+// Game Constants
 constexpr int PANEL_WIDTH = 1024;
 constexpr int PANEL_HEIGHT = 672;
 constexpr int HUD_HEIGHT = 288;

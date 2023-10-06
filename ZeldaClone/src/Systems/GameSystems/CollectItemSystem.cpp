@@ -39,34 +39,37 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 	Entity b = event.b;
 
 	if (a.HasComponent<ItemComponent>() && b.HasComponent<PlayerComponent>()) OnPlayerGetsItem(a, b);
-	if (b.HasComponent<ItemComponent>() && a.HasComponent<PlayerComponent>()) OnPlayerGetsItem(b, a);
+	else if (b.HasComponent<ItemComponent>() && a.HasComponent<PlayerComponent>()) OnPlayerGetsItem(b, a);
 	
 	// Test for boomerang retrieving items
 	if (a.HasComponent<ItemComponent>() && b.HasTag("boomerang")) OnBoomerangGetsItem(a, b);
-	if (b.HasComponent<ItemComponent>() && a.HasTag("boomerang")) OnBoomerangGetsItem(b, a);
+	else if (b.HasComponent<ItemComponent>() && a.HasTag("boomerang")) OnBoomerangGetsItem(b, a);
 }
 
 void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 {
 	auto& type = item.GetComponent<ItemComponent>().type;
-
-	if (type == ItemComponent::ItemCollectType::YELLOW_RUPEE)
+	bool bPlaySound{ true };
+	switch (type)
+	{
+	case ItemComponent::ItemCollectType::YELLOW_RUPEE:
 	{
 		m_GameData.AddRupees(1);
-		item.Kill();
+		bPlaySound = false;
+		break;
 	}
-	else if (type == ItemComponent::ItemCollectType::BLUE_RUPEE)
+	case ItemComponent::ItemCollectType::BLUE_RUPEE:
 	{
 		m_GameData.AddRupees(5);
-		item.Kill();
+		bPlaySound = false;
+		break;
 	}
-	else if (type == ItemComponent::ItemCollectType::BOMBS)
+	case ItemComponent::ItemCollectType::BOMBS:
 	{
 		m_GameData.AddBombs(3);
-		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
-		item.Kill();
+		break;
 	}
-	else if (type == ItemComponent::ItemCollectType::HEARTS)
+	case ItemComponent::ItemCollectType::HEARTS:
 	{
 		auto& health = player.GetComponent<HealthComponent>();
 		health.healthPercentage += 2;
@@ -74,16 +77,24 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 		// Clamp health to the maxHealth --> Create Variable?
 		if (health.healthPercentage >= health.maxHearts * 2)
 			health.healthPercentage = health.maxHearts * 2;
-
-		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
-		item.Kill();
+		break;
 	}
-	else if (type == ItemComponent::ItemCollectType::KEYS)
+	case ItemComponent::ItemCollectType::KEYS:
 	{
 		m_GameData.AddKeys(1);
-		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
-		item.Kill();
+		break;
 	}
+	case ItemComponent::ItemCollectType::DEFAULT:
+		break;
+	default:
+		assert(false && "Item has not been defined!");
+		break;
+	}
+
+	if (bPlaySound)
+		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
+
+	item.Kill();
 }
 
 void CollectItemSystem::OnBoomerangGetsItem(Entity& item, Entity& boomerang)
