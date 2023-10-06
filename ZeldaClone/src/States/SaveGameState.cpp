@@ -27,12 +27,12 @@ SaveGameState::SaveGameState()
 void SaveGameState::Update(const float& deltaTime)
 {
 	reg.Update();
-	Registry::Instance().GetSystem<AnimationSystem>().Update();
+	reg.GetSystem<AnimationSystem>().Update();
 }
 
 void SaveGameState::Render()
 {
-	Registry::Instance().GetSystem<RenderSaveStateSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	reg.GetSystem<RenderSaveStateSystem>().Update(game.GetRenderer(), game.GetAssetManager());
 }
 
 bool SaveGameState::OnEnter()
@@ -72,7 +72,7 @@ bool SaveGameState::OnExit()
 
 void SaveGameState::ProcessEvents(SDL_Event& event)
 {
-	const auto& selector = Registry::Instance().GetEntityByTag("save_selector");
+	const auto& selector = reg.GetEntityByTag("save_selector");
 	auto& transform = selector.GetComponent<TransformComponent>();
 	auto& keyboard = m_InputManager.GetKeyboard();
 	auto& gamepad = m_InputManager.GetGamepad();
@@ -110,21 +110,13 @@ void SaveGameState::ProcessEvents(SDL_Event& event)
 
 			loader.SavePlayerDataToLuaTable(std::to_string(m_GameData.PlayerNum()));
 			loader.SaveSecrets();
-			Logger::Log("Saved Player: " + std::to_string(m_GameData.PlayerNum()));
-
-			//Entity saving = Registry::Instance().CreateEntity();
-			//saving.AddComponent<SpriteComponent>("save_gui", 96, 16, 1, true, 0, 0);
-			//saving.AddComponent<TransformComponent>(glm::vec2(400, 100), glm::vec2(2, 2), 0.0);
-			//saving.AddComponent<AnimationComponent>(2, 5);
-			//saving.AddComponent<SaveComponent>();
-			//Sleep(1000);
 			game.GetStateMachine()->PopState();
 		}
 		else if (transform.position.y == 385)
 		{
 			//State::exitToMain = true;
 			//game.GetStateMachine()->ClearStates();
-			//game.GetStateMachine()->PushState(new MenuState());
+			//game.GetStateMachine()->PushState(std::make_unique<MenuState>());
 		}
 		else if (transform.position.y == 585)
 		{

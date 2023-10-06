@@ -42,7 +42,6 @@ Game& Game::Instance()
 {
 	if (!mInstance)
 	{
-		Logger::Log("Creating new Game instance!\n");
 		mInstance.reset(new Game());
 	}
 
@@ -89,7 +88,7 @@ void Game::Initialize()
 		SDL_WINDOWPOS_CENTERED,
 		m_WindowWidth,
 		m_WindowHeight,
-		SDL_WINDOW_OPENGL // | SDL_WINDOW_RESIZABLE // We don't want resizable in game
+		SDL_WINDOW_OPENGL
 	);
 	
 	// Check to see if the window creation worked correctly

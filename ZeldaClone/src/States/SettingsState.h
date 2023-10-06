@@ -13,7 +13,7 @@ public:
 	static int mActionIndex;
 	static bool mEnterKey;
 	SettingsState();
-	virtual ~SettingsState() { Logger::Err("Settings State Destroyed!!"); }
+	~SettingsState() = default;
 
 	virtual void Update(const float& deltaTime);
 	virtual void Render();

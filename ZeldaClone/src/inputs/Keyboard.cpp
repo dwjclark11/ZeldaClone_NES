@@ -27,7 +27,6 @@ int ConvertKeysNum(int key)
 Keyboard::Keyboard()
     : mKeyString("")
 {
-    Logger::Log("Keyboard Constructor Called");
     mKeyPressed = static_cast<SDL_KeyCode>(-1);
 }
 

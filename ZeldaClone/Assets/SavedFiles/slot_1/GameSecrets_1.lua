@@ -16,11 +16,11 @@ secrets = {
         found = false
     },
     [4] = {
-        location = "push_rock_to_highway_1",
+        location = "bomb_secret_rupees_1",
         found = false
     },
     [5] = {
-        location = "bomb_secret_rupees_1",
+        location = "push_rock_to_highway_1",
         found = false
     },
     [6] = {

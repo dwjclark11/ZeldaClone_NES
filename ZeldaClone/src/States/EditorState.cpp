@@ -35,8 +35,8 @@ void EditorState::Render()
 	//// Create the HUD rect that each tilemap screen will be inside
 	SDL_Rect hudRectTop = { 0, -1080 - camera.GetCameraPos().y, camera.GetCameraWidth(), 1080};
 	SDL_Rect hudRectLeft = { -camera.GetCameraWidth() - camera.GetCameraPos().x, 0, camera.GetCameraWidth(), 1080};
-	SDL_Rect panelRect = {448, 348, 1024, 672 };
-	SDL_Rect hudRect = { 448, 60, 1024, 288 };
+	SDL_Rect panelRect = {448, 348, PANEL_WIDTH, PANEL_HEIGHT};
+	SDL_Rect hudRect = { 448, 60, PANEL_WIDTH, HUD_HEIGHT };
 	SDL_SetRenderDrawColor(game.GetRenderer(), 70, 70, 70, 70);
 	int xNum = MouseControlSystem::CanvasWidth / MouseControlSystem::gridSize;
 	int yNum = MouseControlSystem::CanvasHeight / MouseControlSystem::gridSize;

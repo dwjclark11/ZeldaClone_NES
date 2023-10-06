@@ -10,6 +10,7 @@
 #include "../../Game/Player.h"
 #include "../SoundFXSystem.h"
 #include "../../Utilities/GameData.h"
+#include "../../Utilities/Utility.h"
 
 ProjectileLifeCycleSystem::ProjectileLifeCycleSystem()
 	: game(Game::Instance())
@@ -23,8 +24,8 @@ void ProjectileLifeCycleSystem::Update()
 	{
 		// Get the transform position of the entity to check against the player pos
 		auto& transform = entity.GetComponent<TransformComponent>();
-		const int checkX = transform.position.x / 1024;
-		const int checkY = transform.position.y / 672;
+		const int checkX = transform.position.x / PANEL_WIDTH;
+		const int checkY = transform.position.y / PANEL_HEIGHT;
 		const auto& playerPos = game.GetPlayer()->GetPlayerPos();
 
 		if (checkX != playerPos.x || checkY != playerPos.y)

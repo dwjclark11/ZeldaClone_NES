@@ -2,14 +2,12 @@
 #include <SDL.h>
 #include <string>
 #include "GameStateMachine.h"
-#include "../Logger/Logger.h"
 
 class State
 {
 public:
-	virtual ~State() { Logger::Err("State Destroyed!!"); }
+	virtual ~State() { }
 	
-
 	virtual void Update(const float& deltaTime) = 0;
 	virtual void Render() = 0;
 

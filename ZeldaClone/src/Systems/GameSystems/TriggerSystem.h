@@ -10,6 +10,7 @@ private:
 	LevelLoader loader;
 	class Game& game;
 	class GameData& gameData;
+	Registry& reg;
 
 	bool CheckInventory(ItemComponent::SpecialItemType& item);
 	void SetInventory(ItemComponent::SpecialItemType& item);
@@ -33,6 +34,8 @@ private:
 public:
 
 	TriggerSystem();
+	~TriggerSystem() = default;
+
 	void SubscribeToEvents(EventManager& eventManager);
 	void OnTrigger(class CollisionEvent& event);
 	void OnEnterTrigger(Entity& player, Entity& trigger);

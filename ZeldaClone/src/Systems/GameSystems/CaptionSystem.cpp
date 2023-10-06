@@ -51,8 +51,8 @@ void CaptionSystem::Update(const float& dt)
 	for (const auto& entity : GetSystemEntities())
 	{
 		auto& caption = entity.GetComponent<CaptionComponent>();
-		int xPos = caption.xPos / 1024;
-		int yPos = caption.yPos / 672;
+		int xPos = caption.xPos / PANEL_HEIGHT;
+		int yPos = caption.yPos / PANEL_WIDTH;
 		
 		const auto& playerPos = Game::Instance().GetPlayer()->GetPlayerPos();
 
@@ -134,12 +134,6 @@ void CaptionSystem::Update(const float& dt)
 						ConvertName(caption.caption, caption.xPos, caption.yPos);
 					}
 
-					//Entity newCaption = Registry::Instance().CreateEntity();
-					//newCaption.Group("caption");
-
-					//// Does the std::move make sense here?
-					//newCaption.AddComponent<TextLabelComponent>(glm::vec2(caption.xPos, caption.yPos), caption.caption, "game_font", SDL_Color{ 255,255,255,255 }, false);
-					//newCaption.AddComponent<GameComponent>();
 					caption.started = true;
 				}
 			}

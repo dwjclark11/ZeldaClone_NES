@@ -60,7 +60,6 @@ void MenuState::EliminateKeys()
 				const std::string save1File = "./Assets/SavedFiles/slot_1/save1.lua";
 				if (std::filesystem::remove(save1File))
 				{
-					Logger::Log("Player: " + m_GameData.GetPlayer1Name() + " was eliminated");
 					LevelLoader loader;
 					loader.EliminatePlayerToDefault(1, m_GameData.GetPlayer1Name());
 					m_GameData.SetPlayer1Name("");
@@ -80,7 +79,6 @@ void MenuState::EliminateKeys()
 				const std::string save2File = "./Assets/SavedFiles/slot_2/save2.lua";
 				if (std::filesystem::remove(save2File))
 				{
-					Logger::Log("Player: " + m_GameData.GetPlayer2Name() + " was eliminated");
 					LevelLoader loader;
 					loader.EliminatePlayerToDefault(2, m_GameData.GetPlayer2Name());
 					m_GameData.SetPlayer2Name("");
@@ -100,7 +98,6 @@ void MenuState::EliminateKeys()
 				const std::string save3File = "./Assets/SavedFiles/slot_3/save3.lua";
 				if (std::filesystem::remove(save3File))
 				{
-					Logger::Log("Player: " + m_GameData.GetPlayer3Name() + " was eliminated");
 					LevelLoader loader;
 					loader.EliminatePlayerToDefault(3, m_GameData.GetPlayer3Name());
 					m_GameData.SetPlayer3Name("");
@@ -143,12 +140,6 @@ void MenuState::SelectorKeys()
 		{
 			transform.position.y = 200;
 		}
-	}
-	else if (keyboard.IsKeyJustPressed(KEY_D) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_RIGHT))
-	{
-	}
-	else if (keyboard.IsKeyJustPressed(KEY_A) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_LEFT))
-	{
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
 	{

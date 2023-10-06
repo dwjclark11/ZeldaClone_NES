@@ -16,7 +16,7 @@ private:
 
 public:
 	Gamepad();
-	~Gamepad();
+	~Gamepad() = default;
 
 	/*
 	*   Gamepad.Update() resets the status of all

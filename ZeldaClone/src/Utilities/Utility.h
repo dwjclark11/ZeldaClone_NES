@@ -51,3 +51,8 @@ typedef std::unique_ptr<SDL_Window, SDL_Wrappers::SDL_Destroyer>			Window;
 typedef std::unique_ptr<SDL_Renderer, SDL_Wrappers::SDL_Destroyer> 			Renderer;
 typedef std::unique_ptr<SDL_Texture, SDL_Wrappers::SDL_Destroyer>			Texture;
 typedef std::unique_ptr<SDL_GameController, SDL_Wrappers::SDL_Destroyer>	Controller;
+
+
+constexpr int PANEL_WIDTH = 1024;
+constexpr int PANEL_HEIGHT = 672;
+constexpr int HUD_HEIGHT = 288;

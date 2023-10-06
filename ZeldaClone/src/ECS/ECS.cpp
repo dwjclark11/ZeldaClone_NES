@@ -315,7 +315,6 @@ Registry& Registry::Instance()
 {
 	if (instance == nullptr)
 	{
-		Logger::Log("Creating new Registry Instance!\n");
 		instance.reset(new Registry());
 	}
 	return *instance;

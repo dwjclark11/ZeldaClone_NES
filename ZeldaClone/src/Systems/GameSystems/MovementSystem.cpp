@@ -16,7 +16,7 @@
 #include "../../Events/CollisionEvent.h"
 #include "../../Game/Game.h"
 #include "../../Game/Player.h"
-
+#include "../../Utilities/Utility.h"
 
 void MovementSystem::UpdateBoomerang(const double& deltaTime)
 {
@@ -87,14 +87,14 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 		// Calculate the min max positions -- TODO: MOVE THIS TO ENEMY COMPONENT
 		if (!enemyComponent.distanceCalculated)
 		{
-			const int entityXPanel = transform.position.x / 1024;
-			const int entityYPanel = transform.position.y / 672;
+			const int entityXPanel = transform.position.x / PANEL_WIDTH;
+			const int entityYPanel = transform.position.y / PANEL_HEIGHT;
 
-			enemyComponent.minDistance.x = entityXPanel * 1024;
-			enemyComponent.minDistance.y = entityYPanel * 672;
+			enemyComponent.minDistance.x = entityXPanel * PANEL_WIDTH;
+			enemyComponent.minDistance.y = entityYPanel * PANEL_HEIGHT;
 
-			enemyComponent.maxDistance.x = enemyComponent.minDistance.x + 1024;
-			enemyComponent.maxDistance.y = enemyComponent.minDistance.y + 672;
+			enemyComponent.maxDistance.x = enemyComponent.minDistance.x + PANEL_WIDTH;
+			enemyComponent.maxDistance.y = enemyComponent.minDistance.y + PANEL_HEIGHT;
 
 			enemyComponent.distanceCalculated = true;
 			ai.SetEmemyPos(glm::vec2{ entityXPanel, entityYPanel });
@@ -161,8 +161,8 @@ void MovementSystem::UpdatePlayer(const double& deltaTime)
 	auto& player_sprite = playerEnt.GetComponent<SpriteComponent>();
 	auto& player_collision = playerEnt.GetComponent<BoxColliderComponent>();
 	
-	const int playerXPanel = player_transform.position.x / 1024;
-	const int playerYPanel = player_transform.position.y / 672;
+	const int playerXPanel = player_transform.position.x / PANEL_WIDTH;
+	const int playerYPanel = player_transform.position.y / PANEL_HEIGHT;
 
 	player->SetPlayerPos(glm::vec2(playerXPanel, playerYPanel));
 

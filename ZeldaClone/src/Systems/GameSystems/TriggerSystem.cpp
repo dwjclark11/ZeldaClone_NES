@@ -19,6 +19,7 @@
 #include "../../Utilities/Timer.h"
 #include "../../Utilities/GameData.h"
 #include "../../Utilities/Camera.h"
+#include "../../Utilities/Utility.h"
 #include "../SoundFXSystem.h"
 #include "../../States/GameState.h"
 
@@ -157,7 +158,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	{
 		TriggerBoxComponent::TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 		
-		auto secretArea = Registry::Instance().CreateEntity();
+		auto secretArea = reg.CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 	
@@ -187,7 +188,7 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	{
 		TriggerBoxComponent::TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
 
-		auto secretArea = Registry::Instance().CreateEntity();
+		auto secretArea = reg.CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 		secretArea.AddComponent<TriggerBoxComponent>(trigType,
@@ -250,10 +251,10 @@ void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 			playerTransform.position.y = y;
 
 			// Remove all the prior assets/entities from the current scene
-			Registry::Instance().GetSystem<RenderSystem>().OnExit();
-			Registry::Instance().GetSystem<RenderTileSystem>().OnExit();
-			Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
-			Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
+			reg.GetSystem<RenderSystem>().OnExit();
+			reg.GetSystem<RenderTileSystem>().OnExit();
+			reg.GetSystem<RenderCollisionSystem>().OnExit();
+			reg.GetSystem<RenderTextSystem>().OnExit();
 
 			// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
 			if (scene.assetFile != "no_file")
@@ -263,14 +264,12 @@ void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 			if (scene.tileMapName != "no_file" && scene.mapImageName != "no_file")
 			{
 				std::string mapFile = "Assets/Tilemaps/Maps/" + scene.tileMapName + ".map";
-
 				loader.LoadTilemap(mapFile, scene.mapImageName);
 			}
 
 			// If there is only an image name than it is a full map image, not tiles --> Just load the map
 			if (scene.tileImageName != "no_file")
 			{
-				//Logger::Log("Map: Width[" + std::to_string(scene.imageWidth) + "], Height[" + std::to_string(scene.imageHeight) + "]");
 				loader.LoadMap(scene.tileImageName, scene.imageWidth, scene.imageHeight);
 			}
 
@@ -291,11 +290,8 @@ void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 
 			// Check to see if there is a trigger file
 			if (scene.triggerFile != "no_file")
-			{
-				Logger::Log("Trig " + scene.triggerFile);
 				loader.LoadTriggers(game.GetLuaState(), scene.triggerFile);
-			}
-
+			
 			// Check to see if there is an enemy file
 			if (scene.enemyFile != "no_file")
 				loader.LoadEnemiesFromLuaTable(game.GetLuaState(), scene.enemyFile);
@@ -372,7 +368,7 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 			{
 				StopPlayerMovement(player, trigger);
 				game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
-				auto raft = Registry::Instance().CreateEntity();
+				auto raft = reg.CreateEntity();
 				raft.Tag("raft");
 				raft.AddComponent<TransformComponent>(pTran);
 				raft.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 0, 16);
@@ -449,7 +445,7 @@ void TriggerSystem::UseLadder(Entity& player, Entity& trigger)
 		}
 
 		// Create a temporary ladder entity
-		auto ladder = Registry::Instance().CreateEntity();
+		auto ladder = reg.CreateEntity();
 		ladder.Tag("ladder");
 		ladder.AddComponent<TransformComponent>(playerTransform);
 		ladder.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 112, 48);
@@ -472,9 +468,9 @@ void TriggerSystem::BombSecret(Entity& trigger)
 		const auto& removeTag = trig.entityRemoveTag;
 		if (removeTag != "")
 		{
-			if (Registry::Instance().DoesTagExist(removeTag))
+			if (reg.DoesTagExist(removeTag))
 			{
-				auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+				auto removedEntity = reg.GetEntityByTag(removeTag);
 
 				SecretTrigger(removedEntity);
 				// Remove the entity
@@ -502,7 +498,7 @@ void TriggerSystem::UnlockDoor(Entity& trigger)
 		const auto& removeTag = trig.entityRemoveTag;
 		if (removeTag != "")
 		{
-			auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+			auto removedEntity = reg.GetEntityByTag(removeTag);
 
 			// Remove/Kill the sister door
 			removedEntity.Kill();
@@ -565,13 +561,13 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 	// If the player's health is already at max, no need to start the fairy circle trigger
 	if (playerHealth.healthPercentage != playerHealth.maxHearts * 2)
 	{
-		for (const auto& fairy : Registry::Instance().GetEntitiesByGroup("fairy"))
+		for (const auto& fairy : reg.GetEntitiesByGroup("fairy"))
 		{
 			// Get the fairy transform. It will be used to check against player position and 
 			// to position the circling hearts
 			auto& fairyTransform = fairy.GetComponent<TransformComponent>();
-			const int checkX = fairyTransform.position.x / 1024;
-			const int checkY = fairyTransform.position.y / 672;
+			const int checkX = fairyTransform.position.x / PANEL_WIDTH;
+			const int checkY = fairyTransform.position.y / PANEL_HEIGHT;
 
 
 			// Check to see if the fairy is in the same panel as the player
@@ -590,7 +586,7 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 			for (int i = 0; i < 8; i++)
 			{
 				// Create a new Heart entity to circle the fairy
-				auto fairyHeart = Registry::Instance().CreateEntity();;
+				auto fairyHeart = reg.CreateEntity();;
 				fairyHeart.Group("fairy_hearts");
 				fairyHeart.AddComponent<TransformComponent>(fairyTransform.position, fairyTransform.scale);
 				fairyHeart.AddComponent<SpriteComponent>("hearts", 16, 16, 2, false, 0, 0);
@@ -634,7 +630,7 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 		// Reset the trigger timer
 		trig.collectedTimer.Stop();
 		// Remove All the created hearts
-		for (auto& heart : Registry::Instance().GetEntitiesByGroup("fairy_hearts"))
+		for (auto& heart : reg.GetEntitiesByGroup("fairy_hearts"))
 		{
 			heart.Kill();
 		}
@@ -647,13 +643,13 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 	// Increment the angle for the circle motion calculation
 	angle += 0.05f;
 
-	for (const auto& fairy : Registry::Instance().GetEntitiesByGroup("fairy"))
+	for (const auto& fairy : reg.GetEntitiesByGroup("fairy"))
 	{
 		// Get the fairy transform. It will be used to check against player position and 
 		// to position the circling hearts
 		auto& fairyTransform = fairy.GetComponent<TransformComponent>();
-		const int checkX = fairyTransform.position.x / 1024;
-		const int checkY = fairyTransform.position.y / 672;
+		const int checkX = fairyTransform.position.x / PANEL_WIDTH;
+		const int checkY = fairyTransform.position.y / PANEL_HEIGHT;
 
 
 		// Check to see if the fairy is in the same panel as the player
@@ -662,7 +658,7 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 
 		// Loop through the 8 Circling hearts and change their position around the fairy, 
 		// The fairy's position is the center of the circle
-		for (auto& heart : Registry::Instance().GetEntitiesByGroup("fairy_hearts"))
+		for (auto& heart : reg.GetEntitiesByGroup("fairy_hearts"))
 		{
 			auto& heartsTransform = heart.GetComponent<TransformComponent>();
 
@@ -680,7 +676,7 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 
 void TriggerSystem::UpdateRaft(Entity& player, Entity& trigger)
 {
-	auto raft = Registry::Instance().GetEntityByTag("raft");
+	auto raft = reg.GetEntityByTag("raft");
 	auto& raftTransform = raft.GetComponent<TransformComponent>();
 	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 	auto& playerTransform = player.GetComponent<TransformComponent>();
@@ -737,9 +733,9 @@ void TriggerSystem::UpdateMovingRocks(Entity& player, Entity& trigger)
 		const auto& removeTag = trig.entityRemoveTag;
 		if (removeTag != "")
 		{
-			if (Registry::Instance().DoesTagExist(removeTag))
+			if (reg.DoesTagExist(removeTag))
 			{
-				auto removedEntity = Registry::Instance().GetEntityByTag(removeTag);
+				auto removedEntity = reg.GetEntityByTag(removeTag);
 
 				if (removedEntity.HasComponent<TriggerBoxComponent>())
 				{
@@ -766,7 +762,7 @@ void TriggerSystem::UpdateLadder(Entity& player, Entity& trigger)
 	if (playerTransform.position.x < transform.position.x - 64 ||
 		playerTransform.position.x > transform.position.x + 32)
 	{
-		auto ladder = Registry::Instance().GetEntityByTag("ladder");
+		auto ladder = reg.GetEntityByTag("ladder");
 		trig.active = false;
 		ladder.Kill();
 	}
@@ -777,6 +773,7 @@ TriggerSystem::TriggerSystem()
 	, gameData(GameData::GetInstance())
 	, angle(0.f)
 	, heartOffset(0.f)
+	, reg(Registry::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
@@ -927,7 +924,7 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		UseLadder(player, trigger);
 		break;
 	case TriggerBoxComponent::TriggerType::TRAP_DOOR:
-		Logger::Err("Touching a trap door!!");
+		// TODO: 
 		break;
 	case TriggerBoxComponent::TriggerType::FAIRY_CIRCLE:
 		EnterFairyCircle(player, trigger);

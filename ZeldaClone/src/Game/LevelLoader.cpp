@@ -545,7 +545,6 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, std::string fileName)
 		entity.AddComponent<MenuComponent>();
 		i++;
 	}
-	Logger::Log("Loading Menu assets!!");
 }
 
 
@@ -1805,7 +1804,6 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 		sol::optional<sol::table> hasData = data[i];
 		if (hasData == sol::nullopt)
 		{
-			Logger::Err("No Loaded Entity data");
 			break;
 		}
 
@@ -1821,7 +1819,6 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, std::string filename
 
 			if (CheckForItemInInventory(spec))
 			{
-				Logger::Err("Breaking");
 				break;
 			}
 		}

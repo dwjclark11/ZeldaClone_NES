@@ -229,7 +229,7 @@ void GameState::Update(const float& deltaTime)
 		Mix_VolumeMusic(10);
 		camera.StartFadeIn(true);
 	}
-	Registry::Instance().GetSystem<TriggerSystem>().Update(deltaTime);
+	reg.GetSystem<TriggerSystem>().Update(deltaTime);
 
 	// Update the registry values
 	reg.Update();
@@ -237,18 +237,18 @@ void GameState::Update(const float& deltaTime)
 	// Update all Game systems
 	game.GetPlayer()->UpdateStateMachine();
 
-	Registry::Instance().GetSystem<CollectItemSystem>().Update();
-	Registry::Instance().GetSystem<AnimationSystem>().Update();
-	Registry::Instance().GetSystem<MovementSystem>().Update(deltaTime);
-	Registry::Instance().GetSystem<ProjectileEmitterSystem>().Update();
-	Registry::Instance().GetSystem<CameraMovementSystem>().UpdatePlayerCam(game.GetCamera(), deltaTime);
+	reg.GetSystem<CollectItemSystem>().Update();
+	reg.GetSystem<AnimationSystem>().Update();
+	reg.GetSystem<MovementSystem>().Update(deltaTime);
+	reg.GetSystem<ProjectileEmitterSystem>().Update();
+	reg.GetSystem<CameraMovementSystem>().UpdatePlayerCam(game.GetCamera(), deltaTime);
 
-	Registry::Instance().GetSystem<ProjectileLifeCycleSystem>().Update();
+	reg.GetSystem<ProjectileLifeCycleSystem>().Update();
 
-	Registry::Instance().GetSystem<AISystem>().Update();
-	Registry::Instance().GetSystem<CaptionSystem>().Update(deltaTime);
-	
-	Registry::Instance().GetSystem<CollisionSystem>().Update();
+	reg.GetSystem<AISystem>().Update();
+	reg.GetSystem<CaptionSystem>().Update(deltaTime);
+
+	reg.GetSystem<CollisionSystem>().Update();
 
 	// Update the registry values
 	reg.Update();
@@ -257,9 +257,9 @@ void GameState::Update(const float& deltaTime)
 void GameState::Render()
 {
 	auto& camera = game.GetCamera();
-	Registry::Instance().GetSystem<RenderTileSystem>().Update();
+	reg.GetSystem<RenderTileSystem>().Update();
 	camera.UpdateScreenFlash();
-	Registry::Instance().GetSystem<RenderSystem>().Update();
+	reg.GetSystem<RenderSystem>().Update();
 	
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
@@ -269,13 +269,13 @@ void GameState::Render()
 	
 	camera.UpdateCurtain();
 
-	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	Registry::Instance().GetSystem<HealthSystem>().Update();
+	reg.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	reg.GetSystem<HealthSystem>().Update();
 
 	// If the game is in debug mode, render the collision system
 	if (game.IsDebugging())
 	{
-		Registry::Instance().GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), camera.GetCameraRect());
+		reg.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), camera.GetCameraRect());
 	}
 }
 
@@ -329,12 +329,12 @@ bool GameState::OnEnter()
 		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
 
-		Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-		Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-		Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-		Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
-		Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
-		Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
+		reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
+		reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
+		reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
+		reg.GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
+		reg.GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
+		reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
 
 		firstEntered = true;
 	}

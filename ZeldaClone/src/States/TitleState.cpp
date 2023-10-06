@@ -36,7 +36,7 @@ void TitleState::Update(const float& deltaTime)
 		RenderTitleSystem::titleTimer++;
 	}
 
-	Registry::Instance().GetSystem<AnimationSystem>().Update();
+	reg.GetSystem<AnimationSystem>().Update();
 	
 	if (timer >= 150)
 	{
@@ -53,12 +53,12 @@ void TitleState::Update(const float& deltaTime)
 			scroll = true;
 		}
 		// Start the camera Movement System to Scroll the screen down
-		Registry::Instance().GetSystem<CameraMovementSystem>().UpdateTitleCam(game.GetCamera(), deltaTime);
+		reg.GetSystem<CameraMovementSystem>().UpdateTitleCam(game.GetCamera(), deltaTime);
 		
 		// Reset the TitleScreen --> Pop and Push the TitleState after a certain amount of time!
-		if (Registry::Instance().GetSystem<CameraMovementSystem>().GetScrollFinished())
+		if (reg.GetSystem<CameraMovementSystem>().GetScrollFinished())
 		{
-			Registry::Instance().GetSystem<CameraMovementSystem>().SetScrollFinished(false);
+			reg.GetSystem<CameraMovementSystem>().SetScrollFinished(false);
 			game.GetStateMachine()->PushState(std::make_unique<TitleState>());
 		}
 	}
@@ -66,7 +66,7 @@ void TitleState::Update(const float& deltaTime)
 
 void TitleState::Render()
 {
-	Registry::Instance().GetSystem<RenderTitleSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
+	reg.GetSystem<RenderTitleSystem>().Update(game.GetRenderer(), game.GetAssetManager(), game.GetCamera());
 }
 
 bool TitleState::OnEnter()
@@ -99,19 +99,14 @@ bool TitleState::OnEnter()
 	titleScreen.AddComponent<RigidBodyComponent>(glm::vec2(0));
 	titleScreen.Group("title");
 
-	//Entity waterfall = reg.CreateEntity();
-	//waterfall.AddComponent<SpriteComponent>("waterfall", 32, 64, 1, true);
-	//waterfall.AddComponent<BackgroundImageComponent>(glm::vec2(0, 0), glm::vec2(4, 4));
-	//waterfall.AddComponent<AnimationComponent>(6, 20, false);
-	//waterfall.AddComponent<RigidBodyComponent>(glm::vec2(0));
 	return true;
 }
 
 bool TitleState::OnExit()
 {
 	// Remove Assets/Entities from the game that are not needed anymore
-	Registry::Instance().GetSystem<RenderTitleSystem>().OnExit();
-	Registry::Instance().GetSystem<CameraMovementSystem>().OnExit();
+	reg.GetSystem<RenderTitleSystem>().OnExit();
+	reg.GetSystem<CameraMovementSystem>().OnExit();
 	
 	// Remove Unused Textures
 	game.GetAssetManager()->RemoveTexture("TitleScreen");
@@ -119,7 +114,6 @@ bool TitleState::OnExit()
 	game.GetAssetManager()->RemoveTexture("waterfall");
 	// Remove Unused Music
 	game.GetAssetManager()->RemoveMusic("Title");
-
 
 	return true;
 }

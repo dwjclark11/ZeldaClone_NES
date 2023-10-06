@@ -27,11 +27,6 @@ Camera::Camera(int x, int y, int width, int height)
 	mCamera.h = height;
 }
 
-Camera::~Camera()
-{
-	Logger::Log("Camera Destructor called!");
-}
-
 void Camera::SetCameraPosFromSceneChange(int x, int y)
 {
 	if (x < 1 || y < 1)

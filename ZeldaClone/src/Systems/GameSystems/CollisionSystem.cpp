@@ -7,6 +7,7 @@
 #include "../../Events/CollisionEvent.h"
 #include "../../Game/Game.h"
 #include "../../Game/Player.h"
+#include "../../Utilities/Utility.h"
 
 CollisionSystem::CollisionSystem(EventManager& eventManager)
 	: m_Game(Game::Instance()), m_EventManager(eventManager)
@@ -28,8 +29,8 @@ void CollisionSystem::Update()
 		bool a_has_collider = a.HasComponent<ColliderComponent>();
 		bool a_has_trigger = a.HasComponent<TriggerBoxComponent>();
 
-		const int checkAX = aTransform.position.x / 1024;
-		const int checkAY = aTransform.position.y / 672;
+		const int checkAX = aTransform.position.x / PANEL_WIDTH;
+		const int checkAY = aTransform.position.y / PANEL_HEIGHT;
 
 		const auto& playerPos = m_Game.GetPlayer()->GetPlayerPos();
 
@@ -46,8 +47,8 @@ void CollisionSystem::Update()
 				continue;
 
 			auto& bTransform = b.GetComponent<TransformComponent>();
-			const int checkBX = bTransform.position.x / 1024;
-			const int checkBY = bTransform.position.y / 672;
+			const int checkBX = bTransform.position.x / PANEL_WIDTH;
+			const int checkBY = bTransform.position.y / PANEL_HEIGHT;
 
 			// Check to see if the collider is in the same panel as the player, if not skip the check
 			if (checkBX != playerPos.x || checkBY != playerPos.y)

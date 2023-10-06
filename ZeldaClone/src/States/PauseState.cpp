@@ -125,9 +125,9 @@ void PauseState::Update(const float& deltaTime)
 
 void PauseState::Render()
 {
-	Registry::Instance().GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	Registry::Instance().GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	Registry::Instance().GetSystem<RenderTextSystem>().Update();
+	reg.GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	reg.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
+	reg.GetSystem<RenderTextSystem>().Update();
 }
 
 bool PauseState::OnEnter()
@@ -262,13 +262,13 @@ bool PauseState::OnEnter()
 
 bool PauseState::OnExit()
 {
-	Registry::Instance().GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
-	Registry::Instance().GetSystem<RenderPauseSystem>().OnExit();
+	reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
+	reg.GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
+	reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
+	reg.GetSystem<RenderPauseSystem>().OnExit();
 	return true;
 }
 

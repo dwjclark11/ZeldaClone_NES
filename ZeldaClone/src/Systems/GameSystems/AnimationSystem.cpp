@@ -8,6 +8,7 @@
 #include "../../Game/Game.h"
 #include "../../Game/Player.h"
 #include <SDL.h>
+#include "../../Utilities/Utility.h"
 
 AnimationSystem::AnimationSystem()
 {
@@ -25,8 +26,8 @@ void AnimationSystem::Update()
 		if (Game::Instance().GetStateMachine()->GetCurrentState() == "GAMESTATE")
 		{
 			auto& playerPos = Game::Instance().GetPlayer()->GetPlayerPos();
-			int entX = transform.position.x / 1024;
-			int entY = transform.position.y / 672;
+			int entX = transform.position.x / PANEL_WIDTH;
+			int entY = transform.position.y / PANEL_HEIGHT;
 
 			if (entX != playerPos.x || entY != playerPos.y)
 				continue;
@@ -35,7 +36,6 @@ void AnimationSystem::Update()
 		auto& animation = entity.GetComponent<AnimationComponent>();
 		auto& sprite = entity.GetComponent<SpriteComponent>();
 		
-
 		auto health = HealthComponent();
 		auto ai = AIComponent();
 		auto rigidbody = RigidBodyComponent();

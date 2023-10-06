@@ -5,26 +5,15 @@ Gamepad::Gamepad()
 	: mController(nullptr)
 	, mBtnPressed(-1)
 {
-	Logger::Log("Gamepad Constructor Called!");
-
 	if (SDL_NumJoysticks() < 1)
+		return;
+	
+	// Load Joystick
+	mController = static_cast<Controller>(SDL_GameControllerOpen(0));
+	if (mController == nullptr)
 	{
-		Logger::Err("Gamepad Not Connected");
+		Logger::Err("Unable to open game controller!");
 	}
-	else
-	{
-		// Load Joystick
-		mController = static_cast<Controller>(SDL_GameControllerOpen(0));
-		if (mController == nullptr)
-		{
-			Logger::Err("Unable to open game controller!");
-		}
-	}
-}
-
-Gamepad::~Gamepad()
-{
-	Logger::Log("Gamepad Destructor Called");
 }
 
 void Gamepad::Update()
@@ -70,7 +59,7 @@ void Gamepad::Update()
 void Gamepad::OnButtonDown(int button)
 {
 	// Check to see if the button index is defined
-	if (button > GP_BTN_LAST)
+	if (button >= GP_BTN_LAST)
 	{
 		Logger::Err("FILE: Gamepad.cpp __LINE: 30 - [" + std::to_string(button) + "] button is beyond the index!");
 		return;
@@ -86,7 +75,7 @@ void Gamepad::OnButtonDown(int button)
 void Gamepad::OnButtonUp(int button)
 {
 	// Check to see if the button index is defined
-	if (button > GP_BTN_LAST)
+	if (button >= GP_BTN_LAST)
 	{
 		Logger::Err("FILE: Gamepad.cpp __LINE: 42 - [" + std::to_string(button) + "] button is beyond the index!");
 		return;
@@ -98,7 +87,7 @@ void Gamepad::OnButtonUp(int button)
 bool Gamepad::IsButtonHeld(int button) const
 {
 	// Check to see if the button index is defined
-	if (button > GP_BTN_LAST)
+	if (button >= GP_BTN_LAST)
 	{
 		Logger::Err("FILE: Gamepad.cpp __LINE: 54 - [" + std::to_string(button) + "] button is beyond the index!");
 		return false;
@@ -111,7 +100,7 @@ bool Gamepad::IsButtonHeld(int button) const
 bool Gamepad::IsButtonJustPressed(int button) const
 {
 	// Check to see if the button index is defined
-	if (button > GP_BTN_LAST)
+	if (button >= GP_BTN_LAST)
 	{
 		Logger::Err("FILE: Gamepad.cpp __LINE: 67 - [" + std::to_string(button) + "] button is beyond the index!");
 		return false;
@@ -123,7 +112,7 @@ bool Gamepad::IsButtonJustPressed(int button) const
 bool Gamepad::IsButtonJustReleased(int button) const
 {
 	// Check to see if the button index is defined
-	if (button > GP_BTN_LAST)
+	if (button >= GP_BTN_LAST)
 	{
 		Logger::Err("FILE: Gamepad.cpp __LINE: 79 - [" + std::to_string(button) + "] button is beyond the index!");
 		return false;

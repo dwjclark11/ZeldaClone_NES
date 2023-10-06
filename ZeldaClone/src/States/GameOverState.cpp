@@ -86,7 +86,6 @@ bool GameOverState::OnExit()
 	Registry::Instance().GetSystem<RenderGameOverSystem>().OnExit();
 	Registry::Instance().GetSystem<RenderGameOverTextSystem>().OnExit();
 	Registry::Instance().GetSystem<RenderTextSystem>().OnExit();
-	Logger::Log("Exiting Game Over State");
 	game.GetPlayer()->SetPlayerDead(false);
 	return true;
 }

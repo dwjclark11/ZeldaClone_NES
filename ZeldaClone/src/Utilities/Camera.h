@@ -13,7 +13,6 @@
 */
 class Camera
 {
-
 private:
 	/*
 	*  The actual camera is just an SDL_Rect that is moved around and used to
@@ -30,7 +29,7 @@ private:
 public:
 	Camera();
 	Camera(int x, int y, int width, int height);
-	~Camera();
+	~Camera() = default;
 
 	/*
 	*  GetCameraWidth() returns the width of the SDL_Rect mCamera
