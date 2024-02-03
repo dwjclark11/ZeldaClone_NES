@@ -75,8 +75,8 @@ This game/engine includes the following:
 
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
 
-## How to Build
-This project currently uses Visual Studio 2019 Community and has not been tested on different systems/IDEs.
+## How to Build **Build my be broken due to most recent changes to c++20 and other changes. I will update the build shortly**
+This project currently uses Visual Studio 2022 Community and has not been tested on different systems/IDEs.
 * Step 1)
     *  Clone the repo
 * Step 2)
