@@ -23,9 +23,6 @@ CollectItemSystem::CollectItemSystem()
 {
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<TriggerBoxComponent>();
-
-	yellowCollected = false;
-	blueCollected = false;
 }
 
 void CollectItemSystem::SubscribeToEvents(EventManager& eventManager)
@@ -46,11 +43,14 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 	else if (b.HasComponent<ItemComponent>() && a.HasTag("boomerang")) OnBoomerangGetsItem(b, a);
 }
 
-void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
+void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
 {
-	auto& type = item.GetComponent<ItemComponent>().type;
+	auto& itemComp = item.GetComponent<ItemComponent>();
+	if (itemComp.bCollected)
+		return;
+
 	bool bPlaySound{ true };
-	switch (type)
+	switch (itemComp.type)
 	{
 	case ItemComponent::ItemCollectType::YELLOW_RUPEE:
 	{
@@ -85,7 +85,9 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 		break;
 	}
 	case ItemComponent::ItemCollectType::DEFAULT:
-		break;
+		if (itemComp.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
+			return;
+		
 	default:
 		assert(false && "Item has not been defined!");
 		break;
@@ -93,7 +95,7 @@ void CollectItemSystem::OnPlayerGetsItem(Entity& item, Entity& player)
 
 	if (bPlaySound)
 		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
-
+	itemComp.bCollected = true;
 	item.Kill();
 }
 
@@ -111,6 +113,7 @@ void CollectItemSystem::Update()
 	for (auto& entity : GetSystemEntities())
 	{
 		auto& trigger = entity.GetComponent<TriggerBoxComponent>();
+
 		int time = 2000;
 		if (entity.HasComponent<ItemComponent>())
 		{
@@ -125,7 +128,5 @@ void CollectItemSystem::Update()
 			entity.Kill();
 			game.GetPlayer()->SetPlayerItem(false);
 		}
-		else
-			continue;
 	}
 }

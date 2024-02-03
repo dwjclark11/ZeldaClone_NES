@@ -1,10 +1,11 @@
 #pragma once
 #include "../Logger/Logger.h"
 #include "Event.h"
-#include <map>
+#include <unordered_map>
 #include <typeindex>
 #include <memory>
-#include <list>
+#include <vector>
+#include <cassert>
 
 // Interface class 
 class IEventCallback
@@ -25,8 +26,7 @@ template <typename TOwner, typename TEvent>
 class EventCallback : public IEventCallback
 {
 private:
-	typedef void (TOwner::* CallbackFunction)(TEvent&);
-
+	using CallbackFunction = void (TOwner::*)(TEvent&);
 	TOwner* ownerInstance;
 	CallbackFunction callbackFunction;
 
@@ -39,19 +39,19 @@ public:
 	EventCallback(TOwner* ownerInstance, CallbackFunction callbackFunction)
 		: ownerInstance{ownerInstance}, callbackFunction{callbackFunction}
 	{
-		//this->ownerInstance = ownerInstance;
-		//this->callbackFunction = callbackFunction;
+
 	}
 
 	virtual ~EventCallback() override = default;
 };
-typedef std::list<std::unique_ptr<IEventCallback>> HandlerList;
+
+using Handlers = std::vector<std::unique_ptr<IEventCallback>>;
 
 class EventManager
 {
 private:
 	// The key is the type index, the value is a pointer to event handlers
-	std::map<std::type_index, std::unique_ptr<HandlerList>> subscribers;
+	std::unordered_map<std::type_index, std::unique_ptr<Handlers>> subscribers;
 
 public:
 	EventManager() = default;
@@ -73,12 +73,18 @@ public:
 	template <typename TEvent, typename TOwner>
 	void SubscribeToEvent(TOwner* ownerInstance, void(TOwner::* callbackFunction)(TEvent&))
 	{
-		if (!subscribers[typeid(TEvent)])
+		auto subscriberItr = subscribers.find(typeid(TEvent));
+		if (subscriberItr == subscribers.end())
 		{
-			subscribers[typeid(TEvent)] = std::make_unique<HandlerList>();
+			auto pHandlers = std::make_unique<Handlers>();
+			auto [it, result] = subscribers.emplace(typeid(TEvent), std::move(pHandlers));
+			assert(result && "Not working!");
+			subscriberItr = it;
+			
 		}
+
 		auto subscriber = std::make_unique<EventCallback<TOwner, TEvent>>(ownerInstance, callbackFunction);
-		subscribers[typeid(TEvent)]->push_back(std::move(subscriber));
+		subscriberItr->second->push_back(std::move(subscriber));
 	}
 
 	/*
@@ -92,11 +98,11 @@ public:
 	template <typename TEvent, typename ...TArgs>
 	void EmitEvent(TArgs&& ...args)
 	{
-		auto handlers = subscribers[typeid(TEvent)].get();
-		if (!handlers)
+		auto handlerItr = subscribers.find(typeid(TEvent));
+		if (handlerItr == subscribers.end())
 			return;
-		
-		for (const auto& handler : *handlers)
+
+		for (const auto& handler : *handlerItr->second)
 		{
 			TEvent event(std::forward<TArgs>(args)...);
 			handler->Execute(event);

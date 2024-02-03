@@ -360,8 +360,10 @@ void LevelLoader::ReadHealthComponent(sol::table& table, Entity& entity)
 	if (health != sol::nullopt)
 	{
 		entity.AddComponent<HealthComponent>(
-			table["components"]["health"]["health_percentage"].get_or(9),
-			table["components"]["health"]["max_hearts"].get_or(3));
+			HealthComponent{
+				.healthPercentage = table["components"]["health"]["health_percentage"].get_or(9),
+				.maxHearts = table["components"]["health"]["max_hearts"].get_or(3)
+		});
 	}
 }
 
@@ -529,7 +531,7 @@ void LevelLoader::LoadMenuUIFromLuaTable(sol::state& lua, const std::string& fil
 		sol::optional tag = ui["tag"];
 		if (tag != sol::nullopt)
 		{
-			std::string tempTag = ui["tag"];
+			std::string tempTag = ui["tag"].get_or(std::string{""});
 			entity.Tag(tempTag);
 		}
 
@@ -1857,7 +1859,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& f
 			if (triggerBox != sol::nullopt)
 			{
 				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
-				Logger::Log(lvlData["components"]["trigger_box"]["trigger_file"]);
+				//Logger::Log(lvlData["components"]["trigger_box"]["trigger_file"]);
 				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(lvlData["components"]["trigger_box"]["trigger_type"]);
 
 				newLvlObject.AddComponent<TriggerBoxComponent>(

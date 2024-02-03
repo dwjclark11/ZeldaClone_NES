@@ -63,10 +63,10 @@ void GameState::UpdatePlayerKeys()
 	const auto& playerEnt = player->GetPlayer();
 	auto& playerRigidbody = playerEnt.GetComponent<RigidBodyComponent>();
 
-	auto shield = player->GetShield();
+	const auto& shield = player->GetShield();
 	auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
 
-	auto sword = player->GetSword();
+	const auto& sword = player->GetSword();
 	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
 	if (game.GetCamera().GetFadeAlpha() != 255 || game.PlayerHold())
@@ -169,18 +169,20 @@ void GameState::UpdatePlayerKeys()
 		playerRigidbody.dir = RigidBodyComponent::Dir::LEFT;
 	}
 }
+
 void GameState::UpdatePauseContol()
 {
 	const auto& keyboard = inputManager.GetKeyboard();
 	const auto& gamepad = inputManager.GetGamepad();
-
+	auto& camera = game.GetCamera();
 	// Set to paused
 	if (keyboard.IsKeyJustReleased(KEY_P) || gamepad.IsButtonJustReleased(GP_BTN_Y))
 	{
-		game.GetCamera().SetFadeFinished(false);
-		game.GetCamera().StartFadeOut(true);
-		game.GetCamera().StartFadeIn(false);
+		camera.SetFadeFinished(false);
+		camera.StartFadeOut(true);
+		camera.StartFadeIn(false);
 		inputManager.SetPaused(true);
+		m_bPaused = true;
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_C) || gamepad.IsButtonHeld(GP_BTN_BACK))
 	{
@@ -207,7 +209,23 @@ GameState::GameState(glm::vec2 cameraOffset)
 	, inputManager(InputManager::GetInstance()), cameraOffset(cameraOffset)
 	, gameData(GameData::GetInstance())
 	, hudRect{ 0, 0, game.GetWindowWidth(), 256 }
-
+	, m_bPaused{false}
+	, m_TriggerSystem{ reg.GetSystem<TriggerSystem>() }
+	, m_CollectItemSystem{ reg.GetSystem<CollectItemSystem>() }
+	, m_AnimationSystem{ reg.GetSystem<AnimationSystem>() }
+	, m_MovementSystem{ reg.GetSystem<MovementSystem>() }
+	, m_ProjectileEmitterSystem{ reg.GetSystem<ProjectileEmitterSystem>() }
+	, m_CameraMovementSystem{ reg.GetSystem<CameraMovementSystem>() }
+	, m_ProjectileLifeCycleSystem{ reg.GetSystem<ProjectileLifeCycleSystem>() }
+	, m_AISystem{ reg.GetSystem<AISystem>() }
+	, m_CaptionSystem{ reg.GetSystem<CaptionSystem>() }
+	, m_CollisionSystem{ reg.GetSystem<CollisionSystem>() }
+	, m_DamageSystem{ reg.GetSystem<DamageSystem>() }
+	, m_HealthSystem { reg.GetSystem<HealthSystem>() }
+	, m_RenderSystem{ reg.GetSystem<RenderSystem>() }
+	, m_RenderTileSystem{ reg.GetSystem<RenderTileSystem>() }
+	, m_RenderHUDSystem{ reg.GetSystem<RenderHUDSystem>() }
+	, m_RenderCollisionSystem{ reg.GetSystem<RenderCollisionSystem>() }
 {
 	game.GetCamera().SetCameraPosition(cameraOffset.x, cameraOffset.y);
 }
@@ -223,13 +241,15 @@ void GameState::Update(const float& deltaTime)
 	}
 
 	// Check to see if level music has been paused
-	if (!inputManager.IsPaused() && !camera.FadeOutStarted())
+	if (!inputManager.IsPaused() && !camera.FadeOutStarted() && m_bPaused)
 	{
 		// Turn music volume up
 		Mix_VolumeMusic(10);
 		camera.StartFadeIn(true);
+		m_bPaused = false;
 	}
-	reg.GetSystem<TriggerSystem>().Update(deltaTime);
+
+	m_TriggerSystem.Update(deltaTime);
 
 	// Update the registry values
 	reg.Update();
@@ -237,18 +257,18 @@ void GameState::Update(const float& deltaTime)
 	// Update all Game systems
 	game.GetPlayer()->UpdateStateMachine();
 
-	reg.GetSystem<CollectItemSystem>().Update();
-	reg.GetSystem<AnimationSystem>().Update();
-	reg.GetSystem<MovementSystem>().Update(deltaTime);
-	reg.GetSystem<ProjectileEmitterSystem>().Update();
-	reg.GetSystem<CameraMovementSystem>().UpdatePlayerCam(game.GetCamera(), deltaTime);
+	m_CollectItemSystem.Update();
+	m_AnimationSystem.Update();
+	m_MovementSystem.Update(deltaTime);
+	m_ProjectileEmitterSystem.Update();
+	m_CameraMovementSystem.UpdatePlayerCam(game.GetCamera(), deltaTime);
 
-	reg.GetSystem<ProjectileLifeCycleSystem>().Update();
+	m_ProjectileLifeCycleSystem.Update();
 
-	reg.GetSystem<AISystem>().Update();
-	reg.GetSystem<CaptionSystem>().Update(deltaTime);
+	m_AISystem.Update();
+	m_CaptionSystem.Update(deltaTime);
 
-	reg.GetSystem<CollisionSystem>().Update();
+	m_CollisionSystem.Update();
 
 	// Update the registry values
 	reg.Update();
@@ -257,9 +277,9 @@ void GameState::Update(const float& deltaTime)
 void GameState::Render()
 {
 	auto& camera = game.GetCamera();
-	reg.GetSystem<RenderTileSystem>().Update();
+	m_RenderTileSystem.Update();
 	camera.UpdateScreenFlash();
-	reg.GetSystem<RenderSystem>().Update();
+	m_RenderSystem.Update();
 	
 	// Render all HUD objects
 	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
@@ -269,13 +289,13 @@ void GameState::Render()
 	
 	camera.UpdateCurtain();
 
-	reg.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	reg.GetSystem<HealthSystem>().Update();
+	m_RenderHUDSystem.Update(game.GetRenderer(), game.GetAssetManager());
+	m_HealthSystem.Update();
 
 	// If the game is in debug mode, render the collision system
 	if (game.IsDebugging())
 	{
-		reg.GetSystem<RenderCollisionSystem>().Update(game.GetRenderer(), camera.GetCameraRect());
+		m_RenderCollisionSystem.Update(game.GetRenderer(), camera.GetCameraRect());
 	}
 }
 
@@ -305,36 +325,16 @@ bool GameState::OnEnter()
 		loader.LoadColliders("overworld_colliders_1");
 		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
 
-		// ===============================================================================================
-		// Add all necessary systems to the registry if they are not yet registered
-		// ===============================================================================================
-		reg.AddSystem<RenderHUDSystem>();
-		reg.AddSystem<ProjectileEmitterSystem>();
-		reg.AddSystem<ProjectileLifeCycleSystem>();
-		reg.AddSystem<DamageSystem>();
-		reg.AddSystem<RenderHealthSystem>();
-		reg.AddSystem<RenderTileSystem>();
-		reg.AddSystem<HealthSystem>();
-		reg.AddSystem<CollisionSystem>(game.GetEventManager());
-		reg.AddSystem<MovementSystem>();
-		reg.AddSystem<TriggerSystem>();
-		reg.AddSystem<CollectItemSystem>();
-	
-		reg.AddSystem<RenderTextSystem>();
-		reg.AddSystem<AISystem>();
-		reg.AddSystem<CaptionSystem>();
-		// =================================================================================================
-
 		game.GetMusicPlayer().PlayMusic("Overworld", -1);
 		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
 
-		reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-		reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-		reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-		reg.GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
-		reg.GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
-		reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
+		m_TriggerSystem.SubscribeToEvents(game.GetEventManager());
+		m_CollectItemSystem.SubscribeToEvents(game.GetEventManager());
+		m_MovementSystem.SubscribeToEvents(game.GetEventManager());
+		m_ProjectileEmitterSystem.SubscribeKeyToEvents(game.GetEventManager());
+		m_ProjectileEmitterSystem.SubscribeBtnToEvents(game.GetEventManager());
+		m_DamageSystem.SubscribeToEvents(game.GetEventManager());
 
 		firstEntered = true;
 	}
@@ -376,9 +376,9 @@ bool GameState::OnEnter()
 bool GameState::OnExit()
 {
 	game.GetEventManager().Reset();
-	reg.GetSystem<RenderCollisionSystem>().OnExit();
-	reg.GetSystem<RenderSystem>().OnExit();
-	reg.GetSystem<RenderTileSystem>().OnExit();
+	m_RenderCollisionSystem.OnExit();
+	m_RenderSystem.OnExit();
+	m_RenderTileSystem.OnExit();
 	firstEntered = false;
 	return true;
 }

@@ -135,31 +135,11 @@ public:
 	}
 	virtual ~Pool() = default;
 
-	bool IsEmpty() const
-	{
-		return size == 0;;
-	}
-
-	int GetSize() const
-	{
-		return size;
-	}
-
-	void Resize(int n)
-	{
-		data.resize(n);
-	}
-
-	void Clear()
-	{
-		data.clear();
-		size = 0;
-	}
-
-	void Add(T object)
-	{
-		data.push_back(object);
-	}
+	inline bool IsEmpty() const { return size == 0; }
+	inline int GetSize() const { return size; }
+	inline void Resize(int n) { data.resize(n); }
+	inline void Clear() { data.clear(); size = 0; }
+	inline void Add(T object) { data.push_back(object); }
 
 	void Set(int entityID, T object)
 	{
@@ -217,14 +197,11 @@ public:
 
 	T& Get(int entityID)
 	{
-		int index = entityIDToIndex[entityID]; // Get the index then return the data
+		int index = entityIDToIndex[entityID];
 		return static_cast<T&>(data[index]);
 	}
 
-	T& operator [] (unsigned int index)
-	{
-		return data[index];
-	}
+	inline T& operator [] (unsigned int index) { return data[index]; }
 };
 
 
@@ -238,7 +215,7 @@ class Registry
 {
 private:
 	// Keep track of how many entities were added to the scene
-	int numEntities{0}, mEntityID{1};
+	int numEntities{0};
 	std::set<Entity> entitiesToBeAdded; // Entities awaitng creation in the next Registry Update()
 	std::set<Entity> entitiesToBeKilled; // Entities awaitng destruction in the next Registry Update()
 
@@ -431,7 +408,6 @@ inline void Registry::RemoveSystem()
 
 	systems.erase(system); 
 }
-
 
 
 template<typename TSystem>

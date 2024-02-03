@@ -764,9 +764,10 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, st
 		sol::optional<sol::table> health = enemy["components"]["health"];
 		if (health != sol::nullopt)
 		{
-			newEnemy.AddComponent<HealthComponent>(
-				enemy["components"]["health"]["health_percentage"].get_or(100), 
-				enemy["components"]["health"]["max_hearts"].get_or(3)
+			newEnemy.AddComponent<HealthComponent>(HealthComponent{
+					.healthPercentage = enemy["components"]["health"]["health_percentage"].get_or(6),
+					.maxHearts = enemy["components"]["health"]["max_hearts"].get_or(3)
+					}
 				);
 		}
 

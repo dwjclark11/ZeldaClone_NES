@@ -183,36 +183,36 @@ void Registry::Update()
 void Registry::TagEntity(Entity entity, const std::string& tag)
 {
 	entityPerTag.emplace(tag, entity);
-	tagPerEntity.emplace(std::pair<int, std::vector<std::string>>(entity.GetID(), std::vector<std::string>()));
-	tagPerEntity[entity.GetID()].emplace_back(tag);
+	auto [it, result] = tagPerEntity.emplace(std::pair<int, std::vector<std::string>>(entity.GetID(), std::vector<std::string>()));
+	it->second.emplace_back(tag);
 }
 
 bool Registry::EntityHasTag(Entity entity, const std::string& tag) const
 {
-	if (DoesTagExist(tag))
-		return entityPerTag.find(tag)->second == entity;
-	else
+	auto tagItr = entityPerTag.find(tag);
+	if (tagItr == entityPerTag.end())
 		return false;
+
+	return tagItr->second == entity;
 }
 
 const std::vector<std::string>& Registry::GetEntityTags(const Entity& entity) const
 {
-	const auto& entID = entity.GetID();
-	if (tagPerEntity.find(entID) == tagPerEntity.end())
-	{
-		return std::vector<std::string>();
-	}
+	auto tagItr = tagPerEntity.find(entity.GetID()); 
+	if (tagItr == tagPerEntity.end())
+		return {};
 
-	return tagPerEntity.find(entID)->second;
+	return tagItr->second;
 }
 
 std::vector<std::string> Registry::GetEntityGroups(const Entity& entity)
 {
-	std::vector<std::string> groups;
-	for (const auto& group : groupPerEntity[entity.GetID()])
-		groups.push_back(group);
+	
+	auto groupsItr = groupPerEntity.find(entity.GetID());
+	if (groupsItr == groupPerEntity.end())
+		return {};
 
-	return groups;
+	return groupsItr->second;
 }
 
 bool Registry::DoesTagExist(const std::string& tag) const
@@ -224,10 +224,8 @@ Entity Registry::GetEntityByTag(const std::string& tag) const
 {
 	auto tagItr = entityPerTag.find(tag);
 	if (tagItr == entityPerTag.end())
-	{
-		Logger::Log("Entity with tag [" + tag + "] - Does not exist!");
 		return -1;
-	}
+	
 
 	return tagItr->second;
 }
@@ -253,22 +251,19 @@ void Registry::RemoveEntityTag(Entity entity)
 
 void Registry::GroupEntity(Entity entity, const std::string& group)
 {
-	entitiesPerGroup.emplace(group, std::set<Entity>());
-	entitiesPerGroup[group].emplace(entity);
-	groupPerEntity.emplace(std::pair<int, std::vector<std::string>>(entity.GetID(), std::vector<std::string>()));
-	groupPerEntity[entity.GetID()].emplace_back(group);
+	auto [it1, res1] = entitiesPerGroup.emplace(group, std::set<Entity>());
+	it1->second.emplace(entity);
+	auto [it2, res2] = groupPerEntity.emplace(std::pair<int, std::vector<std::string>>(entity.GetID(), std::vector<std::string>()));
+	it2->second.emplace_back(group);
 }
 
 bool Registry::EntityBelongsToGroup(Entity entity, const std::string& group) const
 {
 	// Error checking and Validation
 	auto groupItr = entitiesPerGroup.find(group);
-	if (groupItr == entitiesPerGroup.end())
-	{
-		//Logger::Err("The Group [" + group + "]  Does Not Exist");
+	if (groupItr == entitiesPerGroup.end())	
 		return false;
-	}
-
+	
 	return groupItr->second.find(entity.GetID()) != groupItr->second.end();
 }
 

@@ -20,6 +20,26 @@
 #include "../Systems/EditorSystems/RenderEditorSystem.h"
 #include <filesystem>
 
+#include "../Systems/GameSystems/RenderSystem.h"
+#include "../Systems/GameSystems/DamageSystem.h"
+#include "../Systems/GameSystems/RenderHUDSystem.h"
+#include "../Systems/GameSystems/MovementSystem.h"
+#include "../Systems/RenderTextSystem.h"
+#include "../Systems/GameSystems/CaptionSystem.h"
+#include "../Systems/GameSystems/RenderHealthSystem.h"
+#include "../Systems/GameSystems/RenderTileSystem.h"
+#include "../Systems/GameSystems/RenderGameOverTextSystem.h"
+#include "../Systems/GameSystems/RenderGameOverSystem.h"
+#include "../Systems/GameSystems/HealthSystem.h"
+#include "../Systems/GameSystems/TriggerSystem.h"
+#include "../Systems/CameraMovementSystem.h"
+#include "../Systems/GameSystems/CollectItemSystem.h"
+#include "../Systems/GameSystems/ProjectileEmitterSystem.h"
+#include "../Systems/GameSystems/ProjectileLifeCycleSystem.h"
+#include "../Systems/GameSystems/AISystem.h"
+#include "../Systems/GameSystems/CollisionSystem.h"
+#include "../Systems/MenuSystems/RenderMainMenuSystem.h"
+
 namespace fs = std::filesystem;
 
 // Define all static variables
@@ -219,9 +239,30 @@ bool MenuState::OnEnter()
 	LevelLoader loader;
 	m_bFull = false;
 
-	if (!reg.HasSystem<RenderTextSystem>()) reg.AddSystem<RenderTextSystem>();
-	if (!reg.HasSystem<RenderSystem>()) reg.AddSystem<RenderSystem>();
-	if (!reg.HasSystem<RenderMainMenuSystem>()) reg.AddSystem<RenderMainMenuSystem>();
+	
+	// ===============================================================================================
+	// Add all necessary systems to the registry if they are not yet registered
+	// ===============================================================================================
+	reg.AddSystem<RenderTextSystem>();
+	reg.AddSystem<RenderSystem>();
+	reg.AddSystem<RenderMainMenuSystem>();
+
+	reg.AddSystem<RenderHUDSystem>();
+	reg.AddSystem<ProjectileEmitterSystem>();
+	reg.AddSystem<ProjectileLifeCycleSystem>();
+	reg.AddSystem<DamageSystem>();
+	reg.AddSystem<RenderHealthSystem>();
+	reg.AddSystem<RenderTileSystem>();
+	reg.AddSystem<HealthSystem>();
+	reg.AddSystem<CollisionSystem>(game.GetEventManager());
+	reg.AddSystem<MovementSystem>();
+	reg.AddSystem<TriggerSystem>();
+	reg.AddSystem<CollectItemSystem>();
+
+	reg.AddSystem<RenderTextSystem>();
+	reg.AddSystem<AISystem>();
+	reg.AddSystem<CaptionSystem>();
+	// =================================================================================================
 
 	loader.LoadAssetsFromLuaTable(lua, "menu_state_assets");
 	loader.LoadMenuUIFromLuaTable(lua, "menu_state_load");
@@ -265,6 +306,7 @@ bool MenuState::OnExit()
 	// Remove Fonts
 	game.GetAssetManager()->RemoveFont("charriot-font-40");
 	game.GetAssetManager()->RemoveFont("charriot-font-60");
+
 	return true;
 }
 

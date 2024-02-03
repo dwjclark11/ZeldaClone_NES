@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <sol/sol.hpp>
 #include "../../Game/Game.h"
+#include <map>
 
 class ProjectileEmitterSystem : public System
 {

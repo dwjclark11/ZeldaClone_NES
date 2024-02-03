@@ -1,19 +1,9 @@
 #pragma once
 #include "../Utilities/Timer.h"
 
-class HealthComponent
+struct HealthComponent
 {
-public:
-	int healthPercentage, maxHearts;
-	bool isHurt, addHeart;
-
-	Timer hurtTimer, lowHeathTimer, deathTimer;
-
-	HealthComponent(int healthPercentage = 6, int maxHearts = 3)
-		: healthPercentage{ healthPercentage }, maxHearts{ maxHearts }
-		, isHurt{ false }, addHeart{ false }
-		, hurtTimer{}, lowHeathTimer{}, deathTimer{}
-	{
-		
-	}
+	int healthPercentage{ 6 }, maxHearts{3};
+	bool isHurt{false}, addHeart{false};
+	Timer hurtTimer{}, lowHeathTimer{}, deathTimer{};
 };

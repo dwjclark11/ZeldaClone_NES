@@ -173,9 +173,7 @@ void MoveState::Update(Entity& entity)
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 	const auto& camera = game.GetCamera();
-	//Logger::Log("X: " + std::to_string(playerTransform.position.x) + "Y: " + std::to_string(playerTransform.position.y));
-	//Logger::Log("CAM_X: " + std::to_string(camera.GetCameraPos().x) + "CAM_Y: " + std::to_string(camera.GetCameraPos().y));
-
+	
 	if (player.GetComponent<RigidBodyComponent>().velocity.x == 0 && 
 		player.GetComponent<RigidBodyComponent>().velocity.y == 0)
 	{

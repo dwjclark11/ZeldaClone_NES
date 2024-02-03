@@ -18,7 +18,7 @@ public:
 	ItemCollectType type;
 	SpecialItemType special;
 	int price;
-
+	bool bCollected{ false };
 	ItemComponent(ItemCollectType type = ItemCollectType::DEFAULT, SpecialItemType special = SpecialItemType::NOT_SPECIAL, int price = 0)
 		: type{type}, special{special}, price{price}
 	{

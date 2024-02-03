@@ -96,7 +96,7 @@ public:
 	inline const bool CurtainOpen() const { return m_bCurtainOpen; }
 	inline const bool CurtainClosed() const { return m_bCurtainClosed; }
 
-	inline const bool& IsCameraMoving() const { return m_bCameraMoving; }
+	inline const bool IsCameraMoving() const { return m_bCameraMoving; }
 	inline void SetCameraMoving(bool moving) { m_bCameraMoving = moving; }
 
 	inline void SetFadeAlpha(Uint8 alpha) { m_FadeAlpha = alpha; }
