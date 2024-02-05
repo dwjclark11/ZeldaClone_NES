@@ -8,7 +8,7 @@ class Player
 private:
 	class GameData& m_GameData;
 	Entity m_Player, m_Sword, m_Shield;
-	bool m_bPlayerCreated, m_bPlayerItem, m_bPlayerDead;
+	bool m_bPlayerCreated, m_bPlayerItem, m_bPlayerDead, m_bAttacking;
 	bool m_bOnStairs, m_bOnRaft, m_bStairsFinished, m_bGetTriforcePiece;
 	StateMachine m_PSM;
 	glm::vec2 m_PlayerPos;
@@ -23,7 +23,7 @@ public:
 	Entity& GetShield() { return m_Shield; }
 
 	void UpdateStateMachine();
-	void UpdatePlayer();
+	void UpdatePlayer(class Game& game, class InputManager& inputManager);
 	void UpdatePlayerColliders();
 
 	inline const bool GetPlayerCreated() const { return m_bPlayerCreated; }
@@ -38,7 +38,7 @@ public:
 	inline const bool GetPlayerOnStairs() const { return m_bOnStairs; }
 	inline void SetPlayerOnStairs(bool stairs) { m_bOnStairs = stairs; }
 
-	inline const bool& GetStairsFinished() const { return m_bStairsFinished; }
+	inline const bool GetStairsFinished() const { return m_bStairsFinished; }
 	inline void SetStairsFinished(bool finished) { m_bStairsFinished = finished; }
 
 	inline void SetOnRaft(bool raft) { m_bOnRaft = raft; }
@@ -53,4 +53,6 @@ public:
 	inline void SetPlayerPos(glm::vec2 pos) { m_PlayerPos = pos; }
 
 	const int GetAttackValue() const { return m_AttackValue; }
+	inline const bool IsAttacking() const { return m_bAttacking; }
+	inline void SetAttacking(bool bAttacking) { m_bAttacking = bAttacking; }
 };

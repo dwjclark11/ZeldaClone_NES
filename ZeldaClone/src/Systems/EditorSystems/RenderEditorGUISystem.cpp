@@ -584,10 +584,10 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 		ComboLoop("Trigger Types", current_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
 		
 		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-		if (ImGui::InputFloat("Transport Offset X", &MouseControlSystem::triggerBox.transportOffset.x, 1, 100));
-		if (ImGui::InputFloat("Transport Offset Y", &MouseControlSystem::triggerBox.transportOffset.y, 1, 100));
-		if (ImGui::InputFloat("Camera Offset X", &MouseControlSystem::triggerBox.cameraOffset.x, 1, 100));
-		if (ImGui::InputFloat("Camera Offset Y", &MouseControlSystem::triggerBox.cameraOffset.y, 1, 100));
+		ImGui::InputFloat("Transport Offset X", &MouseControlSystem::triggerBox.transportOffset.x, 1, 100);
+		ImGui::InputFloat("Transport Offset Y", &MouseControlSystem::triggerBox.transportOffset.y, 1, 100);
+		ImGui::InputFloat("Camera Offset X", &MouseControlSystem::triggerBox.cameraOffset.x, 1, 100);
+		ImGui::InputFloat("Camera Offset Y", &MouseControlSystem::triggerBox.cameraOffset.y, 1, 100);
 		
 		ImGui::TextColored(ImVec4(255, 255, 0, 255), "Set the music to the song ID or \"stop\"");
 		ImFuncs::MyInputText("Level Music", &levelMusic);

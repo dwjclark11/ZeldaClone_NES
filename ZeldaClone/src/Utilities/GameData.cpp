@@ -34,6 +34,9 @@ void GameData::ConvertHUDNumbers()
 
 void GameData::RupeeScroll()
 {
+	if (m_ScrollRupees <= 0)
+		return;
+
 	// Check to see if the rupee scoll timer has started
 	if (!m_RupeeTimer.isStarted())
 		m_RupeeTimer.Start();
@@ -210,11 +213,7 @@ bool GameData::BuyItem(int price)
 }
 
 void GameData::UpdateGameData()
-{
-	// Update the rupeeScroll 
-	if (m_ScrollRupees > 0)
-		RupeeScroll();
-
-	if (m_TotalBombs != m_TotalPrevBombs || m_TotalKeys != m_TotalPrevKeys || m_TotalRupees != m_TotalPrevRupees)
-		ConvertHUDNumbers();
+{ 
+	RupeeScroll();
+	ConvertHUDNumbers();
 }

@@ -103,6 +103,7 @@ void Game::Initialize()
 		-1,
 		SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC 
 	);
+
 	// Check if the renderer was created correctly
 	if (!m_pRenderer)
 	{
@@ -141,9 +142,6 @@ void Game::Initialize()
 	
 	// Push the title screen
 	m_pGameStateMachine->PushState(std::make_unique<TitleState>());
-
-	// Change to the state you want to work on
-	//gameStateMachine->PushState(std::make_unique<EditorState>());
 }
 
 void Game::Update()
@@ -165,10 +163,7 @@ void Game::Update()
 	m_pGameStateMachine->Update(m_DeltaTime);
 	m_InputManager.GetKeyboard().Update();
 	m_InputManager.GetGamepad().Update();
-	
-	if (m_pPlayer)
-		m_pPlayer->UpdatePlayer();
-	
+		
 	GameData::GetInstance().UpdateGameData();
 }
 

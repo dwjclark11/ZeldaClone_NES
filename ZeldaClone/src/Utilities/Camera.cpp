@@ -70,22 +70,21 @@ void Camera::FadeScreen()
 void Camera::UpdateCurtain()
 {
 	auto& game = Game::Instance();
-
-	if (m_bStartClose || m_bStartOpen)
-	{
-		// Render all HUD objects
-		SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-		SDL_RenderFillRect(game.GetRenderer(), &m_LeftRect);
-		SDL_RenderDrawRect(game.GetRenderer(), &m_LeftRect);
-		SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-
-		// Render all HUD objects
-		SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-		SDL_RenderFillRect(game.GetRenderer(), &m_RightRect);
-		SDL_RenderDrawRect(game.GetRenderer(), &m_RightRect);
-		SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-	}
+	if (!m_bStartClose && !m_bStartOpen)
+		return;
 	
+	// Render all HUD objects
+	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+	SDL_RenderFillRect(game.GetRenderer(), &m_LeftRect);
+	SDL_RenderDrawRect(game.GetRenderer(), &m_LeftRect);
+	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+
+	// Render all HUD objects
+	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+	SDL_RenderFillRect(game.GetRenderer(), &m_RightRect);
+	SDL_RenderDrawRect(game.GetRenderer(), &m_RightRect);
+	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+		
 	if (m_bStartOpen)
 	{
 		if (m_LeftRect.x > -512 && m_RightRect.x < 1536)

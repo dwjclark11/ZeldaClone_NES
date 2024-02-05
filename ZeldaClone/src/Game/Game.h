@@ -68,6 +68,7 @@ private:
 	void Update();
 	void ProcessEvents();
 	void Draw();
+
 public:
 	~Game();
 	// Creation of the singleton Game
@@ -86,7 +87,7 @@ public:
 	std::unique_ptr<Player>& CreateNewPlayer(Entity& player, Entity& sword, Entity& shield);
 	std::unique_ptr<Player>& GetPlayer() { return m_pPlayer; };
 
-	inline const bool& IsRunning() const { return m_bIsRunning; }
+	inline const bool IsRunning() const { return m_bIsRunning; }
 	inline void SetGameRunning(bool running) { m_bIsRunning = running; }
 
 	inline const int GetWindowWidth() const { return m_WindowWidth; }

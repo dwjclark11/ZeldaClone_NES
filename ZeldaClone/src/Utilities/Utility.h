@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <SDL.h>
 #include "../Logger/Logger.h"
+
+int GetValue(int num, int digit);
 void ConvertNumberParser(std::string group, int num, int power);
 void ConvertName(const std::string& name, int x, int y);
 void ConvertLetter(const char letter, int x, int y);

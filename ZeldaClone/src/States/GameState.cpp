@@ -60,114 +60,7 @@ bool GameState::firstEntered = false;
 void GameState::UpdatePlayerKeys()
 {
 	const auto& player = game.GetPlayer();
-	const auto& playerEnt = player->GetPlayer();
-	auto& playerRigidbody = playerEnt.GetComponent<RigidBodyComponent>();
-
-	const auto& shield = player->GetShield();
-	auto& shieldRigidbody = shield.GetComponent<RigidBodyComponent>();
-
-	const auto& sword = player->GetSword();
-	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
-
-	if (game.GetCamera().GetFadeAlpha() != 255 || game.PlayerHold())
-	{
-		playerRigidbody.velocity = glm::vec2(0);
-		shieldRigidbody.velocity = glm::vec2(0);
-		swordRigidbody.velocity = glm::vec2(0);
-		return;
-	}
-
-	auto& playerTransform = playerEnt.GetComponent<TransformComponent>();
-	auto& playerCollider = playerEnt.GetComponent<BoxColliderComponent>();
-	auto& playerSprite = playerEnt.GetComponent<SpriteComponent>();
-	auto& playerControl = playerEnt.GetComponent<KeyboardControlComponent>();
-	auto& shieldTransform = shield.GetComponent<TransformComponent>();
-	auto& shieldCollider = shield.GetComponent<BoxColliderComponent>();
-	auto& swordTransform = sword.GetComponent<TransformComponent>();
-	auto& swordCollider = sword.GetComponent<BoxColliderComponent>();
-
-	const auto& keyboard = inputManager.GetKeyboard();
-	const auto& gamepad = inputManager.GetGamepad();
-
-	if (keyboard.IsKeyHeld(KEY_W) || gamepad.IsButtonHeld(GP_BTN_DPAD_UP))
-	{
-		playerRigidbody.velocity = playerControl.upVelocity;
-		playerSprite.srcRect.x = playerSprite.width * 2;
-
-		shieldTransform.position = playerTransform.position;
-		shieldCollider.height = 2;
-		shieldCollider.width = 24;
-		shieldCollider.offset = glm::vec2(48, 32);
-		shieldRigidbody = playerRigidbody;
-
-		swordTransform.position = playerTransform.position;
-		swordCollider.height = 2;
-		swordCollider.width = 2;
-		swordCollider.offset = glm::vec2(64, 60);
-		swordRigidbody = playerRigidbody;
-
-		playerRigidbody.dir = RigidBodyComponent::Dir::UP;
-	}
-
-	if (keyboard.IsKeyHeld(KEY_D) || gamepad.IsButtonHeld(GP_BTN_DPAD_RIGHT))
-	{
-		playerSprite.srcRect.x = playerSprite.width * 3;
-		playerRigidbody.velocity = playerControl.rightVelocity;
-
-		shieldTransform.position = playerTransform.position;
-		shieldCollider.height = 30;
-		shieldCollider.width = 2;
-		shieldCollider.offset = glm::vec2(90, 56);
-		shieldRigidbody = playerRigidbody;
-
-		swordTransform.position = playerTransform.position;
-		swordCollider.height = 2;
-		swordCollider.width = 2;
-		swordCollider.offset = glm::vec2(64, 60);
-		swordRigidbody = playerRigidbody;
-
-		playerRigidbody.dir = RigidBodyComponent::Dir::RIGHT;
-	}
-
-	if (keyboard.IsKeyHeld(KEY_S) || gamepad.IsButtonHeld(GP_BTN_DPAD_DOWN))
-	{
-		playerRigidbody.velocity = playerControl.downVelocity;
-		playerSprite.srcRect.x = playerSprite.width * 0;
-
-		shieldTransform.position = playerTransform.position;
-		shieldCollider.height = 2;
-		shieldCollider.width = 24;
-		shieldCollider.offset = glm::vec2(40, 84);
-		shieldRigidbody = playerRigidbody;
-
-		swordTransform.position = playerTransform.position;
-		swordCollider.height = 2;
-		swordCollider.width = 2;
-		swordCollider.offset = glm::vec2(64, 60);
-		swordRigidbody = playerRigidbody;
-
-		playerRigidbody.dir = RigidBodyComponent::Dir::DOWN;
-	}
-
-	if (keyboard.IsKeyHeld(KEY_A) || gamepad.IsButtonHeld(GP_BTN_DPAD_LEFT))
-	{
-		playerRigidbody.velocity = playerControl.leftVelocity;
-		playerSprite.srcRect.x = playerSprite.width * 1;
-
-		shieldTransform.position = playerTransform.position;
-		shieldCollider.height = 30;
-		shieldCollider.width = 2;
-		shieldCollider.offset = glm::vec2(30, 50);
-		shieldRigidbody = playerRigidbody;
-
-		swordTransform.position = playerTransform.position;
-		swordCollider.height = 2;
-		swordCollider.width = 2;
-		swordCollider.offset = glm::vec2(64, 60);
-		swordRigidbody = playerRigidbody;
-
-		playerRigidbody.dir = RigidBodyComponent::Dir::LEFT;
-	}
+	player->UpdatePlayer(game, inputManager);
 }
 
 void GameState::UpdatePauseContol()
@@ -175,6 +68,8 @@ void GameState::UpdatePauseContol()
 	const auto& keyboard = inputManager.GetKeyboard();
 	const auto& gamepad = inputManager.GetGamepad();
 	auto& camera = game.GetCamera();
+	auto& player = game.GetPlayer();
+
 	// Set to paused
 	if (keyboard.IsKeyJustReleased(KEY_P) || gamepad.IsButtonJustReleased(GP_BTN_Y))
 	{
@@ -195,6 +90,7 @@ void GameState::UpdatePauseContol()
 	if (keyboard.IsKeyJustReleased(KEY_SPACE) || keyboard.IsKeyJustReleased(KEY_RSHIFT) || 
 		gamepad.IsButtonJustReleased(GP_BTN_A) || gamepad.IsButtonJustReleased(GP_BTN_X))
 	{
+		player->SetAttacking(false);
 		inputManager.SetAttack(false);
 	}
 }
@@ -202,6 +98,11 @@ void GameState::UpdatePauseContol()
 GameState::GameState()
 	: GameState(glm::vec2{0.f})
 {
+}
+
+GameState::~GameState()
+{
+
 }
 
 GameState::GameState(glm::vec2 cameraOffset)
@@ -254,9 +155,6 @@ void GameState::Update(const float& deltaTime)
 	// Update the registry values
 	reg.Update();
 
-	// Update all Game systems
-	game.GetPlayer()->UpdateStateMachine();
-
 	m_CollectItemSystem.Update();
 	m_AnimationSystem.Update();
 	m_MovementSystem.Update(deltaTime);
@@ -272,6 +170,9 @@ void GameState::Update(const float& deltaTime)
 
 	// Update the registry values
 	reg.Update();
+
+	// Update all Game systems
+	game.GetPlayer()->UpdateStateMachine();
 }
 
 void GameState::Render()

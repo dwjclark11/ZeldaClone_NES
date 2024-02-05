@@ -59,16 +59,21 @@ void DamageSystem::OnCollision(CollisionEvent& event)
 		OnEnemyHitsPlayer(b, a);
 		return;
 	}
-		
+	
+	bool bAttacking{ game.GetPlayer()->IsAttacking() };
 	// Player Sword Hits Enemy
 	if (b.HasTag("the_sword") && a.HasComponent<EnemyComponent>())
 	{
-		OnPlayerSwordHitsEnemy(b, a);
+		if(bAttacking)
+			OnPlayerSwordHitsEnemy(b, a);
+
 		return;
 	}
 	else if (a.HasTag("the_sword") && b.HasComponent<EnemyComponent>())
 	{
-		OnPlayerSwordHitsEnemy(a, b);
+		if (bAttacking)
+			OnPlayerSwordHitsEnemy(a, b);
+
 		return;
 	}
 		

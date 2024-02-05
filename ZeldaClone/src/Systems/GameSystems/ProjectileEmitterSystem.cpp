@@ -472,15 +472,19 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 	{
 		auto& keyboard = inputManager.GetKeyboard();
 		auto& gamepad = inputManager.GetGamepad();
+		auto& player = game.GetPlayer();
+
 		if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_X))
 		{
 			ItemUsed();
 			inputManager.SetAttack(true);
+			player->SetAttacking(true);
 		}
 		else if ((keyboard.IsKeyJustPressed(KEY_RSHIFT) || gamepad.IsButtonJustPressed(GP_BTN_A)) && swordTimer.GetTicks() == 0)
 		{
 			SwordUsed();
 			inputManager.SetAttack(true);
+			player->SetAttacking(true);
 		}
 	}
 }
@@ -489,14 +493,16 @@ void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 {
 	if (!game.PlayerHold())
 	{
+		auto& player = game.GetPlayer();
 		if (event.button == inputManager.GetBtnCode(InputManager::Action::USE_ITEM))
 		{
 			ItemUsed();
-			
+			player->SetAttacking(true);
 		}
 		else if (event.button == inputManager.GetBtnCode(InputManager::Action::ATTACK) && swordTimer.GetTicks() == 0)
 		{
 			SwordUsed();
+			player->SetAttacking(true);
 		}
 	}
 }

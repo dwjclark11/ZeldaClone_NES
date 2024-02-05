@@ -11,34 +11,21 @@
 #include "../../Game/Player.h"
 #include "../../Utilities/GameData.h"
 
-unsigned int HealthSystem::currentHealth = 6;
-unsigned int HealthSystem::maxHearts = 3;
 unsigned int HealthSystem::numHearts = 3;
 int HealthSystem::loadedHearts = 0;
 
 HealthSystem::HealthSystem()
-	: game(Game::Instance()), reg(Registry::Instance())
+	: game{ Game::Instance() }, reg{ Registry::Instance() }
 {
 	RequiredComponent<HealthComponent>();
 	RequiredComponent<SpriteComponent>();
+	RequiredComponent<PlayerComponent>();
 }
 
 void HealthSystem::Update()
 {
 	for (auto& entity : GetSystemEntities())
 	{
-		if (game.GetPlayer()->GetPlayerDead())
-		{
-			// If the Player is Dead --> Remove the Enemies from the screen
-			if (entity.BelongsToGroup("enemies"))
-				entity.Kill();
-
-			continue;
-		}
-
-		if (!entity.HasComponent<PlayerComponent>())
-			continue;
-		
 		const auto& transform = entity.GetComponent<TransformComponent>();
 		const auto& collider = entity.GetComponent<BoxColliderComponent>();
 		auto& health = entity.GetComponent<HealthComponent>();
@@ -86,19 +73,17 @@ void HealthSystem::Update()
 
 			health.maxHearts += 1;
 			health.healthPercentage = health.maxHearts * 2;
-
 		}
-		currentHealth = health.healthPercentage;
-		maxHearts = health.maxHearts;
 
 		// Start Low health sound timer
-		if (currentHealth <= 2 && !lowHealth)
+		if (health.healthPercentage <= 2 && !lowHealth)
 		{
 			health.lowHeathTimer.Start();
 			lowHealth = true;
 		}
+
 		// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
-		if (currentHealth <= 2 && currentHealth > 0 && health.lowHeathTimer.GetTicks() > 250)
+		if (lowHealth && health.lowHeathTimer.GetTicks() > 250)
 		{
 			game.GetSoundPlayer().PlaySoundFX("low_health", 0, SoundChannel::LOW_HEALTH);
 			health.lowHeathTimer.Stop();
@@ -106,18 +91,18 @@ void HealthSystem::Update()
 		}
 
 		// Change the heart sprite based on the current health
-		for (int i = 1; i <= maxHearts; i++)
+		for (int i = 1; i <= health.maxHearts; i++)
 		{
 			std::string tag = "heart" + std::to_string(i);
 			auto currentHeart = reg.GetEntityByTag(tag);
 			auto& sprite = currentHeart.GetComponent<SpriteComponent>();
 
 			// Compare current Health
-			if (currentHealth >= i * 2)
+			if (health.healthPercentage >= i * 2)
 				sprite.srcRect.x = 0;
-			else if (currentHealth == i * 2 - 1)
+			else if (health.healthPercentage == i * 2 - 1)
 				sprite.srcRect.x = 16;
-			else if (currentHealth <= i * 2 - 2)
+			else if (health.healthPercentage <= i * 2 - 2)
 				sprite.srcRect.x = 32;
 		}
 	}

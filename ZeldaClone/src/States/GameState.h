@@ -47,7 +47,7 @@ public:
 
 	// Constructor
 	GameState();
-	~GameState() = default;
+	~GameState();
 
 	GameState(glm::vec2 cameraOffset);
 	
