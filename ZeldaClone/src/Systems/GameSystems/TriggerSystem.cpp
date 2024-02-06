@@ -23,6 +23,8 @@
 #include "../SoundFXSystem.h"
 #include "../../States/GameState.h"
 
+constexpr float HeartOffset = 0.75f;
+constexpr float AngleIncrease = 0.05f;
 
 bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
 {
@@ -30,19 +32,19 @@ bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
 	switch (item)
 	{
 	case ItemComponent::SpecialItemType::WOOD_SWORD:
-		return gameData.HasItem(GameData::GameItems::WOOD_SWORD);
+		return m_GameData.HasItem(GameData::GameItems::WOOD_SWORD);
 	case ItemComponent::SpecialItemType::STEEL_SWORD:
-		return gameData.HasItem(GameData::GameItems::SILVER_SWORD);
+		return m_GameData.HasItem(GameData::GameItems::SILVER_SWORD);
 	case ItemComponent::SpecialItemType::MAGIC_SWORD:
-		return gameData.HasItem(GameData::GameItems::MAGIC_SWORD);
+		return m_GameData.HasItem(GameData::GameItems::MAGIC_SWORD);
 	case ItemComponent::SpecialItemType::RED_CANDLE:
-		return gameData.HasItem(GameData::GameItems::CANDLE);
+		return m_GameData.HasItem(GameData::GameItems::CANDLE);
 	case ItemComponent::SpecialItemType::WOOD_BOW:
-		return gameData.HasItem(GameData::GameItems::BOW);
+		return m_GameData.HasItem(GameData::GameItems::BOW);
 	case ItemComponent::SpecialItemType::ARROWS:
-		return gameData.HasItem(GameData::GameItems::WOOD_ARROWS);
+		return m_GameData.HasItem(GameData::GameItems::WOOD_ARROWS);
 	case ItemComponent::SpecialItemType::MAGIC_ARROWS:
-		return gameData.HasItem(GameData::GameItems::MAGIC_ARROWS);
+		return m_GameData.HasItem(GameData::GameItems::MAGIC_ARROWS);
 	default:
 		return false;
 		break;
@@ -54,7 +56,7 @@ bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
 
 void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	auto& playerHealth = playerEnt.GetComponent<HealthComponent>();
 
@@ -64,15 +66,15 @@ void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 		break;
 
 	case ItemComponent::SpecialItemType::WOOD_SWORD:
-		gameData.AddItem(GameData::GameItems::WOOD_SWORD);
+		m_GameData.AddItem(GameData::GameItems::WOOD_SWORD);
 		break;
 
 	case ItemComponent::SpecialItemType::STEEL_SWORD:
-		gameData.AddItem(GameData::GameItems::SILVER_SWORD);
+		m_GameData.AddItem(GameData::GameItems::SILVER_SWORD);
 		break;
 
 	case ItemComponent::SpecialItemType::MAGIC_SWORD:
-		gameData.AddItem(GameData::GameItems::MAGIC_SWORD);
+		m_GameData.AddItem(GameData::GameItems::MAGIC_SWORD);
 		break;
 
 	case ItemComponent::SpecialItemType::FULL_HEART:
@@ -81,25 +83,25 @@ void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 		break;
 	}
 	case ItemComponent::SpecialItemType::RAFT:
-		gameData.AddItem(GameData::GameItems::RAFT);
+		m_GameData.AddItem(GameData::GameItems::RAFT);
 		break;
 	case ItemComponent::SpecialItemType::POWER_BRACLET:
-		gameData.AddItem(GameData::GameItems::POWER_BRACLET);
+		m_GameData.AddItem(GameData::GameItems::POWER_BRACLET);
 		break;
 	case ItemComponent::SpecialItemType::RED_CANDLE:
-		gameData.AddItem(GameData::GameItems::CANDLE);
+		m_GameData.AddItem(GameData::GameItems::CANDLE);
 		break;
 	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
-		gameData.AddItem(GameData::GameItems::BOOMERANG);
+		m_GameData.AddItem(GameData::GameItems::BOOMERANG);
 		break;
 	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
-		gameData.AddItem(GameData::GameItems::MAGIC_BOOMERANG);
+		m_GameData.AddItem(GameData::GameItems::MAGIC_BOOMERANG);
 		break;
 	case ItemComponent::SpecialItemType::LADDER:
-		gameData.AddItem(GameData::GameItems::LADDER);
+		m_GameData.AddItem(GameData::GameItems::LADDER);
 		break;
 	case ItemComponent::SpecialItemType::WOOD_BOW:
-		gameData.AddItem(GameData::GameItems::BOW);
+		m_GameData.AddItem(GameData::GameItems::BOW);
 		break;
 	default:
 		break;
@@ -156,9 +158,9 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 
 	if (!secret.found && !startup)
 	{
-		TriggerBoxComponent::TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
+		TriggerBoxComponent::TriggerType trigType = m_Loader.ConvertStringToTriggerType(secret.newTrigger);
 		
-		auto secretArea = reg.CreateEntity();
+		auto secretArea = m_Registry.CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 	
@@ -181,14 +183,14 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 		secretArea.AddComponent<GameComponent>();
 
 		secret.found = true;
-		gameData.SetSecretFound(secret.locationID, true);
-		game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
+		m_GameData.SetSecretFound(secret.locationID, true);
+		m_Game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
 	}
 	else if (secret.found && startup)
 	{
-		TriggerBoxComponent::TriggerType trigType = loader.ConvertStringToTriggerType(secret.newTrigger);
+		TriggerBoxComponent::TriggerType trigType = m_Loader.ConvertStringToTriggerType(secret.newTrigger);
 
-		auto secretArea = reg.CreateEntity();
+		auto secretArea = m_Registry.CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 		secretArea.AddComponent<TriggerBoxComponent>(trigType,
@@ -214,17 +216,16 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 
 void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 {
-	const auto& player1 = game.GetPlayer();
+	const auto& player1 = m_Game.GetPlayer();
 
-	if (player1->GetStairsFinished() || game.GetCamera().CurtainClosed())
+	if (player1->GetStairsFinished() || m_Game.GetCamera().CurtainClosed())
 	{
-		
 		const auto& playerEnt = player1->GetPlayer();
 		auto& playerTransform = playerEnt.GetComponent<TransformComponent>();
 		auto& rigidbody = playerEnt.GetComponent<RigidBodyComponent>();
 		auto& sprite = playerEnt.GetComponent<SpriteComponent>();
 		auto& scene = trigger.GetComponent<SceneChangeComponent>();
-		auto& camera = game.GetCamera();
+		auto& camera = m_Game.GetCamera();
 
 		// Stop the player movement during the scene transition
 		rigidbody.velocity = glm::vec2(0);
@@ -251,37 +252,37 @@ void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 			playerTransform.position.y = y;
 
 			// Remove all the prior assets/entities from the current scene
-			reg.GetSystem<RenderSystem>().OnExit();
-			reg.GetSystem<RenderTileSystem>().OnExit();
-			reg.GetSystem<RenderCollisionSystem>().OnExit();
-			reg.GetSystem<RenderTextSystem>().OnExit();
+			m_Registry.GetSystem<RenderSystem>().OnExit();
+			m_Registry.GetSystem<RenderTileSystem>().OnExit();
+			m_Registry.GetSystem<RenderCollisionSystem>().OnExit();
+			m_Registry.GetSystem<RenderTextSystem>().OnExit();
 
 			// Check to see if the trigger has "no_file" assiged if it has a file load the assets for the scene
 			if (scene.assetFile != "no_file")
-				loader.LoadAssetsFromLuaTable(game.GetLuaState(), scene.assetFile);
+				m_Loader.LoadAssetsFromLuaTable(m_Game.GetLuaState(), scene.assetFile);
 
 			// load the tilemap only if there is an image and a corresponding map
 			if (scene.tileMapName != "no_file" && scene.mapImageName != "no_file")
 			{
 				std::string mapFile = "Assets/Tilemaps/Maps/" + scene.tileMapName + ".map";
-				loader.LoadTilemap(mapFile, scene.mapImageName);
+				m_Loader.LoadTilemap(mapFile, scene.mapImageName);
 			}
 
 			// If there is only an image name than it is a full map image, not tiles --> Just load the map
 			if (scene.tileImageName != "no_file")
 			{
-				loader.LoadMap(scene.tileImageName, scene.imageWidth, scene.imageHeight);
+				m_Loader.LoadMap(scene.tileImageName, scene.imageWidth, scene.imageHeight);
 			}
 
 			// Start the new scene's music || stop the music
 			if (scene.levelMusic != "stop")
-				game.GetMusicPlayer().PlayMusic(scene.levelMusic, -1);
+				m_Game.GetMusicPlayer().PlayMusic(scene.levelMusic, -1);
 			else
-				game.GetMusicPlayer().StopMusic();
+				m_Game.GetMusicPlayer().StopMusic();
 
 			// If there is an entity file, NPCs, Store Items, etc. Load it
 			if (scene.entityFileName != "no_file")
-				loader.LoadEntitiesFromLuaTable(game.GetLuaState(), scene.entityFileName);
+				m_Loader.LoadEntitiesFromLuaTable(m_Game.GetLuaState(), scene.entityFileName);
 
 			// Adjust the camera location to the trigger offset
 			camera.SetCameraPosition(trig.cameraOffset.x, trig.cameraOffset.y);
@@ -290,21 +291,18 @@ void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 
 			// Check to see if there is a trigger file
 			if (scene.triggerFile != "no_file")
-				loader.LoadTriggers(game.GetLuaState(), scene.triggerFile);
+				m_Loader.LoadTriggers(m_Game.GetLuaState(), scene.triggerFile);
 			
 			// Check to see if there is an enemy file
 			if (scene.enemyFile != "no_file")
-				loader.LoadEnemiesFromLuaTable(game.GetLuaState(), scene.enemyFile);
+				m_Loader.LoadEnemiesFromLuaTable(m_Game.GetLuaState(), scene.enemyFile);
 
 			// Load the secrets of the scene that have been found
-			loader.ReadInSecrets(game.GetLuaState());
+			m_Loader.ReadInSecrets(m_Game.GetLuaState());
 
 			// Check to see if there is a collider file
 			if (scene.colliderFile != "no_file")
-				loader.LoadColliders(scene.colliderFile);
-
-			// Remove the current trigger
-			//trigger.Kill();
+				m_Loader.LoadColliders(scene.colliderFile);
 
 			// Finish the fade screen 
 			if (!camera.CurtainClosed())
@@ -319,12 +317,12 @@ void TriggerSystem::ChangeScene(Entity& player, Entity& trigger)
 			if (camera.CurtainClosed())
 				camera.StartCurtainOpen();
 			else
-				game.GetPlayer()->SetStairsFinished(false);
+				m_Game.GetPlayer()->SetStairsFinished(false);
 		}
 	}
 	else
 	{
-		game.GetPlayer()->SetPlayerOnStairs(true);
+		m_Game.GetPlayer()->SetPlayerOnStairs(true);
 	}
 }
 
@@ -340,13 +338,13 @@ void TriggerSystem::PushRocks(Entity& player, Entity& trigger)
 		if (playerRigidBody.dir == RigidBodyComponent::Dir::UP)
 		{
 			trig.active = true;
-			game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
+			m_Game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
 			secret.moveUp = true;
 		}
 		else if (playerRigidBody.dir == RigidBodyComponent::Dir::DOWN)
 		{
 			trig.active = true;
-			game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
+			m_Game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
 			secret.moveDown = true;
 		}
 	}
@@ -359,7 +357,7 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 	const auto& pTran = player.GetComponent<TransformComponent>();
 
-	if (gameData.HasItem(GameData::GameItems::RAFT))
+	if (m_GameData.HasItem(GameData::GameItems::RAFT))
 	{
 		if ((secret.moveDown && playerRigidbody.dir == RigidBodyComponent::Dir::DOWN) || 
 			(secret.moveUp && playerRigidbody.dir == RigidBodyComponent::Dir::UP))
@@ -367,8 +365,8 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 			if (!trigs.active)
 			{
 				StopPlayerMovement(player, trigger);
-				game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
-				auto raft = reg.CreateEntity();
+				m_Game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
+				auto raft = m_Registry.CreateEntity();
 				raft.Tag("raft");
 				raft.AddComponent<TransformComponent>(pTran);
 				raft.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 0, 16);
@@ -378,7 +376,7 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 			}
 
 			trigs.active = true;
-			game.GetPlayer()->SetOnRaft(true);
+			m_Game.GetPlayer()->SetOnRaft(true);
 		}
 	}
 	else
@@ -389,27 +387,27 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 
 void TriggerSystem::Transport(Entity& player, Entity& trigger)
 {
-	if (game.GetCamera().GetFadeAlpha() > 0)
+	if (m_Game.GetCamera().GetFadeAlpha() > 0)
 	{
-		game.GetCamera().StartFadeOut(true);
+		m_Game.GetCamera().StartFadeOut(true);
 		return;
 	}
 
 	auto& playerTransform = player.GetComponent<TransformComponent>();
 	auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 	playerTransform.position = trig.transportOffset;
-	game.GetCamera().SetCameraPosition(trig.cameraOffset.x, trig.cameraOffset.y);
+	m_Game.GetCamera().SetCameraPosition(trig.cameraOffset.x, trig.cameraOffset.y);
 	
-	game.GetSoundPlayer().PlaySoundFX("stairs", 0, SoundChannel::ANY);
+	m_Game.GetSoundPlayer().PlaySoundFX("stairs", 0, SoundChannel::ANY);
 
 	// Finish the fade screen 
-	game.GetCamera().StartFadeOut(false);
-	game.GetCamera().StartFadeIn(true);
+	m_Game.GetCamera().StartFadeOut(false);
+	m_Game.GetCamera().StartFadeIn(true);
 }
 
 void TriggerSystem::UseLadder(Entity& player, Entity& trigger)
 {
-	if (!gameData.HasItem(GameData::GameItems::LADDER))
+	if (!m_GameData.HasItem(GameData::GameItems::LADDER))
 	{
 		StopPlayerMovement(player, trigger);
 		return;
@@ -445,7 +443,7 @@ void TriggerSystem::UseLadder(Entity& player, Entity& trigger)
 		}
 
 		// Create a temporary ladder entity
-		auto ladder = reg.CreateEntity();
+		auto ladder = m_Registry.CreateEntity();
 		ladder.Tag("ladder");
 		ladder.AddComponent<TransformComponent>(playerTransform);
 		ladder.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 112, 48);
@@ -468,9 +466,9 @@ void TriggerSystem::BombSecret(Entity& trigger)
 		const auto& removeTag = trig.entityRemoveTag;
 		if (removeTag != "")
 		{
-			if (reg.DoesTagExist(removeTag))
+			if (m_Registry.DoesTagExist(removeTag))
 			{
-				auto removedEntity = reg.GetEntityByTag(removeTag);
+				auto removedEntity = m_Registry.GetEntityByTag(removeTag);
 
 				SecretTrigger(removedEntity);
 				// Remove the entity
@@ -486,19 +484,19 @@ void TriggerSystem::BombSecret(Entity& trigger)
 void TriggerSystem::UnlockDoor(Entity& trigger)
 {
 	// Unlock the door if keys are available
-	if (gameData.GetTotalKeys() > 0)
+	if (m_GameData.GetTotalKeys() > 0)
 	{
 		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 		// Play door open sound
-		game.GetSoundPlayer().PlaySoundFX("door_unlock", 0, SoundChannel::ANY);
+		m_Game.GetSoundPlayer().PlaySoundFX("door_unlock", 0, SoundChannel::ANY);
 		// Decrement total number of keys
-		gameData.UseKey();
+		m_GameData.UseKey();
 
 		// Check to see if there is a sister door to remove
 		const auto& removeTag = trig.entityRemoveTag;
 		if (removeTag != "")
 		{
-			auto removedEntity = reg.GetEntityByTag(removeTag);
+			auto removedEntity = m_Registry.GetEntityByTag(removeTag);
 
 			// Remove/Kill the sister door
 			removedEntity.Kill();
@@ -512,46 +510,33 @@ void TriggerSystem::UnlockDoor(Entity& trigger)
 void TriggerSystem::BuyShopItem(Entity& trigger)
 {
 	// Check to see if the trigger has an Item Components
-	if (trigger.HasComponent<ItemComponent>() && !gameData.RupeeScrollActive())
+	if (!trigger.HasComponent<ItemComponent>() || m_GameData.RupeeScrollActive())
+		return;
+
+	auto& trig = trigger.GetComponent<TriggerBoxComponent>();
+	auto& shopItem = trigger.GetComponent<ItemComponent>();
+
+	// Check to see if the player has enough rupees
+	if (m_GameData.GetTotalRupees() < shopItem.price)
+		return;
+		
+	// Check to see if key item and if it is already in the inventory
+	if (shopItem.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
 	{
-		auto& trig = trigger.GetComponent<TriggerBoxComponent>();
-		auto& shopItem = trigger.GetComponent<ItemComponent>();
-		// Check to see if the player has enough rupees
-		if (gameData.GetTotalRupees() < shopItem.price)
-		{
-			// Maybe make a cancel sound?
-			Logger::Log("Player Does not Have Enough Rupees!");
+		// Check to see if the item is in the inventory
+		if (CheckInventory(shopItem.special))	
 			return;
-		}
-
-		// Check to see if key item and if it is already in the inventory
-		if (shopItem.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
-		{
-			// Check to see if the item is in the inventory
-			if (CheckInventory(shopItem.special))
-			{
-				Logger::Log("Item is Already in the inventory!");
-				return;
-			}
-		}
-
-		// Test --> Collect the item
-		if (!trig.active)
-		{
-			if (!gameData.BuyItem(shopItem.price))
-			{
-				Logger::Log("Player Rupees is too low!");
-				return;
-			}
-
-			game.GetSoundPlayer().PlaySoundFX("fanfare", 0, SoundChannel::ANY);
-			game.GetPlayer()->SetPlayerItem(true);
-			trig.active = true;
-		}
 	}
-	else
+
+	// Collect the item
+	if (!trig.active)
 	{
-		Logger::Log("TRIGGER: __SHOP_ITEM: All Shop Items must have an ItemComponent!");
+		if (!m_GameData.BuyItem(shopItem.price))
+			return;
+			
+		m_Game.GetSoundPlayer().PlaySoundFX("fanfare", 0, SoundChannel::ANY);
+		m_Game.GetPlayer()->SetPlayerItem(true);
+		trig.active = true;
 	}
 }
 
@@ -561,7 +546,7 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 	// If the player's health is already at max, no need to start the fairy circle trigger
 	if (playerHealth.healthPercentage != playerHealth.maxHearts * 2)
 	{
-		for (const auto& fairy : reg.GetEntitiesByGroup("fairy"))
+		for (const auto& fairy : m_Registry.GetEntitiesByGroup("fairy"))
 		{
 			// Get the fairy transform. It will be used to check against player position and 
 			// to position the circling hearts
@@ -569,9 +554,8 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 			const int checkX = fairyTransform.position.x / PANEL_WIDTH;
 			const int checkY = fairyTransform.position.y / PANEL_HEIGHT;
 
-
 			// Check to see if the fairy is in the same panel as the player
-			if (checkX != game.GetPlayer()->GetPlayerPos().x || checkY != game.GetPlayer()->GetPlayerPos().y)
+			if (checkX != m_Game.GetPlayer()->GetPlayerPos().x || checkY != m_Game.GetPlayer()->GetPlayerPos().y)
 				continue;
 
 			auto& fairyTrig = trigger.GetComponent<TriggerBoxComponent>();
@@ -586,7 +570,7 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 			for (int i = 0; i < 8; i++)
 			{
 				// Create a new Heart entity to circle the fairy
-				auto fairyHeart = reg.CreateEntity();;
+				auto fairyHeart = m_Registry.CreateEntity();;
 				fairyHeart.Group("fairy_hearts");
 				fairyHeart.AddComponent<TransformComponent>(fairyTransform.position, fairyTransform.scale);
 				fairyHeart.AddComponent<SpriteComponent>("hearts", 16, 16, 2, false, 0, 0);
@@ -621,7 +605,7 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 
 		// Play the refill sound
 		if (Mix_Playing(6) == 0)
-			game.GetSoundPlayer().PlaySoundFX("refill_hearts", 0, SoundChannel::LOW_HEALTH);
+			m_Game.GetSoundPlayer().PlaySoundFX("refill_hearts", 0, SoundChannel::LOW_HEALTH);
 	}
 	else
 	{
@@ -630,7 +614,7 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 		// Reset the trigger timer
 		trig.collectedTimer.Stop();
 		// Remove All the created hearts
-		for (auto& heart : reg.GetEntitiesByGroup("fairy_hearts"))
+		for (auto& heart : m_Registry.GetEntitiesByGroup("fairy_hearts"))
 		{
 			heart.Kill();
 		}
@@ -641,9 +625,9 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 	}
 
 	// Increment the angle for the circle motion calculation
-	angle += 0.05f;
+	m_Angle += AngleIncrease;
 
-	for (const auto& fairy : reg.GetEntitiesByGroup("fairy"))
+	for (const auto& fairy : m_Registry.GetEntitiesByGroup("fairy"))
 	{
 		// Get the fairy transform. It will be used to check against player position and 
 		// to position the circling hearts
@@ -653,30 +637,31 @@ void TriggerSystem::UpdateFairyCircle(Entity& player, Entity& trigger)
 
 
 		// Check to see if the fairy is in the same panel as the player
-		if (checkX != game.GetPlayer()->GetPlayerPos().x || checkY != game.GetPlayer()->GetPlayerPos().y)
+		if (checkX != m_Game.GetPlayer()->GetPlayerPos().x || checkY != m_Game.GetPlayer()->GetPlayerPos().y)
 			continue;
 
 		// Loop through the 8 Circling hearts and change their position around the fairy, 
 		// The fairy's position is the center of the circle
-		for (auto& heart : reg.GetEntitiesByGroup("fairy_hearts"))
+		for (auto& heart : m_Registry.GetEntitiesByGroup("fairy_hearts"))
 		{
 			auto& heartsTransform = heart.GetComponent<TransformComponent>();
-
 			// Move the heart in a circular motion
-			heartsTransform.position = glm::vec2((fairyTransform.position.x) + (cos(angle + heartOffset) * 288), (fairyTransform.position.y) + (sin(angle + heartOffset) * 288));
+			heartsTransform.position = glm::vec2(
+				(fairyTransform.position.x) + (cos(m_Angle + m_HeartOffset) * 288), 
+				(fairyTransform.position.y) + (sin(m_Angle + m_HeartOffset) * 288)
+			);
 
 			// This is for offsetting each heart
-			heartOffset += 0.75f;
-
+			m_HeartOffset += HeartOffset;
 		}
 		// Reset the heart offset back to zero so we can restart we we come back into the for loop
-		heartOffset = 0.f;
+		m_HeartOffset = 0.f;
 	}
 }
 
 void TriggerSystem::UpdateRaft(Entity& player, Entity& trigger)
 {
-	auto raft = reg.GetEntityByTag("raft");
+	auto raft = m_Registry.GetEntityByTag("raft");
 	auto& raftTransform = raft.GetComponent<TransformComponent>();
 	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
 	auto& playerTransform = player.GetComponent<TransformComponent>();
@@ -685,24 +670,24 @@ void TriggerSystem::UpdateRaft(Entity& player, Entity& trigger)
 
 	if (secret.moveUp && playerRigidbody.dir == RigidBodyComponent::Dir::UP)
 	{
-		playerTransform.position.y -= 200 * game.GetDeltaTime();
-		raftTransform.position.y -= 200 * game.GetDeltaTime();
+		playerTransform.position.y -= 200 * m_Game.GetDeltaTime();
+		raftTransform.position.y -= 200 * m_Game.GetDeltaTime();
 		if (playerTransform.position.y <= trig.transportOffset.y)
 		{
 			trig.active = false;
-			game.GetPlayer()->SetOnRaft(false);
+			m_Game.GetPlayer()->SetOnRaft(false);
 			raft.Kill();
 		}
 	}
 	else if (secret.moveDown && playerRigidbody.dir == RigidBodyComponent::Dir::DOWN)
 	{
-		playerTransform.position.y += 200 * game.GetDeltaTime();
-		raftTransform.position.y += 200 * game.GetDeltaTime();
+		playerTransform.position.y += 200 * m_Game.GetDeltaTime();
+		raftTransform.position.y += 200 * m_Game.GetDeltaTime();
 
 		if (playerTransform.position.y >= trig.transportOffset.y)
 		{
 			trig.active = false;
-			game.GetPlayer()->SetOnRaft(false);
+			m_Game.GetPlayer()->SetOnRaft(false);
 			raft.Kill();
 		}
 	}
@@ -716,12 +701,12 @@ void TriggerSystem::UpdateMovingRocks(Entity& player, Entity& trigger)
 	auto&sprite = trigger.GetComponent<SpriteComponent>();
 
 	// Move the Block/Rock Up until it reaches its max position
-	if (transform.position.y > secret.startPos.y - sprite.width * game.GetGameScale() && secret.moveUp)
+	if (transform.position.y > secret.startPos.y - sprite.width * m_Game.GetGameScale() && secret.moveUp)
 	{
 		transform.position.y--;
 	}
 	// Move the Block/Rock Down until it reaches its max position
-	else if (transform.position.y < secret.startPos.y + sprite.width * game.GetGameScale() && secret.moveDown)
+	else if (transform.position.y < secret.startPos.y + sprite.width * m_Game.GetGameScale() && secret.moveDown)
 	{
 		transform.position.y++;
 	}
@@ -733,16 +718,16 @@ void TriggerSystem::UpdateMovingRocks(Entity& player, Entity& trigger)
 		const auto& removeTag = trig.entityRemoveTag;
 		if (removeTag != "")
 		{
-			if (reg.DoesTagExist(removeTag))
+			if (m_Registry.DoesTagExist(removeTag))
 			{
-				auto removedEntity = reg.GetEntityByTag(removeTag);
+				auto removedEntity = m_Registry.GetEntityByTag(removeTag);
 
 				if (removedEntity.HasComponent<TriggerBoxComponent>())
 				{
 					const auto& triggerType = removedEntity.GetComponent<TriggerBoxComponent>().triggerType;
 					if (triggerType == TriggerBoxComponent::TriggerType::TRAP_DOOR)
 					{
-						game.GetSoundPlayer().PlaySoundFX("door_unlock", 0, SoundChannel::ANY);
+						m_Game.GetSoundPlayer().PlaySoundFX("door_unlock", 0, SoundChannel::ANY);
 					}
 				}
 				// Remove the entity
@@ -762,18 +747,19 @@ void TriggerSystem::UpdateLadder(Entity& player, Entity& trigger)
 	if (playerTransform.position.x < transform.position.x - 64 ||
 		playerTransform.position.x > transform.position.x + 32)
 	{
-		auto ladder = reg.GetEntityByTag("ladder");
+		auto ladder = m_Registry.GetEntityByTag("ladder");
 		trig.active = false;
 		ladder.Kill();
 	}
 }
 
 TriggerSystem::TriggerSystem()
-	: game(Game::Instance())
-	, gameData(GameData::GetInstance())
-	, angle(0.f)
-	, heartOffset(0.f)
-	, reg(Registry::Instance())
+	: m_Game{ Game::Instance() }
+	, m_GameData{GameData::GetInstance()}
+	, m_Registry{ Registry::Instance() }
+	, m_Loader{}
+	, m_Angle{0.f}
+	, m_HeartOffset{0.f}
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<BoxColliderComponent>();
@@ -894,16 +880,16 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			std::string soundID = "fanfare";
 			if (item.special == ItemComponent::SpecialItemType::TRIFORCE_PIECE)
 			{
-				game.GetPlayer()->SetObtainedTriforce(true);
+				m_Game.GetPlayer()->SetObtainedTriforce(true);
 				soundID = "triforce_fanfare";
-				game.GetMusicPlayer().PlayMusic(soundID, 0);
+				m_Game.GetMusicPlayer().PlayMusic(soundID, 0);
 			}
 			else
 			{
-				game.GetSoundPlayer().PlaySoundFX(soundID, 0, SoundChannel::ANY);
+				m_Game.GetSoundPlayer().PlaySoundFX(soundID, 0, SoundChannel::ANY);
 			}
 
-			game.GetPlayer()->SetPlayerItem(true);
+			m_Game.GetPlayer()->SetPlayerItem(true);
 			trig.active = true;
 		}
 		break;
@@ -944,7 +930,7 @@ void TriggerSystem::Update(const float& dt)
 			continue;
 
 		// Get the player
-		const auto& player = game.GetPlayer();
+		const auto& player = m_Game.GetPlayer();
 		auto& playerEnt = player->GetPlayer();
 	
 		if (entity.HasComponent<SecretComponent>())

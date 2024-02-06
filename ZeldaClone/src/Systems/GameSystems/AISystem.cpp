@@ -14,7 +14,7 @@
 #include <SDL.h>
 
 AISystem::AISystem()
-	: game(Game::Instance())
+	: m_Game(Game::Instance())
 {
 	RequiredComponent<AIComponent>();
 }
@@ -35,7 +35,7 @@ void AISystem::Update()
 		if (stateMachine.StateMachineCreated())
 		{
 			// If the enemy is in the same screen panel as the player --> Update 
-			if (stateMachine.GetEnemyPos() == game.GetPlayer()->GetPlayerPos())
+			if (stateMachine.GetEnemyPos() == m_Game.GetPlayer()->GetPlayerPos())
 			{
 				stateMachine.GetEnemyStateMachine().GetCurrentState()->Update(entity);
 			}

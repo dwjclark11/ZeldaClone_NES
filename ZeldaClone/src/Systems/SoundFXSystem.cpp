@@ -17,6 +17,7 @@ void SoundFX::PlaySoundFX(const std::string& assetID, int loops, int channel)
 {
 	if (Mix_PlayChannel(channel, m_AssetManager.GetSoundFX(assetID), loops) == -1)
 	{
-		Logger::Err("PROBLEMS!");
+		std::string error{Mix_GetError()};
+		Logger::Err("Failed to play Sound FX: " + error);
 	}
 }

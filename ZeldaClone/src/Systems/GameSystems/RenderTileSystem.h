@@ -9,13 +9,12 @@ class AssetManager;
 class RenderTileSystem : public System
 {
 private:
-	class Game& game;
+	class Game& m_Game;
 
 public:
 	RenderTileSystem();
+	~RenderTileSystem() = default;
 
 	void Update();
-			
 	void OnExit();
-
 };

@@ -1,19 +1,16 @@
 #pragma once
 #include "../../ECS/ECS.h"
 
-const int OFFSET = 720;
-
 class RenderHUDSystem : public System
 {
 private:
-	class Game& game;
-	class GameData& gameData;
+	class Game& m_Game;
+	class GameData& m_GameData;
+	bool m_bPause, m_bGamePlay;
 
 public:
-	bool pause;
-	bool gamePlay;
-
 	RenderHUDSystem();
+	~RenderHUDSystem() = default;
 
 	void Update(struct SDL_Renderer* renderer, std::unique_ptr<class AssetManager>& assetManager);
 	void OnExit();

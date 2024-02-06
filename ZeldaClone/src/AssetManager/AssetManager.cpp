@@ -1,184 +1,203 @@
 #include "AssetManager.h"
 #include "../Logger/Logger.h"
 
-// Constructor  
-AssetManager::AssetManager()
-{
-	//Logger::Log("AssetManager constructor called");
-}
-
-// Destructor
-AssetManager::~AssetManager()
-{
-	//Logger::Log("AssetManager destructor called");
-}
-
 // Functions
 void AssetManager::AddTextures(SDL_Renderer* renderer, const std::string& assetID, const std::string& filePath)
 {
-	if (!HasTexture(assetID))
+	if (HasTexture(assetID))
 	{
-		SDL_Surface* surface = IMG_Load(filePath.c_str());
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(std::move(renderer), std::move(surface));
-		
-		
-		if (!texture)
-		{
-			Logger::Err("Unable to create texture [" + assetID + "] " + " at filepath: " + filePath);
-		}
-
-		// Free the surface once the texture is created
-		SDL_FreeSurface(surface);
-
-		// Add the Textures to the map
-		textures.emplace(assetID, std::move(texture));
+		Logger::Err("Unable to create texture [" + assetID + "] - Already Exists");
+		return;
 	}
+
+	SDL_Surface* surface = IMG_Load(filePath.c_str());
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(std::move(renderer), std::move(surface));
+			
+	// Free the surface once the texture is created
+	SDL_FreeSurface(surface);
+
+	if (!texture)
+	{
+		Logger::Err("Unable to create texture [" + assetID + "] " + " at filepath: " + filePath);
+		return;
+	}
+
+	// Add the Textures to the map
+	m_mapTextures.emplace(assetID, std::move(texture));
 }
 
 SDL_Texture* AssetManager::GetTexture(const std::string& assetID)
 {
-	return textures[assetID];
+	auto textItr = m_mapTextures.find(assetID);
+	if (textItr == m_mapTextures.end())
+	{
+		Logger::Err("Asset Manager - Failed to get texture: " + assetID + "- Does not exist");
+		return nullptr;
+	}
+
+	return textItr->second;
 }
 
 bool AssetManager::HasTexture(const std::string& assetID)
 {
-	// search the map of textures and return true if the key has been found
-	if (textures.find(assetID) != textures.end()) return true;
-	
-	// Unable to find the key, return false
-	return false;
+	return m_mapTextures.contains(assetID);
 }
 
 void AssetManager::RemoveTexture(const std::string& assetID)
 {
-	auto it = textures.find(assetID);
-	if (it != textures.end())
+	auto it = m_mapTextures.find(assetID);
+	if (it == m_mapTextures.end())
 	{
-		SDL_DestroyTexture(it->second);
-		textures.erase(it);
-	}
-	else
 		Logger::Log("ASSET_MANAGER: TEXTURE: __LINE__66: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
+		return;
+	}
+
+	SDL_DestroyTexture(it->second);
+	m_mapTextures.erase(it);
 }
 
 void AssetManager::AddFonts(const std::string& assetID, const std::string filePath, int fontSize)
 {
-	if (fonts.find(assetID) == fonts.end())
-		fonts.emplace(assetID, TTF_OpenFont(filePath.c_str(), fontSize));
-	else
+	if (m_mapFonts.contains(assetID))
+	{
 		Logger::Err("ASSET_MANAGER: FONTS: __LINE__64: " + assetID + " ALREADY EXISTS");
+		return;
+	}
+
+	m_mapFonts.emplace(assetID, TTF_OpenFont(filePath.c_str(), fontSize));
 }
 
 TTF_Font* AssetManager::GetFont(const std::string& assetID)
 {
-	return fonts[assetID];
+	auto fontItr = m_mapFonts.find(assetID);
+	if (fontItr == m_mapFonts.end())
+	{
+		Logger::Err("Asset Manager - Failed to get font: " + assetID + "- Does not exist");
+		return nullptr;
+	}
+
+	return fontItr->second;
 }
 
 bool AssetManager::HasFont(const std::string& assetID)
 {
-	// search the map of font and return true if the key has been found
-	if (fonts.find(assetID) != fonts.end()) return true;
-
-	// Unable to find the key, return false
-	return false;
+	return m_mapFonts.contains(assetID);
 }
 
 void AssetManager::RemoveFont(const std::string& assetID)
 {
+
 }
 
 void AssetManager::AddMusic(const std::string& assetID, const std::string& filePath)
 {
-	if (music.find(assetID) == music.end())
-		music.emplace(assetID, Mix_LoadMUS(filePath.c_str()));
-	else
+	if (m_mapMusic.contains(assetID))
+	{
 		Logger::Err("ASSET_MANAGER: MUSIC: __LINE__86: [" + assetID + "] ALREADY EXISTS");
+		return;
+	}
+
+	m_mapMusic.emplace(assetID, Mix_LoadMUS(filePath.c_str()));
 }
 
 Mix_Music* AssetManager::GetMusic(const std::string& assetID)
 {
-	return music[assetID];
+	auto musicItr = m_mapMusic.find(assetID);
+	if (musicItr == m_mapMusic.end())
+	{
+		Logger::Err("ASSET_MANAGER: Failed to get music: [" + assetID + "] Does not exist!");
+		return nullptr;
+	}
+
+	return musicItr->second;
 }
 
 bool AssetManager::HasMusic(const std::string& assetID)
 {
-	if (music.find(assetID) != music.end()) return true;
-
-	return false;
+	return m_mapMusic.contains(assetID);
 }
 
 void AssetManager::RemoveMusic(const std::string& assetID)
 {
-	auto it = music.find(assetID);
-	if (it != music.end())
+	auto it = m_mapMusic.find(assetID);
+	if (it == m_mapMusic.end())
 	{
-		
-		Mix_FreeMusic(it->second);
-		music.erase(it);
-	}
-	else
 		Logger::Log("ASSET_MANAGER: MUSIC: __LINE__123: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
+		return;
+	}
+
+	Mix_FreeMusic(it->second);
+	m_mapMusic.erase(it);
 }
 
 void AssetManager::AddSoundFX(const std::string& assetID, const std::string& filePath)
 {
-	if (soundFX.find(assetID) == soundFX.end())
-		soundFX.emplace(assetID, Mix_LoadWAV(filePath.c_str()));
-	else
+	if (m_mapSoundFx.contains(assetID))
+	{
 		Logger::Err("ASSET_MANAGER: SOUNDFX: __LINE__106: [" + assetID + "] ALREADY EXISTS");
+		return;
+	}
+
+	m_mapSoundFx.emplace(assetID, Mix_LoadWAV(filePath.c_str()));
 }
 
 Mix_Chunk* AssetManager::GetSoundFX(const std::string& assetID)
 {
-	return soundFX[assetID];
+	auto soundItr = m_mapSoundFx.find(assetID);
+	if (soundItr == m_mapSoundFx.end())
+	{
+		Logger::Err("ASSET_MANAGER: Failed to get soundFX: [" + assetID + "] Does not exist!");
+		return nullptr;
+	}
+
+	return soundItr->second;
 }
 
 bool AssetManager::HasSoundFX(const std::string& assetID)
 {
-	if (soundFX.find(assetID) != soundFX.end()) return true;
-	
-	return false;
+	return m_mapSoundFx.contains(assetID);
 }
 
 void AssetManager::RemoveSoundFX(const std::string& assetID)
 {
-	auto it = soundFX.find(assetID);
-	if (it != soundFX.end())
+	auto it = m_mapSoundFx.find(assetID);
+	if (it == m_mapSoundFx.end())
 	{
-		Mix_FreeChunk(it->second);
-		soundFX.erase(it);
-	}
-	else
 		Logger::Log("ASSET_MANAGER: SOUNDFX: __LINE__159: [" + assetID + "] DOES NOT EXIST SO CANNOT BE REMOVED!");
+		return;
+	}
+
+	Mix_FreeChunk(it->second);
+	m_mapSoundFx.erase(it);
 }
 
 void AssetManager::ClearAssets()
 {
-	for (auto& texture : textures)
+	for (auto& texture : m_mapTextures)
 	{
-		// Destroy all the textures
+		// Destroy all the m_mapTextures
 		SDL_DestroyTexture(texture.second); // Clear the SDL_Textures
 	}
-	textures.clear();
+	m_mapTextures.clear();
 
-	for (auto& font : fonts)
+	for (auto& font : m_mapFonts)
 	{
 		TTF_CloseFont(font.second);
 	}
-	fonts.clear();
+	m_mapFonts.clear();
 	
 	// Destroy/ Remove all Music
-	for (auto& fx : soundFX)
+	for (auto& fx : m_mapSoundFx)
 	{
 		Mix_FreeChunk(fx.second);
 	}
-	soundFX.clear();
+	m_mapSoundFx.clear();
 
 	// Destroy / Remove all SoundFX
-	for (auto& music : music)
+	for (auto& m_mapMusic : m_mapMusic)
 	{
-		Mix_FreeMusic(music.second);
+		Mix_FreeMusic(m_mapMusic.second);
 	}
 
-	music.clear();
+	m_mapMusic.clear();
 }

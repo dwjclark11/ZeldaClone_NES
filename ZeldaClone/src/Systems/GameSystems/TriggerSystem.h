@@ -6,18 +6,18 @@ class EventManager;
 class TriggerSystem : public System
 {
 private:
-	sol::state lua;
-	LevelLoader loader;
-	class Game& game;
-	class GameData& gameData;
-	Registry& reg;
+	class Game& m_Game;
+	class GameData& m_GameData;
+	Registry& m_Registry;
+	LevelLoader m_Loader;
+	float m_Angle, m_HeartOffset;
 
+private:
 	bool CheckInventory(ItemComponent::SpecialItemType& item);
 	void SetInventory(ItemComponent::SpecialItemType& item);
 	void StopPlayerMovement(Entity& player, Entity& trigger);
 	
-	float angle;
-	float heartOffset;
+
 	void ChangeScene(Entity& player, Entity& trigger);
 	void PushRocks(Entity& player, Entity& trigger);
 	void RideRaft(Entity& player, Entity& trigger);
@@ -31,8 +31,8 @@ private:
 	void UpdateRaft(Entity& player, Entity& trigger);
 	void UpdateMovingRocks(Entity& player, Entity& trigger);
 	void UpdateLadder(Entity& player, Entity& trigger);
-public:
 
+public:
 	TriggerSystem();
 	~TriggerSystem() = default;
 
@@ -40,6 +40,5 @@ public:
 	void OnTrigger(class CollisionEvent& event);
 	void OnEnterTrigger(Entity& player, Entity& trigger);
 	void Update(const float& dt);
-
 	void SecretTrigger(Entity& trigger, bool startup = false);
 };

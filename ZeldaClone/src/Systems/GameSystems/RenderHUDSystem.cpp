@@ -5,23 +5,23 @@
 #include "../../Components/SpriteComponent.h"
 #include "../../Components/TransformComponent.h"
 #include "../../AssetManager/AssetManager.h"
-#include <SDL.h>
-#include <algorithm>
-#include <vector>
 #include "../../Utilities/GameData.h"
 #include "../../Utilities/Camera.h"
 
+#include <SDL.h>
+#include <algorithm>
+#include <vector>
+
+constexpr int OFFSET = 720;
+
 RenderHUDSystem::RenderHUDSystem()
-	: game(Game::Instance())
-	, gameData(GameData::GetInstance())
+	: m_Game(Game::Instance())
+	, m_GameData(GameData::GetInstance())
+	, m_bPause{false}, m_bGamePlay{false}
 {
-	// All Systems need a required component to help separate what entities need to 
-	// use that system
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
 	RequiredComponent<HUDComponenet>();
-	pause = false;
-	gamePlay = false;
 }
 
 void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager)
@@ -32,18 +32,18 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 		auto& transform = entity.GetComponent<TransformComponent>();
 		auto& sprite = entity.GetComponent<SpriteComponent>();
 
-		if (!gameData.HasItem(GameData::GameItems::WOOD_SWORD) && entity.HasTag("hudSword"))
+		if (!m_GameData.HasItem(GameData::GameItems::WOOD_SWORD) && entity.HasTag("hudSword"))
 		{
 			continue;
 		}
-		else if (gameData.HasItem(GameData::GameItems::WOOD_SWORD) && entity.HasTag("hudSword"))
+		else if (m_GameData.HasItem(GameData::GameItems::WOOD_SWORD) && entity.HasTag("hudSword"))
 		{
-			if (gameData.HasItem(GameData::GameItems::MAGIC_SWORD))
+			if (m_GameData.HasItem(GameData::GameItems::MAGIC_SWORD))
 			{
 				sprite.srcRect.x = sprite.width * 2;
 				sprite.srcRect.y = sprite.height * 0;
 			}
-			else if (gameData.HasItem(GameData::GameItems::SILVER_SWORD))
+			else if (m_GameData.HasItem(GameData::GameItems::SILVER_SWORD))
 			{
 				sprite.srcRect.x = sprite.width * 1;
 				sprite.srcRect.y = sprite.height * 0;
@@ -53,15 +53,15 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 		// Set the src Rect of our original sprite texture
 		SDL_Rect srcRect = sprite.srcRect;
 
-		if (game.GetStateMachine()->GetCurrentState() == "PAUSE" && !pause)
+		if (m_Game.GetStateMachine()->GetCurrentState() == "PAUSE" && !m_bPause)
 		{
-			gamePlay = false;
+			m_bGamePlay = false;
 			transform.position.y += OFFSET;
 		}
-		else if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON" && !gamePlay)
+		else if (m_Game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || m_Game.GetStateMachine()->GetCurrentState() == "DUNGEON" && !m_bGamePlay)
 		{
-			// If we were previously in the pause state, subract the offset from all HUD entities
-			if (pause)
+			// If we were previously in the m_bPause state, subract the offset from all HUD entities
+			if (m_bPause)
 			{
 				transform.position.y -= OFFSET;
 			}
@@ -69,7 +69,7 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 
 		if (entity.HasTag("hudItem"))
 		{
-			switch (gameData.GetSelectedItem())
+			switch (m_GameData.GetSelectedItem())
 			{
 			case GameData::ItemType::BOOMERANG:
 				sprite.srcRect.x = 0;
@@ -125,8 +125,8 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 		// See MovementSystem --> Update()
 		if (entity.HasTag("locator"))
 		{
-			transform.position.x = 10 + (game.GetPlayer()->GetPlayerPos().x * 16);
-			transform.position.y = 40 + (game.GetPlayer()->GetPlayerPos().y * 16);
+			transform.position.x = 10 + (m_Game.GetPlayer()->GetPlayerPos().x * 16);
+			transform.position.y = 40 + (m_Game.GetPlayer()->GetPlayerPos().y * 16);
 		}
 
 		// Set the destination rect with the x, y position to be rendered
@@ -153,16 +153,16 @@ void RenderHUDSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManage
 		);
 	}
 	// Reset the HUD states
-	if (game.GetStateMachine()->GetCurrentState() == "PAUSE")
+	if (m_Game.GetStateMachine()->GetCurrentState() == "PAUSE")
 	{
-		pause = true;
-		gamePlay = false;
+		m_bPause = true;
+		m_bGamePlay = false;
 	}
 
-	if (game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || game.GetStateMachine()->GetCurrentState() == "DUNGEON")
+	if (m_Game.GetStateMachine()->GetCurrentState() == "GAMESTATE" || m_Game.GetStateMachine()->GetCurrentState() == "DUNGEON")
 	{
-		gamePlay = true;
-		pause = false;
+		m_bGamePlay = true;
+		m_bPause = false;
 	}
 
 }

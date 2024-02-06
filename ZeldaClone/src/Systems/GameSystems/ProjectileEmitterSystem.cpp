@@ -26,16 +26,16 @@
 
 void ProjectileEmitterSystem::ClearItemMap()
 {
-	if (projectileAttributeMap.size() > 0)
-		projectileAttributeMap.clear();
+	if (m_mapProjectileAttribs.size() > 0)
+		m_mapProjectileAttribs.clear();
 
-	if (projectileAttributeMap.size() == 0)
+	if (m_mapProjectileAttribs.size() == 0)
 		Logger::Log("Item Map Cleared");
 }
 
 void ProjectileEmitterSystem::ReloadItemMap()
 {
-	if (projectileAttributeMap.size() == 0)
+	if (m_mapProjectileAttribs.size() == 0)
 	{
 		LoadMapAttributes(Game::Instance().GetLuaState());
 		Logger::Log("Item Map Reloaded!");
@@ -49,91 +49,91 @@ void ProjectileEmitterSystem::ReloadItemMap()
 
 void ProjectileEmitterSystem::ItemUsed()
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 
 	auto& rigid = playerEnt.GetComponent<RigidBodyComponent>();
 
 	rigid.velocity = glm::vec2(0);
-	switch (gameData.GetSelectedItem())
+	switch (m_GameData.GetSelectedItem())
 	{
 	case GameData::ItemType::BOW:
 		// Bow uses rupees, must be greater than zero!
-		if (gameData.GetTotalRupees() > 0)
+		if (m_GameData.GetTotalRupees() > 0)
 		{
-			UseItem(projectileAttributeMap.at("bow"));
+			UseItem(m_mapProjectileAttribs.at("bow"));
 
 			// Play the arrow sound!
-			game.GetSoundPlayer().PlaySoundFX("boomerang_arrow", 0, SoundChannel::ANY);
+			m_Game.GetSoundPlayer().PlaySoundFX("boomerang_arrow", 0, SoundChannel::ANY);
 			// Subtract from the total rupees when using the bow!
-			gameData.UseArrow();
+			m_GameData.UseArrow();
 		}
 		break;
 	case GameData::ItemType::BOMB:
-		if (gameData.GetTotalBombs() > 0)
+		if (m_GameData.GetTotalBombs() > 0)
 		{
-			UseItem(projectileAttributeMap.at("bomb"));
-			gameData.UseBomb();
-			game.GetSoundPlayer().PlaySoundFX("bomb_drop", 0, SoundChannel::ANY);
+			UseItem(m_mapProjectileAttribs.at("bomb"));
+			m_GameData.UseBomb();
+			m_Game.GetSoundPlayer().PlaySoundFX("bomb_drop", 0, SoundChannel::ANY);
 		}
 		break;
 	case GameData::ItemType::CANDLE:
-		UseItem(projectileAttributeMap.at("candle"));
-		game.GetSoundPlayer().PlaySoundFX("candle", 0, SoundChannel::ANY);
+		UseItem(m_mapProjectileAttribs.at("candle"));
+		m_Game.GetSoundPlayer().PlaySoundFX("candle", 0, SoundChannel::ANY);
 		break;
 	case GameData::ItemType::BOOMERANG:
 		if (Registry::Instance().DoesTagExist("boomerang"))
 			return;
 
-		UseItem(projectileAttributeMap.at("boomerang"));
-		game.GetSoundPlayer().PlaySoundFX("boomerang_arrow", 0, SoundChannel::ANY);
+		UseItem(m_mapProjectileAttribs.at("boomerang"));
+		m_Game.GetSoundPlayer().PlaySoundFX("boomerang_arrow", 0, SoundChannel::ANY);
 		break;
 	case GameData::ItemType::MAGIC_ROD:
 		UseMagicWand();
-		UseItem(projectileAttributeMap.at("magic_rod"));
-		game.GetSoundPlayer().PlaySoundFX("magic_rod", 0, SoundChannel::ANY);
+		UseItem(m_mapProjectileAttribs.at("magic_rod"));
+		m_Game.GetSoundPlayer().PlaySoundFX("magic_rod", 0, SoundChannel::ANY);
 		break;
 	}
 }
 
 void ProjectileEmitterSystem::SwordUsed()
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	auto& rigid = playerEnt.GetComponent<RigidBodyComponent>();
 
 	rigid.velocity = glm::vec2(0);
 	// Do not use the sword if we do not have a sword
-	if (gameData.HasSword())
+	if (m_GameData.HasSword())
 	{
 		UseSword();
 		// If the player life is full, allow sword beam projectile
-		if (fullLife)
+		if (m_bFullLife)
 		{
 			// Create Sword beam projectile
-			UseItem(projectileAttributeMap.at("beam"));
+			UseItem(m_mapProjectileAttribs.at("beam"));
 
-			game.GetSoundPlayer().PlaySoundFX("sword_shoot", 0, SoundChannel::ANY);
+			m_Game.GetSoundPlayer().PlaySoundFX("sword_shoot", 0, SoundChannel::ANY);
 		}
 		else
-			game.GetSoundPlayer().PlaySoundFX("sword_slash", 0, SoundChannel::ANY);
+			m_Game.GetSoundPlayer().PlaySoundFX("sword_slash", 0, SoundChannel::ANY);
 
-		swordTimer.Start();
+		m_SwordTimer.Start();
 	}
 }
 
 ProjectileEmitterSystem::ProjectileEmitterSystem()
-	: game(Game::Instance())
-	, gameData(GameData::GetInstance())
-	, inputManager(InputManager::GetInstance())
-	, registry(Registry::Instance())
-	, fullLife{false}
-	, swordTimer{}
+	: m_Game(Game::Instance())
+	, m_GameData(GameData::GetInstance())
+	, m_InputManager(InputManager::GetInstance())
+	, m_Registry(Registry::Instance())
+	, m_bFullLife{false}
+	, m_SwordTimer{}
 {
 	RequiredComponent<ProjectileEmitterComponent>();
 	RequiredComponent<TransformComponent>();
-	LoadMapAttributes(game.GetLuaState(), "ProjectileAttributes");
-	swordTimer.Stop();
+	LoadMapAttributes(m_Game.GetLuaState(), "ProjectileAttributes");
+	m_SwordTimer.Stop();
 }
 
 void ProjectileEmitterSystem::SubscribeKeyToEvents(EventManager& eventManager)
@@ -142,7 +142,7 @@ void ProjectileEmitterSystem::SubscribeKeyToEvents(EventManager& eventManager)
 }
 void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	auto& projectileEmitter = playerEnt.GetComponent<ProjectileEmitterComponent>();
 	const auto& transform =   playerEnt.GetComponent<TransformComponent>();
@@ -234,7 +234,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		
 	
 	// Create new projectile entity and add it to the world
-	Entity newItem = playerEnt.registry->CreateEntity();
+	Entity newItem = m_Registry.CreateEntity();
 	newItem.AddComponent<TransformComponent>(projectilePosition, glm::vec2(attrib.scale.x, attrib.scale.y), 0.0);
 
 	if (attrib.group != "bomber")
@@ -246,10 +246,10 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		newItem.AddComponent<BoxColliderComponent>((int)BoxSize.x / transform.scale.x, (int)BoxSize.y / transform.scale.y, glm::vec2(BoxOffset.x, BoxOffset.y));
 	}
 	// Does the projectile have an animation component?
-	if (attrib.animation)
+	if (attrib.bAnimation)
 	{
 		// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
-		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 15, attrib.vertical, true);
+		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 15, attrib.bVertical, true);
 	}
 	projectileEmitter.isFriendly = true;
 	newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
@@ -270,7 +270,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 
 void ProjectileEmitterSystem::UseSword()
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 
 	auto& playerSprite = playerEnt.GetComponent<SpriteComponent>();
@@ -333,13 +333,13 @@ void ProjectileEmitterSystem::UseSword()
 	}
 
 	// Check to see if health is full for sword beam
-	if (playerHealth.healthPercentage == (playerHealth.maxHearts * 2)) fullLife = true;
-	else fullLife = false;
+	if (playerHealth.healthPercentage == (playerHealth.maxHearts * 2)) m_bFullLife = true;
+	else m_bFullLife = false;
 }
 
 void ProjectileEmitterSystem::UseMagicWand()
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	auto& sprite = playerEnt.GetComponent<SpriteComponent>();
 	sprite.srcRect.y = sprite.height * 6;
@@ -451,11 +451,11 @@ void ProjectileEmitterSystem::LoadMapAttributes(sol::state& lua, const std::stri
 				item_attrib["left_offset"]["y"].get_or(0)
 			);
 			newItem.duration = item_attrib["duration"].get_or(3000);
-			newItem.animation = item_attrib["animation"].get_or(false);
-			newItem.vertical = item_attrib["vertical"].get_or(false);
+			newItem.bAnimation = item_attrib["animation"].get_or(false);
+			newItem.bVertical = item_attrib["vertical"].get_or(false);
 
 			// Place the item in the map
-			projectileAttributeMap.emplace(name, newItem);
+			m_mapProjectileAttribs.emplace(name, newItem);
 
 		}
 		i++;
@@ -468,22 +468,22 @@ void ProjectileEmitterSystem::SubscribeBtnToEvents(EventManager& eventManager)
 }
 void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 {
-	if (!game.PlayerHold())
+	if (!m_Game.PlayerHold())
 	{
-		auto& keyboard = inputManager.GetKeyboard();
-		auto& gamepad = inputManager.GetGamepad();
-		auto& player = game.GetPlayer();
+		auto& keyboard = m_InputManager.GetKeyboard();
+		auto& gamepad = m_InputManager.GetGamepad();
+		auto& player = m_Game.GetPlayer();
 
 		if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_X))
 		{
 			ItemUsed();
-			inputManager.SetAttack(true);
+			m_InputManager.SetAttack(true);
 			player->SetAttacking(true);
 		}
-		else if ((keyboard.IsKeyJustPressed(KEY_RSHIFT) || gamepad.IsButtonJustPressed(GP_BTN_A)) && swordTimer.GetTicks() == 0)
+		else if ((keyboard.IsKeyJustPressed(KEY_RSHIFT) || gamepad.IsButtonJustPressed(GP_BTN_A)) && m_SwordTimer.GetTicks() == 0)
 		{
 			SwordUsed();
-			inputManager.SetAttack(true);
+			m_InputManager.SetAttack(true);
 			player->SetAttacking(true);
 		}
 	}
@@ -491,15 +491,15 @@ void ProjectileEmitterSystem::OnKeyPressed(KeyPressedEvent& event)
 
 void ProjectileEmitterSystem::OnBtnPressed(GamePadButtonPressedEvent& event)
 {
-	if (!game.PlayerHold())
+	if (!m_Game.PlayerHold())
 	{
-		auto& player = game.GetPlayer();
-		if (event.button == inputManager.GetBtnCode(InputManager::Action::USE_ITEM))
+		auto& player = m_Game.GetPlayer();
+		if (event.button == m_InputManager.GetBtnCode(InputManager::Action::USE_ITEM))
 		{
 			ItemUsed();
 			player->SetAttacking(true);
 		}
-		else if (event.button == inputManager.GetBtnCode(InputManager::Action::ATTACK) && swordTimer.GetTicks() == 0)
+		else if (event.button == m_InputManager.GetBtnCode(InputManager::Action::ATTACK) && m_SwordTimer.GetTicks() == 0)
 		{
 			SwordUsed();
 			player->SetAttacking(true);
@@ -512,8 +512,8 @@ void ProjectileEmitterSystem::Update()
 	for (auto& entity : GetSystemEntities())
 	{
 		// This is the wait time for the player sword 
-		if (swordTimer.GetTicks() > 250)
-			swordTimer.Stop();
+		if (m_SwordTimer.GetTicks() > 250)
+			m_SwordTimer.Stop();
 
 		// Check the enemy projectile 
 		if (entity.BelongsToGroup("enemies"))
@@ -538,7 +538,7 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 
 	if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
 	{
-		Entity enemyProjectile = entity.registry->CreateEntity();
+		Entity enemyProjectile = m_Registry.CreateEntity();
 		enemyProjectile.Group("projectile");
 		// Variables that can change based on the type of enemy
 		int offsetX = 0;
@@ -627,7 +627,7 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 
 void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	const auto& playerPos = playerEnt.GetComponent<TransformComponent>();
 
@@ -641,9 +641,9 @@ void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 	{
 		if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
 		{
-			Entity enemyProjectile = entity.registry->CreateEntity();
-			Entity enemyProjectile2 = entity.registry->CreateEntity();
-			Entity enemyProjectile3 = entity.registry->CreateEntity();
+			Entity enemyProjectile = m_Registry.CreateEntity();
+			Entity enemyProjectile2 = m_Registry.CreateEntity();
+			Entity enemyProjectile3 = m_Registry.CreateEntity();
 
 			// Have the fireball change direction based on the player position
 			glm::vec2 direction = glm::normalize(playerPos.position - projectileTransform.position);
@@ -713,8 +713,8 @@ std::string ProjectileEmitterSystem::ProjectileAttrib::ToString()
 		<< "Box offset Right: [X: " << rightOffset.x << ", Y: " << rightOffset.y << "]" << "\n"
 		<< "Box offset Left: [X: " << leftOffset.x << ", Y: " << leftOffset.y << "]" << "\n"
 		<< "Duration: " << duration << "\n"
-		<< "Animation: " << animation << "\n"
-		<< "Vertical: " << vertical << "\n";
+		<< "Animation: " << std::boolalpha << bAnimation << "\n"
+		<< "Vertical: " << std::boolalpha << bVertical << "\n";
 
 	return ss.str();
 }

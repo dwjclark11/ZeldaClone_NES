@@ -13,17 +13,20 @@
 #include "../../Utilities/Utility.h"
 #include <SDL.h>
 
+constexpr int LETTER_SPACE = 32;
+
 // This is a hack, I have made an improved version that works much better
 int CaptionSystem::NextLine(std::string& str)
 {
 	for (int i = 0; i < str.length(); i++)
 	{
 		if (i > 18)
+		{
 			if (str[i] == ' ')
 			{
 				return i;
 			}
-				
+		}				
 	}
 }
 

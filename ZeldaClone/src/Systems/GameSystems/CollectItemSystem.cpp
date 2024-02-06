@@ -19,7 +19,7 @@
 #include "../../States/GameState.h"
 
 CollectItemSystem::CollectItemSystem()
-	: game(Game::Instance()), m_GameData(GameData::GetInstance()), reg(Registry::Instance())
+	: m_Game(Game::Instance()), m_GameData(GameData::GetInstance()), m_Registry(Registry::Instance())
 {
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<TriggerBoxComponent>();
@@ -94,7 +94,7 @@ void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
 	}
 
 	if (bPlaySound)
-		game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
+		m_Game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
 	itemComp.bCollected = true;
 	item.Kill();
 }
@@ -126,7 +126,7 @@ void CollectItemSystem::Update()
 		if (trigger.collected && trigger.collectedTimer.GetTicks() > time)
 		{
 			entity.Kill();
-			game.GetPlayer()->SetPlayerItem(false);
+			m_Game.GetPlayer()->SetPlayerItem(false);
 		}
 	}
 }

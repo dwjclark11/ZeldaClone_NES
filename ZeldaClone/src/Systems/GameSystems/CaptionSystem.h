@@ -3,14 +3,14 @@
 
 class CaptionSystem : public System
 {
-private:
-	
+private:	
 	void AddCaption(const Entity& entity, int& spaceX, int& spaceY, char letter);
 	int NextLine(std::string& str);
 
-	const int LETTER_SPACE = 32;
-
 public:
 	CaptionSystem();
+	~CaptionSystem() = default;
+
 	void Update(const float& dt);
+
 };

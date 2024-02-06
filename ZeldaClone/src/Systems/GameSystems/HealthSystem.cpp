@@ -15,7 +15,7 @@ unsigned int HealthSystem::numHearts = 3;
 int HealthSystem::loadedHearts = 0;
 
 HealthSystem::HealthSystem()
-	: game{ Game::Instance() }, reg{ Registry::Instance() }
+	: m_Game{ Game::Instance() }, m_Registry{ Registry::Instance() }, m_bLowHealth{false}
 {
 	RequiredComponent<HealthComponent>();
 	RequiredComponent<SpriteComponent>();
@@ -76,25 +76,25 @@ void HealthSystem::Update()
 		}
 
 		// Start Low health sound timer
-		if (health.healthPercentage <= 2 && !lowHealth)
+		if (health.healthPercentage <= 2 && !m_bLowHealth)
 		{
 			health.lowHeathTimer.Start();
-			lowHealth = true;
+			m_bLowHealth = true;
 		}
 
 		// If the current health is equal or less than 2 and timer is greater, play sound, reset timer
-		if (lowHealth && health.lowHeathTimer.GetTicks() > 250)
+		if (m_bLowHealth && health.lowHeathTimer.GetTicks() > 250)
 		{
-			game.GetSoundPlayer().PlaySoundFX("low_health", 0, SoundChannel::LOW_HEALTH);
+			m_Game.GetSoundPlayer().PlaySoundFX("low_health", 0, SoundChannel::LOW_HEALTH);
 			health.lowHeathTimer.Stop();
-			lowHealth = false;
+			m_bLowHealth = false;
 		}
 
 		// Change the heart sprite based on the current health
 		for (int i = 1; i <= health.maxHearts; i++)
 		{
 			std::string tag = "heart" + std::to_string(i);
-			auto currentHeart = reg.GetEntityByTag(tag);
+			auto currentHeart = m_Registry.GetEntityByTag(tag);
 			auto& sprite = currentHeart.GetComponent<SpriteComponent>();
 
 			// Compare current Health

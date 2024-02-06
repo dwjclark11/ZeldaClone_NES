@@ -26,23 +26,12 @@ class AssetManager;
 class Camera;
 class Player;
 
-// Define constants
-const int FPS = 60;
-const int MILLISECONDS_PER_FRAME = 1000 / FPS;
-
 class Game
 {
 private:
-	int milliSecondsPreviousFrame;
-	int milliSecondsPerFrame;
-	bool m_bIsRunning;
-	class InputManager& m_InputManager;
-
 	SDL_Window* m_pWindow;
 	SDL_Renderer* m_pRenderer;
-	float m_DeltaTime;
-
-	SDL_Rect mouseBox;
+	SDL_Rect m_MouseBox;
 	SDL_Event m_SdlEvent;
 
 	std::unique_ptr<GameStateMachine> m_pGameStateMachine;
@@ -51,35 +40,41 @@ private:
 	std::unique_ptr<MusicPlayer> m_pMusicPlayer;
 	std::unique_ptr<SoundFX> m_pSoundPlayer;
 
-	std::unique_ptr<Camera> m_Camera;
+	std::unique_ptr<Camera> m_pCamera;
 	std::unique_ptr<Player> m_pPlayer;
-
-	static std::unique_ptr<Game> mInstance;
+	class InputManager& m_InputManager;
 	sol::state m_LuaState;
 
+	int m_MSPrevFrame, m_MSPerFrame;
 	int m_GameScale, m_TilePixels, m_WindowWidth, m_WindowHeight;
-	bool m_bDebug;
+	float m_DeltaTime;
+	bool m_bIsRunning, m_bDebug;
 
-	// Constructor
-	Game();
+	static std::unique_ptr<Game> m_pInstance;
 
+private:
 	// Private Function Declarations
 	void Initialize();
 	void Update();
 	void ProcessEvents();
 	void Draw();
+	
+	// Constructor
+	Game();
+	Game(const Game&) = delete;
+	Game& operator=(const Game&) = delete;
 
 public:
-	~Game();
+	~Game() = default;
 	// Creation of the singleton Game
 	static Game& Instance();
 	void Shutdown();
 	void Run();
 
 	// Getters and Setters of objects to be used through-out the game
-	SDL_Renderer* GetRenderer() const { return m_pRenderer; }
-	SDL_Window* GetWindow() { return m_pWindow; }
-	Camera& GetCamera() { return *m_Camera; };
+	inline SDL_Renderer* GetRenderer() const { return m_pRenderer; }
+	inline SDL_Window* GetWindow() { return m_pWindow; }
+	inline Camera& GetCamera() { return *m_pCamera; };
 	SDL_Rect& GetMouseBox();
 	SDL_Event& GetEvent();
 

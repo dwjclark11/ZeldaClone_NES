@@ -18,13 +18,16 @@
 #include "../../Game/Player.h"
 #include "../../Utilities/Utility.h"
 
+constexpr int MAX_WORLD_WIDTH = 16;
+constexpr int MAX_WORLD_HEIGHT = 8;
+
 void MovementSystem::UpdateBoomerang(const double& deltaTime)
 {
 	// If there is no boomerang, nothing to update!
 	if (!Registry::Instance().DoesTagExist("boomerang"))
 		return;
 
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	const auto& playerPos = playerEnt.GetComponent<TransformComponent>();
 	const auto& playerSprite = playerEnt.GetComponent<SpriteComponent>();
@@ -100,7 +103,7 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 			ai.SetEmemyPos(glm::vec2{ entityXPanel, entityYPanel });
 		}
 
-		if (ai.GetEnemyPos() != game.GetPlayer()->GetPlayerPos() || ai.GetEnemyType() == AIComponent::EnemyType::BLADE_TRAP)
+		if (ai.GetEnemyPos() != m_Game.GetPlayer()->GetPlayerPos() || ai.GetEnemyType() == AIComponent::EnemyType::BLADE_TRAP)
 			continue;
 		
 		auto& rigidBody = enemy.GetComponent<RigidBodyComponent>();
@@ -140,21 +143,27 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 		
 		SetDirection(rigidBody);
 
-		if (rigidBody.dir == RigidBodyComponent::Dir::DOWN)
-			sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
-		else if (rigidBody.dir == RigidBodyComponent::Dir::LEFT)
-			sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
-		else if (rigidBody.dir == RigidBodyComponent::Dir::UP)
+		switch (rigidBody.dir)
+		{
+		case RigidBodyComponent::Dir::UP:
 			sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
-		else if (rigidBody.dir == RigidBodyComponent::Dir::RIGHT)
+			break;
+		case RigidBodyComponent::Dir::RIGHT:
 			sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
-
+			break;
+		case RigidBodyComponent::Dir::DOWN:
+			sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
+			break;
+		case RigidBodyComponent::Dir::LEFT:
+			sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
+			break;
+		}
 	}
 }
 
 void MovementSystem::UpdatePlayer(const double& deltaTime)
 {
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	auto& player_transform = playerEnt.GetComponent<TransformComponent>();
 	auto& player_rigidBody = playerEnt.GetComponent<RigidBodyComponent>();
@@ -232,7 +241,7 @@ void MovementSystem::SetDirection(RigidBodyComponent& rigidBody)
 }
 
 MovementSystem::MovementSystem()
-	: game(Game::Instance())
+	: m_Game(Game::Instance())
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<RigidBodyComponent>();
@@ -302,15 +311,9 @@ void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 	auto& obstacle_transform = obstacle.GetComponent<TransformComponent>();
 	auto& obstacle_collider = obstacle.GetComponent<BoxColliderComponent>();
 
-	if (enemy1Rigidbody.dir == RigidBodyComponent::Dir::DOWN)
+	switch (enemy1Rigidbody.dir)
 	{
-		enemy_transform.collision = true;
-		enemy1Rigidbody.velocity.y = 0;
-		enemy_transform.position.y = (obstacle_transform.position.y + obstacle_collider.offset.y) -
-			(enemy_collider.height * enemy_transform.scale.y) - enemy_collider.offset.y;
-		enemy1Rigidbody.velocity.x = -150;
-	}
-	else if (enemy1Rigidbody.dir == RigidBodyComponent::Dir::UP)
+	case RigidBodyComponent::Dir::UP:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.y = 0;
@@ -318,24 +321,40 @@ void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 			(obstacle_collider.height * obstacle_transform.scale.y) - enemy_collider.offset.y;
 
 		enemy1Rigidbody.velocity.x = 150;
+
+		break;
 	}
-	else if (enemy1Rigidbody.dir == RigidBodyComponent::Dir::RIGHT)
+	case RigidBodyComponent::Dir::RIGHT:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.x = 0;
 		enemy_transform.position.x = (obstacle_transform.position.x + obstacle_collider.offset.x) -
 			(obstacle_collider.width * obstacle_transform.scale.x) - enemy_collider.offset.x;
-		
+
 		enemy1Rigidbody.velocity.y = 150;
+
+		break;
 	}
-	else if (enemy1Rigidbody.dir == RigidBodyComponent::Dir::LEFT)
+	case RigidBodyComponent::Dir::DOWN:
+	{
+		enemy_transform.collision = true;
+		enemy1Rigidbody.velocity.y = 0;
+		enemy_transform.position.y = (obstacle_transform.position.y + obstacle_collider.offset.y) -
+			(enemy_collider.height * enemy_transform.scale.y) - enemy_collider.offset.y;
+		enemy1Rigidbody.velocity.x = -150;
+
+		break;
+	}
+	case RigidBodyComponent::Dir::LEFT:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.x = 0;
 		enemy_transform.position.x = (obstacle_transform.position.x + obstacle_collider.offset.x) +
 			(enemy_collider.width * enemy_transform.scale.x) - enemy_collider.offset.x;
-		
+
 		enemy1Rigidbody.velocity.y = -150;
+		break;
+	}
 	}
 }
 

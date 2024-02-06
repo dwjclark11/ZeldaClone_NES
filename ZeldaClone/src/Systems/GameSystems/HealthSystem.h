@@ -4,15 +4,16 @@
 class HealthSystem : public System
 {
 private:
-	class Game& game;
-	class Registry& reg;
-	bool lowHealth = false;
+	class Game& m_Game;
+	class Registry& m_Registry;
+	bool m_bLowHealth;
 
 public:
-	static unsigned int numHearts;
-	static int loadedHearts;
-	
 	HealthSystem();
+	~HealthSystem() = default;
 	void Update();
 	
+	// TODO: Remove these statics
+	static unsigned int numHearts;
+	static int loadedHearts;
 };

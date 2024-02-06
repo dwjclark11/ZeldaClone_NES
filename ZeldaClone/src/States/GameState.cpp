@@ -53,22 +53,21 @@
 #include "../Game/Player.h"
 
 // Set the values of the statics
-const std::string GameState::gameID = "GAMESTATE";
-
-bool GameState::firstEntered = false;
+const std::string GameState::m_sGameID = "GAMESTATE";
+bool GameState::m_bFirstEntered = false;
 
 void GameState::UpdatePlayerKeys()
 {
-	const auto& player = game.GetPlayer();
-	player->UpdatePlayer(game, inputManager);
+	const auto& player = m_Game.GetPlayer();
+	player->UpdatePlayer(m_Game, m_InputManager);
 }
 
 void GameState::UpdatePauseContol()
 {
-	const auto& keyboard = inputManager.GetKeyboard();
-	const auto& gamepad = inputManager.GetGamepad();
-	auto& camera = game.GetCamera();
-	auto& player = game.GetPlayer();
+	const auto& keyboard = m_InputManager.GetKeyboard();
+	const auto& gamepad = m_InputManager.GetGamepad();
+	auto& camera = m_Game.GetCamera();
+	auto& player = m_Game.GetPlayer();
 
 	// Set to paused
 	if (keyboard.IsKeyJustReleased(KEY_P) || gamepad.IsButtonJustReleased(GP_BTN_Y))
@@ -76,22 +75,22 @@ void GameState::UpdatePauseContol()
 		camera.SetFadeFinished(false);
 		camera.StartFadeOut(true);
 		camera.StartFadeIn(false);
-		inputManager.SetPaused(true);
+		m_InputManager.SetPaused(true);
 		m_bPaused = true;
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_C) || gamepad.IsButtonHeld(GP_BTN_BACK))
 	{
-		if (!game.IsDebugging())
-			game.SetDebug(true);
+		if (!m_Game.IsDebugging())
+			m_Game.SetDebug(true);
 		else
-			game.SetDebug(false);
+			m_Game.SetDebug(false);
 	}
 
 	if (keyboard.IsKeyJustReleased(KEY_SPACE) || keyboard.IsKeyJustReleased(KEY_RSHIFT) || 
 		gamepad.IsButtonJustReleased(GP_BTN_A) || gamepad.IsButtonJustReleased(GP_BTN_X))
 	{
 		player->SetAttacking(false);
-		inputManager.SetAttack(false);
+		m_InputManager.SetAttack(false);
 	}
 }
 
@@ -100,49 +99,45 @@ GameState::GameState()
 {
 }
 
-GameState::~GameState()
-{
-
-}
 
 GameState::GameState(glm::vec2 cameraOffset)
-	: game(Game::Instance()), reg(Registry::Instance())
-	, inputManager(InputManager::GetInstance()), cameraOffset(cameraOffset)
-	, gameData(GameData::GetInstance())
-	, hudRect{ 0, 0, game.GetWindowWidth(), 256 }
+	: m_Game(Game::Instance()), m_Registry(Registry::Instance())
+	, m_InputManager(InputManager::GetInstance()), m_CameraOffset(cameraOffset)
+	, m_GameData(GameData::GetInstance())
+	, m_HudRect{ 0, 0, m_Game.GetWindowWidth(), 256 }
 	, m_bPaused{false}
-	, m_TriggerSystem{ reg.GetSystem<TriggerSystem>() }
-	, m_CollectItemSystem{ reg.GetSystem<CollectItemSystem>() }
-	, m_AnimationSystem{ reg.GetSystem<AnimationSystem>() }
-	, m_MovementSystem{ reg.GetSystem<MovementSystem>() }
-	, m_ProjectileEmitterSystem{ reg.GetSystem<ProjectileEmitterSystem>() }
-	, m_CameraMovementSystem{ reg.GetSystem<CameraMovementSystem>() }
-	, m_ProjectileLifeCycleSystem{ reg.GetSystem<ProjectileLifeCycleSystem>() }
-	, m_AISystem{ reg.GetSystem<AISystem>() }
-	, m_CaptionSystem{ reg.GetSystem<CaptionSystem>() }
-	, m_CollisionSystem{ reg.GetSystem<CollisionSystem>() }
-	, m_DamageSystem{ reg.GetSystem<DamageSystem>() }
-	, m_HealthSystem { reg.GetSystem<HealthSystem>() }
-	, m_RenderSystem{ reg.GetSystem<RenderSystem>() }
-	, m_RenderTileSystem{ reg.GetSystem<RenderTileSystem>() }
-	, m_RenderHUDSystem{ reg.GetSystem<RenderHUDSystem>() }
-	, m_RenderCollisionSystem{ reg.GetSystem<RenderCollisionSystem>() }
+	, m_TriggerSystem{ m_Registry.GetSystem<TriggerSystem>() }
+	, m_CollectItemSystem{ m_Registry.GetSystem<CollectItemSystem>() }
+	, m_AnimationSystem{ m_Registry.GetSystem<AnimationSystem>() }
+	, m_MovementSystem{ m_Registry.GetSystem<MovementSystem>() }
+	, m_ProjectileEmitterSystem{ m_Registry.GetSystem<ProjectileEmitterSystem>() }
+	, m_CameraMovementSystem{ m_Registry.GetSystem<CameraMovementSystem>() }
+	, m_ProjectileLifeCycleSystem{ m_Registry.GetSystem<ProjectileLifeCycleSystem>() }
+	, m_AISystem{ m_Registry.GetSystem<AISystem>() }
+	, m_CaptionSystem{ m_Registry.GetSystem<CaptionSystem>() }
+	, m_CollisionSystem{ m_Registry.GetSystem<CollisionSystem>() }
+	, m_DamageSystem{ m_Registry.GetSystem<DamageSystem>() }
+	, m_HealthSystem { m_Registry.GetSystem<HealthSystem>() }
+	, m_RenderSystem{ m_Registry.GetSystem<RenderSystem>() }
+	, m_RenderTileSystem{ m_Registry.GetSystem<RenderTileSystem>() }
+	, m_RenderHUDSystem{ m_Registry.GetSystem<RenderHUDSystem>() }
+	, m_RenderCollisionSystem{ m_Registry.GetSystem<RenderCollisionSystem>() }
 {
-	game.GetCamera().SetCameraPosition(cameraOffset.x, cameraOffset.y);
+	m_Game.GetCamera().SetCameraPosition(m_CameraOffset.x, m_CameraOffset.y);
 }
 
 void GameState::Update(const float& deltaTime)
 {
-	auto& camera = game.GetCamera();
-	if (inputManager.IsPaused() && camera.GetFadeAlpha() == 0)
+	auto& camera = m_Game.GetCamera();
+	if (m_InputManager.IsPaused() && camera.GetFadeAlpha() == 0)
 	{
 		camera.SetFadeFinished(true);
 		camera.StartFadeOut(false);
-		game.GetStateMachine()->PushState(std::make_unique<PauseState>(), false);
+		m_Game.GetStateMachine()->PushState(std::make_unique<PauseState>(), false);
 	}
 
 	// Check to see if level music has been paused
-	if (!inputManager.IsPaused() && !camera.FadeOutStarted() && m_bPaused)
+	if (!m_InputManager.IsPaused() && !camera.FadeOutStarted() && m_bPaused)
 	{
 		// Turn music volume up
 		Mix_VolumeMusic(10);
@@ -151,60 +146,53 @@ void GameState::Update(const float& deltaTime)
 	}
 
 	m_TriggerSystem.Update(deltaTime);
-
-	// Update the registry values
-	reg.Update();
-
 	m_CollectItemSystem.Update();
 	m_AnimationSystem.Update();
 	m_MovementSystem.Update(deltaTime);
 	m_ProjectileEmitterSystem.Update();
-	m_CameraMovementSystem.UpdatePlayerCam(game.GetCamera(), deltaTime);
-
+	m_CameraMovementSystem.UpdatePlayerCam(m_Game.GetCamera(), deltaTime);
 	m_ProjectileLifeCycleSystem.Update();
-
 	m_AISystem.Update();
 	m_CaptionSystem.Update(deltaTime);
-
 	m_CollisionSystem.Update();
 
 	// Update the registry values
-	reg.Update();
+	m_Registry.Update();
 
 	// Update all Game systems
-	game.GetPlayer()->UpdateStateMachine();
+	m_Game.GetPlayer()->UpdateStateMachine();
 }
 
 void GameState::Render()
 {
-	auto& camera = game.GetCamera();
+	auto& camera = m_Game.GetCamera();
 	m_RenderTileSystem.Update();
 	camera.UpdateScreenFlash();
 	m_RenderSystem.Update();
 	
 	// Render all HUD objects
-	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
-	SDL_RenderFillRect(game.GetRenderer(), &hudRect);
-	SDL_RenderDrawRect(game.GetRenderer(), &hudRect);
-	SDL_SetRenderDrawColor(game.GetRenderer(), 0, 0, 0, 255);
+	SDL_SetRenderDrawColor(m_Game.GetRenderer(), 0, 0, 0, 255);
+	SDL_RenderFillRect(m_Game.GetRenderer(), &m_HudRect);
+	SDL_RenderDrawRect(m_Game.GetRenderer(), &m_HudRect);
+	SDL_SetRenderDrawColor(m_Game.GetRenderer(), 0, 0, 0, 255);
 	
 	camera.UpdateCurtain();
 
-	m_RenderHUDSystem.Update(game.GetRenderer(), game.GetAssetManager());
+	m_RenderHUDSystem.Update(m_Game.GetRenderer(), m_Game.GetAssetManager());
 	m_HealthSystem.Update();
 
-	// If the game is in debug mode, render the collision system
-	if (game.IsDebugging())
+	// If the m_Game is in debug mode, render the collision system
+	if (m_Game.IsDebugging())
 	{
-		m_RenderCollisionSystem.Update(game.GetRenderer(), camera.GetCameraRect());
+		m_RenderCollisionSystem.Update(m_Game.GetRenderer(), camera.GetCameraRect());
 	}
 }
 
 bool GameState::OnEnter()
 {
 	LevelLoader loader;
-	auto& camera = game.GetCamera();
-	if (!firstEntered)
+	auto& camera = m_Game.GetCamera();
+	if (!m_bFirstEntered)
 	{
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
 		if (camera.GetCameraPos().x != 7168 && camera.GetCameraPos().x != 6720)
@@ -213,39 +201,39 @@ bool GameState::OnEnter()
 		}
 		camera.StartCurtainOpen();
 
-		// Open the lua libraries into the game
-		game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
+		// Open the lua libraries into the m_Game
+		m_Game.GetLuaState().open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
 		
-		// Make sure the game is not in debug mode!!
-		game.SetDebug(false);
+		// Make sure the m_Game is not in debug mode!!
+		m_Game.SetDebug(false);
 		
-		loader.LoadAssetsFromLuaTable(game.GetLuaState(), "game_state_assets");
-		loader.LoadHUDFromLuaTable(game.GetLuaState(), "hud");
-		loader.LoadEnemiesFromLuaTable(game.GetLuaState(), "overworld_enemies_2");
-		loader.LoadEntitiesFromLuaTable(game.GetLuaState(), "over_world_entities");
+		loader.LoadAssetsFromLuaTable(m_Game.GetLuaState(), "game_state_assets");
+		loader.LoadHUDFromLuaTable(m_Game.GetLuaState(), "hud");
+		loader.LoadEnemiesFromLuaTable(m_Game.GetLuaState(), "overworld_enemies_2");
+		loader.LoadEntitiesFromLuaTable(m_Game.GetLuaState(), "over_world_entities");
 		loader.LoadColliders("overworld_colliders_1");
-		loader.LoadTriggers(game.GetLuaState(), "overworld_triggers");
+		loader.LoadTriggers(m_Game.GetLuaState(), "overworld_triggers");
 
-		game.GetMusicPlayer().PlayMusic("Overworld", -1);
+		m_Game.GetMusicPlayer().PlayMusic("Overworld", -1);
 		// Load the overworld map
 		loader.LoadMap("map", 4096, 1344);
 
-		m_TriggerSystem.SubscribeToEvents(game.GetEventManager());
-		m_CollectItemSystem.SubscribeToEvents(game.GetEventManager());
-		m_MovementSystem.SubscribeToEvents(game.GetEventManager());
-		m_ProjectileEmitterSystem.SubscribeKeyToEvents(game.GetEventManager());
-		m_ProjectileEmitterSystem.SubscribeBtnToEvents(game.GetEventManager());
-		m_DamageSystem.SubscribeToEvents(game.GetEventManager());
+		m_TriggerSystem.SubscribeToEvents(m_Game.GetEventManager());
+		m_CollectItemSystem.SubscribeToEvents(m_Game.GetEventManager());
+		m_MovementSystem.SubscribeToEvents(m_Game.GetEventManager());
+		m_ProjectileEmitterSystem.SubscribeKeyToEvents(m_Game.GetEventManager());
+		m_ProjectileEmitterSystem.SubscribeBtnToEvents(m_Game.GetEventManager());
+		m_DamageSystem.SubscribeToEvents(m_Game.GetEventManager());
 
-		firstEntered = true;
+		m_bFirstEntered = true;
 	}
 
-	if (!game.GetPlayer())
+	if (!m_Game.GetPlayer())
 	{
-		loader.CreatePlayerEntityFromLuaTable(game.GetLuaState(), "new_player_create");
+		loader.CreatePlayerEntityFromLuaTable(m_Game.GetLuaState(), "new_player_create");
 		// Load the player file based on the selected slot
 		auto playerNum = GameData::GetInstance().PlayerNum();
-		loader.LoadPlayerDataFromLuaTable(game.GetLuaState(), "save" + std::to_string(playerNum), playerNum);
+		loader.LoadPlayerDataFromLuaTable(m_Game.GetLuaState(), "save" + std::to_string(playerNum), playerNum);
 
 		auto player = Registry::Instance().GetEntityByTag("player");
 		// Reset the player health after pressing continue [Game Over]
@@ -256,31 +244,31 @@ bool GameState::OnEnter()
 			playerHealth.healthPercentage = 2 * playerHealth.maxHearts;
 		}
 
-		game.GetPlayer()->SetPlayerCreated(true);
+		m_Game.GetPlayer()->SetPlayerCreated(true);
 		{
-			game.GetPlayer()->GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
-			game.GetPlayer()->GetPlayerStateMachine().ChangeState(player);
+			m_Game.GetPlayer()->GetPlayerStateMachine().AddState(std::make_unique<IdleState>());
+			m_Game.GetPlayer()->GetPlayerStateMachine().ChangeState(player);
 		}
 	}
 
 	// Read in all secrets!!
-	loader.ReadInSecrets(game.GetLuaState());
+	loader.ReadInSecrets(m_Game.GetLuaState());
 
-	// Remove the menu/Game over system for it is not needed in the game state
-	reg.RemoveSystem<RenderMainMenuSystem>();	
-	game.GetAssetManager()->AddFonts("game_font", "./Assets/Fonts/prstart.ttf", 30);
-	game.GetAssetManager()->AddTextures(game.GetRenderer(), "simple_enemies", "./Assets/EnemySprites/simple_enemies.png");
+	// Remove the menu/Game over system for it is not needed in the m_Game state
+	m_Registry.RemoveSystem<RenderMainMenuSystem>();	
+	m_Game.GetAssetManager()->AddFonts("game_font", "./Assets/Fonts/prstart.ttf", 30);
+	m_Game.GetAssetManager()->AddTextures(m_Game.GetRenderer(), "simple_enemies", "./Assets/EnemySprites/simple_enemies.png");
 
 	return true;
 }
 
 bool GameState::OnExit()
 {
-	game.GetEventManager().Reset();
+	m_Game.GetEventManager().Reset();
 	m_RenderCollisionSystem.OnExit();
 	m_RenderSystem.OnExit();
 	m_RenderTileSystem.OnExit();
-	firstEntered = false;
+	m_bFirstEntered = false;
 	return true;
 }
 

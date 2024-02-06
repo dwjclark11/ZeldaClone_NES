@@ -5,9 +5,11 @@ class Game;
 class AISystem : public System
 {
 private:
-	Game& game;
+	Game& m_Game;
+
 public:
 	AISystem();
+	~AISystem() = default;
 	
 	void Update();
 };

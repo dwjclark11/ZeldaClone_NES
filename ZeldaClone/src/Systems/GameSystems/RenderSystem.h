@@ -4,10 +4,11 @@
 class RenderSystem : public System
 {
 private:
-	class Game& game;
+	class Game& m_Game;
 
 public:
 	RenderSystem();
+	~RenderSystem() = default;
 
 	void Update();
 	void OnExit();

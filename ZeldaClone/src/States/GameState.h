@@ -8,12 +8,14 @@
 class GameState : public State
 {
 private:
-	static const std::string gameID;
-	glm::vec2 cameraOffset;
-	class Game& game;
-	class GameData& gameData;
-	class Registry& reg;
-	class InputManager& inputManager;
+	static const std::string m_sGameID;
+	static bool m_bFirstEntered;
+
+	class Game& m_Game;
+	class GameData& m_GameData;
+	class Registry& m_Registry;
+	class InputManager& m_InputManager;
+	glm::vec2 m_CameraOffset;
 
 	// Game Systems Refs
 	class TriggerSystem& m_TriggerSystem;
@@ -34,8 +36,7 @@ private:
 	class RenderHUDSystem& m_RenderHUDSystem;
 	class RenderCollisionSystem& m_RenderCollisionSystem;
 
-	SDL_Rect hudRect;
-	
+	SDL_Rect m_HudRect;
 	bool m_bPaused;
 
 private:
@@ -43,14 +44,11 @@ private:
 	void UpdatePauseContol();
 
 public:	
-	static bool firstEntered;
-
-	// Constructor
 	GameState();
-	~GameState();
-
 	GameState(glm::vec2 cameraOffset);
-	
+
+	~GameState() = default;
+
 	virtual void Update(const float& deltaTime) override;
 	virtual void Render() override;
 
@@ -58,5 +56,5 @@ public:
 	virtual bool OnExit() override;
 
 	virtual void ProcessEvents(SDL_Event& event) override;
-	virtual std::string GetStateID() const { return gameID; }
+	virtual std::string GetStateID() const { return m_sGameID; }
 };

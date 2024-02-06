@@ -4,8 +4,7 @@
 class AnimationSystem : public System
 {
 public:
-	
 	AnimationSystem();
-
+	~AnimationSystem() = default;
 	void Update();
 };

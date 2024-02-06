@@ -14,38 +14,40 @@
 #include "../inputs/InputManager.h"
 #include "../inputs/Gamepad.h"
 
+
+// Define constants
+constexpr int FPS = 60;
+constexpr int MILLISECONDS_PER_FRAME = 1000 / FPS;
+
 // Initialize all static variables
-std::unique_ptr<Game> Game::mInstance = nullptr;
+std::unique_ptr<Game> Game::m_pInstance = nullptr;
 
 // Constructor 
 Game::Game()
-	: m_bIsRunning(true)
-	, m_pWindow(nullptr)
-	, m_pRenderer(nullptr)
-	, m_pGameStateMachine(nullptr)
-	, milliSecondsPerFrame(0)
-	, m_DeltaTime(0.0f)
-	, m_Camera{nullptr}
+	: m_bIsRunning{ true }
+	, m_pWindow{ nullptr }
+	, m_pRenderer{ nullptr }
+	, m_pGameStateMachine{ nullptr }
+	, m_MSPerFrame{ 0 }
+	, m_DeltaTime{ 0.0f }
+	, m_pCamera{nullptr}
 	, m_pPlayer{nullptr}
-	, m_InputManager(InputManager::GetInstance())
+	, m_InputManager{ InputManager::GetInstance() }
+	, m_pAssetManager{ std::make_unique<AssetManager>() }
+	, m_pEventManager{ std::make_unique<EventManager>() }
 {
-	m_pAssetManager = std::make_unique<AssetManager>();
-	m_pEventManager = std::make_unique<EventManager>();
+	
 }
-// Destructor
-Game::~Game()
-{
 
-}
 
 Game& Game::Instance()
 {
-	if (!mInstance)
+	if (!m_pInstance)
 	{
-		mInstance.reset(new Game());
+		m_pInstance.reset(new Game());
 	}
 
-	return *mInstance;
+	return *m_pInstance;
 }
 
 // Initialize SDL/IMGUI and variables
@@ -66,8 +68,7 @@ void Game::Initialize()
 	}
 	
 	// Allocate channels and control the volume of the music
-	auto num_channels = Mix_AllocateChannels(16);
-	auto num_reserved_channels = Mix_ReserveChannels(4);
+	Mix_AllocateChannels(16);
 	Mix_Volume(1, MIX_MAX_VOLUME / 4);
 	// Turn music volume down
 	Mix_VolumeMusic(10);
@@ -125,13 +126,13 @@ void Game::Initialize()
 	Registry::Instance().AddSystem<AnimationSystem>();
 	Registry::Instance().AddSystem<CameraMovementSystem>();
 
-	m_Camera = std::make_unique<Camera>(7168, 4448, m_WindowWidth, m_WindowHeight);
+	m_pCamera = std::make_unique<Camera>(7168, 4448, m_WindowWidth, m_WindowHeight);
 	m_pMusicPlayer = std::make_unique<MusicPlayer>(*m_pAssetManager);
 	m_pSoundPlayer = std::make_unique<SoundFX>(*m_pAssetManager);
 	
 	// Initialize Mouse Box for Editor State
-	mouseBox.w = 1;
-	mouseBox.h = 1;
+	m_MouseBox.w = 1;
+	m_MouseBox.h = 1;
 	
 	// Add the needed sounds, textures, and fonts to the asset manager 
 	m_pAssetManager->AddSoundFX("text_slow", "./Assets/sounds/Text_Slow.wav");
@@ -147,18 +148,18 @@ void Game::Initialize()
 void Game::Update()
 {
 	// If we are too fast, waste some time until we reach the desired time per frame.
-	int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - milliSecondsPerFrame);
+	int timeToWait = MILLISECONDS_PER_FRAME - (SDL_GetTicks() - m_MSPerFrame);
 
-	if (timeToWait > 0 && timeToWait <= milliSecondsPerFrame)
+	if (timeToWait > 0 && timeToWait <= m_MSPerFrame)
 	{
 		SDL_Delay(timeToWait);
 	}
 
 	// The difference in ticks since the last frame, converted to seconds
-	m_DeltaTime = (SDL_GetTicks() - milliSecondsPreviousFrame) / 1000.0f;
+	m_DeltaTime = (SDL_GetTicks() - m_MSPrevFrame) / 1000.0f;
 
 	// Store the current time frame
-	milliSecondsPreviousFrame = SDL_GetTicks();
+	m_MSPrevFrame = SDL_GetTicks();
 
 	m_pGameStateMachine->Update(m_DeltaTime);
 	m_InputManager.GetKeyboard().Update();
@@ -276,7 +277,7 @@ void Game::Run()
 
 SDL_Rect& Game::GetMouseBox()
 {
-	return mouseBox;
+	return m_MouseBox;
 }
 
 SDL_Event& Game::GetEvent()
@@ -291,9 +292,15 @@ std::unique_ptr<Player>& Game::CreateNewPlayer(Entity& player, Entity& sword, En
 
 const bool Game::PlayerHold() const 
 {
-	if (m_pPlayer->GetPlayerDead() || m_pPlayer->GetPlayerOnStairs() || 
-		m_pPlayer->GetPlayerItem() || m_Camera->FadeOutStarted() || m_Camera->FadeInStarted() || 
-		m_pPlayer->GetRaft() || m_Camera->IsCameraMoving() || m_InputManager.IsAttacking())
+	if (m_pPlayer->GetPlayerDead() || 
+		m_pPlayer->GetPlayerOnStairs() || 
+		m_pPlayer->GetPlayerItem() || 
+		m_pCamera->FadeOutStarted() || 
+		m_pCamera->FadeInStarted() || 
+		m_pPlayer->GetRaft() || 
+		m_pCamera->IsCameraMoving() || 
+		m_InputManager.IsAttacking()
+	)
 		return true;
 	else
 		return false;
