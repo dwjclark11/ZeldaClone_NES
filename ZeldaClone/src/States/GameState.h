@@ -8,9 +8,6 @@
 class GameState : public State
 {
 private:
-	static const std::string m_sGameID;
-	static bool m_bFirstEntered;
-
 	class Game& m_Game;
 	class GameData& m_GameData;
 	class Registry& m_Registry;
@@ -38,6 +35,8 @@ private:
 
 	SDL_Rect m_HudRect;
 	bool m_bPaused;
+
+	const std::string m_sGameID{"GAMESTATE"};
 
 private:
 	void UpdatePlayerKeys();

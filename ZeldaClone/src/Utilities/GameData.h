@@ -47,7 +47,7 @@ private:
 	int m_TotalPrevBombs, m_TotalKeys, m_TotalPrevKeys, m_TotalTriforcePieces, m_Index;
 	class Game& m_Game;
 	Timer m_RupeeTimer;
-	bool m_bRupeeScrolling, m_bBuyItem;
+	bool m_bRupeeScrolling, m_bBuyItem, m_bGameLoaded;
 	TriggerBoxComponent m_TriggerBoxComponent;
 	SceneChangeComponent m_SceneChangeComponent;
 
@@ -110,4 +110,7 @@ public:
 	inline void SetTriggerBoxValues(const TriggerBoxComponent& trigger_box) { m_TriggerBoxComponent = trigger_box; }
 	inline const SceneChangeComponent& GetScene() { return m_SceneChangeComponent; }
 	inline const TriggerBoxComponent& GetTrigger() { return m_TriggerBoxComponent; }
+
+	inline const bool IsGameLoaded() const { return m_bGameLoaded; }
+	inline void SetGameLoaded(bool bGameLoaded) { m_bGameLoaded = bGameLoaded; }
 };

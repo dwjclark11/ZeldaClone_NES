@@ -52,10 +52,6 @@
 #include "../Inputs/Gamepad.h"
 #include "../Game/Player.h"
 
-// Set the values of the statics
-const std::string GameState::m_sGameID = "GAMESTATE";
-bool GameState::m_bFirstEntered = false;
-
 void GameState::UpdatePlayerKeys()
 {
 	const auto& player = m_Game.GetPlayer();
@@ -192,7 +188,7 @@ bool GameState::OnEnter()
 {
 	LevelLoader loader;
 	auto& camera = m_Game.GetCamera();
-	if (!m_bFirstEntered)
+	if (!m_GameData.IsGameLoaded())
 	{
 		// Always start the player and the camera from the beginning Location for now --> Create Constants for Special CAM Locations
 		if (camera.GetCameraPos().x != 7168 && camera.GetCameraPos().x != 6720)
@@ -224,8 +220,7 @@ bool GameState::OnEnter()
 		m_ProjectileEmitterSystem.SubscribeKeyToEvents(m_Game.GetEventManager());
 		m_ProjectileEmitterSystem.SubscribeBtnToEvents(m_Game.GetEventManager());
 		m_DamageSystem.SubscribeToEvents(m_Game.GetEventManager());
-
-		m_bFirstEntered = true;
+		m_GameData.SetGameLoaded(true);
 	}
 
 	if (!m_Game.GetPlayer())
@@ -268,7 +263,7 @@ bool GameState::OnExit()
 	m_RenderCollisionSystem.OnExit();
 	m_RenderSystem.OnExit();
 	m_RenderTileSystem.OnExit();
-	m_bFirstEntered = false;
+	m_GameData.SetGameLoaded(false);
 	return true;
 }
 
