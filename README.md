@@ -88,13 +88,12 @@ This project currently uses Visual Studio 2022 Community and has not been tested
 
 ## Desired Additions/Changes
 Some of the desired changes are:
-* Change from using the SDL2 renderer to a OpenGL Graphics Pipeline 
 * Add an animation editor to the tilemap editor that allows the ability to load sprites and change animation speeds on the spot
 * Add enemies to any maps using the editor
 * Add a functional AI state machine with for entities/enemies done in lua
     *  Currently this is done in C++, Not easy to make small changes!
 * ~~Ability for user to change keys/gamepad controls (Currently Hard Coded)~~ Completed.
-* Remove a lot of static variables 
+* ~~Remove a lot of static variables~~ 
 * Figure out how to remove the Game Singleton and create a loose coupling amongst concrete classes.
 
 
@@ -105,8 +104,8 @@ Some of the bugs are as follows:
     *  Maybe create an enemy collider that reflects them in the opposite direction?
 * Sometimes dropped items are not picked up correctly.
     *  For instance hearts picked up but not healing, bombs picked up but not adding
-* The sword can hurt enemies when not attacking
-    *  Currently the sword moves around on the player in the center. Need to add check if attacking or not. Or recreate the sword on all attacks...       
+* ~~The sword can hurt enemies when not attacking~~ This has been fixed 
+    *  ~~Currently the sword moves around on the player in the center. Need to add check if attacking or not. Or recreate the sword on all attacks~~      
 
 ## Dustin 
 
