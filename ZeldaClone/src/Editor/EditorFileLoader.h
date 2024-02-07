@@ -2,20 +2,18 @@
 #include "../ECS/ECS.h"
 #include "../AssetManager/AssetManager.h"
 #include "../Components/TriggerBoxComponent.h"
-
 #include "../Components/AIComponent.h"
+#include "../Utilities/LuaTableWriter.h"
+
 #include <SDL.h>
 #include <memory>
-#include "../Utilities/LuaTableWriter.h"
 #include <sol/sol.hpp>
-
-
 
 class EditorFileLoader : public System
 {
 public:
 	// Constructor/Destructor
-	EditorFileLoader();
+	EditorFileLoader(class MouseControlSystem& mouseControl);
 	~EditorFileLoader();
 
 	// Load Functions
@@ -30,26 +28,25 @@ public:
 	void SaveBoxColliderMapToLuaFile(std::string filepath /*const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer*/);
 	void SaveEnemiesToLuaFile(std::string filepath);
 	void SaveTriggersToLuaFile(std::string filepath);
+
 	// Setters
 	void SetFileName(std::string filename);
 	void SetImageName(std::string imageName);
 	std::string SetName(std::string filePath, bool wExtension = true, char separator = '\\');
 	
-	
-
-
 	void LoadEnemiesAttributes(sol::state& lua, std::string& fileName, std::string& enemy_name);
-	
 	void CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy);
 	
 	// Converters
 	std::string ConvertToString(TriggerBoxComponent::TriggerType triggerType);
 	std::string ConvertAIEnemyToString(AIComponent::EnemyType type);
+
 private:
 	// Declaration of variables
-	std::string fileName;
-	std::string imageName;
-	class Registry& reg;
+	std::string m_sFileName;
+	std::string m_sImageName;
+	class Registry& m_Registry;
+	class MouseControlSystem& m_MouseControl;
 
 	void WriteTransformComponent(LuaTableWriter& writer, const class TransformComponent& transform, std::fstream& file, bool last);
 	void WriteBoxColliderComponent(LuaTableWriter& writer, const class BoxColliderComponent& collision, std::fstream& file, bool last);

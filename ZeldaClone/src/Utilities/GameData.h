@@ -34,11 +34,6 @@ public:
 	};
 
 private:
-	const int MAX_RUPEES = 255;
-	const int MAX_BOMBS = 15;
-	const int MAX_KEYS = 15;
-	const int MAX_TRIFORCE_PIECES = 9;
-
 	std::unordered_map<GameItems, bool> m_mapGameItems;
 	std::unordered_map<std::string, bool> m_mapGameSecrets;
 	ItemType m_eSelectedItem;
@@ -71,8 +66,8 @@ public:
 	bool IsSecretFound(const std::string& locationID);
 	void SetSecretFound(const std::string& locationID, bool found);
 	void AddRupees(int num) { m_ScrollRupees += num; }
-	void AddBombs(int num) { m_TotalBombs += num; if (m_TotalBombs >= MAX_BOMBS) m_TotalBombs = MAX_BOMBS; }
-	void AddKeys(int num) { m_TotalKeys += num; if (m_TotalKeys>= MAX_KEYS) m_TotalKeys = MAX_KEYS; }
+	void AddBombs(int num);
+	void AddKeys(int num); 
 	void AddTriforcePieces(int num);
 	void UpdateGameData();
 	bool BuyItem(int price);

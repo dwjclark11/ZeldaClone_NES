@@ -1,5 +1,4 @@
 #pragma once
-#include "../../ECS/ECS.h"
 #include "../../Components/TransformComponent.h"
 #include "../../Components/BoxColliderComponent.h"
 #include "../../Components/TriggerBoxComponent.h"
@@ -11,6 +10,7 @@
 #include "../../Components/RigidBodyComponent.h"
 #include "../../Components/HealthComponent.h"
 #include "../../Components/AIComponent.h"
+#include "../../Components/SecretComponent.h"
 
 #include <SDL.h>
 #include <glm/glm.hpp>
@@ -18,58 +18,11 @@
 
 #include "../../Editor/EditorFileLoader.h"
 
-class MouseControlSystem : public System
+class MouseControlSystem
 {
 public:
-
-	static AIComponent::EnemyType enemyType;
-	static SpriteComponent spriteComponent;
-	static ProjectileEmitterComponent projectileEmitter;
-	static AnimationComponent animationComponent;
-	static TriggerBoxComponent triggerBox;
-	static TransformComponent transformComponent;
-	static BoxColliderComponent boxColliderComponent;
-
-	static int mouseRectX;
-	static int mouseRectY;
-	static int gridSize;
-
-	static bool isCollision;
-	static bool isTrigger;
-
-	static bool createTile;
-	static bool createObstacles;
-	static bool createBoxCollider;
-	static bool createEnemy;
-	static bool createTrigger;
-
-	static bool secretSelected;
-	static bool spriteSelected;
-
-	// Animation  attributes
-	static bool animation;
-	
-	// Projectile Emitter
-	static bool projectile;
-
-
-	// Rigid Body
-	static bool rigidBody;
-	static glm::vec2 rigidBodyVelocity;
-
-	static bool gridSnap;
-	static int imageWidth;
-	static int imageHeight;
-	
-	// Secret Attributes
-	static SecretComponent secretComponent;
-
-	static int CanvasWidth;
-	static int CanvasHeight;
-	static bool OverImGuiWindow;
-
 	MouseControlSystem();
-	~MouseControlSystem() {}
+	~MouseControlSystem() = default;
 
 	void Update(const std::unique_ptr<AssetManager>& assets, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 
@@ -78,35 +31,82 @@ public:
 	void CreateBoxCollider(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	void CreateTrigger(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
 	void CreateEnemy(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera);
-
 	void SetEnemyImage();
+	
+	void SetCreateTile(bool bCreateTile);
+	void SetCreateObstacle(bool bCreateObstacle);
+	void SetCreateBoxCollider(bool bCreateCollider);
+	void SetCreateTrigger(bool bCreatetrigger);
+	void SetCreateEnemy(bool bCreateEnemy);
 
+	inline void SetGridSnap(bool bGridSnap) { m_bGridSnap = bGridSnap; }
+	inline void SetOverImGui(bool bOverGui) { m_bOverImGuiWindow = bOverGui; }
+	inline void SetCollider(bool bCollider) { m_bIsCollision = bCollider; }
+	inline void SetSpriteAssetID(const std::string& sAssetID) { m_SpriteComponent.assetID = sAssetID; }
+	inline void SetEnemyType(AIComponent::EnemyType enemyType) { m_eEnemyType = enemyType; }
+
+	inline const bool IsCreatingTiles() const { return m_bCreateTile; }
+	inline const bool IsCreatingObstacles() const { return m_bCreateObstacles; }
+	inline const bool IsCreatingColliders() const { return m_bCreateBoxCollider; }
+	inline const bool IsCreatingTriggers() const { return m_bCreateTrigger; }
+	inline const bool IsCreatingEnemies() const { return m_bCreateEnemy; }
+	
+	inline void SetBoxCollider(const BoxColliderComponent& boxCollider) { m_BoxColliderComponent = boxCollider; }
+	inline void SetTransformScale(float x, float y) { m_TransformComponent.scale = glm::vec2{ x, y }; }
+	inline void SetSpriteLayer(int layer) { m_SpriteComponent.layer = layer; }
+	inline void SetMouseRect(int x, int y) { m_MouseRectX = x; m_MouseRectY = y; }
+	
+	inline void SetSpriteSrcRect(int x, int y) { m_SpriteComponent.srcRect.x = x; m_SpriteComponent.srcRect.y = y; }
+	inline const SpriteComponent& GetSpriteComponent() const { return m_SpriteComponent; }
 	void MouseBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Rect& camera, bool collider = false, bool trigger = false);
 
-	inline void SetImageName(std::string imageName) { this->imageName = imageName; }
-	inline std::string& GetImageName() { return imageName; }
-	void SetImageID(std::string& imageID) { this->imageIDs.push_back(imageID); }
-	std::string& GetImageID() { return spriteComponent.assetID; }
-	
+	inline void SetImageName(const std::string& imageName) { m_sImageName = imageName; }
+	inline const std::string& GetImageName() const { return m_sImageName; }
+	inline void SetImageID(std::string& imageID) { m_ImageIDs.push_back(imageID); }
+	inline const std::string& GetImageID() const { return m_SpriteComponent.assetID; }
+	inline const int GridSize() const { return m_GridSize; }
+	inline const int GetMouseRectX() { return m_MouseRectX; }
+	inline const int GetMouseRectY() { return m_MouseRectY; }
+
+	inline const int GetCanvasWidth() const { return m_CanvasWidth; }
+	inline const int GetCanvasHeight() const { return m_CanvasHeight; }
+
 private:
-	int mousePosX, mousePosY;
-	int mapSize;
-	int textOffsetX;
-	bool leftPressed;
-	bool rightPressed;
-	std::string imageName;
+	class Registry& m_Registry;
+	EditorFileLoader m_EditorLoader;
+	std::vector<std::string> m_ImageIDs;
 
-	std::string enemyFile = "";
-	std::string enemy_Type = "";
+	AIComponent::EnemyType m_eEnemyType{ AIComponent::EnemyType::NO_TYPE };
+	SpriteComponent m_SpriteComponent{ };
+	ProjectileEmitterComponent m_ProjectileEmitter{ };
+	AnimationComponent m_AnimationComponent{ };
+	TriggerBoxComponent m_TriggerBox{ };
+	TransformComponent m_TransformComponent{ };
+	BoxColliderComponent m_BoxColliderComponent{ };
+	SecretComponent m_SecretComponent{ };
 
-	glm::vec2 mousePosGrid;
-	glm::vec2 mousePosView;
-	glm::vec2 mousePosScreen;
-	std::vector<std::string> imageIDs;
-	EditorFileLoader editor_loader;
+	bool m_bIsCollision{ false }, m_bIsTrigger{ false };
+	bool m_bCreateTile{ false }, m_bCreateObstacles{ false };
+	bool m_bCreateBoxCollider{ false }, m_bCreateEnemy{ false }, m_bCreateTrigger{ false };
+	bool m_bSecretSelected{ false }, m_bSpriteSelected{ false };
+	bool m_bAnimation{ false }, m_bProjectile{ false }, m_bRigidBody{ false };
+	bool m_bGridSnap{ false }, m_bOverImGuiWindow{ false };
+	bool m_bLeftPressed{ false }, m_bRightPressed{ false };
 
-	AIComponent::EnemyType prevEnemyType;
-	int prevMouseX = 0;
-	int prevMouseY = 0;
+	int m_MouseRectX{ 0 }, m_MouseRectY{ 0 }, m_GridSize{ 64 };
+	int m_ImageWidth{ 0 }, m_ImageHeight{ 0 };
+	int m_MousePosX{ 0 }, m_MousePosY{ 0 };
+	int m_PrevMouseX{ 0 }, m_PrevMouseY{ 0 };
+	int m_MapSize{ 100 }, m_CanvasWidth{ 6144 }, m_CanvasHeight{ 4224 };
+	int m_TextOffsetX{ 0 };
+
+	std::string m_sImageName{ "" }, m_sEnemyFile{""}, m_sEnemyType{""};
+
+	glm::vec2 m_MousePosGrid{ 0.f };
+	glm::vec2 m_MousePosView{ 0.f };
+	glm::vec2 m_MousePosScreen{ 0.f };
+	glm::vec2 m_RigidBodyVelocity{ 0.f };
+
+	AIComponent::EnemyType m_ePrevEnemyType{ AIComponent::EnemyType::NO_TYPE };
 
 };

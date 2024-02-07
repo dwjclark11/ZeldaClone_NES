@@ -4,14 +4,12 @@
 class SettingsState : public State
 {
 private:
-	static std::string settingsID;
-	class Game& game;
-	class GameData& gameData;
-	class InputManager& inputManager;
+	class Game& m_Game;
+	class GameData& m_GameData;
+	class InputManager& m_InputManager;
+	const std::string m_sSettingsID{"SETTINGS"};
 
 public:
-	static int mActionIndex;
-	static bool mEnterKey;
 	SettingsState();
 	~SettingsState() = default;
 
@@ -28,6 +26,6 @@ public:
 	virtual void OnBtnDown(SDL_Event* event); 
 	virtual void OnBtnUp(SDL_Event* event);
 
-	virtual std::string GetStateID() const override { return settingsID; }
+	virtual std::string GetStateID() const override { return m_sSettingsID; }
 
 };

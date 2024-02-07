@@ -23,18 +23,15 @@
 #include "../inputs/Keyboard.h"
 #include "../inputs/Gamepad.h"
 
-const std::string PauseState::pauseID = "PAUSE";
-bool PauseState::firstEnter = false;
-
 void PauseState::UpdateSelectedItemSprite()
 {
-	if (m_SelectedItem == gameData.GetSelectedItem())
+	if (m_SelectedItem == m_GameData.GetSelectedItem())
 		return;
 
-	const auto& selectedItem = reg.GetEntityByTag("selectedItem");
+	const auto& selectedItem = m_Registry.GetEntityByTag("selectedItem");
 	auto& sprite = selectedItem.GetComponent<SpriteComponent>();
 
-	switch (gameData.GetSelectedItem())
+	switch (m_GameData.GetSelectedItem())
 	{
 	case GameData::ItemType::BOOMERANG:
 		sprite.srcRect.x = 0;
@@ -85,8 +82,8 @@ void PauseState::UpdateSelectedItemSprite()
 }
 
 PauseState::PauseState()
-	: game(Game::Instance()), reg(Registry::Instance())
-	, gameData(GameData::GetInstance())
+	: m_Game(Game::Instance()), m_Registry(Registry::Instance())
+	, m_GameData(GameData::GetInstance())
 	, m_InputManager(InputManager::GetInstance())
 	, m_SelectedItem{GameData::ItemType::EMPTY }
 {
@@ -94,60 +91,59 @@ PauseState::PauseState()
 
 void PauseState::Update(const float& deltaTime)
 {
-	reg.Update();
+	m_Registry.Update();
 	
-	if (gameData.GetTotalBombs() > 0 && !gameData.HasItem(GameData::GameItems::BOMB))
+	if (m_GameData.GetTotalBombs() > 0 && !m_GameData.HasItem(GameData::GameItems::BOMB))
 	{
-		Entity bombItem = reg.CreateEntity();
+		Entity bombItem = m_Registry.CreateEntity();
 		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
 		bombItem.AddComponent<TransformComponent>(glm::vec2(486, 190), glm::vec2(4, 4), 0.0);
 		bombItem.AddComponent<PauseComponent>();
 		bombItem.Tag("bombItem");
 		bombItem.Group("pause");
 
-		gameData.AddItem(GameData::GameItems::BOMB);
+		m_GameData.AddItem(GameData::GameItems::BOMB);
 	}
 
-	if (game.GetCamera().GetFadeAlpha() == 0 && !game.GetCamera().FadeFinished())
+	if (m_Game.GetCamera().GetFadeAlpha() == 0 && !m_Game.GetCamera().FadeFinished())
 	{
 		m_InputManager.SetPaused(false);
-		game.GetCamera().SetFadeFinished(true);
-		game.GetCamera().StartFadeOut(false);
-		game.GetStateMachine()->PopState();
+		m_Game.GetCamera().SetFadeFinished(true);
+		m_Game.GetCamera().StartFadeOut(false);
+		m_Game.GetStateMachine()->PopState();
 		return;
 	}
 
-	if (gameData.GetTotalBombs() == 0 && gameData.HasItem(GameData::GameItems::BOMB))
-		gameData.RemoveItem(GameData::GameItems::BOMB);
+	if (m_GameData.GetTotalBombs() == 0 && m_GameData.HasItem(GameData::GameItems::BOMB))
+		m_GameData.RemoveItem(GameData::GameItems::BOMB);
 
 	UpdateSelectedItemSprite();
 }
 
 void PauseState::Render()
 {
-	reg.GetSystem<RenderPauseSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	reg.GetSystem<RenderHUDSystem>().Update(game.GetRenderer(), game.GetAssetManager());
-	reg.GetSystem<RenderTextSystem>().Update();
+	m_Registry.GetSystem<RenderPauseSystem>().Update(m_Game.GetRenderer(), m_Game.GetAssetManager());
+	m_Registry.GetSystem<RenderHUDSystem>().Update(m_Game.GetRenderer(), m_Game.GetAssetManager());
+	m_Registry.GetSystem<RenderTextSystem>().Update();
 }
 
 bool PauseState::OnEnter()
 {
 	// Turn music volume down while paused
 	Mix_VolumeMusic(3);
-	game.GetEventManager().Reset();
-	game.GetCamera().StartFadeIn(true);
+	m_Game.GetEventManager().Reset();
+	m_Game.GetCamera().StartFadeIn(true);
 	// =============================================================================================================================
 	// Add all necessary systems to the registry if they are not yet registered
 	// =============================================================================================================================
-	if (!reg.HasSystem<RenderPauseSystem>()) 
-		reg.AddSystem<RenderPauseSystem>();
+	if (!m_Registry.HasSystem<RenderPauseSystem>()) 
+		m_Registry.AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
 
 
-	game.GetAssetManager()->AddTextures(game.GetRenderer(), "pause_hud", "./Assets/HUDSprites/pauseHud.png");
-	firstEnter = true;
-
-	Entity pauseSelector = reg.CreateEntity();
+	m_Game.GetAssetManager()->AddTextures(m_Game.GetRenderer(), "pause_hud", "./Assets/HUDSprites/pauseHud.png");
+	
+	Entity pauseSelector = m_Registry.CreateEntity();
 	pauseSelector.AddComponent<SpriteComponent>("box", 16, 16, 0, false, 16, 0);
 	pauseSelector.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
 	pauseSelector.AddComponent<PauseComponent>();
@@ -156,7 +152,7 @@ bool PauseState::OnEnter()
 	pauseSelector.Tag("pauseSelector");
 	pauseSelector.Group("pause");
 
-	Entity selectedItem = reg.CreateEntity();
+	Entity selectedItem = m_Registry.CreateEntity();
 	selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
 	selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
 	selectedItem.AddComponent<PauseComponent>();
@@ -164,37 +160,37 @@ bool PauseState::OnEnter()
 	selectedItem.Tag("selectedItem");
 	selectedItem.Group("pause");
 
-	Entity hudHolder = reg.CreateEntity();
+	Entity hudHolder = m_Registry.CreateEntity();
 	hudHolder.AddComponent<TransformComponent>(glm::vec2(325, 100), glm::vec2(5, 5), 0.0);
 	hudHolder.AddComponent<SpriteComponent>("pause_hud", 96, 64, 5, true, 0, 0);
 	hudHolder.AddComponent<PauseComponent>();
 	hudHolder.Group("pause");
 
-	Entity hudHolder2 = reg.CreateEntity();
+	Entity hudHolder2 = m_Registry.CreateEntity();
 	hudHolder2.AddComponent<TransformComponent>(glm::vec2(144, 135), glm::vec2(6, 6), 0.0);
 	hudHolder2.AddComponent<SpriteComponent>("hud_holder", 32, 32, 5, true, 0, 0);
 	hudHolder2.AddComponent<PauseComponent>();
 	hudHolder2.Group("pause");
 
-	Entity triforce = reg.CreateEntity();
+	Entity triforce = m_Registry.CreateEntity();
 
-	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, gameData.GetTotalTriforce() * 96, 0);
+	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, m_GameData.GetTotalTriforce() * 96, 0);
 	triforce.AddComponent<TransformComponent>(glm::vec2(325, 400), glm::vec2(4, 4), 0.0);
 	triforce.AddComponent<PauseComponent>();
 
 	// Top Row Items
-	if (gameData.HasItem(GameData::GameItems::BOOMERANG))
+	if (m_GameData.HasItem(GameData::GameItems::BOOMERANG))
 	{
-		Entity boomerang = reg.CreateEntity();
+		Entity boomerang = m_Registry.CreateEntity();
 		boomerang.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 112);
 		boomerang.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
 		boomerang.AddComponent<PauseComponent>();
 		boomerang.Group("pause");
 	}
 
-	if (gameData.GetTotalBombs() > 0 && gameData.HasItem(GameData::GameItems::BOMB))
+	if (m_GameData.GetTotalBombs() > 0 && m_GameData.HasItem(GameData::GameItems::BOMB))
 	{
-		Entity bombs = reg.CreateEntity();
+		Entity bombs = m_Registry.CreateEntity();
 		bombs.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
 		bombs.AddComponent<TransformComponent>(glm::vec2(486, 190), glm::vec2(4, 4), 0.0);
 		bombs.AddComponent<PauseComponent>();
@@ -202,18 +198,18 @@ bool PauseState::OnEnter()
 		bombs.Group("pause");
 	}
 
-	if (gameData.HasItem(GameData::GameItems::BOW))
+	if (m_GameData.HasItem(GameData::GameItems::BOW))
 	{
-		Entity bow = reg.CreateEntity();
+		Entity bow = m_Registry.CreateEntity();
 		bow.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 0);
 		bow.AddComponent<TransformComponent>(glm::vec2(586, 190), glm::vec2(4, 4), 0.0);
 		bow.AddComponent<PauseComponent>();
 		bow.Group("pause");
 	}
 
-	if (gameData.HasItem(GameData::GameItems::CANDLE))
+	if (m_GameData.HasItem(GameData::GameItems::CANDLE))
 	{
-		Entity candle = reg.CreateEntity();
+		Entity candle = m_Registry.CreateEntity();
 		candle.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 48);
 		candle.AddComponent<TransformComponent>(glm::vec2(686, 190), glm::vec2(4, 4), 0.0);
 		candle.AddComponent<PauseComponent>();
@@ -221,36 +217,36 @@ bool PauseState::OnEnter()
 	}
 
 	// Bottom Row Items
-	if (gameData.HasItem(GameData::GameItems::FLUTE))
+	if (m_GameData.HasItem(GameData::GameItems::FLUTE))
 	{
-		Entity flute = reg.CreateEntity();
+		Entity flute = m_Registry.CreateEntity();
 		flute.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 16);
 		flute.AddComponent<TransformComponent>(glm::vec2(386, 260), glm::vec2(4, 4), 0.0);
 		flute.AddComponent<PauseComponent>();
 		flute.Group("pause");
 	}
 
-	if (gameData.HasItem(GameData::GameItems::FOOD))
+	if (m_GameData.HasItem(GameData::GameItems::FOOD))
 	{
-		Entity meat = reg.CreateEntity();
+		Entity meat = m_Registry.CreateEntity();
 		meat.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 112, 16);
 		meat.AddComponent<TransformComponent>(glm::vec2(486, 260), glm::vec2(4, 4), 0.0);
 		meat.AddComponent<PauseComponent>();
 		meat.Group("pause");
 	}
 
-	if (gameData.HasItem(GameData::GameItems::RED_POTION))
+	if (m_GameData.HasItem(GameData::GameItems::RED_POTION))
 	{
-		Entity potion = reg.CreateEntity();
+		Entity potion = m_Registry.CreateEntity();
 		potion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 32, 32);
 		potion.AddComponent<TransformComponent>(glm::vec2(586, 260), glm::vec2(4, 4), 0.0);
 		potion.AddComponent<PauseComponent>();
 		potion.Group("pause");
 	}
 
-	if (gameData.HasItem(GameData::GameItems::MAGIC_ROD))
+	if (m_GameData.HasItem(GameData::GameItems::MAGIC_ROD))
 	{
-		Entity magicalRod = reg.CreateEntity();
+		Entity magicalRod = m_Registry.CreateEntity();
 		magicalRod.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 80);
 		magicalRod.AddComponent<TransformComponent>(glm::vec2(686, 260), glm::vec2(4, 4), 0.0);
 		magicalRod.AddComponent<PauseComponent>();
@@ -262,19 +258,19 @@ bool PauseState::OnEnter()
 
 bool PauseState::OnExit()
 {
-	reg.GetSystem<CollectItemSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<TriggerSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<MovementSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(game.GetEventManager());
-	reg.GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(game.GetEventManager());
-	reg.GetSystem<DamageSystem>().SubscribeToEvents(game.GetEventManager());
-	reg.GetSystem<RenderPauseSystem>().OnExit();
+	m_Registry.GetSystem<CollectItemSystem>().SubscribeToEvents(m_Game.GetEventManager());
+	m_Registry.GetSystem<TriggerSystem>().SubscribeToEvents(m_Game.GetEventManager());
+	m_Registry.GetSystem<MovementSystem>().SubscribeToEvents(m_Game.GetEventManager());
+	m_Registry.GetSystem<ProjectileEmitterSystem>().SubscribeKeyToEvents(m_Game.GetEventManager());
+	m_Registry.GetSystem<ProjectileEmitterSystem>().SubscribeBtnToEvents(m_Game.GetEventManager());
+	m_Registry.GetSystem<DamageSystem>().SubscribeToEvents(m_Game.GetEventManager());
+	m_Registry.GetSystem<RenderPauseSystem>().OnExit();
 	return true;
 }
 
 void PauseState::ProcessEvents(SDL_Event& event)
 {
-	const auto& selector = reg.GetEntityByTag("pauseSelector");
+	const auto& selector = m_Registry.GetEntityByTag("pauseSelector");
 	auto& sprite = selector.GetComponent<SpriteComponent>();
 	auto& transform = selector.GetComponent<TransformComponent>();
 	auto& keyboard = m_InputManager.GetKeyboard();
@@ -283,74 +279,74 @@ void PauseState::ProcessEvents(SDL_Event& event)
 	if (keyboard.IsKeyJustPressed(KEY_W) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_UP))
 	{
 		transform.position.y -= ((sprite.height * transform.scale.y) + 6);
-		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
 		if (transform.position.y < 190) 
 			transform.position.y = 260;
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_S) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_DOWN))
 	{
 		transform.position.y += ((sprite.height * transform.scale.y) + 6);
-		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
 		if (transform.position.y > 260) 
 			transform.position.y = 190;
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_A) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_LEFT))
 	{
 		transform.position.x -= 100;
-		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
 		if (transform.position.x < 386)
 			transform.position.x = 686;
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_D) || gamepad.IsButtonJustPressed(GP_BTN_DPAD_RIGHT))
 	{
 		transform.position.x += 100;
-		game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+		m_Game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
 		if (transform.position.x > 686) 
 			transform.position.x = 386;
 	}
 	else if (keyboard.IsKeyJustPressed(KEY_SPACE) || gamepad.IsButtonJustPressed(GP_BTN_A))
 	{
-		if (transform.position.x == 386 && transform.position.y == 190 && gameData.HasItem(GameData::GameItems::BOOMERANG))
+		if (transform.position.x == 386 && transform.position.y == 190 && m_GameData.HasItem(GameData::GameItems::BOOMERANG))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::BOOMERANG);
+			m_GameData.SetSelectedItem(GameData::ItemType::BOOMERANG);
 		}
-		else if ((transform.position.x == 486 && transform.position.y == 190) && gameData.GetTotalBombs() > 0 && gameData.HasItem(GameData::GameItems::BOMB))
+		else if ((transform.position.x == 486 && transform.position.y == 190) && m_GameData.GetTotalBombs() > 0 && m_GameData.HasItem(GameData::GameItems::BOMB))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::BOMB);
+			m_GameData.SetSelectedItem(GameData::ItemType::BOMB);
 		}
-		else if (transform.position.x == 586 && transform.position.y == 190 && gameData.HasItem(GameData::GameItems::BOW))
+		else if (transform.position.x == 586 && transform.position.y == 190 && m_GameData.HasItem(GameData::GameItems::BOW))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::BOW);
+			m_GameData.SetSelectedItem(GameData::ItemType::BOW);
 		}
-		else if (transform.position.x == 686 && transform.position.y == 190 && gameData.HasItem(GameData::GameItems::CANDLE))
+		else if (transform.position.x == 686 && transform.position.y == 190 && m_GameData.HasItem(GameData::GameItems::CANDLE))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::CANDLE);
+			m_GameData.SetSelectedItem(GameData::ItemType::CANDLE);
 		}
 		else if (transform.position.x == 386 && transform.position.y == 260)
 		{
 
 		}
-		else if (transform.position.x == 486 && transform.position.y == 260 && gameData.HasItem(GameData::GameItems::FOOD))
+		else if (transform.position.x == 486 && transform.position.y == 260 && m_GameData.HasItem(GameData::GameItems::FOOD))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::FOOD);
+			m_GameData.SetSelectedItem(GameData::ItemType::FOOD);
 		}
-		else if (transform.position.x == 586 && transform.position.y == 260 && gameData.HasItem(GameData::GameItems::RED_POTION))
+		else if (transform.position.x == 586 && transform.position.y == 260 && m_GameData.HasItem(GameData::GameItems::RED_POTION))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::POTION_RED);
+			m_GameData.SetSelectedItem(GameData::ItemType::POTION_RED);
 		}
-		else if (transform.position.x == 686 && transform.position.y == 260 && gameData.HasItem(GameData::GameItems::MAGIC_ROD))
+		else if (transform.position.x == 686 && transform.position.y == 260 && m_GameData.HasItem(GameData::GameItems::MAGIC_ROD))
 		{
-			gameData.SetSelectedItem(GameData::ItemType::MAGIC_ROD);
+			m_GameData.SetSelectedItem(GameData::ItemType::MAGIC_ROD);
 		}
 	}
 	else if (keyboard.IsKeyJustReleased(KEY_P) || gamepad.IsButtonJustReleased(GP_BTN_Y))
 	{
-		game.GetCamera().SetFadeFinished(false);
-		game.GetCamera().StartFadeOut(true);
+		m_Game.GetCamera().SetFadeFinished(false);
+		m_Game.GetCamera().StartFadeOut(true);
 	}
 	else if (keyboard.IsKeyJustReleased(KEY_M) || gamepad.IsButtonJustReleased(GP_BTN_START))
 	{
 		// Open the save Screen!
-		game.GetStateMachine()->PushState(std::make_unique<SaveGameState>());
+		m_Game.GetStateMachine()->PushState(std::make_unique<SaveGameState>());
 	}
 }

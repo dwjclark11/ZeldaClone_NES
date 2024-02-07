@@ -5,72 +5,28 @@
 #include "../../Game/Game.h"
 #include "../../Utilities/Camera.h"
 
-int MouseControlSystem::mouseRectX = 0;
-int MouseControlSystem::mouseRectY = 0;
-int MouseControlSystem::gridSize = 64;
-
-
-SpriteComponent MouseControlSystem::spriteComponent = SpriteComponent();
-TransformComponent MouseControlSystem::transformComponent = TransformComponent();
-BoxColliderComponent MouseControlSystem::boxColliderComponent = BoxColliderComponent();
-AnimationComponent MouseControlSystem::animationComponent = AnimationComponent();
-ProjectileEmitterComponent MouseControlSystem::projectileEmitter = ProjectileEmitterComponent();
-TriggerBoxComponent MouseControlSystem::triggerBox = TriggerBoxComponent();
-SecretComponent MouseControlSystem::secretComponent = SecretComponent();
-
-bool MouseControlSystem::isCollision = false;
-bool MouseControlSystem::isTrigger = false;
-bool MouseControlSystem::createTile = false;
-bool MouseControlSystem::createObstacles = false;
-bool MouseControlSystem::createBoxCollider = false;
-bool MouseControlSystem::createEnemy = false;
-bool MouseControlSystem::createTrigger = false;
-
-bool MouseControlSystem::gridSnap = false;
-
-bool MouseControlSystem::animation = false;
-bool MouseControlSystem::projectile = false;
-
-// Rigid Body
-bool MouseControlSystem::rigidBody = false;
-glm::vec2 MouseControlSystem::rigidBodyVelocity = glm::vec2(10, 10);
-
-bool MouseControlSystem::secretSelected = false;
-bool MouseControlSystem::spriteSelected = false;
-
-int MouseControlSystem::imageWidth = 0;
-int MouseControlSystem::imageHeight = 0;
-
-int MouseControlSystem::CanvasWidth = 6144;
-int MouseControlSystem::CanvasHeight = 4224;
-
-bool MouseControlSystem::OverImGuiWindow = false;
-
-AIComponent::EnemyType MouseControlSystem::enemyType = AIComponent::EnemyType::NO_TYPE;
-
 MouseControlSystem::MouseControlSystem()
+	: m_Registry{Registry::Instance()}, m_EditorLoader{*this}
 {
-	mapSize = 100;
-	leftPressed = false;
-	rightPressed = false;
-	textOffsetX = -100;
-	imageName = "";
-	prevEnemyType = AIComponent::EnemyType::NO_TYPE;
+
 }
 
 void MouseControlSystem::Update(const std::unique_ptr<AssetManager>& assets, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Event& event, SDL_Rect& camera)
 {
-	if (createTile) CreateTile(assets, renderer, mouseBox, event, camera);
-	if (createObstacles) CreateObstacles(assets, renderer, mouseBox, event, camera);
-	if (createBoxCollider) CreateBoxCollider(assets, renderer, mouseBox, event, camera);
-	if (createTrigger) CreateTrigger(assets, renderer, mouseBox, event, camera);
-	
-	if (createEnemy)
+	if (m_bCreateTile) 
+		CreateTile(assets, renderer, mouseBox, event, camera);
+	else if (m_bCreateObstacles) 
+		CreateObstacles(assets, renderer, mouseBox, event, camera);
+	else if (m_bCreateBoxCollider) 
+		CreateBoxCollider(assets, renderer, mouseBox, event, camera);
+	else if (m_bCreateTrigger) 
+		CreateTrigger(assets, renderer, mouseBox, event, camera);
+	else if (m_bCreateEnemy)
 	{
-		if (enemyType != prevEnemyType)
+		if (m_eEnemyType != m_ePrevEnemyType)
 		{
 			SetEnemyImage();
-			prevEnemyType = enemyType;
+			m_ePrevEnemyType = m_eEnemyType;
 		}
 
 		CreateEnemy(assets, renderer, mouseBox, event, camera);
@@ -81,53 +37,56 @@ void MouseControlSystem::CreateTile(const std::unique_ptr<AssetManager>& assetMa
 {
 	MouseBox(assetManager, renderer, mouseBox, camera);
 
+	if (m_bOverImGuiWindow)
+		return;
+
 	// This is a test
 	int posX = static_cast<int>(Game::Instance().GetMouseBox().x + 
-		Game::Instance().GetCamera().GetCameraPos().x) / MouseControlSystem::gridSize;															  
+		Game::Instance().GetCamera().GetCameraPos().x) / m_GridSize;															  
 	int posY = static_cast<int>(Game::Instance().GetMouseBox().y + 
-		Game::Instance().GetCamera().GetCameraPos().y) / MouseControlSystem::gridSize;
+		Game::Instance().GetCamera().GetCameraPos().y) / m_GridSize;
 
-	if (event.type == SDL_MOUSEBUTTONDOWN || leftPressed)
+	if (event.type == SDL_MOUSEBUTTONDOWN || m_bLeftPressed)
 	{
 		if (event.type == SDL_MOUSEBUTTONUP)
-			leftPressed = false;
+			m_bLeftPressed = false;
 
-		if ((event.button.button == SDL_BUTTON_LEFT || leftPressed) && !OverImGuiWindow && (posX != prevMouseX || posY != prevMouseY))
+		if ((event.button.button == SDL_BUTTON_LEFT || m_bLeftPressed) && (posX != m_PrevMouseX || posY != m_PrevMouseY))
 		{
 			Entity tile = Registry::Instance().CreateEntity();
 			tile.Group("tiles");
-			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y), transformComponent.scale, transformComponent.rotation);
-			tile.AddComponent<SpriteComponent>(spriteComponent.assetID, mouseRectX, mouseRectY, spriteComponent.layer, spriteComponent.isFixed, spriteComponent.srcRect.x, spriteComponent.srcRect.y);
+			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y), m_TransformComponent.scale, m_TransformComponent.rotation);
+			tile.AddComponent<SpriteComponent>(m_SpriteComponent.assetID, m_MouseRectX, m_MouseRectY, m_SpriteComponent.layer, m_SpriteComponent.isFixed, m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y);
 			tile.AddComponent<EditorComponent>();
 
-			if (isCollision)
+			if (m_bIsCollision)
 			{
-				tile.AddComponent<BoxColliderComponent>(boxColliderComponent.width, boxColliderComponent.height, boxColliderComponent.offset);
+				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent.width, m_BoxColliderComponent.height, m_BoxColliderComponent.offset);
 			}
 
 			Logger::Log("Left Pressed");
-			leftPressed = true;
-			prevMouseX = posX;
-			prevMouseY = posY;
+			m_bLeftPressed = true;
+			m_PrevMouseX = posX;
+			m_PrevMouseY = posY;
 		}
-		if (event.button.button == SDL_BUTTON_RIGHT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_RIGHT && !m_bOverImGuiWindow)
 		{
-			auto subX = (mouseRectX * transformComponent.scale.x) / 2;
-			auto subY = (mouseRectY * transformComponent.scale.y) / 2;
+			auto subX = (m_MouseRectX * m_TransformComponent.scale.x) / 2;
+			auto subY = (m_MouseRectY * m_TransformComponent.scale.y) / 2;
+			auto entities = m_Registry.GetEntitiesByGroup("tiles");
 
-			for (auto& entity : GetSystemEntities())
+			for (auto& entity : entities)
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 
-	
-				if (entity.BelongsToGroup("tiles") && transform.position.x <= (mousePosX - subX + 15)
-					&& transform.position.x >= (mousePosX - subX - 15)
-					&& transform.position.y <= (mousePosY - subY + 15)
-					&& transform.position.y >= (mousePosY - subY - 15)
-					&& !rightPressed)
+				if (transform.position.x <= (m_MousePosX - subX + 15)
+					&& transform.position.x >= (m_MousePosX - subX - 15)
+					&& transform.position.y <= (m_MousePosY - subY + 15)
+					&& transform.position.y >= (m_MousePosY - subY - 15)
+					&& !m_bRightPressed)
 				{
 					entity.Kill();
-					rightPressed = true;
+					m_bRightPressed = true;
 					Logger::Err("Tile with ID: " + std::to_string(entity.GetID()) + " has been removed");
 				}
 			}
@@ -135,8 +94,8 @@ void MouseControlSystem::CreateTile(const std::unique_ptr<AssetManager>& assetMa
 	}
 	else if (event.type == SDL_MOUSEBUTTONUP)
 	{
-		leftPressed = false;
-		rightPressed = false;
+		m_bLeftPressed = false;
+		m_bRightPressed = false;
 	}
 }
 
@@ -144,41 +103,41 @@ void MouseControlSystem::CreateObstacles(const std::unique_ptr<AssetManager>& as
 {
 	MouseBox(assetManager, renderer, mouseBox, camera);
 
-	if (event.type == SDL_MOUSEBUTTONDOWN && !leftPressed)
+	if (event.type == SDL_MOUSEBUTTONDOWN && !m_bLeftPressed)
 	{
-		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_LEFT && !m_bOverImGuiWindow)
 		{
 			Entity tile = Registry::Instance().CreateEntity();
 			tile.Group("tiles"); // Why tiles?
 			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
-				glm::vec2(transformComponent.scale.x, transformComponent.scale.y), transformComponent.rotation);
+				glm::vec2(m_TransformComponent.scale.x, m_TransformComponent.scale.y), m_TransformComponent.rotation);
 		
-			tile.AddComponent<SpriteComponent>(spriteComponent.assetID, mouseRectX, mouseRectY, spriteComponent.layer, spriteComponent.isFixed, spriteComponent.srcRect.x, spriteComponent.srcRect.y);
+			tile.AddComponent<SpriteComponent>(m_SpriteComponent.assetID, m_MouseRectX, m_MouseRectY, m_SpriteComponent.layer, m_SpriteComponent.isFixed, m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y);
 			tile.AddComponent<EditorComponent>();
 			// Does the object have a box Collider?
-			if (isCollision)
+			if (m_bIsCollision)
 			{
-				tile.AddComponent<BoxColliderComponent>(boxColliderComponent.width, boxColliderComponent.height, boxColliderComponent.offset);
+				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent.width, m_BoxColliderComponent.height, m_BoxColliderComponent.offset);
 			}
 		}
 		// Remove the current Entity the mouse is hovering over
-		if (event.button.button == SDL_BUTTON_RIGHT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_RIGHT && !m_bOverImGuiWindow)
 		{
-			auto subX = (mouseRectX * transformComponent.scale.x) / 2;
-			auto subY = (mouseRectY * transformComponent.scale.y) / 2;
-
-			for (auto& entity : GetSystemEntities())
+			auto subX = (m_MouseRectX * m_TransformComponent.scale.x) / 2;
+			auto subY = (m_MouseRectY * m_TransformComponent.scale.y) / 2;
+			auto entities = m_Registry.GetEntitiesByGroup("tiles");
+			for (auto& entity : entities)
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 
-				if (entity.BelongsToGroup("tiles") && transform.position.x <= (mousePosX - subX + 15)
-					&& transform.position.x >= (mousePosX - subX - 15)
-					&& transform.position.y <= (mousePosY - subY + 15)
-					&& transform.position.y >= (mousePosY - subY - 15)
-					&& !rightPressed)
+				if (transform.position.x <= (m_MousePosX - subX + 15)
+					&& transform.position.x >= (m_MousePosX - subX - 15)
+					&& transform.position.y <= (m_MousePosY - subY + 15)
+					&& transform.position.y >= (m_MousePosY - subY - 15)
+					&& !m_bRightPressed)
 				{
 					entity.Kill();
-					rightPressed = true;
+					m_bRightPressed = true;
 					Logger::Err("Tile with ID: " + std::to_string(entity.GetID()) + " has been removed");
 				}
 			}
@@ -186,8 +145,8 @@ void MouseControlSystem::CreateObstacles(const std::unique_ptr<AssetManager>& as
 	}
 	else if (event.type == SDL_MOUSEBUTTONUP)
 	{
-		leftPressed = false;
-		rightPressed = false;
+		m_bLeftPressed = false;
+		m_bRightPressed = false;
 	}
 }
 
@@ -195,46 +154,47 @@ void MouseControlSystem::CreateBoxCollider(const std::unique_ptr<AssetManager>& 
 {
 	MouseBox(assetManager, renderer, mouseBox, camera, true, false);
 
-	if (event.type == SDL_MOUSEBUTTONDOWN && !leftPressed)
+	if (event.type == SDL_MOUSEBUTTONDOWN && !m_bLeftPressed)
 	{
-		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_LEFT && !m_bOverImGuiWindow)
 		{
 			Entity tile = Registry::Instance().CreateEntity();
-			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y), transformComponent.scale, 0.0);
+			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y), m_TransformComponent.scale, 0.0);
 
-			if (isCollision)
+			if (m_bIsCollision)
 			{
 				tile.Group("colliders");
-				tile.AddComponent<BoxColliderComponent>(boxColliderComponent.width, boxColliderComponent.height, boxColliderComponent.offset);
+				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent.width, m_BoxColliderComponent.height, m_BoxColliderComponent.offset);
 				Logger::Log("Collider Created");
 			}
 
-			leftPressed = true;
+			m_bLeftPressed = true;
 		}
-		if (event.button.button == SDL_BUTTON_RIGHT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_RIGHT && !m_bOverImGuiWindow)
 		{
-			auto subX = (mouseRectX * transformComponent.scale.x) / 2;
-			auto subY = (mouseRectY * transformComponent.scale.y) / 2;
+			auto subX = (m_MouseRectX * m_TransformComponent.scale.x) / 2;
+			auto subY = (m_MouseRectY * m_TransformComponent.scale.y) / 2;
 
-			for (auto& entity : GetSystemEntities())
+			auto entities = m_Registry.GetEntitiesByGroup("colliders");
+			for (auto& entity : entities)
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 
-				if (entity.BelongsToGroup("colliders") && transform.position.x <= (mousePosX - subX + 15)
-					&& transform.position.x >= (mousePosX - subX - 15)
-					&& transform.position.y <= (mousePosY - subY + 15)
-					&& transform.position.y >= (mousePosY - subY - 15)
-					&& !rightPressed)
+				if (transform.position.x <= (m_MousePosX - subX + 15)
+					&& transform.position.x >= (m_MousePosX - subX - 15)
+					&& transform.position.y <= (m_MousePosY - subY + 15)
+					&& transform.position.y >= (m_MousePosY - subY - 15)
+					&& !m_bRightPressed)
 				{
 					entity.Kill();
-					rightPressed = true;
+					m_bRightPressed = true;
 					Logger::Err("Collider with ID: " + std::to_string(entity.GetID()) + " has been removed");
 				}
-				else if (entity.BelongsToGroup("trigger") && transform.position.x == (mousePosGrid.x * gridSize)
-					&& transform.position.y == (mousePosGrid.y * gridSize) && !rightPressed)
+				else if (entity.BelongsToGroup("trigger") && transform.position.x == (m_MousePosGrid.x * m_GridSize)
+					&& transform.position.y == (m_MousePosGrid.y * m_GridSize) && !m_bRightPressed)
 				{
 					entity.Kill();
-					rightPressed = true;
+					m_bRightPressed = true;
 					Logger::Err("trigger with ID: " + std::to_string(entity.GetID()) + " has been removed");
 				}
 			}
@@ -242,8 +202,8 @@ void MouseControlSystem::CreateBoxCollider(const std::unique_ptr<AssetManager>& 
 	}
 	else if (event.type == SDL_MOUSEBUTTONUP)
 	{
-		leftPressed = false;
-		rightPressed = false;
+		m_bLeftPressed = false;
+		m_bRightPressed = false;
 	}
 }
 
@@ -252,32 +212,32 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 	// This shows the green Trigger box on the mouse pointer
 	MouseBox(assetManager, renderer, mouseBox, camera, false, true);
 
-	if (event.type == SDL_MOUSEBUTTONDOWN && !leftPressed)
+	if (event.type == SDL_MOUSEBUTTONDOWN && !m_bLeftPressed)
 	{
-		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_LEFT && !m_bOverImGuiWindow)
 		{
 			Entity newTrigger = Registry::Instance().CreateEntity();
 			newTrigger.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
-				transformComponent.scale, transformComponent.rotation);
+				m_TransformComponent.scale, m_TransformComponent.rotation);
 			newTrigger.AddComponent<EditorComponent>();
 			// TODO: Create a trigger function that reads the currently selected trigger attributes!
-			if (isCollision)
+			if (m_bIsCollision)
 			{
-				newTrigger.AddComponent<BoxColliderComponent>(boxColliderComponent.width, boxColliderComponent.height, boxColliderComponent.offset);
+				newTrigger.AddComponent<BoxColliderComponent>(m_BoxColliderComponent.width, m_BoxColliderComponent.height, m_BoxColliderComponent.offset);
 				
 			}
 			newTrigger.AddComponent<TriggerBoxComponent>();
-			newTrigger.GetComponent<TriggerBoxComponent>() = triggerBox;
+			newTrigger.GetComponent<TriggerBoxComponent>() = m_TriggerBox;
 
 
-			if (secretSelected)
+			if (m_bSecretSelected)
 			{
 				auto& startPos = newTrigger.GetComponent<TransformComponent>().position;
 				newTrigger.Group("secret");
 
 				newTrigger.AddComponent<SecretComponent>();
 				auto& secret = newTrigger.GetComponent<SecretComponent>();
-				secret = secretComponent;
+				secret = m_SecretComponent;
 				secret.startPos = startPos;
 			}
 			else
@@ -285,36 +245,37 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 				newTrigger.Group("trigger");
 			}
 			
-			if (spriteSelected)
+			if (m_bSpriteSelected)
 			{
-				newTrigger.AddComponent<SpriteComponent>(spriteComponent.assetID, spriteComponent.width,
-					spriteComponent.height, spriteComponent.layer, spriteComponent.isFixed, spriteComponent.srcRect.x, spriteComponent.srcRect.y);
+				newTrigger.AddComponent<SpriteComponent>(m_SpriteComponent.assetID, m_SpriteComponent.width,
+					m_SpriteComponent.height, m_SpriteComponent.layer, m_SpriteComponent.isFixed, m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y);
 
-				Logger::Log("Sprite Asset ID: " + spriteComponent.assetID + "Sprite Width: " + std::to_string(spriteComponent.width));
+				Logger::Log("Sprite Asset ID: " + m_SpriteComponent.assetID + "Sprite Width: " + std::to_string(m_SpriteComponent.width));
 				Logger::Log("Sprite Asset ID: " + newTrigger.GetComponent<SpriteComponent>().assetID + "Sprite Width: " + std::to_string(newTrigger.GetComponent<SpriteComponent>().width));
 			}
 			
 			Logger::Log("CREATED Trigger");
-			leftPressed = true;
+			m_bLeftPressed = true;
 
 		}
-		if (event.button.button == SDL_BUTTON_RIGHT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_RIGHT && !m_bOverImGuiWindow)
 		{
-			auto subX = (mouseRectX * transformComponent.scale.x) / 2;
-			auto subY = (mouseRectY * transformComponent.scale.y) / 2;
+			auto subX = (m_MouseRectX * m_TransformComponent.scale.x) / 2;
+			auto subY = (m_MouseRectY * m_TransformComponent.scale.y) / 2;
 
-			for (auto& entity : GetSystemEntities())
+			auto entities = m_Registry.GetEntitiesByGroup("trigger");
+			for (auto& entity : entities)
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 
-				if ((entity.BelongsToGroup("trigger") || entity.BelongsToGroup("secret")) && transform.position.x <= (mousePosX - subX + 15)
-					&& transform.position.x >= (mousePosX - subX - 15)
-					&& transform.position.y <= (mousePosY - subY + 15)
-					&& transform.position.y >= (mousePosY - subY - 15)
-					&& !rightPressed)
+				if (transform.position.x <= (m_MousePosX - subX + 15)
+					&& transform.position.x >= (m_MousePosX - subX - 15)
+					&& transform.position.y <= (m_MousePosY - subY + 15)
+					&& transform.position.y >= (m_MousePosY - subY - 15)
+					&& !m_bRightPressed)
 				{
 					entity.Kill();
-					rightPressed = true;
+					m_bRightPressed = true;
 					Logger::Err("Trigger with ID: " + std::to_string(entity.GetID()) + " has been removed");
 				}
 			}
@@ -322,8 +283,8 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 	}
 	else if (event.type == SDL_MOUSEBUTTONUP)
 	{
-		leftPressed = false;
-		rightPressed = false;
+		m_bLeftPressed = false;
+		m_bRightPressed = false;
 	}
 }
 
@@ -332,39 +293,40 @@ void MouseControlSystem::CreateEnemy(const std::unique_ptr<AssetManager>& assetM
 	// This shows the current selecter Enemy On the mouse pointer
 	MouseBox(assetManager, renderer, mouseBox, camera);
 
-	if (event.type == SDL_MOUSEBUTTONDOWN && !leftPressed)
+	if (event.type == SDL_MOUSEBUTTONDOWN && !m_bLeftPressed)
 	{
-		if (event.button.button == SDL_BUTTON_LEFT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_LEFT && !m_bOverImGuiWindow)
 		{
 			Entity enemy = Registry::Instance().CreateEntity();
 			enemy.Group("enemies");
 			enemy.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
-				transformComponent.scale, transformComponent.rotation);
+				m_TransformComponent.scale, m_TransformComponent.rotation);
 			enemy.AddComponent<EditorComponent>();
 
-			editor_loader.CreateNewEnemy(Game::Instance().GetLuaState(), enemyFile, enemy_Type, enemy);
+			m_EditorLoader.CreateNewEnemy(Game::Instance().GetLuaState(), m_sEnemyFile, m_sEnemyType, enemy);
 
 			Logger::Log("CREATED Enemy");
-			leftPressed = true;
+			m_bLeftPressed = true;
 
 		}
-		if (event.button.button == SDL_BUTTON_RIGHT && !OverImGuiWindow)
+		if (event.button.button == SDL_BUTTON_RIGHT && !m_bOverImGuiWindow)
 		{
-			auto subX = (mouseRectX * transformComponent.scale.x) / 2;
-			auto subY = (mouseRectY * transformComponent.scale.y) / 2;
+			auto subX = (m_MouseRectX * m_TransformComponent.scale.x) / 2;
+			auto subY = (m_MouseRectY * m_TransformComponent.scale.y) / 2;
 
-			for (auto& entity : GetSystemEntities())
+			auto enemies = m_Registry.GetEntitiesByGroup("enemies");
+			for (auto& entity : enemies)
 			{
 				auto& transform = entity.GetComponent<TransformComponent>();
 
-				if (entity.BelongsToGroup("enemies") && transform.position.x <= (mousePosX - subX + 15)
-					&& transform.position.x >= (mousePosX - subX - 15)
-					&& transform.position.y <= (mousePosY - subY + 15)
-					&& transform.position.y >= (mousePosY - subY - 15)
-					&& !rightPressed)
+				if (transform.position.x <= (m_MousePosX - subX + 15)
+					&& transform.position.x >= (m_MousePosX - subX - 15)
+					&& transform.position.y <= (m_MousePosY - subY + 15)
+					&& transform.position.y >= (m_MousePosY - subY - 15)
+					&& !m_bRightPressed)
 				{
 					entity.Kill();
-					rightPressed = true;
+					m_bRightPressed = true;
 					Logger::Err("Enemy with ID: " + std::to_string(entity.GetID()) + " has been removed");
 				}
 			}
@@ -372,112 +334,176 @@ void MouseControlSystem::CreateEnemy(const std::unique_ptr<AssetManager>& assetM
 	}
 	else if (event.type == SDL_MOUSEBUTTONUP)
 	{
-		leftPressed = false;
-		rightPressed = false;
+		m_bLeftPressed = false;
+		m_bRightPressed = false;
 	}
 }
 
 void MouseControlSystem::SetEnemyImage()
 {
-	switch (enemyType)
+	switch (m_eEnemyType)
 	{
 	case AIComponent::EnemyType::OCTOROK:
-		enemyFile = "Octorok";
-		enemy_Type = "octorok_red";
+		m_sEnemyFile = "Octorok";
+		m_sEnemyType = "octorok_red";
 		break;
 	case AIComponent::EnemyType::MOBLIN:
-		enemyFile = "Moblin";
-		enemy_Type = "moblin";
+		m_sEnemyFile = "Moblin";
+		m_sEnemyType = "moblin";
 		break;
 	case AIComponent::EnemyType::DARKNUT:
-		enemyFile = "Darknut";
-		enemy_Type = "darknut";
-		Logger::Log("Log type");
+		m_sEnemyFile = "Darknut";
+		m_sEnemyType = "darknut";
 		break;
 	case AIComponent::EnemyType::LEEVER:
-		enemyFile = "Leever";
-		enemy_Type = "leever";
+		m_sEnemyFile = "Leever";
+		m_sEnemyType = "leever";
 		break;
 	case AIComponent::EnemyType::TEKTITE:
-		enemyFile = "Tektite";
-		enemy_Type = "tektite";
+		m_sEnemyFile = "Tektite";
+		m_sEnemyType = "tektite";
 		break;
 	case AIComponent::EnemyType::PEAHAT:
-		enemyFile = "Peahat";
-		enemy_Type = "peahat";
+		m_sEnemyFile = "Peahat";
+		m_sEnemyType = "peahat";
 		break;
 	case AIComponent::EnemyType::ARMOS:
-		enemyFile = "Armos";
-		enemy_Type = "armos";
+		m_sEnemyFile = "Armos";
+		m_sEnemyType = "armos";
 		break;
 	case AIComponent::EnemyType::GHINI:
-		enemyFile = "Ghini";
-		enemy_Type = "ghini";
+		m_sEnemyFile = "Ghini";
+		m_sEnemyType = "ghini";
 		break;
 	case AIComponent::EnemyType::LYNEL:
-		enemyFile = "Lynel";
-		enemy_Type = "lynel";
+		m_sEnemyFile = "Lynel";
+		m_sEnemyType = "lynel";
 		break;
 	case AIComponent::EnemyType::ZORA:
-		enemyFile = "Zora";
-		enemy_Type = "zora";
+		m_sEnemyFile = "Zora";
+		m_sEnemyType = "zora";
 		break;
 	default:
 		break;
 	}
 
 	// Call the load Enemy Attributes --> These attributes are kept in a lua table
-	editor_loader.LoadEnemiesAttributes(Game::Instance().GetLuaState(), enemyFile, enemy_Type);
+	m_EditorLoader.LoadEnemiesAttributes(Game::Instance().GetLuaState(), m_sEnemyFile, m_sEnemyType);
+}
+
+void MouseControlSystem::SetCreateTile(bool bCreateTile)
+{
+	if (bCreateTile)
+	{
+		m_bCreateObstacles = false;
+		m_bCreateBoxCollider = false;
+		m_bCreateEnemy = false;
+		m_bCreateTrigger = false;
+	}
+
+	m_bCreateTile = bCreateTile;
+}
+
+void MouseControlSystem::SetCreateObstacle(bool bCreateObstacle)
+{
+	if (bCreateObstacle)
+	{
+		m_bCreateTile = false;
+		m_bCreateBoxCollider = false;
+		m_bCreateEnemy = false;
+		m_bCreateTrigger = false;
+	}
+
+	m_bCreateObstacles = bCreateObstacle;
+}
+
+void MouseControlSystem::SetCreateBoxCollider(bool bCreateCollider)
+{
+	if (bCreateCollider)
+	{
+		m_bCreateTile = false;
+		m_bCreateObstacles = false;
+		m_bCreateEnemy = false;
+		m_bCreateTrigger = false;
+	}
+
+	m_bCreateBoxCollider = bCreateCollider;
+}
+
+void MouseControlSystem::SetCreateTrigger(bool bCreatetrigger)
+{
+	if (bCreatetrigger)
+	{
+		m_bCreateTile = false;
+		m_bCreateObstacles = false;
+		m_bCreateEnemy = false;
+		m_bCreateBoxCollider = false;
+	}
+
+	m_bCreateTrigger = bCreatetrigger;
+}
+
+void MouseControlSystem::SetCreateEnemy(bool bCreateEnemy)
+{
+	if (bCreateEnemy)
+	{
+		m_bCreateTile = false;
+		m_bCreateObstacles = false;
+		m_bCreateBoxCollider = false;
+		m_bCreateTrigger = false;
+	}
+
+	m_bCreateEnemy = bCreateEnemy;
 }
 
 void MouseControlSystem::MouseBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, SDL_Rect& mouseBox, SDL_Rect& camera, bool collider, bool trigger)
 {
-	SDL_GetMouseState(&mousePosX, &mousePosY);
+	SDL_GetMouseState(&m_MousePosX, &m_MousePosY);
 
-	mousePosX += camera.x;
-	mousePosY += camera.y;
-	mousePosScreen.x = mousePosX;
-	mousePosScreen.y = mousePosY;
+	m_MousePosX += camera.x;
+	m_MousePosY += camera.y;
+	m_MousePosScreen.x = m_MousePosX;
+	m_MousePosScreen.y = m_MousePosY;
 
 	// If Grid Snap is enabled, snap the tile/sprite to the next grid location
-	if (gridSnap)
+	if (m_bGridSnap)
 	{
-		mousePosGrid.x = static_cast<int>(mousePosScreen.x) * gridSize;
-		mousePosGrid.y = static_cast<int>(mousePosScreen.y) * gridSize;
+		m_MousePosGrid.x = static_cast<int>(m_MousePosScreen.x) * m_GridSize;
+		m_MousePosGrid.y = static_cast<int>(m_MousePosScreen.y) * m_GridSize;
 
-		if (mousePosScreen.x >= 0) mousePosGrid.x = (static_cast<int>(mousePosScreen.x)) / gridSize;
-		if (mousePosScreen.y >= 0) mousePosGrid.y = (static_cast<int>(mousePosScreen.y)) / gridSize;
+		if (m_MousePosScreen.x >= 0) m_MousePosGrid.x = (static_cast<int>(m_MousePosScreen.x)) / m_GridSize;
+		if (m_MousePosScreen.y >= 0) m_MousePosGrid.y = (static_cast<int>(m_MousePosScreen.y)) / m_GridSize;
 
-		mouseBox.x = (mousePosGrid.x * gridSize) - camera.x;
-		mouseBox.y = (mousePosGrid.y * gridSize) - camera.y;
+		mouseBox.x = (m_MousePosGrid.x * m_GridSize) - camera.x;
+		mouseBox.y = (m_MousePosGrid.y * m_GridSize) - camera.y;
 
 	}
 	else // Float the tile/sprite at the center of the mouse
 	{
-		mouseBox.x = mousePosScreen.x - camera.x - (mouseRectX * transformComponent.scale.x) / 2; 
-		mouseBox.y = mousePosScreen.y - camera.y - (mouseRectY * transformComponent.scale.y) / 2; 
+		mouseBox.x = m_MousePosScreen.x - camera.x - (m_MouseRectX * m_TransformComponent.scale.x) / 2; 
+		mouseBox.y = m_MousePosScreen.y - camera.y - (m_MouseRectY * m_TransformComponent.scale.y) / 2; 
 	}
 
 	SDL_Rect srcRect = {
-		spriteComponent.srcRect.x,
-		spriteComponent.srcRect.y,
-		mouseRectX,
-		mouseRectY
+		m_SpriteComponent.srcRect.x,
+		m_SpriteComponent.srcRect.y,
+		m_MouseRectX,
+		m_MouseRectY
 	};
 
 	// Set the destination Rectangle with the x, y position to be rendererd;
 	SDL_Rect dstRect = {
 		mouseBox.x,
 		mouseBox.y,
-		mouseBox.w * mouseRectX * transformComponent.scale.x,
-		mouseBox.h * mouseRectY * transformComponent.scale.y
+		mouseBox.w * m_MouseRectX * m_TransformComponent.scale.x,
+		mouseBox.h * m_MouseRectY * m_TransformComponent.scale.y
 	};
 
 	if (!collider)
 	{
 		SDL_RenderCopyEx(
 			renderer,
-			assetManager->GetTexture(spriteComponent.assetID), // Should this not have a texture associated?
+			assetManager->GetTexture(m_SpriteComponent.assetID), // Should this not have a texture associated?
 			&srcRect,
 			&dstRect,
 			0, // Passed as an angle in degrees

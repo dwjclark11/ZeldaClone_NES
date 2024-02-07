@@ -4,18 +4,19 @@
 class PauseState : public State
 {
 private:
-	bool static firstEnter;
-	static const std::string pauseID;
+	
+	const std::string m_sPauseID{"PAUSE"};
 
-	class Game& game;
-	class Registry& reg;
+	class Game& m_Game;
+	class Registry& m_Registry;
 	class InputManager& m_InputManager;
-	GameData& gameData;
+	GameData& m_GameData;
 	GameData::ItemType m_SelectedItem;
+
+private:
 	void UpdateSelectedItemSprite();
 
 public:
-
 	PauseState();
 	~PauseState() = default;
 
@@ -26,5 +27,5 @@ public:
 	virtual bool OnExit() override;
 	virtual void ProcessEvents(SDL_Event& event) override;
 
-	virtual std::string GetStateID() const { return pauseID; }
+	virtual std::string GetStateID() const { return m_sPauseID; }
 };

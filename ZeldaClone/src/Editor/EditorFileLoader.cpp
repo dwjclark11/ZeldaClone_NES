@@ -11,16 +11,17 @@
 #include "../Components/EditorComponent.h"
 #include "../Components/AIComponent.h"
 #include "../Components/SecretComponent.h"
-
+#include "../Systems/EditorSystems/MouseControlSystem.h"
 #include "../Game/LevelLoader.h"
 
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "../Systems/EditorSystems/MouseControlSystem.h"
 #include <filesystem>
-EditorFileLoader::EditorFileLoader()
-	: reg(Registry::Instance())
+
+EditorFileLoader::EditorFileLoader(MouseControlSystem& mouseControl)
+	: m_Registry{ Registry::Instance() }
+	, m_MouseControl{mouseControl}
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
@@ -33,9 +34,9 @@ EditorFileLoader::~EditorFileLoader()
 
 void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
 {
-	std::string filename = std::filesystem::path(imageName).stem().string();
+	std::string filename = std::filesystem::path(m_sImageName).stem().string();
 	// Adding Textures to the asset Manager
-	assetManager->AddTextures(renderer, "image-Name", imageName);
+	assetManager->AddTextures(renderer, "image-Name", m_sImageName);
 	Logger::Err(filename);
 	
 	// Load the tilemap
@@ -43,12 +44,12 @@ void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetMan
 	
 	// Open and read the text file
 	std::fstream mapFile;
-	mapFile.open(fileName);
+	mapFile.open(m_sFileName);
 	
 	// Check to see if the file opened correctly
 	if (!mapFile.is_open())
 	{
-		Logger::Err("Unable to open [" + fileName + "]");
+		Logger::Err("Unable to open [" + m_sFileName + "]");
 	}
 	
 	// Load the tilemap file 
@@ -80,7 +81,7 @@ void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetMan
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity tile = reg.CreateEntity();
+		Entity tile = m_Registry.CreateEntity();
 		tile.Group(group);
 		tile.AddComponent<SpriteComponent>("image-Name", tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
@@ -103,12 +104,12 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 	
 	// Open and read the text file
 	std::fstream mapFile;
-	mapFile.open(fileName);
+	mapFile.open(m_sFileName);
 	
 	// Check to see if the file opened correctly
 	if (!mapFile.is_open())
 	{
-		Logger::Err("Unable to open [" + fileName + "]");
+		Logger::Err("Unable to open [" + m_sFileName + "]");
 	}
 	
 	while (true)
@@ -136,7 +137,7 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity object = reg.CreateEntity();
+		Entity object = m_Registry.CreateEntity();
 		object.Group(group);
 		object.AddComponent<SpriteComponent>(assetID, tileSize, tileSize, zIndex, false, srcRectX, srcRectY);
 		object.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
@@ -152,15 +153,15 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 	mapFile.close();
 }
 
-void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string& fileName)
+void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string& m_sFileName)
 {
 	// Open and read the text file
 	std::fstream mapFile;
-	mapFile.open(fileName);
+	mapFile.open(m_sFileName);
 
 	if (!mapFile.is_open())
 	{
-		Logger::Err("EDITOR_LOADER: COLLIDERS: __LINE__ 164: Unable to open [" + fileName + "]");
+		Logger::Err("EDITOR_LOADER: COLLIDERS: __LINE__ 164: Unable to open [" + m_sFileName + "]");
 	}
 
 	while (true)
@@ -183,7 +184,7 @@ void EditorFileLoader::LoadBoxColliderMap(const std::unique_ptr<AssetManager>& a
 		if (mapFile.eof()) break;
 
 		// Create a new entity for each tile
-		Entity boxCollider = reg.CreateEntity();
+		Entity boxCollider = m_Registry.CreateEntity();
 		boxCollider.Group(group);
 		boxCollider.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(colliderScaleX, colliderScaleY), 0.0);
 		boxCollider.AddComponent<BoxColliderComponent>(colWidth, colHeight, glm::vec2(offset.x, offset.y));
@@ -201,9 +202,9 @@ void EditorFileLoader::SaveTilemap(std::string filepath, const std::unique_ptr<A
 	// Log the path where we saved the file!!
 	Logger::Err(filepath);
 
-	if (!reg.GetEntitiesByGroup("tiles").empty())
+	if (!m_Registry.GetEntitiesByGroup("tiles").empty())
 	{
-		for (auto entity : reg.GetEntitiesByGroup("tiles"))
+		for (auto entity : m_Registry.GetEntitiesByGroup("tiles"))
 		{
 			if (entity.BelongsToGroup("tiles"))
 			{
@@ -251,9 +252,9 @@ void EditorFileLoader::SaveObjectMap(std::string filepath, const std::unique_ptr
 	// Log the path where we saved the file!!
 	Logger::Err(filepath);
 
-	if (!reg.GetEntitiesByGroup("obstacles").empty())
+	if (!m_Registry.GetEntitiesByGroup("obstacles").empty())
 	{
-		for (auto entity : reg.GetEntitiesByGroup("obstacles"))
+		for (auto entity : m_Registry.GetEntitiesByGroup("obstacles"))
 		{
 			if (entity.BelongsToGroup("obstacles"))
 			{
@@ -291,9 +292,9 @@ void EditorFileLoader::SaveBoxColliderMap(std::string filepath, const std::uniqu
 	// Log the path where we saved the file!!
 	Logger::Err(filepath);
 
-	if (!reg.GetEntitiesByGroup("colliders").empty())
+	if (!m_Registry.GetEntitiesByGroup("colliders").empty())
 	{
-		for (auto entity : reg.GetEntitiesByGroup("colliders"))
+		for (auto entity : m_Registry.GetEntitiesByGroup("colliders"))
 		{
 			bool collider = false;
 			bool trigger = false;
@@ -332,9 +333,9 @@ void EditorFileLoader::SaveBoxColliderMapToLuaFile(std::string filepath)
 	m_writer.WriteDeclareTable("colliders", file);
 	
 	// If there are colliders in the registry, save them to a lua file, using the LuaTableWriter
-	if (!reg.GetEntitiesByGroup("colliders").empty())
+	if (!m_Registry.GetEntitiesByGroup("colliders").empty())
 	{
-		for (const auto& entity : reg.GetEntitiesByGroup("colliders"))
+		for (const auto& entity : m_Registry.GetEntitiesByGroup("colliders"))
 		{
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& collision = entity.GetComponent<BoxColliderComponent>();
@@ -386,9 +387,9 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 	m_writer.WriteDeclareTable("enemies", file);
 
 	// If there are Enemies in the registry, save them to a lua file, using the LuaTableWriter
-	if (!reg.GetEntitiesByGroup("enemies").empty())
+	if (!m_Registry.GetEntitiesByGroup("enemies").empty())
 	{
-		for (const auto& entity : reg.GetEntitiesByGroup("enemies"))
+		for (const auto& entity : m_Registry.GetEntitiesByGroup("enemies"))
 		{
 			bool animation = false;
 			bool projectile = false;
@@ -567,10 +568,10 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 	m_writer.WriteDeclareTable("triggers", file);
 
 	// If there are Enemies in the registry, save them to a lua file, using the LuaTableWriter
-	if (reg.DoesGroupExist("triggers"))
+	if (m_Registry.DoesGroupExist("triggers"))
 	{
 		// Write All of the triggers
-		for (const auto& entity : reg.GetEntitiesByGroup("triggers"))
+		for (const auto& entity : m_Registry.GetEntitiesByGroup("triggers"))
 		{
 
 			const auto&	transform = entity.GetComponent<TransformComponent>();
@@ -604,11 +605,11 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 			i++;
 		}
 	}
-	//
-	if (reg.DoesGroupExist("secret"))
+	
+	if (m_Registry.DoesGroupExist("secret"))
 	{
 		// Write All of the triggers
-		for (const auto& entity : reg.GetEntitiesByGroup("secret"))
+		for (const auto& entity : m_Registry.GetEntitiesByGroup("secret"))
 		{
 			const auto& transform = entity.GetComponent<TransformComponent>();
 			const auto& boxCollider = entity.GetComponent<BoxColliderComponent>();
@@ -653,12 +654,12 @@ void EditorFileLoader::SaveTriggersToLuaFile(std::string filepath)
 
 void EditorFileLoader::SetFileName(std::string filename)
 {
-	this->fileName = filename;
+	this->m_sFileName = filename;
 }
 
-void EditorFileLoader::SetImageName(std::string imageName)
+void EditorFileLoader::SetImageName(std::string m_sImageName)
 {
-	this->imageName = imageName;
+	this->m_sImageName = m_sImageName;
 }
 
 std::string EditorFileLoader::SetName(std::string filePath, bool wExtension, char separator)
@@ -674,9 +675,9 @@ std::string EditorFileLoader::SetName(std::string filePath, bool wExtension, cha
 	return "";
 }
 
-void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& fileName, std::string& enemy_name)
+void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& m_sFileName, std::string& enemy_name)
 {
-	sol::load_result script = lua.load_file("./Assets/EditorFiles/" + fileName + ".lua");
+	sol::load_result script = lua.load_file("./Assets/EditorFiles/" + m_sFileName + ".lua");
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -687,7 +688,7 @@ void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& fileN
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/EditorFiles/" + fileName + ".lua");
+	lua.script_file("./Assets/EditorFiles/" + m_sFileName + ".lua");
 
 	sol::table enemy = lua[enemy_name];
 
@@ -698,23 +699,30 @@ void EditorFileLoader::LoadEnemiesAttributes(sol::state& lua, std::string& fileN
 		sol::optional<sol::table> sprite = enemy["components"]["sprite"];
 		if (sprite != sol::nullopt)
 		{
-			MouseControlSystem::spriteComponent.assetID = enemy["components"]["sprite"]["asset_id"];
-			MouseControlSystem::spriteComponent.srcRect.x = enemy["components"]["sprite"]["src_rect_x"].get_or(0);
-			MouseControlSystem::spriteComponent.srcRect.y = enemy["components"]["sprite"]["src_rect_y"].get_or(0);
+			m_MouseControl.SetSpriteAssetID(enemy["components"]["sprite"]["asset_id"].get_or(std::string{""}));
+			m_MouseControl.SetSpriteSrcRect(
+				enemy["components"]["sprite"]["src_rect_x"].get_or(0),
+				enemy["components"]["sprite"]["src_rect_y"].get_or(0)
+			);
+		
 		}
 
 		sol::optional<sol::table> ai = enemy["components"]["ai_component"];
 		if (ai != sol::nullopt)
 		{
 			LevelLoader loader;
-			MouseControlSystem::enemyType = loader.ConvertStringToEnemyType(enemy["components"]["ai_component"]["enemy_type"]);
+			m_MouseControl.SetEnemyType(
+				loader.ConvertStringToEnemyType(
+					enemy["components"]["ai_component"]["enemy_type"].get_or(std::string{""})
+				)
+			);
 		}
 	}
 }
 
-void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy)
+void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& m_sFileName, std::string& enemy_name, Entity& newEnemy)
 {
-	sol::load_result script = lua.load_file("./Assets/EditorFiles/" + fileName + ".lua");
+	sol::load_result script = lua.load_file("./Assets/EditorFiles/" + m_sFileName + ".lua");
 	// This checks the syntax of our script, but it does not execute the script
 	if (!script.valid())
 	{
@@ -725,7 +733,7 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& fileName, st
 	}
 
 	// Executes the script using the sol State
-	lua.script_file("./Assets/EditorFiles/" + fileName + ".lua");
+	lua.script_file("./Assets/EditorFiles/" + m_sFileName + ".lua");
 
 	sol::table enemy = lua[enemy_name];
 

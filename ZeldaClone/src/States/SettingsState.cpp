@@ -21,14 +21,11 @@
 #include "../utilities/Camera.h"
 #include "../utilities/GameData.h"
 
-std::string SettingsState::settingsID = "SETTINGS";
-int SettingsState::mActionIndex = 0;
-bool SettingsState::mEnterKey = false;
-
 SettingsState::SettingsState()
-	: inputManager(InputManager::GetInstance())
-	, game(Game::Instance()), gameData(GameData::GetInstance())
+	: m_InputManager(InputManager::GetInstance())
+	, m_Game(Game::Instance()), m_GameData(GameData::GetInstance())
 {
+
 }
 
 void SettingsState::Update(const float& deltaTime)
@@ -64,21 +61,21 @@ bool SettingsState::OnEnter()
 	Game::Instance().GetAssetManager()->AddSoundFX("bomb_drop", "./Assets/sounds/Bomb_Drop.wav");
 	Game::Instance().GetAssetManager()->AddSoundFX("get_item", "./Assets/sounds/Get_Item.wav");
 
-	std::string attackKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::ATTACK)));
-	std::string moveUpKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_UP)));
-	std::string moveDownKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_DOWN)));
-	std::string moveLeftKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_LEFT)));
-	std::string moveRightKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::MOVE_RIGHT)));
-	std::string useItemKey = std::string(SDL_GetKeyName(inputManager.GetKeyCode(InputManager::Action::USE_ITEM)));
+	std::string attackKey = std::string(SDL_GetKeyName(m_InputManager.GetKeyCode(InputManager::Action::ATTACK)));
+	std::string moveUpKey = std::string(SDL_GetKeyName(m_InputManager.GetKeyCode(InputManager::Action::MOVE_UP)));
+	std::string moveDownKey = std::string(SDL_GetKeyName(m_InputManager.GetKeyCode(InputManager::Action::MOVE_DOWN)));
+	std::string moveLeftKey = std::string(SDL_GetKeyName(m_InputManager.GetKeyCode(InputManager::Action::MOVE_LEFT)));
+	std::string moveRightKey = std::string(SDL_GetKeyName(m_InputManager.GetKeyCode(InputManager::Action::MOVE_RIGHT)));
+	std::string useItemKey = std::string(SDL_GetKeyName(m_InputManager.GetKeyCode(InputManager::Action::USE_ITEM)));
 
 	std::string attackBtn = 
-		std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::ATTACK)));
+		std::string(SDL_GameControllerGetStringForButton(m_InputManager.GetBtnCode(InputManager::Action::ATTACK)));
 	std::string moveUpBtn = 
-		std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_UP)));
-	std::string moveDownBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_DOWN)));
-	std::string moveLeftBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_LEFT)));
-	std::string moveRightBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::MOVE_RIGHT)));
-	std::string useItemBtn = std::string(SDL_GameControllerGetStringForButton(inputManager.GetBtnCode(InputManager::Action::USE_ITEM)));
+		std::string(SDL_GameControllerGetStringForButton(m_InputManager.GetBtnCode(InputManager::Action::MOVE_UP)));
+	std::string moveDownBtn = std::string(SDL_GameControllerGetStringForButton(m_InputManager.GetBtnCode(InputManager::Action::MOVE_DOWN)));
+	std::string moveLeftBtn = std::string(SDL_GameControllerGetStringForButton(m_InputManager.GetBtnCode(InputManager::Action::MOVE_LEFT)));
+	std::string moveRightBtn = std::string(SDL_GameControllerGetStringForButton(m_InputManager.GetBtnCode(InputManager::Action::MOVE_RIGHT)));
+	std::string useItemBtn = std::string(SDL_GameControllerGetStringForButton(m_InputManager.GetBtnCode(InputManager::Action::USE_ITEM)));
 
 
 	auto action = Registry::Instance().CreateEntity();
@@ -209,7 +206,7 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 //		if (event.symbol == SDLK_RETURN)
 //		{
 //			SettingsState::mEnterKey = true;
-//			game.GetSoundPlayer().PlaySoundFX("bomb_drop", 0, SoundChannel::ANY);
+//			m_Game.GetSoundPlayer().PlaySoundFX("bomb_drop", 0, SoundChannel::ANY);
 //			break;
 //
 //		}
@@ -223,7 +220,7 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 //				selectTransform.position.y = 600;
 //				SettingsState::mActionIndex = 5;
 //			}
-//			game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+//			m_Game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
 //		}
 //		else if (event.symbol == SDLK_DOWN)
 //		{
@@ -235,12 +232,12 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 //				selectTransform.position.y = 225;
 //				SettingsState::mActionIndex = 0;
 //			}
-//			game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
+//			m_Game.GetSoundPlayer().PlaySoundFX("text_slow", 0, SoundChannel::TEXT);
 //		}
 //	}
 //	else
 //	{
-//		inputManager.ChangeKeyBinding(static_cast<InputManager::Action>(SettingsState::mActionIndex), event.symbol);
+//		m_InputManager.ChangeKeyBinding(static_cast<InputManager::Action>(SettingsState::mActionIndex), event.symbol);
 //		std::string keyPressed = std::string(SDL_GetKeyName(event.symbol));
 //		if (entity.HasComponent<TextLabelComponent>())
 //		{
@@ -250,7 +247,7 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 //				Logger::Log(keyPressed);
 //				auto& text = entity.GetComponent<TextLabelComponent>();
 //				text.text = keyPressed;
-//				game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::ANY);
+//				m_Game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::ANY);
 //				SettingsState::mEnterKey = false;
 //				break;
 //			}
@@ -278,7 +275,7 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 //	else
 //		selectText.text = "Choose an Action to Change!";
 
-	if (inputManager.GetKeyboard().IsKeyJustPressed(KEY_BACKSPACE) || inputManager.GetGamepad().IsButtonJustPressed(GP_BTN_B))
+	if (m_InputManager.GetKeyboard().IsKeyJustPressed(KEY_BACKSPACE) || m_InputManager.GetGamepad().IsButtonJustPressed(GP_BTN_B))
 	{
 		Game::Instance().GetStateMachine()->PushState(std::make_unique<MenuState>());
 	}

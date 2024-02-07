@@ -9,12 +9,9 @@
 
 RenderEditorSystem::RenderEditorSystem()
 {
-	// All Systems need a required component to help separate what entities need to 
-	// use that system
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
 	RequiredComponent<EditorComponent>();
-
 }
 
 void RenderEditorSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetManager>& assetManager, SDL_Rect& camera)
@@ -49,13 +46,9 @@ void RenderEditorSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetMan
 
 		// Bypass Rendering entities, if we are outside the camera view and are not fixed sprites
 		if (isEntityOutsideCameraView && !renderableEntity.spriteComponent.isFixed)
-		{
-
 			continue;
-		}
-
+		
 		renderableEntities.emplace_back(renderableEntity);
-
 	}
 
 	// Sort the new vector using a lambda function that compares each renderableEntity and returns a bool value
@@ -68,8 +61,8 @@ void RenderEditorSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetMan
 	// Loop all entities that the system is interested in
 	for (const auto& entity : renderableEntities)
 	{
-		const auto transform = entity.transformComponent;
-		const auto sprite = entity.spriteComponent;
+		const auto& transform = entity.transformComponent;
+		const auto& sprite = entity.spriteComponent;
 
 		// Set the src Rect of our original sprite texture
 		SDL_Rect srcRect = sprite.srcRect;

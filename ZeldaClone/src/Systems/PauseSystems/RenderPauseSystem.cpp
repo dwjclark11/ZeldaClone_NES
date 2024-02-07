@@ -49,8 +49,8 @@ void RenderPauseSystem::Update(SDL_Renderer* renderer, std::unique_ptr<AssetMana
 			&srcRect,
 			&dstRect,
 			transform.rotation,
-			NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
-			sprite.flip				// This is if we want to flup a sprite
+			NULL,			
+			sprite.flip		
 		);
 	}
 }

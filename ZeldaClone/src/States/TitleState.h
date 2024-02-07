@@ -4,13 +4,16 @@
 class TitleState : public State
 {
 private:
-	class Game& game;
-	class Registry& reg;
+	class Game& m_Game;
+	class Registry& m_Registry;
+	int m_Timer;
+	bool m_bScroll, m_bScrollFinished, bOffset;
+	std::unique_ptr<class Timer> m_pCamMoveTimer;
+	const std::string m_sTitleID{"TITLESTATE"};
 
-	int timer;
-	bool scroll;
-
-	static const std::string titleID;
+private:
+	void UpdateCameraMovement(class Camera& camera, const float& dt);
+	void AnimateTitle();
 
 public:
 	TitleState();
@@ -23,5 +26,5 @@ public:
 	virtual bool OnExit()  override;
 
 	virtual void ProcessEvents(SDL_Event& event) override;
-	virtual std::string GetStateID() const override { return titleID; }
+	virtual std::string GetStateID() const override { return m_sTitleID; }
 };

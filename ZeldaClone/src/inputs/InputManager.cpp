@@ -30,13 +30,11 @@ void InputManager::CreateDefaultKeyBindings()
 }
 
 InputManager::InputManager()
-	: m_pKeyboard{ nullptr }, m_pGamepad{nullptr}
+	: m_pKeyboard{ std::make_unique<Keyboard>() }, m_pGamepad{ std::make_unique<Gamepad>() }
 	, m_bKeydown{false} , m_bPaused{false}, m_bAttack{false}
 {
 	CreateDefaultBtnBindings();
 	CreateDefaultKeyBindings();
-	m_pKeyboard = std::make_unique<Keyboard>();
-	m_pGamepad = std::make_unique<Gamepad>();
 }
 
 InputManager& InputManager::GetInstance()
@@ -47,51 +45,47 @@ InputManager& InputManager::GetInstance()
 	return *m_pInstance;
 }
 
-InputManager::~InputManager()
-{
-
-}
-
 void InputManager::AddKeyToMap(Action action, SDL_Keycode key)
 {
-	if (mMappedKeys.find(action) == mMappedKeys.end())
-	{
-		mMappedKeys.emplace(action, key);
-	}
+	if (!mMappedKeys.contains(action))
+		mMappedKeys.emplace(action, key);	
 }
 
 void InputManager::ChangeKeyBinding(Action action, SDL_Keycode key)
 {
-	if (mMappedKeys.find(action) != mMappedKeys.end())
-		mMappedKeys[action] = key;
+	auto keyItr = mMappedKeys.find(action);
+	if (keyItr != mMappedKeys.end())
+		keyItr->second = key;
 }
 
 const SDL_Keycode InputManager::GetKeyCode(Action action)
 {
-	if (mMappedKeys.find(action) != mMappedKeys.end())
-		return mMappedKeys[action];
+	auto keyItr = mMappedKeys.find(action);
+	if (keyItr != mMappedKeys.end())
+		return keyItr->second;
 
 	return SDLK_UNKNOWN;
 }
 
 const SDL_GameControllerButton InputManager::GetBtnCode(Action action)
 {
-	if (mMappedButtons.find(action) != mMappedButtons.end())
-		return mMappedButtons[action];
+	auto btnItr = mMappedButtons.find(action);
+	if (btnItr != mMappedButtons.end())
+		return btnItr->second;
 
 	return SDL_CONTROLLER_BUTTON_INVALID;
 }
 
 void InputManager::AddBtnToMap(Action action, SDL_GameControllerButton button)
 {
-	if (mMappedButtons.find(action) == mMappedButtons.end())
-	{
-		mMappedButtons.emplace(action, button);
-	}
+	if (!mMappedButtons.contains(action))
+		mMappedButtons.emplace(action, button);	
 }
 
 void InputManager::ChangeBtnBinding(Action action, SDL_GameControllerButton button)
 {
-	if (mMappedButtons.find(action) != mMappedButtons.end())
-		mMappedButtons[action] = button;
+	auto btnItr = mMappedButtons.find(action);
+
+	if (btnItr != mMappedButtons.end())
+		btnItr->second = button;
 }

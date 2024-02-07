@@ -15,21 +15,28 @@ public:
 		MOVE_UP = 0, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT,
 		ATTACK, USE_ITEM, PAUSE, SELECT, CANCEL,
 	};
+
 private:
 	std::map<Action, SDL_Keycode> mMappedKeys;
 	std::map<Action, SDL_GameControllerButton> mMappedButtons;
-	void CreateDefaultBtnBindings();
-	void CreateDefaultKeyBindings();
-
-	InputManager();
-	static std::unique_ptr<InputManager> m_pInstance;
 	std::unique_ptr<Keyboard> m_pKeyboard;
 	std::unique_ptr<Gamepad> m_pGamepad;
 	bool m_bKeydown, m_bPaused, m_bAttack;
 
+	static std::unique_ptr<InputManager> m_pInstance;
+
+private:
+	void CreateDefaultBtnBindings();
+	void CreateDefaultKeyBindings();
+
+	InputManager();
+	InputManager(const InputManager&) = delete;
+	InputManager& operator=(const InputManager&) = delete;
+
 public:
 	static InputManager& GetInstance();
-	~InputManager();
+	~InputManager() = default;
+
 	void AddKeyToMap(Action action, SDL_Keycode key);
 	void ChangeKeyBinding(Action action, SDL_Keycode key);
 	const std::map<Action, SDL_Keycode>& GetKeyBindings() const { return mMappedKeys; }

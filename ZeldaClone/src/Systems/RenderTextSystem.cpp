@@ -9,14 +9,14 @@
 #include <SDL.h>
 
 RenderTextSystem::RenderTextSystem()
-	: game(Game::Instance())
+	: m_Game(Game::Instance())
 {
 	RequiredComponent<TextLabelComponent>();
 }
 
 void RenderTextSystem::Update()
 {
-	const auto& camera = game.GetCamera();
+	const auto& camera = m_Game.GetCamera();
 	const auto& cameraPos = camera.GetCameraPos();
 	const auto& cameraHeight = camera.GetCameraHeight();
 	const auto& cameraWidth = camera.GetCameraWidth();
@@ -25,15 +25,15 @@ void RenderTextSystem::Update()
 	{
 		auto& textLabel = entity.GetComponent<TextLabelComponent>();
 
-		SDL_SetRenderDrawColor(game.GetRenderer(), textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
+		SDL_SetRenderDrawColor(m_Game.GetRenderer(), textLabel.color.r, textLabel.color.g, textLabel.color.b, 255);
 		
 		SDL_Surface* surface = TTF_RenderText_Blended(
-			game.GetAssetManager()->GetFont(textLabel.assetID),
+			m_Game.GetAssetManager()->GetFont(textLabel.assetID),
 			textLabel.text.c_str(),
 			textLabel.color
 		);
 
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(game.GetRenderer(), surface);
+		SDL_Texture* texture = SDL_CreateTextureFromSurface(m_Game.GetRenderer(), surface);
 
 		// As soon as we create a texture we can free the surface
 		SDL_FreeSurface(surface);
@@ -50,7 +50,7 @@ void RenderTextSystem::Update()
 			labelHeight
 		};
 
-		SDL_RenderCopy(game.GetRenderer(), texture, NULL, &dstRect);
+		SDL_RenderCopy(m_Game.GetRenderer(), texture, NULL, &dstRect);
 
 		SDL_DestroyTexture(texture);
 	}

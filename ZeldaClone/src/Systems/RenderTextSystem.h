@@ -4,9 +4,10 @@
 class RenderTextSystem : public System
 {
 private:
-	class Game& game;
+	class Game& m_Game;
 public: 
 	RenderTextSystem();
+	~RenderTextSystem() = default;
 	
 	void Update();
 	void OnExit();

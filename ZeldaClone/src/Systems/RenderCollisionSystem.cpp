@@ -14,9 +14,7 @@ RenderCollisionSystem::RenderCollisionSystem()
 
 void RenderCollisionSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
 {
-	//auto& entities = GetSystemEntities();
-	auto entities = GetSystemEntities();
-	for (const auto& entity : entities)
+	for (const auto& entity : GetSystemEntities())
 	{
 		const auto& transform = entity.GetComponent<TransformComponent>();
 		const auto& collider = entity.GetComponent<BoxColliderComponent>();
@@ -39,6 +37,7 @@ void RenderCollisionSystem::Update(SDL_Renderer* renderer, SDL_Rect& camera)
 			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 125);
 			SDL_RenderFillRect(renderer, &srcRect);
 		}
+
 		SDL_RenderDrawRect(renderer, &srcRect);
 	}
 }

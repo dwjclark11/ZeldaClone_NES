@@ -15,117 +15,28 @@
 
 
 CameraMovementSystem::CameraMovementSystem()
-	: game(Game::Instance())
-	, gameData(GameData::GetInstance())
+	: m_Game{ Game::Instance() }
+	, m_GameData{ GameData::GetInstance() }
 	, m_CamSpeed{640}
 	, m_PrevCamX{ 7168 }
 	, m_PrevCamY{ 4448 }
-	, m_bStartEast{false}
-	, m_bStartWest{false}
-	, m_bStartNorth{false}
-	, m_bStartSouth{false}
+	, m_bStartEast{ false }
+	, m_bStartWest{ false }
+	, m_bStartNorth{ false }
+	, m_bStartSouth{ false }
 {
 	RequiredComponent<CameraFollowComponent>();
 	RequiredComponent<TransformComponent>();
-
-	// Initialize all the member variables
-	first = false;
-	titleScreenScroll_1 = false;
-	titleScreenScroll_2 = false;
-	titleScreenScroll_3 = false;
-	timerStart = false;
-	titleScreenScroll_Finished = false;
-	scrollTimer = 0;
-
-}
-
-void CameraMovementSystem::UpdateTitleCam(Camera& camera, const float& dt)
-{
-	if (!timer.isStarted())
-		timer.Start();
-	// Camera data
-	const auto& cameraPos = camera.GetCameraPos();
-	const auto& cameraWidth = camera.GetCameraWidth();
-	const auto& cameraHeight = camera.GetCameraHeight();
-	int new_cam_x = cameraPos.x;
-	int new_cam_y = cameraPos.y;
-	
-	/*
-		This part of the system controls the scroll of the camera during the title screen animations
-		The camera will wait for a certain amount of time and then the screen should appear to scroll
-		in a upwards motion, pausing for 3 seconds at 960
-	*/
-	// Where to place the Origin of the camera during the first entrance of the state
-	if (!first)
-	{
-		camera.SetCameraPosition(0, 0);
-		first = true;
-	}
-
-	if (!titleScreenScroll_1 && !titleScreenScroll_2 && !camera.IsCameraMoving())
-	{
-		titleScreenScroll_1 = true;
-		camera.SetCameraMoving(true);
-	}
-
-	if (titleScreenScroll_1)
-	{
-		new_cam_y += 100 * dt;
-		std::this_thread::sleep_for(std::chrono::microseconds(5));
-
-		if (new_cam_y >= 960)
-		{
-			new_cam_y = 960;
-			titleScreenScroll_1 = false;
-			camera.SetCameraMoving(true);
-		}
-	}
-
-	if (!titleScreenScroll_1 && !titleScreenScroll_2 && !titleScreenScroll_3)
-	{
-		if (timer.GetTicks() > 18000)
-			titleScreenScroll_2 = true;
-	}
-
-	if (titleScreenScroll_2)
-	{
-		new_cam_y += 100 * dt;
-
-		if (new_cam_y >= 6720)
-		{
-			new_cam_y = 6720;
-			titleScreenScroll_3 = true;
-		}
-	}
-	if (titleScreenScroll_3)
-	{
-		//if (timer.isStarted()) Logger::Log("ticks: " + std::to_string(timer.GetTicks()));
-		if (timer.GetTicks() > 120000)
-		{
-			titleScreenScroll_Finished = true;
-			titleScreenScroll_3 = false;
-			titleScreenScroll_2 = false;
-			titleScreenScroll_1 = false;
-			timer.Stop();
-			new_cam_y = 0;
-		}
-	}
-	// Keep the camera rectange view inside the screen limits
-	new_cam_x = new_cam_x < 0 ? 0 : new_cam_x; // If the camera.x is < 0 make it 0
-	new_cam_y = new_cam_y < 0 ? 0 : new_cam_y;
-
-	camera.SetCameraPosition(new_cam_x, new_cam_y);
-	//camera.SetCameraMoving(false);
 }
 
 void CameraMovementSystem::UpdatePlayerCam(Camera& camera, const float& dt)
 {
-	int window_width = game.GetWindowWidth();
-	int window_height = game.GetWindowHeight();
-	int level_width = gameData.GetLevelWidth();
-	int level_height = gameData.GetLevelHeight();
+	int window_width = m_Game.GetWindowWidth();
+	int window_height = m_Game.GetWindowHeight();
+	int level_width = m_GameData.GetLevelWidth();
+	int level_height = m_GameData.GetLevelHeight();
 
-	const auto& player = game.GetPlayer();
+	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	const auto& transform = playerEnt.GetComponent<TransformComponent>();
 
@@ -236,12 +147,6 @@ void CameraMovementSystem::UpdateEditorCam(Camera& camera, const float& dt)
 	const auto& cameraPos = camera.GetCameraPos();
 	const auto& cameraWidth = camera.GetCameraWidth();
 	const auto& cameraHeight = camera.GetCameraHeight();
-	
-	if (!first)
-	{
-		camera.SetCameraPosition(0, 0);
-		first = true;
-	}
 
 	// Keep the camera rectange view inside the screen limits
 	int new_cam_x = cameraPos.x;
@@ -256,10 +161,4 @@ void CameraMovementSystem::UpdateEditorCam(Camera& camera, const float& dt)
 	new_cam_y = (new_cam_y + cameraHeight > 100000) ? 100000 - cameraHeight : new_cam_y;
 
 	camera.SetCameraPosition(new_cam_x, new_cam_y);
-}
-
-void CameraMovementSystem::OnExit()
-{
-	first = false;
-	scrollTimer = 0;
 }

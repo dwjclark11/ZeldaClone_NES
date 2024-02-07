@@ -5,6 +5,11 @@
 #include "../Game/Game.h"
 #include "../Systems/SoundFXSystem.h"
 
+constexpr int MAX_RUPEES = 255;
+constexpr int MAX_BOMBS = 15;
+constexpr int MAX_KEYS = 15;
+constexpr int MAX_TRIFORCE_PIECES = 9;
+
 std::unique_ptr<GameData> GameData::m_pInstance = nullptr;
 
 void GameData::ConvertHUDNumbers()
@@ -192,6 +197,20 @@ void GameData::SetSecretFound(const std::string& locationID, bool found)
 	{
 		gameSecretsItr->second = found;
 	}
+}
+
+void GameData::AddBombs(int num)
+{
+	m_TotalBombs += num; 
+	if (m_TotalBombs >= MAX_BOMBS) 
+		m_TotalBombs = MAX_BOMBS; 
+}
+
+void GameData::AddKeys(int num)
+{
+	m_TotalKeys += num; 
+	if (m_TotalKeys >= MAX_KEYS) 
+		m_TotalKeys = MAX_KEYS;
 }
 
 void GameData::AddTriforcePieces(int num)

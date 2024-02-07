@@ -11,8 +11,6 @@
 RenderMainMenuSystem::RenderMainMenuSystem()
 	: m_GameData(GameData::GetInstance())
 {
-	// All Systems need a required component to help separate what entities need to 
-	// use that system
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<SpriteComponent>();
 	RequiredComponent<MenuComponent>();
