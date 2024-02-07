@@ -56,12 +56,22 @@ void MouseControlSystem::CreateTile(const std::unique_ptr<AssetManager>& assetMa
 			Entity tile = Registry::Instance().CreateEntity();
 			tile.Group("tiles");
 			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y), m_TransformComponent.scale, m_TransformComponent.rotation);
-			tile.AddComponent<SpriteComponent>(m_SpriteComponent.assetID, m_MouseRectX, m_MouseRectY, m_SpriteComponent.layer, m_SpriteComponent.isFixed, m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y);
+			tile.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = m_SpriteComponent.assetID,
+					.width = m_MouseRectX,
+					.height = m_MouseRectY,
+					.layer = m_SpriteComponent.layer,
+					.isFixed = m_SpriteComponent.isFixed,
+					.srcRect = SDL_Rect{m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y, m_MouseRectX, m_MouseRectY} 
+				}
+			);
+
 			tile.AddComponent<EditorComponent>();
 
 			if (m_bIsCollision)
 			{
-				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent.width, m_BoxColliderComponent.height, m_BoxColliderComponent.offset);
+				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent);
 			}
 
 			Logger::Log("Left Pressed");
@@ -109,15 +119,26 @@ void MouseControlSystem::CreateObstacles(const std::unique_ptr<AssetManager>& as
 		{
 			Entity tile = Registry::Instance().CreateEntity();
 			tile.Group("tiles"); // Why tiles?
-			tile.AddComponent<TransformComponent>(glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
-				glm::vec2(m_TransformComponent.scale.x, m_TransformComponent.scale.y), m_TransformComponent.rotation);
+			tile.AddComponent<TransformComponent>(
+				glm::vec2(mouseBox.x + camera.x, mouseBox.y + camera.y),
+				m_TransformComponent.scale, m_TransformComponent.rotation);
 		
-			tile.AddComponent<SpriteComponent>(m_SpriteComponent.assetID, m_MouseRectX, m_MouseRectY, m_SpriteComponent.layer, m_SpriteComponent.isFixed, m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y);
+			tile.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = m_SpriteComponent.assetID,
+					.width = m_MouseRectX,
+					.height = m_MouseRectY,
+					.layer = m_SpriteComponent.layer,
+					.isFixed = m_SpriteComponent.isFixed,
+					.srcRect = SDL_Rect { m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y, m_MouseRectX, m_MouseRectY} 
+				}
+			);
+
 			tile.AddComponent<EditorComponent>();
 			// Does the object have a box Collider?
 			if (m_bIsCollision)
 			{
-				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent.width, m_BoxColliderComponent.height, m_BoxColliderComponent.offset);
+				tile.AddComponent<BoxColliderComponent>(m_BoxColliderComponent);
 			}
 		}
 		// Remove the current Entity the mouse is hovering over
@@ -247,8 +268,16 @@ void MouseControlSystem::CreateTrigger(const std::unique_ptr<AssetManager>& asse
 			
 			if (m_bSpriteSelected)
 			{
-				newTrigger.AddComponent<SpriteComponent>(m_SpriteComponent.assetID, m_SpriteComponent.width,
-					m_SpriteComponent.height, m_SpriteComponent.layer, m_SpriteComponent.isFixed, m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y);
+				newTrigger.AddComponent<SpriteComponent>(
+					SpriteComponent{
+						.assetID = m_SpriteComponent.assetID,
+						.width = m_MouseRectX,
+						.height = m_MouseRectY,
+						.layer = m_SpriteComponent.layer,
+						.isFixed = m_SpriteComponent.isFixed,
+						.srcRect = SDL_Rect{ m_SpriteComponent.srcRect.x, m_SpriteComponent.srcRect.y, m_MouseRectX, m_MouseRectY} 
+					}
+				);
 
 				Logger::Log("Sprite Asset ID: " + m_SpriteComponent.assetID + "Sprite Width: " + std::to_string(m_SpriteComponent.width));
 				Logger::Log("Sprite Asset ID: " + newTrigger.GetComponent<SpriteComponent>().assetID + "Sprite Width: " + std::to_string(newTrigger.GetComponent<SpriteComponent>().width));

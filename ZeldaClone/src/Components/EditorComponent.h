@@ -1,7 +1,6 @@
 #pragma once
 
-class EditorComponent
+struct EditorComponent
 {
-public:
-	EditorComponent() {}
+
 };

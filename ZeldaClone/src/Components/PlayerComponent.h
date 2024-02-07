@@ -1,6 +1,5 @@
 #pragma once
-class PlayerComponent
+struct PlayerComponent
 {
-public:
-	PlayerComponent() = default;
+
 };

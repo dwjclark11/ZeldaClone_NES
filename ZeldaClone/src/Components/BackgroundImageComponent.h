@@ -1,17 +1,9 @@
 #pragma once
 #include <glm/glm.hpp>
 
-class BackgroundImageComponent
+struct BackgroundImageComponent
 {
-public:
-	glm::vec2 position;
-	glm::vec2 scale;
-	double rotation;
-
-	BackgroundImageComponent(glm::vec2 position = glm::vec2(0, 0), glm::vec2 scale = glm::vec2(1, 1), double rotation = 0.0f)
-	{
-		this->position = position;
-		this->scale = scale;
-		this->rotation = rotation;
-	}
+	glm::vec2 position{ 0.f };
+	glm::vec2 scale{ 1.f };
+	double rotation{ 0.f };
 };

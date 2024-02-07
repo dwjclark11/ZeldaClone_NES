@@ -123,19 +123,19 @@ void DamageSystem::OnPlayerHitsProjectile(Entity projectile, Entity player)
 		{
 			switch (projectileRigid.dir)
 			{
-			case RigidBodyComponent::Dir::UP:
+			case RigidBodyDir::UP:
 				playerTransform.position.y -= 64;
 				break;
-			case RigidBodyComponent::Dir::DOWN:
+			case RigidBodyDir::DOWN:
 				playerTransform.position.y += 64;
 				break;
-			case RigidBodyComponent::Dir::LEFT:
+			case RigidBodyDir::LEFT:
 				playerTransform.position.x -= 64;
 				break;
-			case RigidBodyComponent::Dir::RIGHT:
+			case RigidBodyDir::RIGHT:
 				playerTransform.position.y += 64;
 				break;
-			case RigidBodyComponent::Dir::NO_DIR:
+			case RigidBodyDir::NO_DIR:
 				__debugbreak();
 				break;
 			}
@@ -205,21 +205,21 @@ void DamageSystem::OnPlayerSwordHitsEnemy(Entity sword, Entity enemy)
 			// Move the enemy slightly away in the opposite direction of movement
 			switch (player_rb.dir)
 			{
-			case RigidBodyComponent::Dir::UP:
+			case RigidBodyDir::UP:
 				enemyTransform.position.y -= 64;
-				enemyRigidbody.dir = RigidBodyComponent::Dir::UP;
+				enemyRigidbody.dir = RigidBodyDir::UP;
 				break;
-			case RigidBodyComponent::Dir::RIGHT:
+			case RigidBodyDir::RIGHT:
 				enemyTransform.position.x += 64;
-				enemyRigidbody.dir = RigidBodyComponent::Dir::RIGHT;
+				enemyRigidbody.dir = RigidBodyDir::RIGHT;
 				break;
-			case RigidBodyComponent::Dir::DOWN:
+			case RigidBodyDir::DOWN:
 				enemyTransform.position.y += 64;
-				enemyRigidbody.dir = RigidBodyComponent::Dir::DOWN;
+				enemyRigidbody.dir = RigidBodyDir::DOWN;
 				break;
-			case RigidBodyComponent::Dir::LEFT:
+			case RigidBodyDir::LEFT:
 				enemyTransform.position.x -= 64;
-				enemyRigidbody.dir = RigidBodyComponent::Dir::LEFT;
+				enemyRigidbody.dir = RigidBodyDir::LEFT;
 				break;
 			}
 		}
@@ -283,21 +283,21 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 		{
 			switch (proj_rb.dir)
 			{
-			case RigidBodyComponent::Dir::UP:
+			case RigidBodyDir::UP:
 				enemyTransform.position.y -= 64;
-				rigidBody.dir = RigidBodyComponent::Dir::UP;
+				rigidBody.dir = RigidBodyDir::UP;
 				break;
-			case RigidBodyComponent::Dir::RIGHT:
+			case RigidBodyDir::RIGHT:
 				enemyTransform.position.x += 64;
-				rigidBody.dir = RigidBodyComponent::Dir::RIGHT;
+				rigidBody.dir = RigidBodyDir::RIGHT;
 				break;
-			case RigidBodyComponent::Dir::DOWN:
+			case RigidBodyDir::DOWN:
 				enemyTransform.position.y += 64;
-				rigidBody.dir = RigidBodyComponent::Dir::DOWN;
+				rigidBody.dir = RigidBodyDir::DOWN;
 				break;
-			case RigidBodyComponent::Dir::LEFT:
+			case RigidBodyDir::LEFT:
 				enemyTransform.position.x -= 64;
-				rigidBody.dir = RigidBodyComponent::Dir::LEFT;
+				rigidBody.dir = RigidBodyDir::LEFT;
 				break;
 			}
 		}
@@ -329,16 +329,16 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 				// Move the enemy slightly away in the opposite direction of movement
 				switch (proj_rb.dir)
 				{
-				case RigidBodyComponent::Dir::UP:
+				case RigidBodyDir::UP:
 					enemyTransform.position.y -= 64;
 					break;
-				case RigidBodyComponent::Dir::RIGHT:
+				case RigidBodyDir::RIGHT:
 					enemyTransform.position.x += 64;
 					break;
-				case RigidBodyComponent::Dir::DOWN:
+				case RigidBodyDir::DOWN:
 					enemyTransform.position.y += 64;
 					break;
-				case RigidBodyComponent::Dir::LEFT:
+				case RigidBodyDir::LEFT:
 					enemyTransform.position.x -= 64;
 					break;
 				}
@@ -386,21 +386,21 @@ void DamageSystem::OnEnemyHitsPlayer(Entity enemy, Entity player)
 	{
 		switch (enemy_rb.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			playerTransform.position.y -= 64;
-			rigidBody.dir = RigidBodyComponent::Dir::UP;
+			rigidBody.dir = RigidBodyDir::UP;
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			playerTransform.position.x += 64;
-			rigidBody.dir = RigidBodyComponent::Dir::RIGHT;
+			rigidBody.dir = RigidBodyDir::RIGHT;
 			break;
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			playerTransform.position.y += 64;
-			rigidBody.dir = RigidBodyComponent::Dir::DOWN;
+			rigidBody.dir = RigidBodyDir::DOWN;
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			playerTransform.position.x -= 64;
-			rigidBody.dir = RigidBodyComponent::Dir::LEFT;
+			rigidBody.dir = RigidBodyDir::LEFT;
 			break;
 		}
 	}

@@ -27,60 +27,60 @@
 Timer timer;
 Game& game = Game::Instance();
 
-void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
+void SetSpecialItem(SpecialItemType special, Entity& player)
 {
 	auto& health = player.GetComponent<HealthComponent>();
 	auto& gameData = GameData::GetInstance();
 
 	switch (special)
 	{
-	case ItemComponent::SpecialItemType::NOT_SPECIAL:
+	case SpecialItemType::NOT_SPECIAL:
 		break;
 
-	case ItemComponent::SpecialItemType::WOOD_SWORD:
+	case SpecialItemType::WOOD_SWORD:
 		gameData.AddItem(GameData::GameItems::WOOD_SWORD);
 		break;
 
-	case ItemComponent::SpecialItemType::STEEL_SWORD:
+	case SpecialItemType::STEEL_SWORD:
 		gameData.AddItem(GameData::GameItems::SILVER_SWORD);
 		break;
 
-	case ItemComponent::SpecialItemType::MAGIC_SWORD:
+	case SpecialItemType::MAGIC_SWORD:
 		gameData.AddItem(GameData::GameItems::MAGIC_SWORD);
 		break;
 
-	case ItemComponent::SpecialItemType::FULL_HEART:
+	case SpecialItemType::FULL_HEART:
 		health.addHeart = true;
 		break;
 	
-	case ItemComponent::SpecialItemType::RAFT:
+	case SpecialItemType::RAFT:
 		gameData.AddItem(GameData::GameItems::RAFT);
 		break;
-	case ItemComponent::SpecialItemType::POWER_BRACLET:
+	case SpecialItemType::POWER_BRACLET:
 		gameData.AddItem(GameData::GameItems::POWER_BRACLET);
 		break;
-	case ItemComponent::SpecialItemType::RED_CANDLE:
+	case SpecialItemType::RED_CANDLE:
 		gameData.AddItem(GameData::GameItems::CANDLE);
 		break;
-	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
+	case SpecialItemType::WOOD_BOOMERANG:
 		gameData.AddItem(GameData::GameItems::BOOMERANG);
 		break;
-	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
+	case SpecialItemType::MAGIC_BOOMERANG:
 		gameData.AddItem(GameData::GameItems::MAGIC_BOOMERANG);
 		break;
-	case ItemComponent::SpecialItemType::LADDER:
+	case SpecialItemType::LADDER:
 		gameData.AddItem(GameData::GameItems::LADDER);
 		break;
-	case ItemComponent::SpecialItemType::ARROWS:
+	case SpecialItemType::ARROWS:
 		gameData.AddItem(GameData::GameItems::WOOD_ARROWS);
 		break;
-	case ItemComponent::SpecialItemType::MAGIC_ARROWS:
+	case SpecialItemType::MAGIC_ARROWS:
 		gameData.AddItem(GameData::GameItems::MAGIC_ARROWS);
 		break;
-	case ItemComponent::SpecialItemType::WOOD_BOW:
+	case SpecialItemType::WOOD_BOW:
 		gameData.AddItem(GameData::GameItems::BOW);
 		break;
-	case ItemComponent::SpecialItemType::TRIFORCE_PIECE:
+	case SpecialItemType::TRIFORCE_PIECE:
 	{
 		gameData.AddTriforcePieces(1);
 		break;
@@ -90,18 +90,18 @@ void SetSpecialItem(ItemComponent::SpecialItemType special, Entity& player)
 	}
 }
 
-void SetItemCollect(ItemComponent::ItemCollectType type)
+void SetItemCollect(ItemCollectType type)
 {
 	auto& gameData = GameData::GetInstance();
 	switch (type)
 	{
-	case ItemComponent::ItemCollectType::BOMBS:
+	case ItemCollectType::BOMBS:
 		gameData.AddBombs(4);
 		break;
 	}
 }
 
-void CheckItem(ItemComponent::ItemCollectType type)
+void CheckItem(ItemCollectType type)
 {
 
 }
@@ -224,7 +224,7 @@ void CollectItemState::Update(Entity& entity)
 	auto& sm = game.GetPlayer()->GetPlayerStateMachine();
 	auto& camera = game.GetCamera();
 	// Stop player movement!
-	playerRigidBody = glm::vec2(0);
+	playerRigidBody.velocity = glm::vec2(0);
 	bool obtained_triforce = game.GetPlayer()->ObtainedTriforcePiece();
 	int time =  obtained_triforce ? 9000 : 2000;
 	
@@ -236,12 +236,12 @@ void CollectItemState::Update(Entity& entity)
 			continue;
 
 		const auto& special = trigger.GetComponent<ItemComponent>();
-		if (special.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
+		if (special.special != SpecialItemType::NOT_SPECIAL)
 		{
 			SetSpecialItem(special.special, entity);
 		}
 
-		if (special.type != ItemComponent::ItemCollectType::DEFAULT)
+		if (special.type != ItemCollectType::DEFAULT)
 			SetItemCollect(special.type);
 
 		auto& transform = trigger.GetComponent<TransformComponent>();
@@ -308,23 +308,35 @@ void CollectItemState::Update(Entity& entity)
 			);
 
 			newSceneTrigger.AddComponent<TriggerBoxComponent>(
-				TriggerBoxComponent::TriggerType::SCENE_CHANGE,
-				glm::vec2{
-					trigger_component.transportOffset.x,
-					trigger_component.transportOffset.y
-				},
-				glm::vec2{
-					trigger_component.cameraOffset.x,
-					trigger_component.cameraOffset.x }
-				);
+				TriggerBoxComponent{
+					.triggerType = TriggerType::SCENE_CHANGE,
+					.transportOffset = glm::vec2{
+						trigger_component.transportOffset.x,
+						trigger_component.transportOffset.y
+					},
+					.cameraOffset = glm::vec2{
+						trigger_component.cameraOffset.x,
+						trigger_component.cameraOffset.x
+					}
+				}
+			);
+			
 			newSceneTrigger.AddComponent<SceneChangeComponent>(
-				scene_component.levelMusic, scene_component.assetFile,
-				scene_component.enemyFile, scene_component.colliderFile, 
-				scene_component.tileMapName, scene_component.tileImageName, 
-				scene_component.mapImageName, scene_component.entityFileName, 
-				scene_component.triggerFile, scene_component.imageWidth, 
-				scene_component.imageHeight
-				);
+				SceneChangeComponent{
+						.levelMusic = scene_component.levelMusic,
+						.assetFile = scene_component.assetFile,
+						.enemyFile = scene_component.enemyFile,
+						.colliderFile = scene_component.colliderFile,
+						.tileMapName = scene_component.tileMapName,
+						.tileImageName = scene_component.tileImageName,
+						.mapImageName = scene_component.mapImageName,
+						.entityFileName = scene_component.entityFileName,
+						.triggerFile = scene_component.triggerFile,
+						.imageHeight = scene_component.imageWidth,
+						.imageWidth = scene_component.imageHeight
+				}
+			);
+
 			newSceneTrigger.AddComponent<GameComponent>();
 
 			sm.AddState(std::make_unique<IdleState>());

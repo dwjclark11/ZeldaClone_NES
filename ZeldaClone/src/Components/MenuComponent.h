@@ -1,11 +1,6 @@
 #pragma once
 
-class MenuComponent
+struct MenuComponent
 {
-public:
-	int slotPos;
-	MenuComponent(int slotPos = 0) 
-	{
-		this->slotPos = slotPos;
-	}
+	int slotPos{ 0 };	
 };

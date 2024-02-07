@@ -1,7 +1,6 @@
 #pragma once
 
-class GameComponent
+struct GameComponent
 {
-public:
-	GameComponent() {}
+
 };

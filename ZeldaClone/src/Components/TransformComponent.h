@@ -4,13 +4,7 @@
 class TransformComponent
 {
 public:
-	glm::vec2 position, scale;
-	double rotation;
-	bool collision;
-
-	TransformComponent(glm::vec2 position = glm::vec2(0, 0), glm::vec2 scale = glm::vec2(1, 1), double rotation = 0.0f)
-		: position{position}, scale{scale}, rotation{rotation}, collision{false}
-	{
-
-	}
+	glm::vec2 position{ 0.f }, scale{ 1.f };
+	double rotation{ 0.0 };
+	bool collision{ false };
 };

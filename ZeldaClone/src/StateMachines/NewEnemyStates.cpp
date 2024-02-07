@@ -316,27 +316,91 @@ void EnemyDeathState::ItemDrop(Entity& enemy)
 
 	if (chance % 7 == 0)
 	{
-		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::BOMBS);
-		item.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 64, 112);
-
+		item.AddComponent<ItemComponent>(ItemCollectType::BOMBS);
+		item.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect{64, 112, 16, 16}
+			}
+		);
 	}
+
 	else if (chance % 5 == 0)
 	{
-		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::BLUE_RUPEE);
-		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
-		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
+		item.AddComponent<ItemComponent>(ItemCollectType::BLUE_RUPEE);
+		item.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "hearts",
+				.width = 16,
+				.height = 16,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect{48, 0, 16, 16}
+			}
+		);
+
+		item.AddComponent<AnimationComponent>(
+			AnimationComponent{
+				.numFrames = 2,
+				.frameSpeedRate = 10,
+				.vertical = false,
+				.isLooped = true,
+				.frameOffset = 48
+			}
+		);
 
 	}
 	else if (chance % 3 == 0)
 	{
-		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::HEARTS);
-		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 0, 0);
-		item.AddComponent<AnimationComponent>(2, 10, false, true, 0);
+		item.AddComponent<ItemComponent>(ItemCollectType::HEARTS);
+		item.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "hearts",
+				.width = 16,
+				.height = 16,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect{0, 0, 16, 16} 
+			}
+		);
+
+		item.AddComponent<AnimationComponent>(
+			AnimationComponent{
+				.numFrames = 2,
+				.frameSpeedRate = 10,
+				.vertical = false,
+				.isLooped = true,
+				.frameOffset = 0 
+			}
+		);
 	}
 	else if (chance % 2 == 0)
 	{
-		item.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::YELLOW_RUPEE);
-		item.AddComponent<SpriteComponent>("hearts", 16, 16, 1, false, 48, 0);
-		item.AddComponent<AnimationComponent>(2, 10, false, true, 48);
+		item.AddComponent<ItemComponent>(ItemCollectType::YELLOW_RUPEE);
+		
+		item.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "hearts",
+				.width = 16,
+				.height = 16,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect{48, 0, 16, 16}
+			}
+		);
+	
+		item.AddComponent<AnimationComponent>(
+			AnimationComponent{
+				.numFrames = 2,
+				.frameSpeedRate = 10,
+				.vertical = false,
+				.isLooped = true,
+				.frameOffset = 48 
+			}
+		);
 	}
 }

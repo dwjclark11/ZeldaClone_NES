@@ -25,10 +25,10 @@ private:
 
 	// Helper Functions
 	AssetType ConvertToAssetType(std::string& type);
-	ItemComponent::SpecialItemType ConvertLuaStringToSpecial(std::string& special);
+	SpecialItemType ConvertLuaStringToSpecial(std::string& special);
 	
-	ItemComponent::ItemCollectType ConvertLuaStringToItem(std::string& type);
-	bool CheckForItemInInventory(ItemComponent::SpecialItemType& type);
+	ItemCollectType ConvertLuaStringToItem(std::string& type);
+	bool CheckForItemInInventory(SpecialItemType& type);
 	void ConvertName(const std::string& name, int x, int y);
 	bool ReadSpriteComponent(sol::table& table, Entity& entity);
 	void ReadBoxColliderComponent(sol::table& table, Entity& entity);
@@ -70,7 +70,7 @@ public:
 	void SaveSecrets();
 	void ReadInSecrets(sol::state& lua);
 
-	TriggerBoxComponent::TriggerType ConvertStringToTriggerType(const std::string& type);
+	TriggerType ConvertStringToTriggerType(const std::string& type);
 
 	AIComponent::EnemyType ConvertStringToEnemyType(const std::string& enemyType);
 	AIComponent::EnemyBossType ConvertStringToEnemyBossType(const std::string& bossType);

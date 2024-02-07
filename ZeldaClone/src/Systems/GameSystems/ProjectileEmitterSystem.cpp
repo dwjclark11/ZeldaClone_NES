@@ -165,7 +165,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 	// Use the fire ahead of the player in the direction the player is facing
 	switch (rigidbody.dir)
 	{
-	case RigidBodyComponent::Dir::UP:
+	case RigidBodyDir::UP:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = (transform.position.x + attrib.transOffsetUp.x);
@@ -182,7 +182,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxOffset = attrib.upOffset;
 		directionY = -1;
 		break;
-	case RigidBodyComponent::Dir::RIGHT:
+	case RigidBodyDir::RIGHT:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = ((transform.position.x + attrib.transOffsetRight.x) + sprite.width * 3);
@@ -198,7 +198,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxOffset = attrib.rightOffset;
 		directionX = 1;
 		break;
-	case RigidBodyComponent::Dir::DOWN:
+	case RigidBodyDir::DOWN:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = (transform.position.x + attrib.transOffsetDown.x);
@@ -214,7 +214,7 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		BoxOffset = attrib.downOffset;
 		directionY = 1;
 		break;
-	case RigidBodyComponent::Dir::LEFT:
+	case RigidBodyDir::LEFT:
 		if (attrib.numFrames == 1)
 		{
 			projectilePosition.x = ((transform.position.x + attrib.transOffsetLeft.x) - sprite.width * 3);
@@ -249,11 +249,35 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 	if (attrib.bAnimation)
 	{
 		// TODO: Change the frame speed from hard coded to individual --> attrib.frame_speed
-		newItem.AddComponent<AnimationComponent>(attrib.numFrames, 15, attrib.bVertical, true);
+		newItem.AddComponent<AnimationComponent>(
+			AnimationComponent{
+				.numFrames = attrib.numFrames,
+				.frameSpeedRate = 15,
+				.vertical = attrib.bVertical,
+				.isLooped = true }
+		);
 	}
 	projectileEmitter.isFriendly = true;
-	newItem.AddComponent<SpriteComponent>(attrib.sprite_name, attrib.width, attrib.height, 2, false, attrib.srcRectX, attrib.srcRectY);
-	newItem.AddComponent<ProjectileComponent>(true, 10, attrib.duration, static_cast<ProjectileComponent::Dir>(rigidbody.dir));
+	newItem.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = attrib.sprite_name,
+			.width = attrib.width,
+			.height = attrib.height,
+			.layer = 2,
+			.isFixed = false,
+			.srcRect = SDL_Rect{attrib.srcRectX, attrib.srcRectY, attrib.width, attrib.height} 
+		}
+	);
+
+	newItem.AddComponent<ProjectileComponent>( 
+		ProjectileComponent{
+			.isFriendly = projectileEmitter.isFriendly, 
+			.hitPercentDamage = 10,
+			.duration = attrib.duration,
+			.dir = static_cast<ProjectileDir>(rigidbody.dir)
+		}
+	);
+
 	newItem.AddComponent<GameComponent>();
 
 	if (attrib.group == "boomerang")
@@ -286,7 +310,7 @@ void ProjectileEmitterSystem::UseSword()
 
 	switch (rigidbody.dir)
 	{
-	case RigidBodyComponent::Dir::UP:
+	case RigidBodyDir::UP:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.y = 60;
 
@@ -297,7 +321,7 @@ void ProjectileEmitterSystem::UseSword()
 
 		shieldCollider.offset.y = 60;
 		break;
-	case RigidBodyComponent::Dir::RIGHT:
+	case RigidBodyDir::RIGHT:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.x = 30;
 
@@ -308,7 +332,7 @@ void ProjectileEmitterSystem::UseSword()
 
 		shieldCollider.offset.x = 70;
 		break;
-	case RigidBodyComponent::Dir::DOWN:
+	case RigidBodyDir::DOWN:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.y = 30;
 
@@ -319,7 +343,7 @@ void ProjectileEmitterSystem::UseSword()
 
 		shieldCollider.offset.y = 60;
 		break;
-	case RigidBodyComponent::Dir::LEFT:
+	case RigidBodyDir::LEFT:
 		playerSprite.srcRect.y = playerSprite.height * 5;
 		playerCollider.offset.x = 60;
 
@@ -561,16 +585,16 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 			scale = 4;
 			switch (rigid.dir)
 			{
-			case RigidBodyComponent::Dir::UP:
+			case RigidBodyDir::UP:
 				srcRectX = 0 * 16;
 				break;
-			case RigidBodyComponent::Dir::RIGHT:
+			case RigidBodyDir::RIGHT:
 				srcRectX = 1 * 16;
 				break;
-			case RigidBodyComponent::Dir::DOWN:
+			case RigidBodyDir::DOWN:
 				srcRectX = 2 * 16;
 				break;
-			case RigidBodyComponent::Dir::LEFT:
+			case RigidBodyDir::LEFT:
 				srcRectX = 3 * 16;
 				break;
 			}
@@ -589,22 +613,22 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 		// was triggered
 		switch (rigid.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			projectileEmitter.projectileVelocity = glm::vec2(0, -400);
 			offsetX = 20;
 			offsetY = 0;
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			projectileEmitter.projectileVelocity = glm::vec2(400, 0);
 			offsetX = 0;
 			offsetY = 20;
 			break;
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			projectileEmitter.projectileVelocity = glm::vec2(0, 400);
 			offsetX = 20;
 			offsetY = 0;
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			projectileEmitter.projectileVelocity = glm::vec2(-400, 0);
 			offsetX = 0;
 			offsetY = 20;
@@ -617,8 +641,26 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 		enemyProjectile.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
 		projectileEmitter.isFriendly = false;
-		enemyProjectile.AddComponent<SpriteComponent>("items", 16, 16, 2, false, srcRectX, srcRectY);
-		enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration, static_cast<ProjectileComponent::Dir>(rigid.dir));
+		enemyProjectile.AddComponent<SpriteComponent>(
+			SpriteComponent {
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 2,
+				.isFixed = false,
+				.srcRect = SDL_Rect{srcRectX, srcRectY, 16, 16} 
+			}
+		);
+		
+		enemyProjectile.AddComponent<ProjectileComponent>(
+			ProjectileComponent{
+				.isFriendly = projectileEmitter.isFriendly,
+				.hitPercentDamage = projectileEmitter.hitPercentDamage,
+				.duration = projectileEmitter.projectileDuration,
+				.dir = static_cast<ProjectileDir>(rigid.dir)
+			}
+		);
+
 		enemyProjectile.AddComponent<GameComponent>();
 
 		projectileEmitter.shotFired = true;
@@ -656,9 +698,35 @@ void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 			enemyProjectile.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
 			projectileEmitter.isFriendly = false;
-			enemyProjectile.AddComponent<SpriteComponent>("fire_ball", 16, 16, 2, false, 0, 0);
-			enemyProjectile.AddComponent<AnimationComponent>(4, 20, false, true, 0);
-			enemyProjectile.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+			enemyProjectile.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "fire_ball",
+					.width = 16,
+					.height = 16,
+					.layer = 2,
+					.isFixed = false,
+					.srcRect = SDL_Rect{0, 0, 16, 16} 
+				}
+			);
+
+			enemyProjectile.AddComponent<AnimationComponent>(
+				AnimationComponent{
+					.numFrames = 4,
+					.frameSpeedRate = 20,
+					.vertical = false,
+					.isLooped = true,
+					.frameOffset = 0
+				}
+			);
+			
+			enemyProjectile.AddComponent<ProjectileComponent>(ProjectileComponent{
+				.isFriendly = projectileEmitter.isFriendly,
+				.hitPercentDamage = projectileEmitter.hitPercentDamage,
+				.duration = projectileEmitter.projectileDuration//,
+				//.dir = static_cast<ProjectileDir>(rigid.dir)
+				}
+			);
+
 			enemyProjectile.AddComponent<GameComponent>();
 
 			enemyProjectile2.Group("projectile");
@@ -668,9 +736,34 @@ void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 			enemyProjectile2.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
 			projectileEmitter.isFriendly = false;
-			enemyProjectile2.AddComponent<SpriteComponent>("fire_ball", 16, 16, 2, false, 0, 0);
-			enemyProjectile2.AddComponent<AnimationComponent>(4, 20, false, true, 0);
-			enemyProjectile2.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+			enemyProjectile2.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "fire_ball",
+					.width = 16,
+					.height = 16,
+					.layer = 2,
+					.isFixed = false,
+					.srcRect = SDL_Rect{0, 0, 16, 16} 
+				}
+			);
+
+			enemyProjectile2.AddComponent<AnimationComponent>(
+				AnimationComponent{
+					.numFrames = 4,
+					.frameSpeedRate = 20,
+					.vertical = false,
+					.isLooped = true,
+					.frameOffset = 0
+				}
+			);
+			
+			enemyProjectile2.AddComponent<ProjectileComponent>(ProjectileComponent{
+				.isFriendly = projectileEmitter.isFriendly,
+				.hitPercentDamage = projectileEmitter.hitPercentDamage,
+				.duration = projectileEmitter.projectileDuration
+				}
+			);
+
 			enemyProjectile2.AddComponent<GameComponent>();
 
 			enemyProjectile3.Group("projectile");
@@ -680,9 +773,34 @@ void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 			enemyProjectile3.AddComponent<BoxColliderComponent>(16, 16, glm::vec2(0, 0));
 
 			projectileEmitter.isFriendly = false;
-			enemyProjectile3.AddComponent<SpriteComponent>("fire_ball", 16, 16, 2, false, 0, 0);
-			enemyProjectile3.AddComponent<AnimationComponent>(4, 20, false, true, 0);
-			enemyProjectile3.AddComponent<ProjectileComponent>(false, projectileEmitter.hitPercentDamage, projectileEmitter.projectileDuration);
+			enemyProjectile3.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "fire_ball",
+					.width = 16,
+					.height = 16,
+					.layer = 2,
+					.isFixed = false,
+					.srcRect = SDL_Rect{0, 0, 16, 16}
+				}
+			);
+
+			enemyProjectile3.AddComponent<AnimationComponent>(
+				AnimationComponent{
+					.numFrames = 4,
+					.frameSpeedRate = 20,
+					.vertical = false,
+					.isLooped = true,
+					.frameOffset = 0
+				}
+			);
+
+			enemyProjectile3.AddComponent<ProjectileComponent>(ProjectileComponent{
+				.isFriendly = projectileEmitter.isFriendly,
+				.hitPercentDamage = projectileEmitter.hitPercentDamage,
+				.duration = projectileEmitter.projectileDuration,
+				}
+			);
+
 			enemyProjectile3.AddComponent<GameComponent>();
 
 			projectileEmitter.shotFired = true;

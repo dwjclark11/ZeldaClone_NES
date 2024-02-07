@@ -16,11 +16,37 @@ void ProjectileLifeCycleSystem::UpdateBombAnimation(Entity entity)
 {
 	auto explosion = entity.registry->CreateEntity();
 	explosion.AddComponent<TransformComponent>(entity.GetComponent<TransformComponent>().position, glm::vec2(4, 4), 0.0);
-	explosion.AddComponent<SpriteComponent>("items", 16, 16, 3, false, 80, 112);
+	explosion.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "items",
+			.width = 16,
+			.height = 16,
+			.layer = 3,
+			.isFixed = false,
+			.srcRect = SDL_Rect{80, 112, 16, 16} 
+		}
+	);
+
 	explosion.AddComponent<RigidBodyComponent>(glm::vec2(0));
-	explosion.AddComponent<ProjectileComponent>(false, 1, 500);
+	explosion.AddComponent<ProjectileComponent>(
+		ProjectileComponent{
+			.isFriendly = false,
+			.hitPercentDamage = 1,
+			.duration = 500,
+		}
+	);
+
 	explosion.AddComponent<BoxColliderComponent>(16, 16);
-	explosion.AddComponent<AnimationComponent>(3, 10, false, false, 80);
+	explosion.AddComponent<AnimationComponent>(
+		AnimationComponent{
+			.numFrames = 3,
+			.frameSpeedRate = 10,
+			.vertical = false,
+			.isLooped = false,
+			.frameOffset = 80
+		}
+	);
+
 	explosion.AddComponent<GameComponent>();
 
 	explosion.Group("explode");

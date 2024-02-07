@@ -83,7 +83,18 @@ void EditorFileLoader::LoadTilemap(const std::unique_ptr<AssetManager>& assetMan
 		// Create a new entity for each tile
 		Entity tile = m_Registry.CreateEntity();
 		tile.Group(group);
-		tile.AddComponent<SpriteComponent>("image-Name", tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
+		
+		tile.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "image-Name", 
+				.width = tileWidth, 
+				.height = tileHeight, 
+				.layer = zIndex, 
+				.isFixed = false, 
+				.srcRect = SDL_Rect{srcRectX, srcRectY, tileWidth, tileHeight}
+			}
+		);
+
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		tile.AddComponent<EditorComponent>();
 
@@ -139,7 +150,17 @@ void EditorFileLoader::LoadObjectMap(const std::unique_ptr<AssetManager>& assetM
 		// Create a new entity for each tile
 		Entity object = m_Registry.CreateEntity();
 		object.Group(group);
-		object.AddComponent<SpriteComponent>(assetID, tileSize, tileSize, zIndex, false, srcRectX, srcRectY);
+		object.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = assetID,
+				.width = tileSize,
+				.height = tileSize,
+				.layer = zIndex,
+				.isFixed = false,
+				.srcRect = SDL_Rect{srcRectX, srcRectY, tileSize, tileSize}
+			}
+		);
+
 		object.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		object.AddComponent<EditorComponent>();
 		// If the obstacle has a collider, add a BoxColliderComponent
@@ -745,14 +766,20 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& m_sFileName,
 		if (sprite != sol::nullopt)
 		{
 			newEnemy.AddComponent<SpriteComponent>(
-				enemy["components"]["sprite"]["asset_id"], 
-				enemy["components"]["sprite"]["width"], 
-				enemy["components"]["sprite"]["height"], 
-				enemy["components"]["sprite"]["layer"].get_or(1), 
-				enemy["components"]["sprite"]["fixed"].get_or(false), 
-				enemy["components"]["sprite"]["src_rect_x"].get_or(0), 
-				enemy["components"]["sprite"]["src_rect_y"].get_or(0) 	
-				);
+				SpriteComponent{
+					.assetID = enemy["components"]["sprite"]["asset_id"].get_or(std::string{""}),
+				.width = enemy["components"]["sprite"]["width"].get_or(0),
+				.height = enemy["components"]["sprite"]["height"].get_or(0),
+				.layer = enemy["components"]["sprite"]["layer"].get_or(1),
+				.isFixed = enemy["components"]["sprite"]["fixed"].get_or(false),
+				.srcRect = SDL_Rect{
+					enemy["components"]["sprite"]["src_rect_x"].get_or(0),
+					enemy["components"]["sprite"]["src_rect_y"].get_or(0),
+					enemy["components"]["sprite"]["width"].get_or(0),
+					enemy["components"]["sprite"]["height"].get_or(0)
+					} 
+				}
+			);
 		}
 
 		// Set the BoxCollider Component
@@ -795,12 +822,14 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& m_sFileName,
 		if (animation != sol::nullopt)
 		{
 			newEnemy.AddComponent<AnimationComponent>(
-				enemy["components"]["animation"]["num_frames"].get_or(1),
-				enemy["components"]["animation"]["frame_rate"].get_or(1),
-				enemy["components"]["animation"]["vertical"].get_or(true),
-				enemy["components"]["animation"]["looped"].get_or(true),
-				enemy["components"]["animation"]["frame_offset"].get_or(0)
-				);
+				AnimationComponent{
+					.numFrames = enemy["components"]["animation"]["num_frames"].get_or(1),
+					.frameSpeedRate = enemy["components"]["animation"]["frame_rate"].get_or(1),
+					.vertical = enemy["components"]["animation"]["vertical"].get_or(true),
+					.isLooped = enemy["components"]["animation"]["looped"].get_or(true),
+					.frameOffset = enemy["components"]["animation"]["frame_offset"].get_or(0)
+				}
+			);
 		}
 
 		// Set the Projectile Emitter Component
@@ -830,19 +859,19 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& m_sFileName,
 }
 
 
-std::string EditorFileLoader::ConvertToString(TriggerBoxComponent::TriggerType triggerType)
+std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 {
 	switch (triggerType)
 	{
-		case TriggerBoxComponent::TriggerType::NO_TRIGGER: return "no_trigger"; break;
-		case TriggerBoxComponent::TriggerType::SCENE_CHANGE: return "scene_change"; break;
-		case TriggerBoxComponent::TriggerType::TRANSPORT: return "transport"; break;
-		case TriggerBoxComponent::TriggerType::BURN_BUSHES: return "burn_bushes"; break;
-		case TriggerBoxComponent::TriggerType::PUSH_ROCKS: return "push_rocks"; break;
-		case TriggerBoxComponent::TriggerType::COLLECT_ITEM: return "collect_item"; break;
-		case TriggerBoxComponent::TriggerType::BOMB_SECRET: return "bomb_secret"; break;
-		case TriggerBoxComponent::TriggerType::LOCKED_DOOR: return "locked_door"; break;
-		case TriggerBoxComponent::TriggerType::HIDDEN_OBJECT: return "hidden_object"; break;
+		case TriggerType::NO_TRIGGER: return "no_trigger"; break;
+		case TriggerType::SCENE_CHANGE: return "scene_change"; break;
+		case TriggerType::TRANSPORT: return "transport"; break;
+		case TriggerType::BURN_BUSHES: return "burn_bushes"; break;
+		case TriggerType::PUSH_ROCKS: return "push_rocks"; break;
+		case TriggerType::COLLECT_ITEM: return "collect_item"; break;
+		case TriggerType::BOMB_SECRET: return "bomb_secret"; break;
+		case TriggerType::LOCKED_DOOR: return "locked_door"; break;
+		case TriggerType::HIDDEN_OBJECT: return "hidden_object"; break;
 	}
 }
 

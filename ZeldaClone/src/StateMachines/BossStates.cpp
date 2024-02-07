@@ -43,21 +43,21 @@ void BossIdleState::Update(Entity& entity)
 		//if (rigid.velocity == glm::vec2(0))
 		//{
 		//	rigid.velocity = glm::vec2(-50, 0);
-		//	rigid.dir = RigidBodyComponent::Dir::LEFT;
+		//	rigid.dir = RigidBodyDir::LEFT;
 		//}
 
 		switch (rigid.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			rigid.velocity = glm::vec2(0, -50);
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			rigid.velocity = glm::vec2(50, 0);
 			break; 
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			rigid.velocity = glm::vec2(0, 50);
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			rigid.velocity = glm::vec2(-50, 0);
 			break;
 		default:
@@ -119,14 +119,14 @@ void BossPatrolState::Update (class Entity& entity)
 
 	if (walkTimer.GetTicks() > 1000)
 	{
-		if (rigid.dir == RigidBodyComponent::Dir::LEFT)
+		if (rigid.dir == RigidBodyDir::LEFT)
 		{
-			rigid.dir = RigidBodyComponent::Dir::RIGHT;
+			rigid.dir = RigidBodyDir::RIGHT;
 			transition = true;
 		}
-		else if (rigid.dir == RigidBodyComponent::Dir::RIGHT)
+		else if (rigid.dir == RigidBodyDir::RIGHT)
 		{
-			rigid.dir = RigidBodyComponent::Dir::LEFT;
+			rigid.dir = RigidBodyDir::LEFT;
 			transition = true;
 		}
 	}
@@ -289,10 +289,21 @@ void BossDeathState::DropHeart(Entity& entity)
 	Entity fullHeart = Registry::Instance().CreateEntity();
 	fullHeart.Group("trigger");
 	fullHeart.AddComponent<TransformComponent>(pos, glm::vec2(4, 4));
-	fullHeart.AddComponent<SpriteComponent>("full_heart", 16, 16, 1, false, 0, 0);
-	fullHeart.AddComponent<ItemComponent>(ItemComponent::ItemCollectType::DEFAULT, ItemComponent::SpecialItemType::FULL_HEART);
+	
+	fullHeart.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "full_heart",
+			.width = 16,
+			.height = 16,
+			.layer = 1,
+			.isFixed = false,
+			.srcRect = SDL_Rect{0, 0, 16, 16}
+		}
+	);
+
+	fullHeart.AddComponent<ItemComponent>(ItemCollectType::DEFAULT, SpecialItemType::FULL_HEART);
 	fullHeart.AddComponent<BoxColliderComponent>(16, 16);
-	fullHeart.AddComponent<TriggerBoxComponent>(TriggerBoxComponent::TriggerType::COLLECT_ITEM);
+	fullHeart.AddComponent<TriggerBoxComponent>(TriggerType::COLLECT_ITEM);
 	fullHeart.AddComponent<GameComponent>();
 	Game::Instance().GetSoundPlayer().PlaySoundFX("special_item", 0, SoundChannel::ANY);
 }

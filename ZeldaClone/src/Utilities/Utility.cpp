@@ -62,7 +62,17 @@ void ConvertNumber(int number, int x, int y)
 		auto entity = Registry::Instance().CreateEntity();
 		entity.Group("caption");
 		entity.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(4, 4));
-		entity.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
+		entity.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "numbers",
+				.width = 8,
+				.height = 8,
+				.layer = 5,
+				.isFixed = false,
+				.srcRect = SDL_Rect {0, 0, 8, 8} 
+			}
+		);
+
 		entity.AddComponent<GameComponent>();
 	}
 	else
@@ -74,7 +84,17 @@ void ConvertNumber(int number, int x, int y)
 			auto entity = Registry::Instance().CreateEntity();
 			entity.Group("caption");
 			entity.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(4, 4));
-			entity.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
+			entity.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "numbers",
+					.width = 8,
+					.height = 8,
+					.layer = 5,
+					.isFixed = false,
+					.srcRect = SDL_Rect {0, 0, 8, 8}
+				}
+			);
+
 			entity.AddComponent<GameComponent>();
 			if (temp_num >= 0 && temp_num <= 9)
 			{
@@ -87,7 +107,17 @@ void ConvertNumber(int number, int x, int y)
 			auto entity2 = Registry::Instance().CreateEntity();
 			entity2.Group("caption");
 			entity2.AddComponent<TransformComponent>(glm::vec2(x + (32 * digits - 1), y), glm::vec2(4, 4));
-			entity2.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
+			entity2.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "numbers",
+					.width = 8,
+					.height = 8,
+					.layer = 5,
+					.isFixed = false,
+					.srcRect = SDL_Rect {0, 0, 8, 8}
+				}
+			);
+
 			entity2.AddComponent<GameComponent>();
 			if (temp_num2 >= 0 && temp_num2 <= 9)
 			{
@@ -100,7 +130,17 @@ void ConvertNumber(int number, int x, int y)
 			auto entity3 = Registry::Instance().CreateEntity();
 			entity3.Group("caption");
 			entity3.AddComponent<TransformComponent>(glm::vec2(x + (32 * digits), y), glm::vec2(4, 4));
-			entity3.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
+			entity3.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "numbers",
+					.width = 8,
+					.height = 8,
+					.layer = 5,
+					.isFixed = false,
+					.srcRect = SDL_Rect {0, 0, 8, 8}
+				}
+			);
+
 			entity3.AddComponent<GameComponent>();
 			if (temp_num3 >= 0 && temp_num3 <= 9)
 			{
@@ -123,7 +163,17 @@ void ConvertNumber(const std::string& number, int x, int y)
 		auto entity = Registry::Instance().CreateEntity();
 		entity.Group("caption");
 		entity.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(4, 4));
-		entity.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
+		entity.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "numbers",
+				.width = 8,
+				.height = 8,
+				.layer = 5,
+				.isFixed = false,
+				.srcRect = SDL_Rect{0, 0, 8, 8} 
+			}
+		);
+
 		entity.AddComponent<GameComponent>();
 	}
 	else
@@ -138,7 +188,16 @@ void ConvertNumber(const std::string& number, int x, int y)
 			auto entity = Registry::Instance().CreateEntity();
 			entity.Group("caption");
 			entity.AddComponent<TransformComponent>(glm::vec2(x + (space * i), y), glm::vec2(scale, scale));
-			entity.AddComponent<SpriteComponent>("numbers", 8, 8, 5, false, 0, 0);
+			entity.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "numbers",
+					.width = 8,
+					.height = 8,
+					.layer = 5,
+					.isFixed = false,
+					.srcRect = SDL_Rect{0, 0, 8, 8}
+				}
+			);
 			entity.AddComponent<GameComponent>();
 
 			if (temp_num >= 48 && temp_num <= 57)
@@ -169,7 +228,17 @@ void ConvertName(const std::string& name, int x, int y)
 		Entity nameEnt = Registry::Instance().CreateEntity();
 
 		nameEnt.Group("caption");
-		nameEnt.AddComponent<SpriteComponent>("caption_letters", 16, 16, 0, false, 0, 0);
+		nameEnt.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "caption_letters",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{0, 0, 16, 16} 
+			}
+		);
+
 		nameEnt.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
 		
 		if (GSM->GetCurrentState() == "MENU_STATE")
@@ -205,7 +274,17 @@ void ConvertLetter(const char letter, int x, int y)
 	Entity nameEnt = Registry::Instance().CreateEntity();
 
 	nameEnt.Group("caption");
-	nameEnt.AddComponent<SpriteComponent>("caption_letters", 16, 16, 2, false, 0, 0);
+	nameEnt.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "caption_letters",
+			.width = 16,
+			.height = 16,
+			.layer = 2,
+			.isFixed = false,
+			.srcRect = SDL_Rect{0, 0, 16, 16} 
+		}
+	);
+
 	nameEnt.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
 	
 	auto& GSM = Game::Instance().GetStateMachine();

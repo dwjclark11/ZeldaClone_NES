@@ -1,8 +1,6 @@
 #pragma once
 
-class GamePadComponent
+struct GamePadComponent
 {
-public:
-	GamePadComponent() {};
 
 };

@@ -1,7 +1,6 @@
 #pragma once
 
-class CameraFollowComponent
+struct CameraFollowComponent
 {
-public:
-	CameraFollowComponent() = default;
+	// Empty, only the player will have this
 };

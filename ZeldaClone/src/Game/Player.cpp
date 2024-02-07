@@ -52,7 +52,7 @@ void Player::UpdatePlayerColliders()
 	auto& swordRigidbody = sword.GetComponent<RigidBodyComponent>();
 
 	// reset the sword
-	swordRigidbody = glm::vec2(0);
+	swordRigidbody.velocity = glm::vec2(0);
 	swordCollider.offset = glm::vec2(64, 60);
 	swordCollider.height = 4;
 	swordCollider.width = 4;
@@ -66,7 +66,7 @@ void Player::UpdatePlayerColliders()
 
 	switch (playerRigidbody.dir)
 	{
-	case RigidBodyComponent::Dir::UP:
+	case RigidBodyDir::UP:
 		playerSprite.srcRect.x = playerSprite.width * 2;
 		playerSprite.srcRect.y = playerSprite.height * 0;
 
@@ -74,7 +74,7 @@ void Player::UpdatePlayerColliders()
 		swordCollider.width = 24;
 		swordCollider.offset = glm::vec2(48, 32);
 		break;
-	case RigidBodyComponent::Dir::RIGHT:
+	case RigidBodyDir::RIGHT:
 		playerSprite.srcRect.x = playerSprite.width * 3;
 		playerSprite.srcRect.y = playerSprite.height * 0;
 
@@ -82,7 +82,7 @@ void Player::UpdatePlayerColliders()
 		swordCollider.width = 2;
 		swordCollider.offset = glm::vec2(90, 56);
 		break;
-	case RigidBodyComponent::Dir::DOWN:
+	case RigidBodyDir::DOWN:
 		playerSprite.srcRect.x = playerSprite.width * 0;
 		playerSprite.srcRect.y = playerSprite.height * 0;
 
@@ -90,7 +90,7 @@ void Player::UpdatePlayerColliders()
 		swordCollider.width = 24;
 		swordCollider.offset = glm::vec2(40, 84);
 		break;
-	case RigidBodyComponent::Dir::LEFT:
+	case RigidBodyDir::LEFT:
 		playerSprite.srcRect.x = playerSprite.width * 1;
 		playerSprite.srcRect.y = playerSprite.height * 0;
 
@@ -164,7 +164,7 @@ void Player::UpdatePlayer(Game& game, InputManager& inputManager)
 		swordCollider.offset = glm::vec2(64, 60);
 		swordRigidbody = playerRigidbody;
 
-		playerRigidbody.dir = RigidBodyComponent::Dir::UP;
+		playerRigidbody.dir = RigidBodyDir::UP;
 	}
 
 	if (keyboard.IsKeyHeld(KEY_D) || gamepad.IsButtonHeld(GP_BTN_DPAD_RIGHT))
@@ -184,7 +184,7 @@ void Player::UpdatePlayer(Game& game, InputManager& inputManager)
 		swordCollider.offset = glm::vec2(64, 60);
 		swordRigidbody = playerRigidbody;
 
-		playerRigidbody.dir = RigidBodyComponent::Dir::RIGHT;
+		playerRigidbody.dir = RigidBodyDir::RIGHT;
 	}
 
 	if (keyboard.IsKeyHeld(KEY_S) || gamepad.IsButtonHeld(GP_BTN_DPAD_DOWN))
@@ -204,7 +204,7 @@ void Player::UpdatePlayer(Game& game, InputManager& inputManager)
 		swordCollider.offset = glm::vec2(64, 60);
 		swordRigidbody = playerRigidbody;
 
-		playerRigidbody.dir = RigidBodyComponent::Dir::DOWN;
+		playerRigidbody.dir = RigidBodyDir::DOWN;
 	}
 
 	if (keyboard.IsKeyHeld(KEY_A) || gamepad.IsButtonHeld(GP_BTN_DPAD_LEFT))
@@ -224,6 +224,6 @@ void Player::UpdatePlayer(Game& game, InputManager& inputManager)
 		swordCollider.offset = glm::vec2(64, 60);
 		swordRigidbody = playerRigidbody;
 
-		playerRigidbody.dir = RigidBodyComponent::Dir::LEFT;
+		playerRigidbody.dir = RigidBodyDir::LEFT;
 	}
 }

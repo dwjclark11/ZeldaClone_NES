@@ -981,7 +981,17 @@ bool RenderEditorGUISystem::LoadEntireMapSprite(const std::unique_ptr<AssetManag
 	auto newMap = Registry::Instance().CreateEntity();
 	newMap.Group("map");
 	newMap.AddComponent<TransformComponent>(glm::vec2(0), glm::vec2(scaleX, scaleY), 0);
-	newMap.AddComponent<SpriteComponent>(mapAssetID, mapWidth, mapHeight, 0, false, 0, 0);
+	newMap.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = mapAssetID,
+			.width = mapWidth,
+			.height = mapHeight,
+			.layer = 0,
+			.isFixed = false,
+			.srcRect = SDL_Rect{0, 0, mapWidth, mapHeight} 
+		}
+	);
+
 	newMap.AddComponent<EditorComponent>();
 
 	Logger::Log("Created Map!!");

@@ -1,5 +1,5 @@
 ----------------------------------------------------------
--- Game Secrets
+-- Game Secrets file#: 1
 ----------------------------------------------------------
 
 secrets = {
@@ -20,15 +20,15 @@ secrets = {
         found = false
     },
     [5] = {
-        location = "push_rock_to_highway_1",
-        found = false
-    },
-    [6] = {
         location = "bomb_secret_rupees_2",
         found = false
     },
-    [7] = {
+    [6] = {
         location = "burn_bush_potion_shop_1",
+        found = false
+    },
+    [7] = {
+        location = "push_rock_to_highway_1",
         found = false
     }
 }

@@ -43,21 +43,61 @@ bool SaveGameState::OnEnter()
 
 	Entity saveText = reg.CreateEntity();
 	saveText.AddComponent<TransformComponent>(glm::vec2(200, 200), glm::vec2(4, 4), 0.0);
-	saveText.AddComponent<SpriteComponent>("save_gui", 144, 16, 0, true, 0,0);
+	saveText.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "save_gui",
+			.width = 144,
+			.height = 16,
+			.layer = 0,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 0, 144, 16} 
+		}
+	);
+
 	saveText.AddComponent<SaveComponent>();
 	
 	Entity exitText = reg.CreateEntity();
 	exitText.AddComponent<TransformComponent>(glm::vec2(200, 400), glm::vec2(4, 4), 0.0);
-	exitText.AddComponent<SpriteComponent>("save_gui", 192, 16, 0, true, 0, 16);
+	exitText.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "save_gui",
+			.width = 192,
+			.height = 16,
+			.layer = 0,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 16, 192, 16} 
+		}
+	);
+
 	exitText.AddComponent<SaveComponent>();
 
 	Entity quitText = reg.CreateEntity();
 	quitText.AddComponent<TransformComponent>(glm::vec2(200, 600), glm::vec2(4, 4), 0.0);
-	quitText.AddComponent<SpriteComponent>("save_gui", 144, 16, 0, true, 0, 32);
+	quitText.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "save_gui",
+			.width = 144,
+			.height = 16,
+			.layer = 0,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 32, 144, 16} 
+		}
+	);
+
 	quitText.AddComponent<SaveComponent>();
 
 	Entity selector = reg.CreateEntity();
-	selector.AddComponent<SpriteComponent>("hud_hearts", 16, 16, 5, true, 0, 0);
+	selector.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "hud_hearts",
+			.width = 16,
+			.height = 16,
+			.layer = 5,
+			.isFixed = true,
+			.srcRect = SDL_Rect {0, 0, 16, 16} 
+		}
+	);
+
 	selector.AddComponent<TransformComponent>(glm::vec2(100, 185), glm::vec2(6, 6), 0.0);
 	selector.AddComponent<KeyboardControlComponent>();
 	selector.AddComponent<SaveComponent>();

@@ -90,31 +90,31 @@ void IdleUpdateBladeTrap(Entity& entity)
 
 	switch (enemy.moveDir)
 	{
-	case EnemyComponent::MoveDir::UP:
+	case MoveDir::UP:
 		if ((player_transform.position.x + player_collider.offset.x + (player_collider.width * player_transform.scale.x)) >= enemy_transform.position.x && (player_transform.position.x + player_collider.offset.x) <= (enemy_transform.position.x + (enemy_collider.width * enemy_transform.scale.x)) && player_transform.position.y + player_collider.offset.y <= enemy_transform.position.y && player_transform.position.y + (player_collider.height * player_transform.scale.y) >= enemy_transform.position.y - enemy.maxMoveDistance)
 		{
 			attack = true;
 		}
 		break;
-	case EnemyComponent::MoveDir::RIGHT:
+	case MoveDir::RIGHT:
 		if ((player_transform.position.x + player_collider.offset.x) >= (enemy_transform.position.x + (enemy_collider.width * enemy_transform.scale.x)) && (player_transform.position.x + player_collider.offset.x) <= (enemy_transform.position.x + (enemy_collider.width * enemy_transform.scale.x) + enemy.maxMoveDistance) && player_transform.position.y + (player_collider.height * player_transform.scale.y) + player_collider.offset.y >= enemy_transform.position.y && player_transform.position.y + player_collider.offset.y <= enemy_transform.position.y + (enemy_collider.height * enemy_transform.scale.y))
 		{
 			attack = true;
 		}
 		break;
-	case EnemyComponent::MoveDir::DOWN:
+	case MoveDir::DOWN:
 		if ((player_transform.position.x + player_collider.offset.x + (player_collider.width * player_transform.scale.x)) >= enemy_transform.position.x && (player_transform.position.x + player_collider.offset.x) <= (enemy_transform.position.x + (enemy_collider.width * enemy_transform.scale.x)) && player_transform.position.y >= enemy_transform.position.y && player_transform.position.y <= enemy_transform.position.y + (enemy_collider.height * enemy_transform.scale.y) + enemy.maxMoveDistance)
 		{
 			attack = true;
 		}
 		break;
-	case EnemyComponent::MoveDir::LEFT:
+	case MoveDir::LEFT:
 		if ((player_transform.position.x + player_collider.offset.x) <= (enemy_transform.position.x) && (player_transform.position.x + player_collider.offset.x + (player_collider.width * player_transform.scale.x)) >= (enemy_transform.position.x  - enemy.maxMoveDistance) && player_transform.position.y + (player_collider.height * player_transform.scale.y) + player_collider.offset.y >= enemy_transform.position.y && player_transform.position.y + player_collider.offset.y <= enemy_transform.position.y + (enemy_collider.height * enemy_transform.scale.y))
 		{
 			attack = true;
 		}
 		break;
-	case EnemyComponent::MoveDir::NO_MOVE:
+	case MoveDir::NO_MOVE:
 		return;
 	}
 
@@ -270,7 +270,7 @@ void PatrolUpdateBladeTrap(Entity& entity)
 
 	switch (enemy.moveDir)
 	{
-	case EnemyComponent::MoveDir::UP:
+	case MoveDir::UP:
 		if (!enemy.maxMoveReached)
 		{
 			if (transform.position.y > enemy.startPos.y - enemy.maxMoveDistance)
@@ -290,7 +290,7 @@ void PatrolUpdateBladeTrap(Entity& entity)
 		}
 		break;
 
-	case EnemyComponent::MoveDir::RIGHT:
+	case MoveDir::RIGHT:
 		if (!enemy.maxMoveReached)
 		{
 			if (transform.position.x < enemy.startPos.x + enemy.maxMoveDistance)
@@ -310,7 +310,7 @@ void PatrolUpdateBladeTrap(Entity& entity)
 		}
 		break;
 
-	case EnemyComponent::MoveDir::DOWN:
+	case MoveDir::DOWN:
 		if (!enemy.maxMoveReached)
 		{
 			if (transform.position.y < enemy.startPos.y + enemy.maxMoveDistance)
@@ -332,7 +332,7 @@ void PatrolUpdateBladeTrap(Entity& entity)
 		}
 		break;
 
-	case EnemyComponent::MoveDir::LEFT:
+	case MoveDir::LEFT:
 		if (!enemy.maxMoveReached)
 		{
 			if (transform.position.x > enemy.startPos.x - enemy.maxMoveDistance)
@@ -353,7 +353,7 @@ void PatrolUpdateBladeTrap(Entity& entity)
 
 		break;
 
-	case EnemyComponent::MoveDir::NO_MOVE:
+	case MoveDir::NO_MOVE:
 		return;
 	}
 
@@ -406,16 +406,16 @@ void PatrolUpdateLever(Entity& entity)
 	{
 		switch (rigid.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			rigid.velocity = glm::vec2(sign * 50, 0);
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			rigid.velocity = glm::vec2(0, sign * 50);
 			break;
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			rigid.velocity = glm::vec2(sign * 50, 0);
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			rigid.velocity = glm::vec2(0, sign * 50);
 			break;
 		}

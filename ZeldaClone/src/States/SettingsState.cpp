@@ -91,63 +91,63 @@ bool SettingsState::OnEnter()
 	auto upACT = Registry::Instance().CreateEntity();
 	upACT.AddComponent<TextLabelComponent>(glm::vec2(400, 225), moveUpKey, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	upACT.AddComponent<KeyboardControlComponent>();
-	upACT.AddComponent<SettingsComponent>(0, SettingsComponent::Input::KEY);
+	upACT.AddComponent<SettingsComponent>(0, SettingsInput::KEY);
 
 	auto downACT = Registry::Instance().CreateEntity();
 	downACT.AddComponent<TextLabelComponent>(glm::vec2(400, 300), moveDownKey, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	downACT.AddComponent<KeyboardControlComponent>();
-	downACT.AddComponent<SettingsComponent>(1, SettingsComponent::Input::KEY);
+	downACT.AddComponent<SettingsComponent>(1, SettingsInput::KEY);
 
 	auto leftACT = Registry::Instance().CreateEntity();
 	leftACT.AddComponent<TextLabelComponent>(glm::vec2(400, 375), moveLeftKey, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	leftACT.AddComponent<KeyboardControlComponent>();
-	leftACT.AddComponent<SettingsComponent>(2, SettingsComponent::Input::KEY);
+	leftACT.AddComponent<SettingsComponent>(2, SettingsInput::KEY);
 
 	auto rightACT = Registry::Instance().CreateEntity();
 	rightACT.AddComponent<TextLabelComponent>(glm::vec2(400, 450), moveRightKey, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	rightACT.AddComponent<KeyboardControlComponent>();
-	rightACT.AddComponent<SettingsComponent>(3, SettingsComponent::Input::KEY);
+	rightACT.AddComponent<SettingsComponent>(3, SettingsInput::KEY);
 
 	auto attackACT = Registry::Instance().CreateEntity();
 	attackACT.AddComponent<TextLabelComponent>(glm::vec2(400, 525), attackKey, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	attackACT.AddComponent<KeyboardControlComponent>();
-	attackACT.AddComponent<SettingsComponent>(4, SettingsComponent::Input::KEY);
+	attackACT.AddComponent<SettingsComponent>(4, SettingsInput::KEY);
 
 	auto useItemACT = Registry::Instance().CreateEntity();
 	useItemACT.AddComponent<TextLabelComponent>(glm::vec2(400, 600), useItemKey, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	useItemACT.AddComponent<KeyboardControlComponent>();
-	useItemACT.AddComponent<SettingsComponent>(5, SettingsComponent::Input::KEY);
+	useItemACT.AddComponent<SettingsComponent>(5, SettingsInput::KEY);
 
 
 	auto upACTBtn = Registry::Instance().CreateEntity();
 	upACTBtn.AddComponent<TextLabelComponent>(glm::vec2(700, 225), moveUpBtn, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	upACTBtn.AddComponent<GamePadComponent>();
-	upACTBtn.AddComponent<SettingsComponent>(0, SettingsComponent::Input::BUTTON);
+	upACTBtn.AddComponent<SettingsComponent>(0, SettingsInput::BUTTON);
 
 	auto downACTBtn = Registry::Instance().CreateEntity();
 	downACTBtn.AddComponent<TextLabelComponent>(glm::vec2(700, 300), moveDownBtn, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	downACTBtn.AddComponent<GamePadComponent>();
-	downACTBtn.AddComponent<SettingsComponent>(1, SettingsComponent::Input::BUTTON);
+	downACTBtn.AddComponent<SettingsComponent>(1, SettingsInput::BUTTON);
 
 	auto leftACTBtn = Registry::Instance().CreateEntity();
 	leftACTBtn.AddComponent<TextLabelComponent>(glm::vec2(700, 375), moveLeftBtn, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	leftACTBtn.AddComponent<GamePadComponent>();
-	leftACTBtn.AddComponent<SettingsComponent>(2, SettingsComponent::Input::BUTTON);
+	leftACTBtn.AddComponent<SettingsComponent>(2, SettingsInput::BUTTON);
 
 	auto rightACTBtn = Registry::Instance().CreateEntity();
 	rightACTBtn.AddComponent<TextLabelComponent>(glm::vec2(700, 450), moveRightBtn, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	rightACTBtn.AddComponent<GamePadComponent>();
-	rightACTBtn.AddComponent<SettingsComponent>(3, SettingsComponent::Input::BUTTON);
+	rightACTBtn.AddComponent<SettingsComponent>(3, SettingsInput::BUTTON);
 
 	auto attackACTBtn = Registry::Instance().CreateEntity();
 	attackACTBtn.AddComponent<TextLabelComponent>(glm::vec2(700, 525), attackBtn, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	attackACTBtn.AddComponent<GamePadComponent>();
-	attackACTBtn.AddComponent<SettingsComponent>(4, SettingsComponent::Input::BUTTON);
+	attackACTBtn.AddComponent<SettingsComponent>(4, SettingsInput::BUTTON);
 
 	auto useItemACTBtn = Registry::Instance().CreateEntity();
 	useItemACTBtn.AddComponent<TextLabelComponent>(glm::vec2(700, 600), useItemBtn, "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
 	useItemACTBtn.AddComponent<GamePadComponent>();
-	useItemACTBtn.AddComponent<SettingsComponent>(5, SettingsComponent::Input::BUTTON);
+	useItemACTBtn.AddComponent<SettingsComponent>(5, SettingsInput::BUTTON);
 
 	auto moveUpWord = Registry::Instance().CreateEntity();
 	moveUpWord.AddComponent<TextLabelComponent>(glm::vec2(100, 225), "MOVE UP", "charriot-font-40", SDL_Color{ 255, 255, 255, 255 });
@@ -174,7 +174,17 @@ bool SettingsState::OnEnter()
 	useItemWord.AddComponent<SettingsComponent>();
 
 	auto selector = Registry::Instance().CreateEntity();
-	selector.AddComponent<SpriteComponent>("hearts", 16, 16, 0, true);
+	selector.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "hearts",
+			.width = 16,
+			.height = 16,
+			.layer = 0,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 0, 16, 16} 
+		}
+	);
+
 	selector.AddComponent<TransformComponent>(glm::vec2(50, 225), glm::vec2(4, 4), 0);
 	selector.AddComponent<SettingsComponent>();
 	selector.AddComponent<GameComponent>();
@@ -242,7 +252,7 @@ void SettingsState::ProcessEvents(SDL_Event& event)
 //		if (entity.HasComponent<TextLabelComponent>())
 //		{
 //
-//			if (settings.index == SettingsState::mActionIndex && settings.input == SettingsComponent::Input::KEY)
+//			if (settings.index == SettingsState::mActionIndex && settings.input == SettingsInput::KEY)
 //			{
 //				Logger::Log(keyPressed);
 //				auto& text = entity.GetComponent<TextLabelComponent>();

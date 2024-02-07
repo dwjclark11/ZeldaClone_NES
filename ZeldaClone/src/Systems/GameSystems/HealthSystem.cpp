@@ -64,7 +64,17 @@ void HealthSystem::Update()
 			tag += std::to_string(numHearts);
 			// Create a new player Heart
 			Entity newHeart = Registry::Instance().CreateEntity();
-			newHeart.AddComponent<SpriteComponent>("hud_hearts", 16, 16, 5, true, 0, 0);
+			newHeart.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "hud_hearts",
+					.width = 16,
+					.height = 16,
+					.layer = 5,
+					.isFixed = true,
+					.srcRect = SDL_Rect{0, 0, 16, 16} 
+				}
+			);
+
 			newHeart.AddComponent<TransformComponent>(glm::vec2(xPos, yPos), glm::vec2(4, 4), 0.0);
 			newHeart.AddComponent<HealthComponent>(0);
 			newHeart.AddComponent<HUDComponenet>();

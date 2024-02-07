@@ -13,8 +13,8 @@ private:
 	float m_Angle, m_HeartOffset;
 
 private:
-	bool CheckInventory(ItemComponent::SpecialItemType& item);
-	void SetInventory(ItemComponent::SpecialItemType& item);
+	bool CheckInventory(SpecialItemType& item);
+	void SetInventory(SpecialItemType& item);
 	void StopPlayerMovement(Entity& player, Entity& trigger);
 	
 

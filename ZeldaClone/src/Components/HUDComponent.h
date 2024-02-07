@@ -1,7 +1,6 @@
 #pragma once
 
-class HUDComponenet
+struct HUDComponenet
 {
-public:
-	HUDComponenet() {}
+
 };

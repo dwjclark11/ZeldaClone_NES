@@ -96,7 +96,17 @@ void PauseState::Update(const float& deltaTime)
 	if (m_GameData.GetTotalBombs() > 0 && !m_GameData.HasItem(GameData::GameItems::BOMB))
 	{
 		Entity bombItem = m_Registry.CreateEntity();
-		bombItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
+		bombItem.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect {64, 112, 16, 16}
+			}
+		);
+
 		bombItem.AddComponent<TransformComponent>(glm::vec2(486, 190), glm::vec2(4, 4), 0.0);
 		bombItem.AddComponent<PauseComponent>();
 		bombItem.Tag("bombItem");
@@ -144,7 +154,17 @@ bool PauseState::OnEnter()
 	m_Game.GetAssetManager()->AddTextures(m_Game.GetRenderer(), "pause_hud", "./Assets/HUDSprites/pauseHud.png");
 	
 	Entity pauseSelector = m_Registry.CreateEntity();
-	pauseSelector.AddComponent<SpriteComponent>("box", 16, 16, 0, false, 16, 0);
+	pauseSelector.AddComponent<SpriteComponent>( 
+		SpriteComponent{
+			.assetID = "box",
+			.width = 16,
+			.height = 16,
+			.layer = 0,
+			.isFixed = false,
+			.srcRect = SDL_Rect{16, 0, 16, 16}
+		}
+	);
+	
 	pauseSelector.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
 	pauseSelector.AddComponent<PauseComponent>();
 	pauseSelector.AddComponent<KeyboardControlComponent>();
@@ -153,7 +173,17 @@ bool PauseState::OnEnter()
 	pauseSelector.Group("pause");
 
 	Entity selectedItem = m_Registry.CreateEntity();
-	selectedItem.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 48, 16);
+	selectedItem.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "items",
+			.width = 16,
+			.height = 16,
+			.layer = 0,
+			.isFixed = false,
+			.srcRect = SDL_Rect {48, 16, 16, 16} 
+		}
+	);
+
 	selectedItem.AddComponent<TransformComponent>(glm::vec2(200, 185), glm::vec2(6, 6), 0.0);
 	selectedItem.AddComponent<PauseComponent>();
 	selectedItem.AddComponent<KeyboardControlComponent>();
@@ -162,19 +192,49 @@ bool PauseState::OnEnter()
 
 	Entity hudHolder = m_Registry.CreateEntity();
 	hudHolder.AddComponent<TransformComponent>(glm::vec2(325, 100), glm::vec2(5, 5), 0.0);
-	hudHolder.AddComponent<SpriteComponent>("pause_hud", 96, 64, 5, true, 0, 0);
+	
+	hudHolder.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "pause_hud",
+			.width = 96,
+			.height = 64,
+			.layer = 5,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 0, 96, 64} 
+		}
+	);
+
 	hudHolder.AddComponent<PauseComponent>();
 	hudHolder.Group("pause");
 
 	Entity hudHolder2 = m_Registry.CreateEntity();
 	hudHolder2.AddComponent<TransformComponent>(glm::vec2(144, 135), glm::vec2(6, 6), 0.0);
-	hudHolder2.AddComponent<SpriteComponent>("hud_holder", 32, 32, 5, true, 0, 0);
+	hudHolder2.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "hud_holder",
+			.width = 32,
+			.height = 32,
+			.layer = 5,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 0, 32, 32} 
+		}
+	);
+
 	hudHolder2.AddComponent<PauseComponent>();
 	hudHolder2.Group("pause");
 
 	Entity triforce = m_Registry.CreateEntity();
+	triforce.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "triforce",
+			.width = 96,
+			.height = 64,
+			.layer = 0,
+			.isFixed = false,
+			.srcRect = SDL_Rect {m_GameData.GetTotalTriforce() * 96, 0, 96, 64} 
+		}
+	);
 
-	triforce.AddComponent<SpriteComponent>("triforce", 96, 64, 0, false, m_GameData.GetTotalTriforce() * 96, 0);
 	triforce.AddComponent<TransformComponent>(glm::vec2(325, 400), glm::vec2(4, 4), 0.0);
 	triforce.AddComponent<PauseComponent>();
 
@@ -182,7 +242,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::BOOMERANG))
 	{
 		Entity boomerang = m_Registry.CreateEntity();
-		boomerang.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 112);
+		boomerang.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{0, 112, 16, 16} 
+			}
+		);
+
 		boomerang.AddComponent<TransformComponent>(glm::vec2(386, 190), glm::vec2(4, 4), 0.0);
 		boomerang.AddComponent<PauseComponent>();
 		boomerang.Group("pause");
@@ -191,7 +261,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.GetTotalBombs() > 0 && m_GameData.HasItem(GameData::GameItems::BOMB))
 	{
 		Entity bombs = m_Registry.CreateEntity();
-		bombs.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 112);
+		bombs.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{64, 112, 16, 16} 
+			}
+		);
+
 		bombs.AddComponent<TransformComponent>(glm::vec2(486, 190), glm::vec2(4, 4), 0.0);
 		bombs.AddComponent<PauseComponent>();
 		bombs.Tag("bombItem");
@@ -201,7 +281,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::BOW))
 	{
 		Entity bow = m_Registry.CreateEntity();
-		bow.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 0);
+		bow.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{64, 0, 16, 16} 
+			}
+		);
+
 		bow.AddComponent<TransformComponent>(glm::vec2(586, 190), glm::vec2(4, 4), 0.0);
 		bow.AddComponent<PauseComponent>();
 		bow.Group("pause");
@@ -210,7 +300,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::CANDLE))
 	{
 		Entity candle = m_Registry.CreateEntity();
-		candle.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 0, 48);
+		candle.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect {0, 48, 16, 16} 
+			}
+		);
+
 		candle.AddComponent<TransformComponent>(glm::vec2(686, 190), glm::vec2(4, 4), 0.0);
 		candle.AddComponent<PauseComponent>();
 		candle.Group("pause");
@@ -220,7 +320,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::FLUTE))
 	{
 		Entity flute = m_Registry.CreateEntity();
-		flute.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 80, 16);
+		flute.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{80, 16, 16, 16} 
+			}
+		);
+
 		flute.AddComponent<TransformComponent>(glm::vec2(386, 260), glm::vec2(4, 4), 0.0);
 		flute.AddComponent<PauseComponent>();
 		flute.Group("pause");
@@ -229,7 +339,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::FOOD))
 	{
 		Entity meat = m_Registry.CreateEntity();
-		meat.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 112, 16);
+		meat.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect {112, 16, 16, 16} 
+			}
+		);
+
 		meat.AddComponent<TransformComponent>(glm::vec2(486, 260), glm::vec2(4, 4), 0.0);
 		meat.AddComponent<PauseComponent>();
 		meat.Group("pause");
@@ -238,7 +358,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::RED_POTION))
 	{
 		Entity potion = m_Registry.CreateEntity();
-		potion.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 32, 32);
+		potion.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect {32, 32, 16, 16} 
+			}
+		);
+
 		potion.AddComponent<TransformComponent>(glm::vec2(586, 260), glm::vec2(4, 4), 0.0);
 		potion.AddComponent<PauseComponent>();
 		potion.Group("pause");
@@ -247,7 +377,17 @@ bool PauseState::OnEnter()
 	if (m_GameData.HasItem(GameData::GameItems::MAGIC_ROD))
 	{
 		Entity magicalRod = m_Registry.CreateEntity();
-		magicalRod.AddComponent<SpriteComponent>("items", 16, 16, 0, false, 64, 80);
+		magicalRod.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{64, 80, 16, 16} 
+			}
+		);
+
 		magicalRod.AddComponent<TransformComponent>(glm::vec2(686, 260), glm::vec2(4, 4), 0.0);
 		magicalRod.AddComponent<PauseComponent>();
 		magicalRod.Group("pause");

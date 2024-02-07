@@ -50,12 +50,32 @@ bool NameState::OnEnter()
 	game.GetAssetManager()->AddFonts("charriot-font-120", "./Assets/Fonts/charriot.ttf", 120);
 
 	Entity letters = reg.CreateEntity();
-	letters.AddComponent<SpriteComponent>("name-letters", 128, 112, 0, true);
+	letters.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "name-letters",
+			.width = 128,
+			.height = 112,
+			.layer = 0,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 0, 128, 112}
+		}
+	);
+	
 	letters.AddComponent<TransformComponent>(glm::vec2(260, 200), glm::vec2(4,4), 0);
 	letters.AddComponent<RegisterNameComponent>();
 
 	Entity box = reg.CreateEntity();
-	box.AddComponent<SpriteComponent>("box", 16, 16, 0, true);
+	box.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "box",
+			.width = 16,
+			.height = 16,
+			.layer = 0,
+			.isFixed = true,
+			.srcRect = SDL_Rect{0, 0, 16, 16}
+		}
+	);
+
 	box.AddComponent<TransformComponent>(glm::vec2(260, 200), glm::vec2(4, 4), 0);
 	box.AddComponent<RegisterNameComponent>();
 	box.AddComponent<KeyboardControlComponent>();

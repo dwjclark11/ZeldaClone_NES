@@ -1,14 +1,7 @@
 #pragma once
 #include <SDL.h>
 
-class CameraComponent
+struct CameraComponent
 {
-public:
-	SDL_Rect camera;
-
-	CameraComponent(SDL_Rect camera = { 0,0, 1024, 960 })
-		: camera{camera}
-	{
-		
-	}
+	SDL_Rect camera{ 0,0, 1024, 960 };
 };

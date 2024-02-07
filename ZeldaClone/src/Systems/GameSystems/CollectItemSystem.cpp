@@ -52,24 +52,24 @@ void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
 	bool bPlaySound{ true };
 	switch (itemComp.type)
 	{
-	case ItemComponent::ItemCollectType::YELLOW_RUPEE:
+	case ItemCollectType::YELLOW_RUPEE:
 	{
 		m_GameData.AddRupees(1);
 		bPlaySound = false;
 		break;
 	}
-	case ItemComponent::ItemCollectType::BLUE_RUPEE:
+	case ItemCollectType::BLUE_RUPEE:
 	{
 		m_GameData.AddRupees(5);
 		bPlaySound = false;
 		break;
 	}
-	case ItemComponent::ItemCollectType::BOMBS:
+	case ItemCollectType::BOMBS:
 	{
 		m_GameData.AddBombs(3);
 		break;
 	}
-	case ItemComponent::ItemCollectType::HEARTS:
+	case ItemCollectType::HEARTS:
 	{
 		auto& health = player.GetComponent<HealthComponent>();
 		health.healthPercentage += 2;
@@ -79,13 +79,13 @@ void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
 			health.healthPercentage = health.maxHearts * 2;
 		break;
 	}
-	case ItemComponent::ItemCollectType::KEYS:
+	case ItemCollectType::KEYS:
 	{
 		m_GameData.AddKeys(1);
 		break;
 	}
-	case ItemComponent::ItemCollectType::DEFAULT:
-		if (itemComp.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
+	case ItemCollectType::DEFAULT:
+		if (itemComp.special != SpecialItemType::NOT_SPECIAL)
 			return;
 		
 	default:
@@ -118,7 +118,7 @@ void CollectItemSystem::Update()
 		if (entity.HasComponent<ItemComponent>())
 		{
 			auto& item = entity.GetComponent<ItemComponent>();
-			if (item.special == ItemComponent::SpecialItemType::TRIFORCE_PIECE)
+			if (item.special == SpecialItemType::TRIFORCE_PIECE)
 			{
 				time = 9000;
 			}

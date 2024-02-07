@@ -38,7 +38,7 @@ public:
 	void CreateNewEnemy(sol::state& lua, std::string& fileName, std::string& enemy_name, Entity& newEnemy);
 	
 	// Converters
-	std::string ConvertToString(TriggerBoxComponent::TriggerType triggerType);
+	std::string ConvertToString(TriggerType triggerType);
 	std::string ConvertAIEnemyToString(AIComponent::EnemyType type);
 
 private:

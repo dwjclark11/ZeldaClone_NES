@@ -108,11 +108,28 @@ void TitleState::Update(const float& deltaTime)
 		if (!m_bScroll)
 		{
 			Entity scrollSheet = m_Registry.CreateEntity();
-			scrollSheet.AddComponent<SpriteComponent>("title_scroll", 256, 1920, 10, false);
+			scrollSheet.AddComponent<SpriteComponent>(
+				SpriteComponent{
+					.assetID = "title_scroll",
+					.width = 256,
+					.height = 1920,
+					.layer = 10,
+					.isFixed = false,
+					.srcRect = SDL_Rect {0, 0, 256, 1920} 
+				}
+			);
+
 			scrollSheet.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(4,4));
 			scrollSheet.AddComponent<BackgroundImageComponent>(glm::vec2(0,0), glm::vec2(4,4));
 			scrollSheet.AddComponent<RigidBodyComponent>(glm::vec2(0));
-			scrollSheet.AddComponent<AnimationComponent>(2, 6, false);
+			scrollSheet.AddComponent<AnimationComponent>(
+				AnimationComponent{
+					.numFrames = 2,
+					.frameSpeedRate = 6,
+					.vertical = false
+				}
+			);
+
 			scrollSheet.Tag("title_scroll");
 			
 			m_bScroll = true;
@@ -152,10 +169,27 @@ bool TitleState::OnEnter()
 	
 	// Create the Title Screen Entity
 	Entity titleScreen = m_Registry.CreateEntity();
-	titleScreen.AddComponent<SpriteComponent>("TitleScreen", 256, 240, 0, false);
+	titleScreen.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = "TitleScreen",
+			.width = 256,
+			.height = 240,
+			.layer = 0,
+			.isFixed = false,
+			.srcRect = SDL_Rect{0, 0, 256, 240} 
+		}
+	);
+
 	titleScreen.AddComponent<BackgroundImageComponent>(glm::vec2(0,0), glm::vec2(4,4));
 	titleScreen.AddComponent<TransformComponent>(glm::vec2(0,0), glm::vec2(4,4));
-	titleScreen.AddComponent<AnimationComponent>(3, 4, false);
+	titleScreen.AddComponent<AnimationComponent>(
+		AnimationComponent{
+			.numFrames = 3,
+			.frameSpeedRate = 4,
+			.vertical = false
+		}
+	);
+
 	titleScreen.AddComponent<RigidBodyComponent>(glm::vec2(0));
 	titleScreen.Tag("title");
 

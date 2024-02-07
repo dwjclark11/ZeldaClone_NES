@@ -1,7 +1,6 @@
 #pragma once
 
-class RegisterNameComponent
+struct RegisterNameComponent
 {
-public:
-	RegisterNameComponent() {}
+
 };

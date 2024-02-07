@@ -26,24 +26,24 @@
 constexpr float HeartOffset = 0.75f;
 constexpr float AngleIncrease = 0.05f;
 
-bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
+bool TriggerSystem::CheckInventory(SpecialItemType& item)
 {
 	// Check to see the item is in the inventory
 	switch (item)
 	{
-	case ItemComponent::SpecialItemType::WOOD_SWORD:
+	case SpecialItemType::WOOD_SWORD:
 		return m_GameData.HasItem(GameData::GameItems::WOOD_SWORD);
-	case ItemComponent::SpecialItemType::STEEL_SWORD:
+	case SpecialItemType::STEEL_SWORD:
 		return m_GameData.HasItem(GameData::GameItems::SILVER_SWORD);
-	case ItemComponent::SpecialItemType::MAGIC_SWORD:
+	case SpecialItemType::MAGIC_SWORD:
 		return m_GameData.HasItem(GameData::GameItems::MAGIC_SWORD);
-	case ItemComponent::SpecialItemType::RED_CANDLE:
+	case SpecialItemType::RED_CANDLE:
 		return m_GameData.HasItem(GameData::GameItems::CANDLE);
-	case ItemComponent::SpecialItemType::WOOD_BOW:
+	case SpecialItemType::WOOD_BOW:
 		return m_GameData.HasItem(GameData::GameItems::BOW);
-	case ItemComponent::SpecialItemType::ARROWS:
+	case SpecialItemType::ARROWS:
 		return m_GameData.HasItem(GameData::GameItems::WOOD_ARROWS);
-	case ItemComponent::SpecialItemType::MAGIC_ARROWS:
+	case SpecialItemType::MAGIC_ARROWS:
 		return m_GameData.HasItem(GameData::GameItems::MAGIC_ARROWS);
 	default:
 		return false;
@@ -54,7 +54,7 @@ bool TriggerSystem::CheckInventory(ItemComponent::SpecialItemType& item)
 	return false;
 }
 
-void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
+void TriggerSystem::SetInventory(SpecialItemType& item)
 {
 	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
@@ -62,45 +62,45 @@ void TriggerSystem::SetInventory(ItemComponent::SpecialItemType& item)
 
 	switch (item)
 	{
-	case ItemComponent::SpecialItemType::NOT_SPECIAL:
+	case SpecialItemType::NOT_SPECIAL:
 		break;
 
-	case ItemComponent::SpecialItemType::WOOD_SWORD:
+	case SpecialItemType::WOOD_SWORD:
 		m_GameData.AddItem(GameData::GameItems::WOOD_SWORD);
 		break;
 
-	case ItemComponent::SpecialItemType::STEEL_SWORD:
+	case SpecialItemType::STEEL_SWORD:
 		m_GameData.AddItem(GameData::GameItems::SILVER_SWORD);
 		break;
 
-	case ItemComponent::SpecialItemType::MAGIC_SWORD:
+	case SpecialItemType::MAGIC_SWORD:
 		m_GameData.AddItem(GameData::GameItems::MAGIC_SWORD);
 		break;
 
-	case ItemComponent::SpecialItemType::FULL_HEART:
+	case SpecialItemType::FULL_HEART:
 	{
 		playerHealth.addHeart = true;
 		break;
 	}
-	case ItemComponent::SpecialItemType::RAFT:
+	case SpecialItemType::RAFT:
 		m_GameData.AddItem(GameData::GameItems::RAFT);
 		break;
-	case ItemComponent::SpecialItemType::POWER_BRACLET:
+	case SpecialItemType::POWER_BRACLET:
 		m_GameData.AddItem(GameData::GameItems::POWER_BRACLET);
 		break;
-	case ItemComponent::SpecialItemType::RED_CANDLE:
+	case SpecialItemType::RED_CANDLE:
 		m_GameData.AddItem(GameData::GameItems::CANDLE);
 		break;
-	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
+	case SpecialItemType::WOOD_BOOMERANG:
 		m_GameData.AddItem(GameData::GameItems::BOOMERANG);
 		break;
-	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
+	case SpecialItemType::MAGIC_BOOMERANG:
 		m_GameData.AddItem(GameData::GameItems::MAGIC_BOOMERANG);
 		break;
-	case ItemComponent::SpecialItemType::LADDER:
+	case SpecialItemType::LADDER:
 		m_GameData.AddItem(GameData::GameItems::LADDER);
 		break;
-	case ItemComponent::SpecialItemType::WOOD_BOW:
+	case SpecialItemType::WOOD_BOW:
 		m_GameData.AddItem(GameData::GameItems::BOW);
 		break;
 	default:
@@ -121,25 +121,25 @@ void TriggerSystem::StopPlayerMovement(Entity& player, Entity& trigger)
 
 		switch (playerRigidbody.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			playerTransform.collision = true;
 			playerRigidbody.velocity.y = 0;
 			playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) + (obstacleCollider.height * obstacleTransform.scale.y);
 			playerTransform.position.x = playerTransform.position.x;
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			playerTransform.collision = true;
 			playerRigidbody.velocity.x = 0;
 			playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
 			playerTransform.position.y = playerTransform.position.y;
 			break;
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			playerTransform.collision = true;
 			playerRigidbody.velocity.y = 0;
 			playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) - (playerCollider.height * playerTransform.scale.y);
 			playerTransform.position.x = playerTransform.position.x;
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			playerTransform.collision = true;
 			playerRigidbody.velocity.x = 0;
 			playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) + (obstacleCollider.width * obstacleTransform.scale.x);
@@ -158,28 +158,54 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 
 	if (!secret.found && !startup)
 	{
-		TriggerBoxComponent::TriggerType trigType = m_Loader.ConvertStringToTriggerType(secret.newTrigger);
+		TriggerType trigType = m_Loader.ConvertStringToTriggerType(secret.newTrigger);
 		
 		auto secretArea = m_Registry.CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
 	
-		secretArea.AddComponent<TriggerBoxComponent>(trigType,
-			secretTrigger.transportOffset, secretTrigger.cameraOffset);
+		secretArea.AddComponent<TriggerBoxComponent>(
+			TriggerBoxComponent{
+				.triggerType = trigType,
+				.transportOffset = secretTrigger.transportOffset,
+				.cameraOffset = secretTrigger.cameraOffset 
+			}
+		);
 		
 		if (trigger.HasComponent<SceneChangeComponent>())
 		{
 			const auto& scene = trigger.GetComponent<SceneChangeComponent>();
 			secretArea.AddComponent<SceneChangeComponent>(
-				scene.levelMusic, scene.assetFile, scene.enemyFile,
-				scene.colliderFile, scene.tileMapName, scene.tileImageName,
-				scene.mapImageName, scene.entityFileName, scene.triggerFile,
-				scene.imageWidth, scene.imageHeight);
+				SceneChangeComponent{
+					.levelMusic = scene.levelMusic,
+					.assetFile = scene.assetFile,
+					.enemyFile = scene.enemyFile,
+					.colliderFile = scene.colliderFile,
+					.tileMapName = scene.tileMapName,
+					.tileImageName = scene.tileImageName,
+					.mapImageName = scene.mapImageName,
+					.entityFileName = scene.entityFileName,
+					.triggerFile = scene.triggerFile,
+					.imageHeight = scene.imageHeight,
+					.imageWidth = scene.imageWidth
+				}
+			); 
 		}
 
-
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
-		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
+		secretArea.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = secret.newSpriteAssetID,
+				.width = secret.spriteWidth,
+				.height = secret.spriteHeight,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect{
+					secret.spriteSrcX, secret.spriteSrcY, secret.spriteWidth, secret.spriteHeight
+				} 
+			}
+		);
+		
 		secretArea.AddComponent<GameComponent>();
 
 		secret.found = true;
@@ -188,29 +214,56 @@ void TriggerSystem::SecretTrigger(Entity& trigger, bool startup)
 	}
 	else if (secret.found && startup)
 	{
-		TriggerBoxComponent::TriggerType trigType = m_Loader.ConvertStringToTriggerType(secret.newTrigger);
+		TriggerType trigType = m_Loader.ConvertStringToTriggerType(secret.newTrigger);
 
 		auto secretArea = m_Registry.CreateEntity();
 		secretArea.Group("trigger");
 		secretArea.AddComponent<BoxColliderComponent>(secretCollider.width, secretCollider.height, secretCollider.offset);
-		secretArea.AddComponent<TriggerBoxComponent>(trigType,
-			secretTrigger.transportOffset, secretTrigger.cameraOffset);
-
+		secretArea.AddComponent<TriggerBoxComponent>(
+			TriggerBoxComponent{
+				.triggerType = trigType,
+				.transportOffset = secretTrigger.transportOffset,
+				.cameraOffset = secretTrigger.cameraOffset
+			}
+		);
 
 		if (trigger.HasComponent<SceneChangeComponent>())
 		{
 			const auto& scene = trigger.GetComponent<SceneChangeComponent>();
 			secretArea.AddComponent<SceneChangeComponent>(
-				scene.levelMusic, scene.assetFile, scene.enemyFile,
-				scene.colliderFile, scene.tileMapName, scene.tileImageName,
-				scene.mapImageName, scene.entityFileName, scene.triggerFile,
-				scene.imageWidth, scene.imageHeight);
+				SceneChangeComponent{
+						.levelMusic = scene.levelMusic,
+						.assetFile = scene.assetFile,
+						.enemyFile = scene.enemyFile,
+						.colliderFile = scene.colliderFile,
+						.tileMapName = scene.tileMapName,
+						.tileImageName = scene.tileImageName,
+						.mapImageName = scene.mapImageName,
+						.entityFileName = scene.entityFileName,
+						.triggerFile = scene.triggerFile,
+						.imageHeight = scene.imageHeight,
+						.imageWidth  = scene.imageWidth
+				}
+			);
 		}
 
 		secretArea.AddComponent<TransformComponent>(secretTransform.position, secretTransform.scale, secretTransform.rotation);
-		secretArea.AddComponent<SpriteComponent>(secret.newSpriteAssetID, secret.spriteWidth, secret.spriteHeight, 1, false, secret.spriteSrcX, secret.spriteSrcY);
+		secretArea.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = secret.newSpriteAssetID,
+				.width = secret.spriteWidth,
+				.height = secret.spriteHeight,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect {
+					secret.spriteSrcX, secret.spriteSrcY, secret.spriteWidth, secret.spriteHeight
+				} 
+			}
+		);
+
 		secretArea.AddComponent<GameComponent>();
 	}
+
 	trigger.Kill();
 }
 
@@ -335,13 +388,13 @@ void TriggerSystem::PushRocks(Entity& player, Entity& trigger)
 
 	if (!trig.active && !secret.found)
 	{
-		if (playerRigidBody.dir == RigidBodyComponent::Dir::UP)
+		if (playerRigidBody.dir == RigidBodyDir::UP)
 		{
 			trig.active = true;
 			m_Game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
 			secret.moveUp = true;
 		}
-		else if (playerRigidBody.dir == RigidBodyComponent::Dir::DOWN)
+		else if (playerRigidBody.dir == RigidBodyDir::DOWN)
 		{
 			trig.active = true;
 			m_Game.GetSoundPlayer().PlaySoundFX("secret", 0, SoundChannel::ANY);
@@ -359,8 +412,8 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 
 	if (m_GameData.HasItem(GameData::GameItems::RAFT))
 	{
-		if ((secret.moveDown && playerRigidbody.dir == RigidBodyComponent::Dir::DOWN) || 
-			(secret.moveUp && playerRigidbody.dir == RigidBodyComponent::Dir::UP))
+		if ((secret.moveDown && playerRigidbody.dir == RigidBodyDir::DOWN) || 
+			(secret.moveUp && playerRigidbody.dir == RigidBodyDir::UP))
 		{
 			if (!trigs.active)
 			{
@@ -369,7 +422,17 @@ void TriggerSystem::RideRaft(Entity& player, Entity& trigger)
 				auto raft = m_Registry.CreateEntity();
 				raft.Tag("raft");
 				raft.AddComponent<TransformComponent>(pTran);
-				raft.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 0, 16);
+				raft.AddComponent<SpriteComponent>(
+					SpriteComponent{
+						.assetID = "items",
+						.width = 16,
+						.height = 16,
+						.layer = 1,
+						.isFixed = false,
+						.srcRect = SDL_Rect{0, 16, 16, 16} 
+					}
+				);
+
 				raft.AddComponent<GameComponent>();
 				raft.GetComponent<TransformComponent>().position.x += 32;
 				raft.GetComponent<TransformComponent>().position.y += 32;
@@ -424,19 +487,19 @@ void TriggerSystem::UseLadder(Entity& player, Entity& trigger)
 		auto yOffset = 64;
 		switch (playerRigidbody.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			xOffset = 32;
 			yOffset = -64;
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			xOffset = 64;
 			yOffset = 32;
 			break;
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			xOffset = 32;
 			yOffset = 64;
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			xOffset = -16;
 			yOffset = 32;
 			break;
@@ -446,7 +509,17 @@ void TriggerSystem::UseLadder(Entity& player, Entity& trigger)
 		auto ladder = m_Registry.CreateEntity();
 		ladder.Tag("ladder");
 		ladder.AddComponent<TransformComponent>(playerTransform);
-		ladder.AddComponent<SpriteComponent>("items", 16, 16, 1, false, 112, 48);
+		ladder.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "items",
+				.width = 16,
+				.height = 16,
+				.layer = 1,
+				.isFixed = false,
+				.srcRect = SDL_Rect{112, 48, 16, 16} 
+			}
+		);
+
 		ladder.AddComponent<GameComponent>();
 		ladder.GetComponent<TransformComponent>().position.x += xOffset;
 		ladder.GetComponent<TransformComponent>().position.y += yOffset;
@@ -521,7 +594,7 @@ void TriggerSystem::BuyShopItem(Entity& trigger)
 		return;
 		
 	// Check to see if key item and if it is already in the inventory
-	if (shopItem.special != ItemComponent::SpecialItemType::NOT_SPECIAL)
+	if (shopItem.special != SpecialItemType::NOT_SPECIAL)
 	{
 		// Check to see if the item is in the inventory
 		if (CheckInventory(shopItem.special))	
@@ -573,7 +646,17 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 				auto fairyHeart = m_Registry.CreateEntity();;
 				fairyHeart.Group("fairy_hearts");
 				fairyHeart.AddComponent<TransformComponent>(fairyTransform.position, fairyTransform.scale);
-				fairyHeart.AddComponent<SpriteComponent>("hearts", 16, 16, 2, false, 0, 0);
+				fairyHeart.AddComponent<SpriteComponent>(
+					SpriteComponent{
+						.assetID = "hearts",
+						.width = 16,
+						.height = 16,
+						.layer = 2,
+						.isFixed = false,
+						.srcRect = SDL_Rect{0, 0, 16, 16 } 
+					}
+				);
+
 				fairyHeart.AddComponent<GameComponent>();
 			}
 		}
@@ -668,7 +751,7 @@ void TriggerSystem::UpdateRaft(Entity& player, Entity& trigger)
 	auto& secret = trigger.GetComponent<SecretComponent>();
 	auto& trig = trigger.GetComponent<TriggerBoxComponent>();
 
-	if (secret.moveUp && playerRigidbody.dir == RigidBodyComponent::Dir::UP)
+	if (secret.moveUp && playerRigidbody.dir == RigidBodyDir::UP)
 	{
 		playerTransform.position.y -= 200 * m_Game.GetDeltaTime();
 		raftTransform.position.y -= 200 * m_Game.GetDeltaTime();
@@ -679,7 +762,7 @@ void TriggerSystem::UpdateRaft(Entity& player, Entity& trigger)
 			raft.Kill();
 		}
 	}
-	else if (secret.moveDown && playerRigidbody.dir == RigidBodyComponent::Dir::DOWN)
+	else if (secret.moveDown && playerRigidbody.dir == RigidBodyDir::DOWN)
 	{
 		playerTransform.position.y += 200 * m_Game.GetDeltaTime();
 		raftTransform.position.y += 200 * m_Game.GetDeltaTime();
@@ -725,7 +808,7 @@ void TriggerSystem::UpdateMovingRocks(Entity& player, Entity& trigger)
 				if (removedEntity.HasComponent<TriggerBoxComponent>())
 				{
 					const auto& triggerType = removedEntity.GetComponent<TriggerBoxComponent>().triggerType;
-					if (triggerType == TriggerBoxComponent::TriggerType::TRAP_DOOR)
+					if (triggerType == TriggerType::TRAP_DOOR)
 					{
 						m_Game.GetSoundPlayer().PlaySoundFX("door_unlock", 0, SoundChannel::ANY);
 					}
@@ -793,24 +876,24 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	if (b.HasComponent<SecretComponent>())
 	{
 		auto& trig = b.GetComponent<TriggerBoxComponent>();
-		if (trig.triggerType == TriggerBoxComponent::TriggerType::BOMB_SECRET && a.BelongsToGroup("explode"))
+		if (trig.triggerType == TriggerType::BOMB_SECRET && a.BelongsToGroup("explode"))
 		{
 			OnEnterTrigger(a, b);
 			return;
 		}
 			
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::BURN_BUSHES && a.BelongsToGroup("fire"))
+		else if (trig.triggerType == TriggerType::BURN_BUSHES && a.BelongsToGroup("fire"))
 		{
 			OnEnterTrigger(a, b);
 			return;
 		}
 			
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS && a.HasTag("player"))
+		else if (trig.triggerType == TriggerType::PUSH_ROCKS && a.HasTag("player"))
 		{
 			OnEnterTrigger(a, b);
 			return;
 		}
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT && a.HasTag("player"))
+		else if (trig.triggerType == TriggerType::RAFT && a.HasTag("player"))
 		{
 			OnEnterTrigger(a, b);
 			return;
@@ -820,23 +903,23 @@ void TriggerSystem::OnTrigger(CollisionEvent& event)
 	else if (a.HasComponent<SecretComponent>())
 	{
 		auto& trig = a.GetComponent<TriggerBoxComponent>();
-		if (trig.triggerType == TriggerBoxComponent::TriggerType::BOMB_SECRET && b.BelongsToGroup("explode"))
+		if (trig.triggerType == TriggerType::BOMB_SECRET && b.BelongsToGroup("explode"))
 		{
 			OnEnterTrigger(b, a);
 			return;
 		}
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::BURN_BUSHES && b.BelongsToGroup("fire"))
+		else if (trig.triggerType == TriggerType::BURN_BUSHES && b.BelongsToGroup("fire"))
 		{
 			OnEnterTrigger(b, a);
 			return;
 		}
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::PUSH_ROCKS && b.HasTag("player"))
+		else if (trig.triggerType == TriggerType::PUSH_ROCKS && b.HasTag("player"))
 		{
 			OnEnterTrigger(b, a);
 			return;
 		}
 
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::RAFT && b.HasTag("player"))
+		else if (trig.triggerType == TriggerType::RAFT && b.HasTag("player"))
 		{
 			OnEnterTrigger(b, a);
 			return;
@@ -851,16 +934,16 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 
 	switch (trig.triggerType)
 	{
-	case TriggerBoxComponent::TriggerType::NO_TRIGGER:
+	case TriggerType::NO_TRIGGER:
 		Logger::Err("TRIGGER_SYSTEM: __LINE: 174 - There is not trigger set for this entity");
 		break;
-	case TriggerBoxComponent::TriggerType::SCENE_CHANGE: 
+	case TriggerType::SCENE_CHANGE: 
 		ChangeScene(player, trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::TRANSPORT:
+	case TriggerType::TRANSPORT:
 		Transport(player, trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::BURN_BUSHES:
+	case TriggerType::BURN_BUSHES:
 
 		if (trigger.HasComponent<SecretComponent>())
 		{
@@ -869,16 +952,16 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 			trigger.Kill();
 		}
 		break;
-	case TriggerBoxComponent::TriggerType::PUSH_ROCKS:
+	case TriggerType::PUSH_ROCKS:
 		PushRocks(player, trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::COLLECT_ITEM:
+	case TriggerType::COLLECT_ITEM:
 	{
 		if (!trig.active)
 		{
 			auto& item = trigger.GetComponent<ItemComponent>();
 			std::string soundID = "fanfare";
-			if (item.special == ItemComponent::SpecialItemType::TRIFORCE_PIECE)
+			if (item.special == SpecialItemType::TRIFORCE_PIECE)
 			{
 				m_Game.GetPlayer()->SetObtainedTriforce(true);
 				soundID = "triforce_fanfare";
@@ -894,25 +977,25 @@ void TriggerSystem::OnEnterTrigger(Entity& player, Entity& trigger)
 		}
 		break;
 	}
-	case TriggerBoxComponent::TriggerType::BOMB_SECRET:
+	case TriggerType::BOMB_SECRET:
 		BombSecret(trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::LOCKED_DOOR:
+	case TriggerType::LOCKED_DOOR:
 		UnlockDoor(trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::SHOP_ITEM:
+	case TriggerType::SHOP_ITEM:
 		BuyShopItem(trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::RAFT:
+	case TriggerType::RAFT:
 		RideRaft(player, trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::LADDER:
+	case TriggerType::LADDER:
 		UseLadder(player, trigger);
 		break;
-	case TriggerBoxComponent::TriggerType::TRAP_DOOR:
+	case TriggerType::TRAP_DOOR:
 		// TODO: 
 		break;
-	case TriggerBoxComponent::TriggerType::FAIRY_CIRCLE:
+	case TriggerType::FAIRY_CIRCLE:
 		EnterFairyCircle(player, trigger);
 		break;
 	default:
@@ -942,18 +1025,18 @@ void TriggerSystem::Update(const float& dt)
 
 			switch (trig.triggerType)
 			{
-			case TriggerBoxComponent::TriggerType::PUSH_ROCKS:
+			case TriggerType::PUSH_ROCKS:
 				UpdateMovingRocks(playerEnt, entity);
 				break;
-			case TriggerBoxComponent::TriggerType::RAFT:
+			case TriggerType::RAFT:
 				UpdateRaft(playerEnt, entity);
 				break;
-			case TriggerBoxComponent::TriggerType::LADDER:
+			case TriggerType::LADDER:
 				UpdateLadder(playerEnt, entity);
 				break;
 			}
 		}
-		else if (trig.triggerType == TriggerBoxComponent::TriggerType::FAIRY_CIRCLE)
+		else if (trig.triggerType == TriggerType::FAIRY_CIRCLE)
 		{
 			UpdateFairyCircle(playerEnt, entity);
 		}

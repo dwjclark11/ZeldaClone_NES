@@ -55,7 +55,19 @@ void LevelLoader::LoadMap(const std::string& mapName, int image_width, int image
 
 	Entity secret = reg.CreateEntity();
 	secret.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(4, 4), 0.0);
-	secret.AddComponent<SpriteComponent>(mapName, image_width, image_height, 1, false, 0, 0);
+	secret.AddComponent<SpriteComponent>(
+		SpriteComponent{
+			.assetID = mapName,
+			.width = image_width,
+			.height = image_height,
+			.layer = 1,
+			.isFixed = false,
+			.srcRect = SDL_Rect {
+				0, 0, image_width, image_height
+			}
+		}
+	);
+
 	secret.AddComponent<TileComponent>();
 	secret.Group("map");
 }
@@ -107,7 +119,19 @@ void LevelLoader::LoadTilemap(const std::string& fileName, const std::string& im
 
 		// Create a new entity for each tile
 		Entity tile = reg.CreateEntity();
-		tile.AddComponent<SpriteComponent>(assetID, tileWidth, tileHeight, zIndex, false, srcRectX, srcRectY);
+		tile.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = assetID,
+				.width = tileWidth,
+				.height = tileHeight,
+				.layer = zIndex,
+				.isFixed = false,
+				.srcRect = SDL_Rect{
+					srcRectX, srcRectY, tileWidth, tileHeight
+					}
+			}
+		);
+
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		tile.AddComponent<ColliderComponent>();
 		if (zIndex < 2)
@@ -272,7 +296,17 @@ void LevelLoader::LoadMenuScreenFromLuaTable(sol::state& lua, const std::string&
 				// Create new heart Entity for each parsed tile
 				Entity heart = reg.CreateEntity();
 				heart.Group("hearts_" + fileName);
-				heart.AddComponent<SpriteComponent>("hearts", 16, 16, 0, false, 0, 0);
+				heart.AddComponent<SpriteComponent>(
+					SpriteComponent{
+						.assetID = "hearts",
+						.width = 16,
+						.height = 16,
+						.layer = 0,
+						.isFixed = false,
+						.srcRect = SDL_Rect {0, 0, 16, 16}
+					}
+				);
+
 				heart.AddComponent<TransformComponent>(glm::vec2(transformX + xTransform, transformY + yTransform), glm::vec2(4, 4), 0.0);
 				heart.AddComponent<MenuComponent>();
 
@@ -311,16 +345,24 @@ bool LevelLoader::ReadSpriteComponent(sol::table& table, Entity& entity)
 	if (sprite != sol::nullopt)
 	{
 		entity.AddComponent<SpriteComponent>(
-			table["components"]["sprite"]["asset_id"],
-			table["components"]["sprite"]["width"],
-			table["components"]["sprite"]["height"],
-			table["components"]["sprite"]["z_index"].get_or(1), // Layer
-			table["components"]["sprite"]["is_fixed"].get_or(false),
-			table["components"]["sprite"]["src_rect_x"].get_or(0),
-			table["components"]["sprite"]["src_rect_y"].get_or(0),
-			glm::vec2(
+			SpriteComponent{
+				.assetID = table["components"]["sprite"]["asset_id"].get_or(std::string{""}),
+				.width = table["components"]["sprite"]["width"].get_or(0),
+				.height = table["components"]["sprite"]["height"].get_or(0),
+				.layer = table["components"]["sprite"]["z_index"].get_or(1),
+				.isFixed = table["components"]["sprite"]["is_fixed"].get_or(false),
+				.srcRect = SDL_Rect {
+					table["components"]["sprite"]["src_rect_x"].get_or(0),
+					table["components"]["sprite"]["src_rect_y"].get_or(0),
+					table["components"]["sprite"]["width"].get_or(0),
+					table["components"]["sprite"]["height"].get_or(0)
+				},
+				.offset = glm::vec2{
 				table["components"]["sprite"]["offset"]["x"].get_or(0),
-				table["components"]["sprite"]["offset"]["y"].get_or(0)));
+				table["components"]["sprite"]["offset"]["y"].get_or(0)
+				}
+			}
+		);
 		
 		return true;
 	}
@@ -346,11 +388,14 @@ void LevelLoader::ReadAnimationComponent(sol::table& table, Entity& entity)
 	if (animation != sol::nullopt)
 	{
 		entity.AddComponent<AnimationComponent>(
-			table["components"]["animation"]["num_frames"].get_or(1),
-			table["components"]["animation"]["frame_rate"].get_or(1),
-			table["components"]["animation"]["vertical"].get_or(false),
-			table["components"]["animation"]["looped"].get_or(false),
-			table["components"]["animation"]["frame_offset"].get_or(0));
+			AnimationComponent{
+				.numFrames = table["components"]["animation"]["num_frames"].get_or(1),
+				.frameSpeedRate = table["components"]["animation"]["frame_rate"].get_or(1),
+				.vertical = table["components"]["animation"]["vertical"].get_or(false),
+				.isLooped = table["components"]["animation"]["looped"].get_or(false),
+				.frameOffset = table["components"]["animation"]["frame_offset"].get_or(0)
+			}
+		);
 	}
 }
 
@@ -588,7 +633,19 @@ void LevelLoader::LoadLevel(const std::string& level)
 		// Create a new entity for each tile
 		Entity tile = reg.CreateEntity();
 		tile.Group(group);
-		tile.AddComponent<SpriteComponent>("tiles", tileWidth, tileHeight, 0, false, srcRectX, srcRectY);
+		tile.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "tiles",
+				.width = tileWidth,
+				.height = tileHeight,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect {
+					srcRectX, srcRectY, tileWidth, tileHeight
+				}
+			}
+		);
+
 		tile.AddComponent<TransformComponent>(glm::vec2(tranX, tranY), glm::vec2(tileScaleX, tileScaleX), 0.0);
 		tile.AddComponent<TileComponent>();
 		if (collider)
@@ -638,40 +695,40 @@ void LevelLoader::LoadColliders(const std::string& filename)
 	mapFile.close();
 }
 
-TriggerBoxComponent::TriggerType LevelLoader::ConvertStringToTriggerType(const std::string& type)
+TriggerType LevelLoader::ConvertStringToTriggerType(const std::string& type)
 {
 	if (type == "no_trigger")
-		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
+		return TriggerType::NO_TRIGGER;
 	else if (type == "scene_change")
-		return TriggerBoxComponent::TriggerType::SCENE_CHANGE;
+		return TriggerType::SCENE_CHANGE;
 	else if (type == "burn_bush")
-		return TriggerBoxComponent::TriggerType::BURN_BUSHES;
+		return TriggerType::BURN_BUSHES;
 	else if (type == "transport")
-		return TriggerBoxComponent::TriggerType::TRANSPORT;
+		return TriggerType::TRANSPORT;
 	else if (type == "push_rocks")
-		return TriggerBoxComponent::TriggerType::PUSH_ROCKS;
+		return TriggerType::PUSH_ROCKS;
 	else if (type == "collect_item")
-		return TriggerBoxComponent::TriggerType::COLLECT_ITEM;
+		return TriggerType::COLLECT_ITEM;
 	else if (type == "bomb_secret")
-		return TriggerBoxComponent::TriggerType::BOMB_SECRET;
+		return TriggerType::BOMB_SECRET;
 	else if (type == "locked_door")
-		return TriggerBoxComponent::TriggerType::LOCKED_DOOR;
+		return TriggerType::LOCKED_DOOR;
 	else if (type == "hidden_object")
-		return TriggerBoxComponent::TriggerType::HIDDEN_OBJECT;
+		return TriggerType::HIDDEN_OBJECT;
 	else if (type == "shop_item")
-		return TriggerBoxComponent::TriggerType::SHOP_ITEM;
+		return TriggerType::SHOP_ITEM;
 	else if (type == "raft")
-		return TriggerBoxComponent::TriggerType::RAFT;
+		return TriggerType::RAFT;
 	else if (type == "ladder")
-		return TriggerBoxComponent::TriggerType::LADDER;
+		return TriggerType::LADDER;
 	else if (type == "money_game")
-		return TriggerBoxComponent::TriggerType::MONEY_GAME;
+		return TriggerType::MONEY_GAME;
 	else if (type == "trap_door")
-		return TriggerBoxComponent::TriggerType::TRAP_DOOR;
+		return TriggerType::TRAP_DOOR;
 	else if (type == "fairy_circle")
-		return TriggerBoxComponent::TriggerType::FAIRY_CIRCLE;
+		return TriggerType::FAIRY_CIRCLE;
 	else 
-		return TriggerBoxComponent::TriggerType::NO_TRIGGER;
+		return TriggerType::NO_TRIGGER;
 }
 
 AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(const std::string& enemyType)
@@ -793,22 +850,23 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 			if (triggerBox != sol::nullopt)
 			{
 				//Logger::Log(trigger["components"]["trigger_box"]["trigger_file"]);
-				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
+				TriggerType triggerType = ConvertStringToTriggerType(trigger["components"]["trigger_box"]["trigger_type"]);
 			
 				newTrigger.AddComponent<TriggerBoxComponent>(
-					triggerType,
-					glm::vec2(
-						trigger["components"]["trigger_box"]["transport_offset"]["x"].get_or(0.0),
-						trigger["components"]["trigger_box"]["transport_offset"]["y"].get_or(0.0)
-					),
-					glm::vec2(
-						trigger["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
-						trigger["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
-					),
-
-					trigger["components"]["trigger_box"]["collider"].get_or(false),
-					trigger["components"]["trigger_box"]["entity_removed_tag"].get_or(std::string(""))
-					);
+					TriggerBoxComponent{
+						.triggerType = triggerType,
+						.transportOffset = glm::vec2{
+							trigger["components"]["trigger_box"]["transport_offset"]["x"].get_or(0.0),
+							trigger["components"]["trigger_box"]["transport_offset"]["y"].get_or(0.0)
+						},
+						.cameraOffset = glm::vec2{
+							trigger["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
+							trigger["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
+						},
+						.entityRemoveTag = trigger["components"]["trigger_box"]["entity_removed_tag"].get_or(std::string("")),
+						.collider = trigger["components"]["trigger_box"]["collider"].get_or(false),						
+					}
+				);
 			}
 
 			sol::optional<sol::table> scene = trigger["components"]["scene_change"];
@@ -817,17 +875,20 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 			if (scene != sol::nullopt)
 			{
 				newTrigger.AddComponent<SceneChangeComponent>(
-					trigger["components"]["scene_change"]["level_music"].get_or(std::string("stop")),
-					trigger["components"]["scene_change"]["asset_file"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["enemy_file"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["collider_file"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["tilemap_name"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["tilemap_image"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["map_image"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["entity_file"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["trigger_file"].get_or(std::string("no_file")),
-					trigger["components"]["scene_change"]["image_width"].get_or(0),
-					trigger["components"]["scene_change"]["image_height"].get_or(0));
+					SceneChangeComponent{
+						.levelMusic = trigger["components"]["scene_change"]["level_music"].get_or(std::string("stop")),
+						.assetFile = trigger["components"]["scene_change"]["asset_file"].get_or(std::string("no_file")),
+						.enemyFile = trigger["components"]["scene_change"]["enemy_file"].get_or(std::string("no_file")),
+						.colliderFile = trigger["components"]["scene_change"]["collider_file"].get_or(std::string("no_file")),
+						.tileMapName = trigger["components"]["scene_change"]["tilemap_name"].get_or(std::string("no_file")),
+						.tileImageName = trigger["components"]["scene_change"]["tilemap_image"].get_or(std::string("no_file")),
+						.mapImageName = trigger["components"]["scene_change"]["map_image"].get_or(std::string("no_file")),
+						.entityFileName = trigger["components"]["scene_change"]["entity_file"].get_or(std::string("no_file")),
+						.triggerFile = trigger["components"]["scene_change"]["trigger_file"].get_or(std::string("no_file")),
+						.imageHeight = trigger["components"]["scene_change"]["image_height"].get_or(0),
+						.imageWidth  = trigger["components"]["scene_change"]["image_width"].get_or(0)
+					}
+				);
 			}
 
 			// Check if the trigger is a secret/Hidden Area
@@ -835,19 +896,22 @@ void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
 			if (secret != sol::nullopt)
 			{
 				newTrigger.AddComponent<SecretComponent>(
-					trigger["components"]["secret"]["location_id"],
-					trigger["components"]["secret"]["new_trigger"],
-					trigger["components"]["secret"]["new_sprite_id"],
-					trigger["components"]["secret"]["sprite_width"].get_or(0),
-					trigger["components"]["secret"]["sprite_height"].get_or(0),
-					trigger["components"]["secret"]["sprite_src_x"].get_or(0),
-					trigger["components"]["secret"]["sprite_src_y"].get_or(0),
-					glm::vec2(
-						trigger["components"]["secret"]["start_pos"]["x"].get_or(0),
-						trigger["components"]["secret"]["start_pos"]["y"].get_or(0)),
-					trigger["components"]["secret"]["move_up"].get_or(false),
-					trigger["components"]["secret"]["move_down"].get_or(false)
-					);
+					SecretComponent{
+						.locationID = trigger["components"]["secret"]["location_id"],
+						.newTrigger = trigger["components"]["secret"]["new_trigger"],
+						.newSpriteAssetID = trigger["components"]["secret"]["new_sprite_id"],
+						.spriteWidth = trigger["components"]["secret"]["sprite_width"].get_or(0),
+						.spriteHeight = trigger["components"]["secret"]["sprite_height"].get_or(0),
+						.spriteSrcX = trigger["components"]["secret"]["sprite_src_x"].get_or(0),
+						.spriteSrcY = trigger["components"]["secret"]["sprite_src_y"].get_or(0),
+						.startPos = glm::vec2{
+							trigger["components"]["secret"]["start_pos"]["x"].get_or(0),
+							trigger["components"]["secret"]["start_pos"]["y"].get_or(0)
+						},
+						.moveUp = trigger["components"]["secret"]["move_up"].get_or(false),
+						.moveDown = trigger["components"]["secret"]["move_down"].get_or(false)
+					}	
+				);
 
 				// Set the start postition to the transform position
 				newTrigger.GetComponent<SecretComponent>().startPos = newTrigger.GetComponent<TransformComponent>().position;
@@ -1467,17 +1531,17 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, const std::string& fi
 			{
 
 				std::string move_dir = entity["components"]["enemy_component"]["move_dir"];
-				EnemyComponent::MoveDir moveDir = EnemyComponent::MoveDir::NO_MOVE;
+				MoveDir moveDir = MoveDir::NO_MOVE;
 				if (move_dir == "up")
-					moveDir = EnemyComponent::MoveDir::UP;
+					moveDir = MoveDir::UP;
 				else if (move_dir == "right")
-					moveDir = EnemyComponent::MoveDir::RIGHT;
+					moveDir = MoveDir::RIGHT;
 				else if (move_dir == "down")
-					moveDir = EnemyComponent::MoveDir::DOWN;
+					moveDir = MoveDir::DOWN;
 				else if (move_dir == "left")
-					moveDir = EnemyComponent::MoveDir::LEFT;
+					moveDir = MoveDir::LEFT;
 				else
-					moveDir = EnemyComponent::MoveDir::NO_MOVE;
+					moveDir = MoveDir::NO_MOVE;
 
 				newEntity.AddComponent<EnemyComponent>(
 						entity["components"]["enemy_component"]["max_move_distance"].get_or(0),
@@ -1712,69 +1776,69 @@ void LevelLoader::LoadAssetsFromLuaTable(sol::state& lua, const std::string& fil
 		i++;
 	}
 }
-ItemComponent::ItemCollectType LevelLoader::ConvertLuaStringToItem(std::string& type)
+ItemCollectType LevelLoader::ConvertLuaStringToItem(std::string& type)
 {
 	if (type == "default")
-		return ItemComponent::ItemCollectType::DEFAULT;
+		return ItemCollectType::DEFAULT;
 	else if (type == "bombs")
-		return ItemComponent::ItemCollectType::BOMBS;
+		return ItemCollectType::BOMBS;
 	else if (type == "heart")
-		return ItemComponent::ItemCollectType::HEARTS;
+		return ItemCollectType::HEARTS;
 	else if (type == "keys")
-		return ItemComponent::ItemCollectType::KEYS;
+		return ItemCollectType::KEYS;
 	else
-		return ItemComponent::ItemCollectType::DEFAULT;
+		return ItemCollectType::DEFAULT;
 }
-ItemComponent::SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
+SpecialItemType LevelLoader::ConvertLuaStringToSpecial(std::string& special)
 {
 	if (special == "none")
-		return ItemComponent::SpecialItemType::NOT_SPECIAL;
+		return SpecialItemType::NOT_SPECIAL;
 	else if (special == "wood_sword")
-		return ItemComponent::SpecialItemType::WOOD_SWORD;
+		return SpecialItemType::WOOD_SWORD;
 	else if (special == "steel_sword")
-		return ItemComponent::SpecialItemType::STEEL_SWORD;
+		return SpecialItemType::STEEL_SWORD;
 	else if (special == "magic_sword")
-		return ItemComponent::SpecialItemType::MAGIC_SWORD;
+		return SpecialItemType::MAGIC_SWORD;
 	else if (special == "full_heart")
-		return ItemComponent::SpecialItemType::FULL_HEART;
+		return SpecialItemType::FULL_HEART;
 	else if (special == "raft")
-		return ItemComponent::SpecialItemType::RAFT;
+		return SpecialItemType::RAFT;
 	else if (special == "power_braclet")
-		return ItemComponent::SpecialItemType::POWER_BRACLET;
+		return SpecialItemType::POWER_BRACLET;
 	else if (special == "red_candle")
-		return ItemComponent::SpecialItemType::RED_CANDLE;
+		return SpecialItemType::RED_CANDLE;
 	else if (special == "wood_boomerang")
-		return ItemComponent::SpecialItemType::WOOD_BOOMERANG;
+		return SpecialItemType::WOOD_BOOMERANG;
 	else if (special == "magic_boomerang")
-		return ItemComponent::SpecialItemType::MAGIC_BOOMERANG;
+		return SpecialItemType::MAGIC_BOOMERANG;
 	else if (special == "ladder")
-		return ItemComponent::SpecialItemType::LADDER;
+		return SpecialItemType::LADDER;
 	else if (special == "arrows")
-		return ItemComponent::SpecialItemType::ARROWS;
+		return SpecialItemType::ARROWS;
 	else if (special == "wood_bow")
-		return ItemComponent::SpecialItemType::WOOD_BOW;
+		return SpecialItemType::WOOD_BOW;
 	else if (special == "triforce_piece")
-		return ItemComponent::SpecialItemType::TRIFORCE_PIECE;
+		return SpecialItemType::TRIFORCE_PIECE;
 	else
-		return ItemComponent::SpecialItemType::NOT_SPECIAL;
+		return SpecialItemType::NOT_SPECIAL;
 }
 
-bool LevelLoader::CheckForItemInInventory(ItemComponent::SpecialItemType& type)
+bool LevelLoader::CheckForItemInInventory(SpecialItemType& type)
 {
 	auto& gameData = GameData::GetInstance();
 	switch (type)
 	{
-	case ItemComponent::SpecialItemType::WOOD_SWORD:
+	case SpecialItemType::WOOD_SWORD:
 		return gameData.HasItem(GameData::GameItems::WOOD_SWORD);
-	case ItemComponent::SpecialItemType::LADDER:
+	case SpecialItemType::LADDER:
 		return gameData.HasItem(GameData::GameItems::LADDER);
-	case ItemComponent::SpecialItemType::WOOD_BOOMERANG:
+	case SpecialItemType::WOOD_BOOMERANG:
 		return gameData.HasItem(GameData::GameItems::BOOMERANG);
-	case ItemComponent::SpecialItemType::MAGIC_BOOMERANG:
+	case SpecialItemType::MAGIC_BOOMERANG:
 		return gameData.HasItem(GameData::GameItems::MAGIC_BOOMERANG);
-	case ItemComponent::SpecialItemType::STEEL_SWORD:
+	case SpecialItemType::STEEL_SWORD:
 		return gameData.HasItem(GameData::GameItems::SILVER_SWORD);
-	case ItemComponent::SpecialItemType::WOOD_BOW:
+	case SpecialItemType::WOOD_BOW:
 		return gameData.HasItem(GameData::GameItems::BOW);
 	default:
 		return false;
@@ -1817,7 +1881,7 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& f
 		if (level_item != sol::nullopt)
 		{
 			std::string item = lvlData["level_item"];
-			ItemComponent::SpecialItemType spec = ConvertLuaStringToSpecial(item);
+			SpecialItemType spec = ConvertLuaStringToSpecial(item);
 
 			if (CheckForItemInInventory(spec))
 			{
@@ -1860,19 +1924,21 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& f
 			{
 				//std::string type = trigger["components"]["trigger_box"]["trigger_type"];
 				//Logger::Log(lvlData["components"]["trigger_box"]["trigger_file"]);
-				TriggerBoxComponent::TriggerType triggerType = ConvertStringToTriggerType(lvlData["components"]["trigger_box"]["trigger_type"]);
+				TriggerType triggerType = ConvertStringToTriggerType(lvlData["components"]["trigger_box"]["trigger_type"]);
 
 				newLvlObject.AddComponent<TriggerBoxComponent>(
-					triggerType,
-					glm::vec2(
-						lvlData["components"]["trigger_box"]["transport_offset"]["x"].get_or(0.0),
-						lvlData["components"]["trigger_box"]["transport_offset"]["y"].get_or(0.0)
-					),
-					glm::vec2(
-						lvlData["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
-						lvlData["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
-					)
-					);
+					TriggerBoxComponent{
+						.triggerType = triggerType,
+						.transportOffset = glm::vec2{
+							lvlData["components"]["trigger_box"]["transport_offset"]["x"].get_or(0.0),
+							lvlData["components"]["trigger_box"]["transport_offset"]["y"].get_or(0.0)
+						},
+						.cameraOffset = glm::vec2{
+							lvlData["components"]["trigger_box"]["camera_offset"]["x"].get_or(0.0),
+							lvlData["components"]["trigger_box"]["camera_offset"]["y"].get_or(0.0)
+						}
+					}
+				);
 			}
 
 			// Item Type Component
@@ -1900,13 +1966,14 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& f
 			sol::optional<sol::table> caption = lvlData["components"]["caption"];
 			if (caption != sol::nullopt)
 			{
-				newLvlObject.AddComponent<CaptionComponent>(
-					lvlData["components"]["caption"]["captions"],
-					lvlData["components"]["caption"]["scrollable"].get_or(true),
-					lvlData["components"]["caption"]["x_pos"].get_or(0),
-					lvlData["components"]["caption"]["y_pos"].get_or(0),
-					lvlData["components"]["caption"]["is_number"].get_or(false)
-					);
+				newLvlObject.AddComponent<CaptionComponent>(CaptionComponent{
+						.caption = lvlData["components"]["caption"]["captions"].get_or(std::string{""}),
+						.scrollable = lvlData["components"]["caption"]["scrollable"].get_or(true),
+						.is_number = lvlData["components"]["caption"]["is_number"].get_or(false),
+						.xPos = lvlData["components"]["caption"]["x_pos"].get_or(0),
+						.yPos = lvlData["components"]["caption"]["y_pos"].get_or(0)
+					}
+				);
 			}
 
 			// Scene Change component
@@ -1916,17 +1983,20 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& f
 			if (scene != sol::nullopt)
 			{
 				newLvlObject.AddComponent<SceneChangeComponent>(
-					lvlData["components"]["scene_change"]["level_music"].get_or(std::string("stop")),
-					lvlData["components"]["scene_change"]["asset_file"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["enemy_file"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["collider_file"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["tilemap_name"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["tilemap_image"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["map_image"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["entity_file"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["trigger_file"].get_or(std::string("no_file")),
-					lvlData["components"]["scene_change"]["image_width"].get_or(0),
-					lvlData["components"]["scene_change"]["image_height"].get_or(0));
+					SceneChangeComponent{
+						.levelMusic = lvlData["components"]["scene_change"]["level_music"].get_or(std::string("stop")),
+						.assetFile = lvlData["components"]["scene_change"]["asset_file"].get_or(std::string("no_file")),
+						.enemyFile = lvlData["components"]["scene_change"]["enemy_file"].get_or(std::string("no_file")),
+						.colliderFile = lvlData["components"]["scene_change"]["collider_file"].get_or(std::string("no_file")),
+						.tileMapName = lvlData["components"]["scene_change"]["tilemap_name"].get_or(std::string("no_file")),
+						.tileImageName = lvlData["components"]["scene_change"]["tilemap_image"].get_or(std::string("no_file")),
+						.mapImageName = lvlData["components"]["scene_change"]["map_image"].get_or(std::string("no_file")),
+						.entityFileName = lvlData["components"]["scene_change"]["entity_file"].get_or(std::string("no_file")),
+						.triggerFile = lvlData["components"]["scene_change"]["trigger_file"].get_or(std::string("no_file")),
+						.imageHeight = lvlData["components"]["scene_change"]["image_height"].get_or(0),
+						.imageWidth = lvlData["components"]["scene_change"]["image_width"].get_or(0)
+					}
+				);
 			}
 		}
 		i++;
@@ -1951,7 +2021,17 @@ void LevelLoader::ConvertName(const std::string& name, int x, int y)
 		Entity nameEnt = reg.CreateEntity();
 
 		nameEnt.Group(name);
-		nameEnt.AddComponent<SpriteComponent>("caption_letters", 16, 16, 0, false, 0, 0);
+		nameEnt.AddComponent<SpriteComponent>(
+			SpriteComponent{
+				.assetID = "caption_letters",
+				.width = 16,
+				.height = 16,
+				.layer = 0,
+				.isFixed = false,
+				.srcRect = SDL_Rect{0, 0, 16, 16}
+			}
+		);
+
 		nameEnt.AddComponent<TransformComponent>(glm::vec2(x, y), glm::vec2(1.5, 1.5), 0);
 		nameEnt.AddComponent<MenuComponent>();
 

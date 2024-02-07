@@ -145,16 +145,16 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 
 		switch (rigidBody.dir)
 		{
-		case RigidBodyComponent::Dir::UP:
+		case RigidBodyDir::UP:
 			sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
 			break;
-		case RigidBodyComponent::Dir::RIGHT:
+		case RigidBodyDir::RIGHT:
 			sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
 			break;
-		case RigidBodyComponent::Dir::DOWN:
+		case RigidBodyDir::DOWN:
 			sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
 			break;
-		case RigidBodyComponent::Dir::LEFT:
+		case RigidBodyDir::LEFT:
 			sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
 			break;
 		}
@@ -224,19 +224,19 @@ void MovementSystem::SetDirection(RigidBodyComponent& rigidBody)
 {
 	if (rigidBody.velocity.y > 0)
 	{
-		rigidBody.dir = RigidBodyComponent::Dir::DOWN;
+		rigidBody.dir = RigidBodyDir::DOWN;
 	}
 	else if (rigidBody.velocity.y < 0)
 	{
-		rigidBody.dir = RigidBodyComponent::Dir::UP;
+		rigidBody.dir = RigidBodyDir::UP;
 	}
 	else if (rigidBody.velocity.x > 0)
 	{
-		rigidBody.dir = RigidBodyComponent::Dir::RIGHT;
+		rigidBody.dir = RigidBodyDir::RIGHT;
 	}
 	else if (rigidBody.velocity.x < 0)
 	{
-		rigidBody.dir = RigidBodyComponent::Dir::LEFT;
+		rigidBody.dir = RigidBodyDir::LEFT;
 	}
 }
 
@@ -313,7 +313,7 @@ void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 
 	switch (enemy1Rigidbody.dir)
 	{
-	case RigidBodyComponent::Dir::UP:
+	case RigidBodyDir::UP:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.y = 0;
@@ -324,7 +324,7 @@ void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 
 		break;
 	}
-	case RigidBodyComponent::Dir::RIGHT:
+	case RigidBodyDir::RIGHT:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.x = 0;
@@ -335,7 +335,7 @@ void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 
 		break;
 	}
-	case RigidBodyComponent::Dir::DOWN:
+	case RigidBodyDir::DOWN:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.y = 0;
@@ -345,7 +345,7 @@ void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
 
 		break;
 	}
-	case RigidBodyComponent::Dir::LEFT:
+	case RigidBodyDir::LEFT:
 	{
 		enemy_transform.collision = true;
 		enemy1Rigidbody.velocity.x = 0;
@@ -369,25 +369,25 @@ void MovementSystem::OnPlayerHitsObstacle(Entity obstacle, Entity player)
 
 	switch (playerRigidbody.dir)
 	{
-	case RigidBodyComponent::Dir::UP:
+	case RigidBodyDir::UP:
 		playerTransform.collision = true;
 		playerRigidbody.velocity.y = 0;
 		playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) + (obstacleCollider.height * obstacleTransform.scale.y);
 		playerTransform.position.x = playerTransform.position.x;
 		break;
-	case RigidBodyComponent::Dir::RIGHT:
+	case RigidBodyDir::RIGHT:
 		playerTransform.collision = true;
 		playerRigidbody.velocity.x = 0;
 		playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
 		playerTransform.position.y = playerTransform.position.y;
 		break;
-	case RigidBodyComponent::Dir::DOWN:
+	case RigidBodyDir::DOWN:
 		playerTransform.collision = true;
 		playerRigidbody.velocity.y = 0;
 		playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) - (playerCollider.height * playerTransform.scale.y);
 		playerTransform.position.x = playerTransform.position.x;
 		break;
-	case RigidBodyComponent::Dir::LEFT:
+	case RigidBodyDir::LEFT:
 		playerTransform.collision = true;
 		playerRigidbody.velocity.x = 0;
 		playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) + (obstacleCollider.width * obstacleTransform.scale.x);
