@@ -295,6 +295,7 @@ const bool Game::PlayerHold() const
 	if (m_pPlayer->GetPlayerDead() || 
 		m_pPlayer->GetPlayerOnStairs() || 
 		m_pPlayer->GetPlayerItem() || 
+		m_pPlayer->PlayerHeld() || 
 		m_pCamera->FadeOutStarted() || 
 		m_pCamera->FadeInStarted() || 
 		m_pPlayer->GetRaft() || 

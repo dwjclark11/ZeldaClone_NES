@@ -8,7 +8,7 @@ class Player
 private:
 	class GameData& m_GameData;
 	Entity m_Player, m_Sword, m_Shield;
-	bool m_bPlayerCreated, m_bPlayerItem, m_bPlayerDead, m_bAttacking;
+	bool m_bPlayerCreated, m_bPlayerItem, m_bPlayerDead, m_bAttacking, m_bHoldPlayer;
 	bool m_bOnStairs, m_bOnRaft, m_bStairsFinished, m_bGetTriforcePiece;
 	StateMachine m_PSM;
 	glm::vec2 m_PlayerPos;
@@ -55,4 +55,8 @@ public:
 	const int GetAttackValue() const { return m_AttackValue; }
 	inline const bool IsAttacking() const { return m_bAttacking; }
 	inline void SetAttacking(bool bAttacking) { m_bAttacking = bAttacking; }
+	inline void HoldPlayer() { m_bHoldPlayer = true; }
+	inline void ReleasePlayer() { m_bHoldPlayer = false; }
+	inline const bool PlayerHeld() { return m_bHoldPlayer; }
+
 };

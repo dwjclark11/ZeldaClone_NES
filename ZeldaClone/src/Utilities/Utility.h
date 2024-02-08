@@ -54,8 +54,12 @@ typedef std::unique_ptr<SDL_Renderer, SDL_Wrappers::SDL_Destroyer> 			Renderer;
 typedef std::unique_ptr<SDL_Texture, SDL_Wrappers::SDL_Destroyer>			Texture;
 typedef std::unique_ptr<SDL_GameController, SDL_Wrappers::SDL_Destroyer>	Controller;
 
-
 // Game Constants
 constexpr int PANEL_WIDTH = 1024;
 constexpr int PANEL_HEIGHT = 672;
 constexpr int HUD_HEIGHT = 288;
+constexpr int CAM_SPEED = 640;
+constexpr int START_CAM_X_POS = 7168;
+constexpr int START_CAM_Y_POS = 4448;
+constexpr int START_PLAYER_X_POS = 7600;
+constexpr int START_PLAYER_Y_POS = 5152;

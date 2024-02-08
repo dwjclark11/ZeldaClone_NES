@@ -7,6 +7,7 @@
 #include "../Components/PlayerComponent.h"
 #include "../Game/Game.h"
 #include "../Game/Player.h"
+#include "../Utilities/Utility.h"
 #include "../Utilities/GameData.h"
 #include "../Utilities/Camera.h"
 #include <chrono>
@@ -17,7 +18,7 @@
 CameraMovementSystem::CameraMovementSystem()
 	: m_Game{ Game::Instance() }
 	, m_GameData{ GameData::GetInstance() }
-	, m_CamSpeed{640}
+	, m_CamSpeed{ 640 }
 	, m_PrevCamX{ 7168 }
 	, m_PrevCamY{ 4448 }
 	, m_bStartEast{ false }
@@ -67,12 +68,11 @@ void CameraMovementSystem::UpdatePlayerCam(Camera& camera, const float& dt)
 		camera.SetCameraMoving(true);
 	}
 
-	//Logger::Log("CamY: " + std::to_string(camera.y));
 	if (m_bStartNorth)
 	{
 		new_cam_y -= m_CamSpeed * dt;
 
-		int newCamY = prevCamY - window_height + 288;
+		int newCamY = prevCamY - window_height + HUD_HEIGHT;
 
 		if (newCamY <= 0) 
 			newCamY = 0;
@@ -88,7 +88,7 @@ void CameraMovementSystem::UpdatePlayerCam(Camera& camera, const float& dt)
 	{
 		new_cam_y += m_CamSpeed * dt;
 
-		int newCamY = prevCamY + window_height - 288;
+		int newCamY = prevCamY + window_height - HUD_HEIGHT;
 
 		if (newCamY >= level_height)
 			newCamY = level_height;

@@ -619,6 +619,7 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 	// If the player's health is already at max, no need to start the fairy circle trigger
 	if (playerHealth.healthPercentage != playerHealth.maxHearts * 2)
 	{
+		m_Game.GetPlayer()->HoldPlayer();
 		for (const auto& fairy : m_Registry.GetEntitiesByGroup("fairy"))
 		{
 			// Get the fairy transform. It will be used to check against player position and 
@@ -660,6 +661,10 @@ void TriggerSystem::EnterFairyCircle(Entity& player, Entity& trigger)
 				fairyHeart.AddComponent<GameComponent>();
 			}
 		}
+	}
+	else 
+	{
+		m_Game.GetPlayer()->ReleasePlayer();
 	}
 }
 

@@ -845,15 +845,18 @@ void EditorFileLoader::CreateNewEnemy(sol::state& lua, std::string& m_sFileName,
 		sol::optional<sol::table> ai = enemy["components"]["ai_component"];
 		if (ai != sol::nullopt)
 		{
-			
+
 			LevelLoader loader;
 			newEnemy.AddComponent<AIComponent>(
-				glm::vec2(
-					enemy["components"]["ai_component"]["enemy_pos"]["x"],
-					enemy["components"]["ai_component"]["enemy_pos"]["y"]
-				),
-				loader.ConvertStringToEnemyType(enemy["components"]["ai_component"]["enemy_type"])
-				);
+				AIComponent{
+					.enemyPos = glm::vec2{
+						enemy["components"]["ai_component"]["enemy_pos"]["x"].get_or(0),
+						enemy["components"]["ai_component"]["enemy_pos"]["y"].get_or(0)
+				},
+				.enemyType = loader.ConvertStringToEnemyType(
+					enemy["components"]["ai_component"]["enemy_type"].get_or(std::string{""}))
+				}
+			);
 		}
 	}
 }

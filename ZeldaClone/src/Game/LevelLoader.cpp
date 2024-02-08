@@ -1511,13 +1511,16 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, const std::string& fi
 				EnemyBossType boss_type = ConvertStringToEnemyBossType(entity["components"]["ai_component"]["enemy_boss_type"].get_or(std::string("not_a_boss")));
 
 				newEntity.AddComponent<AIComponent>(
-					glm::vec2(
+					AIComponent{
+						.enemyPos = glm::vec2{
 						entity["components"]["ai_component"]["enemy_pos"]["x"].get_or(0),
-						entity["components"]["ai_component"]["enemy_pos"]["y"].get_or(0)),
-					type,
-					boss_type,
-					entity["components"]["ai_component"]["is_boss"].get_or(false)
-					);
+						entity["components"]["ai_component"]["enemy_pos"]["y"].get_or(0)
+						},
+						.enemyType = type,
+						.bossType = boss_type,
+						.bIsBoss = entity["components"]["ai_component"]["is_boss"].get_or(false)
+					}
+				);
 			}
 			
 			// Add Render Component based on the current Application State
@@ -1544,13 +1547,15 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, const std::string& fi
 					moveDir = MoveDir::NO_MOVE;
 
 				newEntity.AddComponent<EnemyComponent>(
-						entity["components"]["enemy_component"]["max_move_distance"].get_or(0),
-						moveDir,
-					glm::vec2(
-						entity["components"]["enemy_component"]["start_pos"]["x"].get_or(0),
-						entity["components"]["enemy_component"]["start_pos"]["y"].get_or(0)
-						)
-					);
+					EnemyComponent{
+						.maxMoveDistance = entity["components"]["enemy_component"]["max_move_distance"].get_or(0),
+						.moveDir = moveDir,
+						.startPos = glm::vec2{
+							entity["components"]["enemy_component"]["start_pos"]["x"].get_or(0),
+							entity["components"]["enemy_component"]["start_pos"]["y"].get_or(0)
+						}
+					}
+				);
 			}
 			else
 			{
