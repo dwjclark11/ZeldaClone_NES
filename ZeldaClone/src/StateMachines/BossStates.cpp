@@ -34,9 +34,8 @@ void BossIdleState::Update(Entity& entity)
 	auto& ai = entity.GetComponent<AIComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 
-	if (ai.GetBossType() == AIComponent::EnemyBossType::AQUAMENTUS)
+	if (ai.bossType == EnemyBossType::AQUAMENTUS)
 	{
 		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 		
@@ -66,8 +65,8 @@ void BossIdleState::Update(Entity& entity)
 			
 		if (rigid.velocity != glm::vec2(0, 0))
 		{
-			esm.AddState(std::make_unique<BossPatrolState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<BossPatrolState>());
+			ai.esm->ChangeState(entity);
 		}
 	}
 	
@@ -113,8 +112,6 @@ void BossPatrolState::Update (class Entity& entity)
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
-	
 	auto& projectileEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 
 	if (walkTimer.GetTicks() > 1000)
@@ -150,14 +147,14 @@ void BossPatrolState::Update (class Entity& entity)
 	{
 		Game::Instance().GetSoundPlayer().PlaySoundFX("boss_scream_1", 0, SoundChannel::ANY);
 
-		ai.GetEnemyStateMachine().AddState(std::make_unique<BossIdleState>());
-		ai.GetEnemyStateMachine().ChangeState(entity);
+		ai.esm->AddState(std::make_unique<BossIdleState>());
+		ai.esm->ChangeState(entity);
 	}
 
 	if (enemyHealth.isHurt)
 	{
-		esm.AddState(std::make_unique<BossHurtState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<BossHurtState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
@@ -203,7 +200,6 @@ void BossHurtState::Update(class Entity& entity)
 {
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 
 	if (enemyHealth.hurtTimer.GetTicks() > 1000 && enemyHealth.healthPercentage > 0)
 	{
@@ -212,13 +208,13 @@ void BossHurtState::Update(class Entity& entity)
 
 		if (!ai.stunTimer.isStarted())
 		{
-			esm.AddState(std::make_unique<BossIdleState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<BossIdleState>());
+			ai.esm->ChangeState(entity);
 		}
 		else
 		{
-			esm.AddState(std::make_unique<BossStunnedState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<BossStunnedState>());
+			ai.esm->ChangeState(entity);
 		}
 
 	}
@@ -226,8 +222,8 @@ void BossHurtState::Update(class Entity& entity)
 	else if (enemyHealth.healthPercentage <= 0)
 	{
 		// Call the EnemyDeathState
-		esm.AddState(std::make_unique<BossDeathState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<BossDeathState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
@@ -275,9 +271,7 @@ void BossDeathState::Update (class Entity& entity)
 
 	if (ai.deathTimer.GetTicks() > 500)
 	{
-
 		entity.Kill();
-		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
 	}
 }
 

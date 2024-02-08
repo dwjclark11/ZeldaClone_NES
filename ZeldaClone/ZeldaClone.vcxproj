@@ -163,7 +163,6 @@
     <ClCompile Include="libs\imgui\imgui_sdl.cpp" />
     <ClCompile Include="libs\imgui\imgui_stdlib.cpp" />
     <ClCompile Include="libs\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Components\AIComponent.cpp" />
     <ClCompile Include="src\Game\Player.cpp" />
     <ClCompile Include="src\inputs\Button.cpp" />
     <ClCompile Include="src\inputs\InputManager.cpp" />

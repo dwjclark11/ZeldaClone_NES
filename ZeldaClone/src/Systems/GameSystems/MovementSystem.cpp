@@ -100,10 +100,10 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 			enemyComponent.maxDistance.y = enemyComponent.minDistance.y + PANEL_HEIGHT;
 
 			enemyComponent.distanceCalculated = true;
-			ai.SetEmemyPos(glm::vec2{ entityXPanel, entityYPanel });
+			ai.enemyPos = glm::vec2{ entityXPanel, entityYPanel };
 		}
 
-		if (ai.GetEnemyPos() != m_Game.GetPlayer()->GetPlayerPos() || ai.GetEnemyType() == AIComponent::EnemyType::BLADE_TRAP)
+		if (ai.enemyPos != m_Game.GetPlayer()->GetPlayerPos() || ai.enemyType == EnemyType::BLADE_TRAP)
 			continue;
 		
 		auto& rigidBody = enemy.GetComponent<RigidBodyComponent>();

@@ -22,7 +22,7 @@ void EnemyIdleState::OnEnter(Entity& entity)
 {
 	//auto& ai = entity.GetComponent<AIComponent>();
 
-	//if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	//if (ai.enemyType() != EnemyType::LEEVER)
 	//{
 	//	auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 	//	if (projEmitter.shotTriggered)
@@ -39,38 +39,38 @@ void EnemyIdleState::Update(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 
-	if (ai.IsABoss())
+	if (ai.bIsBoss)
 		return;
 
-	switch (ai.GetEnemyType())
+	switch (ai.enemyType)
 	{
-	case AIComponent::EnemyType::OCTOROK:
-	case AIComponent::EnemyType::MOBLIN:
+	case EnemyType::OCTOROK:
+	case EnemyType::MOBLIN:
 		IdleUpdateOctoMoblin(entity);
 		break;
-	case AIComponent::EnemyType::DARKNUT:
+	case EnemyType::DARKNUT:
 		break;
-	case AIComponent::EnemyType::LEEVER:
+	case EnemyType::LEEVER:
 		IdleUpdateLever(entity);
 		break;
-	case AIComponent::EnemyType::TEKTITE:
+	case EnemyType::TEKTITE:
 		break;
-	case AIComponent::EnemyType::PEAHAT:
+	case EnemyType::PEAHAT:
 		break;
-	case AIComponent::EnemyType::ARMOS:
+	case EnemyType::ARMOS:
 		break;
-	case AIComponent::EnemyType::KEESE:
+	case EnemyType::KEESE:
 		break;
-	case AIComponent::EnemyType::BLADE_TRAP:
+	case EnemyType::BLADE_TRAP:
 		IdleUpdateBladeTrap(entity);
 		return;
-	case AIComponent::EnemyType::GEL:
+	case EnemyType::GEL:
 		break;
-	case AIComponent::EnemyType::STALFOS:
+	case EnemyType::STALFOS:
 		break;
-	case AIComponent::EnemyType::GORIYA:
+	case EnemyType::GORIYA:
 		break;
-	case AIComponent::EnemyType::NO_TYPE:
+	case EnemyType::NO_TYPE:
 		__debugbreak();
 		return;
 	}
@@ -107,7 +107,7 @@ void PatrolState::OnEnter(Entity& entity)
 	ai.aiTimer.Start();
 
 
-	if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	if (ai.enemyType != EnemyType::LEEVER)
 	{
 		auto& projEmitter = entity.GetComponent<ProjectileEmitterComponent>();
 		if (!projEmitter.shotTriggered)
@@ -129,38 +129,38 @@ void PatrolState::Update(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 
-	if (ai.IsABoss())
+	if (ai.bIsBoss)
 		return;
 
-	switch (ai.GetEnemyType())
+	switch (ai.enemyType)
 	{
-	case AIComponent::EnemyType::OCTOROK:
-	case AIComponent::EnemyType::MOBLIN:
+	case EnemyType::OCTOROK:
+	case EnemyType::MOBLIN:
 		PatrolUpdateOctoMoblin(entity);
 		break;
-	case AIComponent::EnemyType::DARKNUT:
+	case EnemyType::DARKNUT:
 		break;
-	case AIComponent::EnemyType::LEEVER:
+	case EnemyType::LEEVER:
 		PatrolUpdateLever(entity);
 		break;
-	case AIComponent::EnemyType::TEKTITE:
+	case EnemyType::TEKTITE:
 		break;
-	case AIComponent::EnemyType::PEAHAT:
+	case EnemyType::PEAHAT:
 		break;
-	case AIComponent::EnemyType::ARMOS:
+	case EnemyType::ARMOS:
 		break;
-	case AIComponent::EnemyType::KEESE:
+	case EnemyType::KEESE:
 		break;
-	case AIComponent::EnemyType::BLADE_TRAP:
+	case EnemyType::BLADE_TRAP:
 		PatrolUpdateBladeTrap(entity);
 		return;
-	case AIComponent::EnemyType::GEL:
+	case EnemyType::GEL:
 		break;
-	case AIComponent::EnemyType::STALFOS:
+	case EnemyType::STALFOS:
 		break;
-	case AIComponent::EnemyType::GORIYA:
+	case EnemyType::GORIYA:
 		break;
-	case AIComponent::EnemyType::NO_TYPE:
+	case EnemyType::NO_TYPE:
 		__debugbreak();
 		return;
 	}
@@ -185,7 +185,8 @@ void HurtState::Update(Entity& entity)
 {
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
+	if (!ai.esm)
+		return;
 
 	if (enemyHealth.hurtTimer.GetTicks() > 1000 && enemyHealth.healthPercentage > 0)
 	{
@@ -194,13 +195,13 @@ void HurtState::Update(Entity& entity)
 
 		if (!ai.stunTimer.isStarted())
 		{
-			esm.AddState(std::make_unique<EnemyIdleState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<EnemyIdleState>());
+			ai.esm->ChangeState(entity);
 		}
 		else
 		{
-			esm.AddState(std::make_unique<EnemyStunnedState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<EnemyStunnedState>());
+			ai.esm->ChangeState(entity);
 		}
 			
 	}
@@ -208,8 +209,8 @@ void HurtState::Update(Entity& entity)
 	else if (enemyHealth.healthPercentage <= 0)
 	{
 		// Call the EnemyDeathState
-		esm.AddState(std::make_unique<EnemyDeathState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyDeathState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
@@ -257,7 +258,6 @@ void EnemyDeathState::Update(Entity& entity)
 	if (ai.deathTimer.GetTicks() > 1000)
 	{
 		entity.Kill();
-		ai.GarbageCollect(); // Delete the enemyStateMachine of this enemy!
 	}
 }
 
@@ -276,26 +276,27 @@ void EnemyStunnedState::OnEnter(Entity& entity)
 void EnemyStunnedState::OnExit(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
-	ai.SetStunned(false);
+	ai.bStunned = false;
 }
 
 void EnemyStunnedState::Update(Entity& entity)
 {
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
+	if (!ai.esm)
+		return;
 
 	if (ai.stunTimer.GetTicks() > 3000)
 	{
 		ai.stunTimer.Stop();
-		esm.AddState(std::make_unique<EnemyIdleState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyIdleState>());
+		ai.esm->ChangeState(entity);
 	}
 
 	if (enemyHealth.isHurt)
 	{
-		esm.AddState(std::make_unique<HurtState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<HurtState>());
+		ai.esm->ChangeState(entity);
 	}	
 }
 

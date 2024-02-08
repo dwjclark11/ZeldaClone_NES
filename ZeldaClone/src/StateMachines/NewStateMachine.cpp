@@ -7,7 +7,7 @@ StateMachine::StateMachine()
 	, mIsAdding(false)
 	, mIsReplacing(false)
 {
-	//Logger::Err("State Machine Created!");
+	//Logger::Log("State Machine Created!");
 }
 
 StateMachine::~StateMachine()

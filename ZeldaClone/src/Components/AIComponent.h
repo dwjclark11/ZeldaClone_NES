@@ -4,61 +4,30 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-class AIComponent
+enum class EnemyType
 {
-public: 
-	
-	enum class EnemyType
-	{
-		OCTOROK = 0, MOBLIN, DARKNUT,
-		LEEVER, TEKTITE, PEAHAT,
-		ARMOS, GHINI, LYNEL,
-		ZORA, KEESE, BLADE_TRAP,
-		GEL, STALFOS, GORIYA,
-		NO_TYPE,
-	};
-	
-	enum class EnemyBossType
-	{
-		NOT_A_BOSS = 0, AQUAMENTUS, DODONGO,
-		MANHANDLA, GLEEOK, DIGDOGGER,
-		GOHMA, GANON
-	};
+	OCTOROK = 0, MOBLIN, DARKNUT,
+	LEEVER, TEKTITE, PEAHAT,
+	ARMOS, GHINI, LYNEL,
+	ZORA, KEESE, BLADE_TRAP,
+	GEL, STALFOS, GORIYA,
+	NO_TYPE,
+};
 
-private:
-	StateMachine* esm;
-	glm::vec2 enemyPos;
-	EnemyType enemyType;
-	EnemyBossType bossType;
+enum class EnemyBossType
+{
+	NOT_A_BOSS = 0, AQUAMENTUS, DODONGO,
+	MANHANDLA, GLEEOK, DIGDOGGER,
+	GOHMA, GANON
+};
 
-	bool created;
-	bool stunned;
-	bool boss;
-	
-public:
-	// Should I make these private?
-	Timer aiTimer;
-	Timer deathTimer;
-	Timer stunTimer;
-	Timer leeverTimer;
-	
-	
-	AIComponent(glm::vec2 enemyPos = glm::vec2(0, 0), EnemyType enemyType = EnemyType::OCTOROK, EnemyBossType = EnemyBossType::NOT_A_BOSS, bool boss = false);
+struct AIComponent
+{
+	glm::vec2 enemyPos{ 0.f };
+	EnemyType enemyType{ EnemyType::OCTOROK };
+	EnemyBossType bossType{ EnemyBossType::NOT_A_BOSS };
 
-	inline void GarbageCollect() { delete esm; esm = nullptr; }	
-	inline StateMachine& GetEnemyStateMachine() { return *esm; }
-	
-	inline const glm::vec2& GetEnemyPos() { return enemyPos; }
-	inline void SetEmemyPos(glm::vec2 pos) { enemyPos = pos; }
-	inline void SetStunned(bool stun) { stunned = stun; }
-	inline const bool GetStunned() { return stunned; }
-	inline const EnemyType GetEnemyType() const { return enemyType; }
-	inline void SetEnemyType(EnemyType type) { enemyType = type; }
-	inline const EnemyBossType GetBossType() const { return bossType; }
-	inline const bool IsABoss() const { return boss; }
-	inline void SetCreated(bool create) { created = create; }
-	inline const bool IsCreated() const { return created; }
-	const bool StateMachineCreated();
-	void CreateStateMachine();
-	
+	bool bIsBoss{ false }, bCreated{ false }, bStunned{ false };
+	Timer aiTimer{ }, deathTimer{}, stunTimer{}, leeverTimer{};
+	std::shared_ptr<StateMachine> esm{ nullptr };
 };

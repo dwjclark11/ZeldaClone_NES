@@ -21,19 +21,17 @@
 void IdleUpdateOctoMoblin(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
-
 
 	if (enemyHealth.isHurt)
 	{
-		esm.AddState(std::make_unique<HurtState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<HurtState>());
+		ai.esm->ChangeState(entity);
 	}
-	else if (ai.GetStunned())
+	else if (ai.bStunned)
 	{
-		esm.AddState(std::make_unique<EnemyStunnedState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyStunnedState>());
+		ai.esm->ChangeState(entity);
 	}
 
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
@@ -66,8 +64,8 @@ void IdleUpdateOctoMoblin(Entity& entity)
 
 	if (rigid.velocity != glm::vec2(0, 0))
 	{
-		esm.AddState(std::make_unique<PatrolState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<PatrolState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
@@ -81,7 +79,6 @@ void IdleUpdateBladeTrap(Entity& entity)
 
 	// Get the entity attributes
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 	const auto& enemy = entity.GetComponent<EnemyComponent>();
 	const auto& enemy_transform = entity.GetComponent<TransformComponent>();
 	const auto& enemy_collider = entity.GetComponent<BoxColliderComponent>();
@@ -120,26 +117,25 @@ void IdleUpdateBladeTrap(Entity& entity)
 
 	if (attack)
 	{
-		esm.AddState(std::make_unique<PatrolState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<PatrolState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
 void IdleUpdateLever(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 
 	if (enemyHealth.isHurt)
 	{
-		esm.AddState(std::make_unique<HurtState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<HurtState>());
+		ai.esm->ChangeState(entity);
 	}
-	else if (ai.GetStunned())
+	else if (ai.bStunned)
 	{
-		esm.AddState(std::make_unique<EnemyStunnedState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyStunnedState>());
+		ai.esm->ChangeState(entity);
 	}
 
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
@@ -173,8 +169,8 @@ void IdleUpdateLever(Entity& entity)
 		animation.frameSpeedRate = 12;
 		animation.frameOffset = 64;
 		rigid.velocity = glm::vec2(50, 0);
-		esm.AddState(std::make_unique<PatrolState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<PatrolState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
@@ -190,23 +186,22 @@ void PatrolUpdateOctoMoblin(Entity& entity)
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 
 	if (enemyHealth.isHurt)
 	{
-		esm.AddState(std::make_unique<HurtState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<HurtState>());
+		ai.esm->ChangeState(entity);
 	}
-	else if (rigid.velocity == glm::vec2(0) && ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	else if (rigid.velocity == glm::vec2(0) && ai.enemyType != EnemyType::LEEVER)
 	{
-		esm.AddState(std::make_unique<EnemyIdleState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyIdleState>());
+		ai.esm->ChangeState(entity);
 	}
 
-	if (ai.GetStunned())
+	if (ai.bStunned)
 	{
-		esm.AddState(std::make_unique<EnemyStunnedState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyStunnedState>());
+		ai.esm->ChangeState(entity);
 	}
 
 
@@ -226,8 +221,8 @@ void PatrolUpdateOctoMoblin(Entity& entity)
 		}
 		else
 		{
-			esm.AddState(std::make_unique<EnemyIdleState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<EnemyIdleState>());
+			ai.esm->ChangeState(entity);
 
 		}
 	}
@@ -237,7 +232,7 @@ void PatrolUpdateOctoMoblin(Entity& entity)
 		// Set the direction of the enemy randomly
 		sign = num % 2 == 0 ? 1 : -1;
 
-		if (ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+		if (ai.enemyType != EnemyType::LEEVER)
 		{
 			if (num == 1)
 				rigid.velocity = glm::vec2(sign * 150, 0);
@@ -265,7 +260,7 @@ void PatrolUpdateBladeTrap(Entity& entity)
 	auto& enemy = entity.GetComponent<EnemyComponent>();
 	auto& delta_time = Game::Instance().GetDeltaTime();
 	auto& ai = entity.GetComponent<AIComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
+	
 	bool returned{ false };
 
 	switch (enemy.moveDir)
@@ -359,8 +354,8 @@ void PatrolUpdateBladeTrap(Entity& entity)
 
 	if (returned)
 	{
-		esm.AddState(std::make_unique<EnemyIdleState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyIdleState>());
+		ai.esm->ChangeState(entity);
 	}
 }
 
@@ -377,23 +372,22 @@ void PatrolUpdateLever(Entity& entity)
 	auto& enemyHealth = entity.GetComponent<HealthComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& esm = ai.GetEnemyStateMachine();
 
 	if (enemyHealth.isHurt)
 	{
-		esm.AddState(std::make_unique<HurtState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<HurtState>());
+		ai.esm->ChangeState(entity);
 	}
-	else if (rigid.velocity == glm::vec2(0) && ai.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	else if (rigid.velocity == glm::vec2(0) && ai.enemyType != EnemyType::LEEVER)
 	{
-		esm.AddState(std::make_unique<EnemyIdleState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyIdleState>());
+		ai.esm->ChangeState(entity);
 	}
 
-	if (ai.GetStunned())
+	if (ai.bStunned)
 	{
-		esm.AddState(std::make_unique<EnemyStunnedState>());
-		esm.ChangeState(entity);
+		ai.esm->AddState(std::make_unique<EnemyStunnedState>());
+		ai.esm->ChangeState(entity);
 	}
 
 
@@ -426,7 +420,7 @@ void PatrolUpdateLever(Entity& entity)
 		ai.aiTimer.Start();
 	}
 
-	if (ai.GetEnemyType() == AIComponent::EnemyType::LEEVER)
+	if (ai.enemyType == EnemyType::LEEVER)
 	{
 		if (ai.leeverTimer.GetTicks() > 10000 && ai.leeverTimer.GetTicks() < 10100)
 		{
@@ -449,8 +443,8 @@ void PatrolUpdateLever(Entity& entity)
 
 			ai.leeverTimer.Stop();
 
-			esm.AddState(std::make_unique<EnemyIdleState>());
-			esm.ChangeState(entity);
+			ai.esm->AddState(std::make_unique<EnemyIdleState>());
+			ai.esm->ChangeState(entity);
 		}
 	}
 }

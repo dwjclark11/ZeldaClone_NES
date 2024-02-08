@@ -39,7 +39,7 @@ public:
 	
 	// Converters
 	std::string ConvertToString(TriggerType triggerType);
-	std::string ConvertAIEnemyToString(AIComponent::EnemyType type);
+	std::string ConvertAIEnemyToString(EnemyType type);
 
 private:
 	// Declaration of variables

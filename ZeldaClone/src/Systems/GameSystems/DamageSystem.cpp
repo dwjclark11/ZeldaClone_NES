@@ -110,7 +110,7 @@ void DamageSystem::OnPlayerHitsProjectile(Entity projectile, Entity player)
 		return;
 
 	auto& playerTransform = player.GetComponent<TransformComponent>();
-	auto& playerRigid= player.GetComponent<RigidBodyComponent>();
+	auto& playerRigid = player.GetComponent<RigidBodyComponent>();
 	auto& projectileRigid = projectile.GetComponent<RigidBodyComponent>();
 		
 	bool is_shield = player.HasTag("the_shield");
@@ -136,7 +136,7 @@ void DamageSystem::OnPlayerHitsProjectile(Entity projectile, Entity player)
 				playerTransform.position.y += 64;
 				break;
 			case RigidBodyDir::NO_DIR:
-				__debugbreak();
+				playerTransform.position.y -= 64;
 				break;
 			}
 		}
@@ -195,7 +195,7 @@ void DamageSystem::OnPlayerSwordHitsEnemy(Entity sword, Entity enemy)
 	const auto& player_rb = playerEnt.GetComponent<RigidBodyComponent>();
 
 	auto& enemyAI = enemy.GetComponent<AIComponent>();
-	if (enemyAI.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	if (enemyAI.enemyType != EnemyType::LEEVER)
 	{
 		// Subtract 1 HP from the enemy
 		enemyHealth.healthPercentage -= player->GetAttackValue(); 
@@ -276,7 +276,7 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 	auto& rigidBody = enemy.GetComponent<RigidBodyComponent>();
 	auto& enemyAI = enemy.GetComponent<AIComponent>();
 
-	if (enemyAI.GetEnemyType() != AIComponent::EnemyType::LEEVER)
+	if (enemyAI.enemyType != EnemyType::LEEVER)
 	{
 		health.healthPercentage -= 1;
 		if (!enemyTransform.collision)
@@ -416,9 +416,9 @@ void DamageSystem::OnEnemyHitsBoomerang(Entity enemy, Entity boomerang)
 
 	enemyRigid.velocity = glm::vec2(0);
 
-	if (!enemyAI.GetStunned())
+	if (!enemyAI.bStunned)
 	{
-		enemyAI.SetStunned(true);
+		enemyAI.bStunned = true;
 		// Play the enemy hit sound FX
 		m_Game.GetSoundPlayer().PlaySoundFX("enemy_hit", 0, SoundChannel::ANY);
 	}

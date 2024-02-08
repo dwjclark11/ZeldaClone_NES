@@ -332,8 +332,8 @@ void CollectItemState::Update(Entity& entity)
 						.mapImageName = scene_component.mapImageName,
 						.entityFileName = scene_component.entityFileName,
 						.triggerFile = scene_component.triggerFile,
-						.imageHeight = scene_component.imageWidth,
-						.imageWidth = scene_component.imageHeight
+						.imageHeight = scene_component.imageHeight,
+						.imageWidth = scene_component.imageWidth
 				}
 			);
 

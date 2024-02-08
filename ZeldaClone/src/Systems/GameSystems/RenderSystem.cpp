@@ -122,9 +122,6 @@ void RenderSystem::OnExit()
 			continue;
 		}
 
-		if (entity.HasComponent<AIComponent>())
-			entity.GetComponent<AIComponent>().GarbageCollect();
-			
 		entity.Kill();		
 	}
 }

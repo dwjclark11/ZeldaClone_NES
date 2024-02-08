@@ -544,10 +544,10 @@ void ProjectileEmitterSystem::Update()
 		{
 			const auto& ai = entity.GetComponent<AIComponent>();
 			// If the entity is just a regular enmemy, use this update
-			if (ai.GetEnemyType() != AIComponent::EnemyType::NO_TYPE)
+			if (ai.enemyType != EnemyType::NO_TYPE)
 				EnemyProjectileUpdate(entity);
 			// If the entity is Boss, use this update
-			if (ai.GetBossType() != AIComponent::EnemyBossType::NOT_A_BOSS)
+			if (ai.bossType != EnemyBossType::NOT_A_BOSS)
 				BossProjectileUpdate(entity);
 		}
 	}
@@ -571,15 +571,15 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 		int srcRectY = 0;
 		int scale = 0;
 
-		switch (ai.GetEnemyType())
+		switch (ai.enemyType)
 		{
-		case AIComponent::EnemyType::OCTOROK:
+		case EnemyType::OCTOROK:
 			srcRectX = 48;
 			srcRectY = 0;
 			scale = 2;
 			break;
 
-		case AIComponent::EnemyType::MOBLIN:
+		case EnemyType::MOBLIN:
 			// Set the srcRect for the projectile sprite
 			srcRectY = 4 * 16;
 			scale = 4;
@@ -601,7 +601,7 @@ void ProjectileEmitterSystem::EnemyProjectileUpdate(Entity& entity)
 
 			break;
 
-		case AIComponent::EnemyType::ZORA:
+		case EnemyType::ZORA:
 			// TODO: Create a sprite sheet of enemy projectiles
 			// enemyProjectile.AddComponent<AnimationComponent>(4, 20, false);
 			break;
@@ -679,7 +679,7 @@ void ProjectileEmitterSystem::BossProjectileUpdate(Entity& entity)
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
 	const auto& ai = entity.GetComponent<AIComponent>();
 
-	if (ai.GetBossType() == AIComponent::EnemyBossType::AQUAMENTUS)
+	if (ai.bossType == EnemyBossType::AQUAMENTUS)
 	{
 		if (projectileEmitter.shotTriggered && !projectileEmitter.shotFired)
 		{

@@ -1,7 +1,6 @@
 ---------------------------------------------------------
 -- Sword Cave Triggers
 ---------------------------------------------------------
-
 triggers = {
 	-- First Sword Cave Entrance
 	[1] = {
@@ -26,10 +25,10 @@ triggers = {
 				level_music			= "Overworld",
 				asset_file			= "game_state_assets",
 				enemy_file			= "overworld_enemies_2",
-				collider_file		= "Test_Colliders",--"overworld_colliders_1", 
+				collider_file		= "overworld_colliders_1", 
 				tilemap_name 		= "no_file",
 				tilemap_image   	= "map",
-				entity_file			= "no_file",
+				entity_file			= "over_world_entities",
 				trigger_file		= "overworld_triggers",
 				image_width			= 4096,
 				image_height		= 1344

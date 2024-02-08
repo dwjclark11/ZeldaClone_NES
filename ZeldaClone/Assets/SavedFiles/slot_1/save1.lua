@@ -1,12 +1,11 @@
 ----------------------------------------------------------
 -- Save file#: 1
 ----------------------------------------------------------
-
 player_data = {
     [1] = {
         menu_shared_values = {
             name = "SCION",
-            num_hearts = 3,
+            num_hearts = 5,
             blue_ring = false,
             red_ring = false
         },
@@ -17,9 +16,9 @@ player_data = {
         items = {
             boomerang = false,
             magic_boomerang = false,
-            wood_sword = false,
-            steel_sword = false,
-            magic_sword = false,
+            wood_sword = true,
+            steel_sword = true,
+            magic_sword = true,
             magic_rod = false,
             candle = false,
             bombs = false,
@@ -37,7 +36,7 @@ player_data = {
         inventory = {
             num_rupees = 0,
             num_bombs = 0,
-            num_keys = 0
+            num_keys = 4
         }
     }
 }

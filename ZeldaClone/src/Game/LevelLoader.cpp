@@ -731,49 +731,49 @@ TriggerType LevelLoader::ConvertStringToTriggerType(const std::string& type)
 		return TriggerType::NO_TRIGGER;
 }
 
-AIComponent::EnemyType LevelLoader::ConvertStringToEnemyType(const std::string& enemyType)
+EnemyType LevelLoader::ConvertStringToEnemyType(const std::string& enemyType)
 {
 	if (enemyType == "octorok")
-		return AIComponent::EnemyType::OCTOROK;
+		return EnemyType::OCTOROK;
 	else if (enemyType == "moblin")
-		return AIComponent::EnemyType::MOBLIN;
+		return EnemyType::MOBLIN;
 	else if (enemyType == "darknut")
-		return AIComponent::EnemyType::DARKNUT;
+		return EnemyType::DARKNUT;
 	else if (enemyType == "leever")
-		return AIComponent::EnemyType::LEEVER;
+		return EnemyType::LEEVER;
 	else if (enemyType == "tektite")
-		return AIComponent::EnemyType::TEKTITE;
+		return EnemyType::TEKTITE;
 	else if (enemyType == "peahat")
-		return AIComponent::EnemyType::PEAHAT;
+		return EnemyType::PEAHAT;
 	else if (enemyType == "armos")
-		return AIComponent::EnemyType::ARMOS;
+		return EnemyType::ARMOS;
 	else if (enemyType == "ghini")
-		return AIComponent::EnemyType::GHINI;
+		return EnemyType::GHINI;
 	else if (enemyType == "lynel")
-		return AIComponent::EnemyType::LYNEL;
+		return EnemyType::LYNEL;
 	else if (enemyType == "zora")
-		return AIComponent::EnemyType::ZORA;
+		return EnemyType::ZORA;
 	else if (enemyType == "keese")
-		return AIComponent::EnemyType::KEESE;
+		return EnemyType::KEESE;
 	else if (enemyType == "blade_trap")
-		return AIComponent::EnemyType::BLADE_TRAP;
+		return EnemyType::BLADE_TRAP;
 	else if (enemyType == "stalfos")
-		return AIComponent::EnemyType::STALFOS;
+		return EnemyType::STALFOS;
 	else if (enemyType == "goriya")
-		return AIComponent::EnemyType::GORIYA;
+		return EnemyType::GORIYA;
 	else
-		return AIComponent::EnemyType::NO_TYPE;
+		return EnemyType::NO_TYPE;
 }
 
 
-AIComponent::EnemyBossType LevelLoader::ConvertStringToEnemyBossType(const std::string& bossType)
+EnemyBossType LevelLoader::ConvertStringToEnemyBossType(const std::string& bossType)
 {
 	if (bossType == "aquamentus")
-		return AIComponent::EnemyBossType::AQUAMENTUS;
+		return EnemyBossType::AQUAMENTUS;
 	else if (bossType == "not_a_boss")
-		return AIComponent::EnemyBossType::NOT_A_BOSS;
+		return EnemyBossType::NOT_A_BOSS;
 	else
-		return AIComponent::EnemyBossType::NOT_A_BOSS;
+		return EnemyBossType::NOT_A_BOSS;
 }
 
 void LevelLoader::LoadTriggers(sol::state& lua, const std::string& fileName)
@@ -1507,8 +1507,8 @@ void LevelLoader::LoadEnemiesFromLuaTable(sol::state& lua, const std::string& fi
 			sol::optional<sol::table> ai = entity["components"]["ai_component"];
 			if (ai != sol::nullopt)
 			{
-				AIComponent::EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"].get_or(std::string("no_type")));
-				AIComponent::EnemyBossType boss_type = ConvertStringToEnemyBossType(entity["components"]["ai_component"]["enemy_boss_type"].get_or(std::string("not_a_boss")));
+				EnemyType type = ConvertStringToEnemyType(entity["components"]["ai_component"]["enemy_type"].get_or(std::string("no_type")));
+				EnemyBossType boss_type = ConvertStringToEnemyBossType(entity["components"]["ai_component"]["enemy_boss_type"].get_or(std::string("not_a_boss")));
 
 				newEntity.AddComponent<AIComponent>(
 					glm::vec2(

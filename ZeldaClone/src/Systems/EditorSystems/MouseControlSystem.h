@@ -43,7 +43,7 @@ public:
 	inline void SetOverImGui(bool bOverGui) { m_bOverImGuiWindow = bOverGui; }
 	inline void SetCollider(bool bCollider) { m_bIsCollision = bCollider; }
 	inline void SetSpriteAssetID(const std::string& sAssetID) { m_SpriteComponent.assetID = sAssetID; }
-	inline void SetEnemyType(AIComponent::EnemyType enemyType) { m_eEnemyType = enemyType; }
+	inline void SetEnemyType(EnemyType enemyType) { m_eEnemyType = enemyType; }
 
 	inline const bool IsCreatingTiles() const { return m_bCreateTile; }
 	inline const bool IsCreatingObstacles() const { return m_bCreateObstacles; }
@@ -76,7 +76,7 @@ private:
 	EditorFileLoader m_EditorLoader;
 	std::vector<std::string> m_ImageIDs;
 
-	AIComponent::EnemyType m_eEnemyType{ AIComponent::EnemyType::NO_TYPE };
+	EnemyType m_eEnemyType{ EnemyType::NO_TYPE };
 	SpriteComponent m_SpriteComponent{ };
 	ProjectileEmitterComponent m_ProjectileEmitter{ };
 	AnimationComponent m_AnimationComponent{ };
@@ -107,6 +107,6 @@ private:
 	glm::vec2 m_MousePosScreen{ 0.f };
 	glm::vec2 m_RigidBodyVelocity{ 0.f };
 
-	AIComponent::EnemyType m_ePrevEnemyType{ AIComponent::EnemyType::NO_TYPE };
+	EnemyType m_ePrevEnemyType{ EnemyType::NO_TYPE };
 
 };

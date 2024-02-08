@@ -10,6 +10,11 @@
 #include "../../AssetManager/AssetManager.h"
 #include "../../Game/Game.h"
 #include "../../Game/Player.h"
+
+#include "../../StateMachines/NewEnemyStates.h"
+#include "../../StateMachines/BossStates.h"
+
+#include <memory>
 #include <string>
 #include <SDL.h>
 
@@ -23,22 +28,23 @@ void AISystem::Update()
 {
 	for (auto& entity : GetSystemEntities())
 	{
-		auto& stateMachine = entity.GetComponent<AIComponent>();
-		// If the AI state machine is nullptr, create one!
-		if (!stateMachine.StateMachineCreated() && !stateMachine.IsCreated())
+		auto& ai = entity.GetComponent<AIComponent>();
+		
+		if (!ai.esm)
 		{
-			stateMachine.CreateStateMachine();
-			stateMachine.GetEnemyStateMachine().ChangeState(entity);
+			ai.esm = std::make_shared<StateMachine>();
+
+			if (!ai.bIsBoss)
+				ai.esm->AddState(std::make_unique<EnemyIdleState>());
+			else
+				ai.esm->AddState(std::make_unique<BossIdleState>());
+
+			ai.esm->ChangeState(entity);
 		}
 			
-		// If the AI state machine has been created, update the entity AI
-		if (stateMachine.StateMachineCreated())
+		if (ai.enemyPos == m_Game.GetPlayer()->GetPlayerPos())
 		{
-			// If the enemy is in the same screen panel as the player --> Update 
-			if (stateMachine.GetEnemyPos() == m_Game.GetPlayer()->GetPlayerPos())
-			{
-				stateMachine.GetEnemyStateMachine().GetCurrentState()->Update(entity);
-			}
+			ai.esm->GetCurrentState()->Update(entity);
 		}
 	}
 }

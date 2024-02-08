@@ -35,12 +35,22 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 	Entity a = event.a;
 	Entity b = event.b;
 
-	if (a.HasComponent<ItemComponent>() && b.HasComponent<PlayerComponent>()) OnPlayerGetsItem(a, b);
-	else if (b.HasComponent<ItemComponent>() && a.HasComponent<PlayerComponent>()) OnPlayerGetsItem(b, a);
+	if (a.HasComponent<ItemComponent>() && b.HasTag("player")) 
+	{
+		OnPlayerGetsItem(a, b);
+		return;
+	}
+	else if (b.HasComponent<ItemComponent>() && a.HasTag("player")) 
+	{
+		OnPlayerGetsItem(b, a);
+		return;
+	}
 	
 	// Test for boomerang retrieving items
-	if (a.HasComponent<ItemComponent>() && b.HasTag("boomerang")) OnBoomerangGetsItem(a, b);
-	else if (b.HasComponent<ItemComponent>() && a.HasTag("boomerang")) OnBoomerangGetsItem(b, a);
+	if (a.HasComponent<ItemComponent>() && b.HasTag("boomerang")) 
+		OnBoomerangGetsItem(a, b);
+	else if (b.HasComponent<ItemComponent>() && a.HasTag("boomerang")) 
+		OnBoomerangGetsItem(b, a);
 }
 
 void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)

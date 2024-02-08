@@ -372,43 +372,43 @@ void MouseControlSystem::SetEnemyImage()
 {
 	switch (m_eEnemyType)
 	{
-	case AIComponent::EnemyType::OCTOROK:
+	case EnemyType::OCTOROK:
 		m_sEnemyFile = "Octorok";
 		m_sEnemyType = "octorok_red";
 		break;
-	case AIComponent::EnemyType::MOBLIN:
+	case EnemyType::MOBLIN:
 		m_sEnemyFile = "Moblin";
 		m_sEnemyType = "moblin";
 		break;
-	case AIComponent::EnemyType::DARKNUT:
+	case EnemyType::DARKNUT:
 		m_sEnemyFile = "Darknut";
 		m_sEnemyType = "darknut";
 		break;
-	case AIComponent::EnemyType::LEEVER:
+	case EnemyType::LEEVER:
 		m_sEnemyFile = "Leever";
 		m_sEnemyType = "leever";
 		break;
-	case AIComponent::EnemyType::TEKTITE:
+	case EnemyType::TEKTITE:
 		m_sEnemyFile = "Tektite";
 		m_sEnemyType = "tektite";
 		break;
-	case AIComponent::EnemyType::PEAHAT:
+	case EnemyType::PEAHAT:
 		m_sEnemyFile = "Peahat";
 		m_sEnemyType = "peahat";
 		break;
-	case AIComponent::EnemyType::ARMOS:
+	case EnemyType::ARMOS:
 		m_sEnemyFile = "Armos";
 		m_sEnemyType = "armos";
 		break;
-	case AIComponent::EnemyType::GHINI:
+	case EnemyType::GHINI:
 		m_sEnemyFile = "Ghini";
 		m_sEnemyType = "ghini";
 		break;
-	case AIComponent::EnemyType::LYNEL:
+	case EnemyType::LYNEL:
 		m_sEnemyFile = "Lynel";
 		m_sEnemyType = "lynel";
 		break;
-	case AIComponent::EnemyType::ZORA:
+	case EnemyType::ZORA:
 		m_sEnemyFile = "Zora";
 		m_sEnemyType = "zora";
 		break;

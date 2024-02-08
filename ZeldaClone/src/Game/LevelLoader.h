@@ -72,7 +72,7 @@ public:
 
 	TriggerType ConvertStringToTriggerType(const std::string& type);
 
-	AIComponent::EnemyType ConvertStringToEnemyType(const std::string& enemyType);
-	AIComponent::EnemyBossType ConvertStringToEnemyBossType(const std::string& bossType);
+	EnemyType ConvertStringToEnemyType(const std::string& enemyType);
+	EnemyBossType ConvertStringToEnemyBossType(const std::string& bossType);
 
 };

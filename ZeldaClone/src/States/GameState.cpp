@@ -140,6 +140,9 @@ void GameState::Update(const float& deltaTime)
 		camera.StartFadeIn(true);
 		m_bPaused = false;
 	}
+	
+	// Update the registry values
+	m_Registry.Update();
 
 	m_TriggerSystem.Update(deltaTime);
 	m_CollectItemSystem.Update();

@@ -541,7 +541,7 @@ void EditorFileLoader::SaveEnemiesToLuaFile(std::string filepath)
 
 			if (ai)
 			{
-				std::string enemy_type_str = ConvertAIEnemyToString(ai_comp.GetEnemyType());
+				std::string enemy_type_str = ConvertAIEnemyToString(ai_comp.enemyType);
 				
 				m_writer.WriteDeclareTable("ai_component", file);
 				m_writer.WriteDeclareTable("enemy_pos", file);
@@ -875,32 +875,32 @@ std::string EditorFileLoader::ConvertToString(TriggerType triggerType)
 	}
 }
 
-std::string EditorFileLoader::ConvertAIEnemyToString(AIComponent::EnemyType type)
+std::string EditorFileLoader::ConvertAIEnemyToString(EnemyType type)
 {
 	switch (type)
 	{
-	case AIComponent::EnemyType::OCTOROK:
+	case EnemyType::OCTOROK:
 		return "octorok";
 		break;
-	case AIComponent::EnemyType::MOBLIN:
+	case EnemyType::MOBLIN:
 		return "moblin";
 		break;
-	case AIComponent::EnemyType::DARKNUT:
+	case EnemyType::DARKNUT:
 		return "darknut";
 		break;
-	case AIComponent::EnemyType::LEEVER:
+	case EnemyType::LEEVER:
 		return "leever";
 		break;
-	case AIComponent::EnemyType::GHINI:
+	case EnemyType::GHINI:
 		return "ghini";
 		break;
-	case AIComponent::EnemyType::LYNEL:
+	case EnemyType::LYNEL:
 		return "lynel";
 		break;
-	case AIComponent::EnemyType::PEAHAT:
+	case EnemyType::PEAHAT:
 		return "peahat";
 		break;
-	case AIComponent::EnemyType::NO_TYPE:
+	case EnemyType::NO_TYPE:
 		return "no_type";
 		break;
 	default:
