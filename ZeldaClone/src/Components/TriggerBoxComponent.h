@@ -16,6 +16,6 @@ struct TriggerBoxComponent
 	glm::vec2 transportOffset{ 0.f }, cameraOffset{ 0.f };
 	std::string entityRemoveTag{ "" };
 	bool collider{ false }, active{ false }, collected{ false };
-	
+	int collectTime{ 2000 };
 	Timer collectedTimer{ };
 };

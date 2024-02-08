@@ -146,7 +146,6 @@ void GameState::Update(const float& deltaTime)
 
 	m_TriggerSystem.Update(deltaTime);
 	m_CollectItemSystem.Update();
-	m_AnimationSystem.Update();
 	m_MovementSystem.Update(deltaTime);
 	m_ProjectileEmitterSystem.Update();
 	m_CameraMovementSystem.UpdatePlayerCam(m_Game.GetCamera(), deltaTime);
@@ -167,6 +166,7 @@ void GameState::Render()
 	auto& camera = m_Game.GetCamera();
 	m_RenderTileSystem.Update();
 	camera.UpdateScreenFlash();
+	m_AnimationSystem.Update();
 	m_RenderSystem.Update();
 	
 	// Render all HUD objects

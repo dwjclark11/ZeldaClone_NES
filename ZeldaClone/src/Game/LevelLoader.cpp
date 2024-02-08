@@ -1971,7 +1971,8 @@ void LevelLoader::LoadEntitiesFromLuaTable(sol::state& lua, const std::string& f
 			sol::optional<sol::table> caption = lvlData["components"]["caption"];
 			if (caption != sol::nullopt)
 			{
-				newLvlObject.AddComponent<CaptionComponent>(CaptionComponent{
+				newLvlObject.AddComponent<CaptionComponent>(
+					CaptionComponent{
 						.caption = lvlData["components"]["caption"]["captions"].get_or(std::string{""}),
 						.scrollable = lvlData["components"]["caption"]["scrollable"].get_or(true),
 						.is_number = lvlData["components"]["caption"]["is_number"].get_or(false),

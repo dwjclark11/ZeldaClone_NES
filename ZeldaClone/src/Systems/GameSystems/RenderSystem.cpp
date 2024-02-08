@@ -76,9 +76,6 @@ void RenderSystem::Update()
 		const auto& transform = entity.transformComponent;
 		const auto& sprite = entity.spriteComponent;
 
-		// Set the src Rect of our original sprite texture
-		SDL_Rect srcRect = sprite.srcRect;
-
 		// Set the destination rect with the x, y position to be rendered
 		SDL_Rect dstRect = {
 			static_cast<int>(transform.position.x - (sprite.isFixed ? 0 : cameraPos.x)), 
@@ -96,11 +93,11 @@ void RenderSystem::Update()
 		SDL_RenderCopyEx(
 			m_Game.GetRenderer(),
 			tex,
-			&srcRect,
+			&sprite.srcRect,
 			&dstRect,
 			transform.rotation,
-			NULL,					// The rotation is done on the screnter of the sprite, width / 2, height / 2
-			sprite.flip				// This is if we want to flup a sprite
+			NULL,					
+			sprite.flip				
 		);
 	}
 }

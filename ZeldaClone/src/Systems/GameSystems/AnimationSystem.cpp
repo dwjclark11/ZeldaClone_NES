@@ -19,26 +19,37 @@ AnimationSystem::AnimationSystem()
 
 void AnimationSystem::Update()
 {
+	auto& pPlayer = Game::Instance().GetPlayer();
+	glm::vec2 playerPos{0.f};
+
+	if (pPlayer)
+		playerPos = pPlayer->GetPlayerPos();
+
 	for (const auto& entity : GetSystemEntities())
 	{
 		auto& transform = entity.GetComponent<TransformComponent>();
 		
 		if (Game::Instance().GetStateMachine()->GetCurrentState() == "GAMESTATE")
 		{
-			auto& playerPos = Game::Instance().GetPlayer()->GetPlayerPos();
-			int entX = transform.position.x / PANEL_WIDTH;
-			int entY = transform.position.y / PANEL_HEIGHT;
+			if (pPlayer)
+			{
+				int entX = transform.position.x / PANEL_WIDTH;
+				int entY = transform.position.y / PANEL_HEIGHT;
 
-			if (entX != playerPos.x || entY != playerPos.y)
-				continue;
+				if (entX != playerPos.x || entY != playerPos.y)
+					continue;
+			}
 		}
 	
 		auto& animation = entity.GetComponent<AnimationComponent>();
 		auto& sprite = entity.GetComponent<SpriteComponent>();
 		
-		auto health = HealthComponent();
-		auto ai = AIComponent();
-		auto rigidbody = RigidBodyComponent();
+		HealthComponent health{};
+		AIComponent ai{};
+		RigidBodyComponent rigidbody{};
+
+		if (animation.numFrames <= 0 || animation.bFinished)
+			continue;
 
 		// Check to see if the entity has a rigid body component
 		if (entity.HasComponent<RigidBodyComponent>())
@@ -55,7 +66,7 @@ void AnimationSystem::Update()
 		if (entity.HasComponent<AIComponent>())
 		{
 			// If the animation is a horizontal scroll
-			if (rigidbody.velocity != glm::vec2(0))
+			if (rigidbody.velocity != glm::vec2(0) || health.isHurt || health.healthPercentage <= 0)
 			{
 				if (!animation.vertical)
 				{
@@ -66,8 +77,6 @@ void AnimationSystem::Update()
 					sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 				}
 			}
-			else if (health.isHurt || health.healthPercentage <= 0) // If the enemy is hurt use this frame
-				sprite.srcRect.y = animation.currentFrame * sprite.height + animation.frameOffset;
 		}
 		else
 		{
@@ -94,5 +103,9 @@ void AnimationSystem::Update()
 				sprite.srcRect.x = (animation.currentFrame * sprite.width) + animation.frameOffset;
 			}
 		}
+
+		// If not looped and at the last frame --> set finished
+		if (!animation.isLooped && animation.currentFrame >= animation.numFrames - 1)
+			animation.bFinished = true;
 	}
 }

@@ -23,6 +23,7 @@ CollectItemSystem::CollectItemSystem()
 {
 	RequiredComponent<BoxColliderComponent>();
 	RequiredComponent<TriggerBoxComponent>();
+	RequiredComponent<ItemComponent>();
 }
 
 void CollectItemSystem::SubscribeToEvents(EventManager& eventManager)
@@ -35,14 +36,14 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 	Entity a = event.a;
 	Entity b = event.b;
 
-	if (a.HasComponent<ItemComponent>() && b.HasTag("player")) 
+	if (a.HasComponent<ItemComponent>() && b.HasComponent<PlayerComponent>()) 
 	{
-		OnPlayerGetsItem(a, b);
+		OnPlayerGetsItem(a);
 		return;
 	}
-	else if (b.HasComponent<ItemComponent>() && a.HasTag("player")) 
+	else if (b.HasComponent<ItemComponent>() && a.HasComponent<PlayerComponent>()) 
 	{
-		OnPlayerGetsItem(b, a);
+		OnPlayerGetsItem(b);
 		return;
 	}
 	
@@ -53,7 +54,7 @@ void CollectItemSystem::OnCollision(CollisionEvent& event)
 		OnBoomerangGetsItem(b, a);
 }
 
-void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
+void CollectItemSystem::OnPlayerGetsItem(Entity item)
 {
 	auto& itemComp = item.GetComponent<ItemComponent>();
 	if (itemComp.bCollected)
@@ -81,7 +82,7 @@ void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
 	}
 	case ItemCollectType::HEARTS:
 	{
-		auto& health = player.GetComponent<HealthComponent>();
+		auto& health = m_Game.GetPlayer()->GetPlayer().GetComponent<HealthComponent>();
 		health.healthPercentage += 2;
 
 		// Clamp health to the maxHealth --> Create Variable?
@@ -105,6 +106,7 @@ void CollectItemSystem::OnPlayerGetsItem(Entity item, Entity player)
 
 	if (bPlaySound)
 		m_Game.GetSoundPlayer().PlaySoundFX("get_item", 0, SoundChannel::COLLECT);
+
 	itemComp.bCollected = true;
 	item.Kill();
 }
@@ -123,17 +125,11 @@ void CollectItemSystem::Update()
 	for (auto& entity : GetSystemEntities())
 	{
 		auto& trigger = entity.GetComponent<TriggerBoxComponent>();
+		
+		if (!trigger.collected)
+			continue;
 
-		int time = 2000;
-		if (entity.HasComponent<ItemComponent>())
-		{
-			auto& item = entity.GetComponent<ItemComponent>();
-			if (item.special == SpecialItemType::TRIFORCE_PIECE)
-			{
-				time = 9000;
-			}
-		}
-		if (trigger.collected && trigger.collectedTimer.GetTicks() > time)
+		if (trigger.collected && trigger.collectedTimer.GetTicks() > trigger.collectTime)
 		{
 			entity.Kill();
 			m_Game.GetPlayer()->SetPlayerItem(false);

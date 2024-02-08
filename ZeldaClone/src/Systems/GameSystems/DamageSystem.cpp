@@ -36,12 +36,12 @@ void DamageSystem::OnCollision(CollisionEvent& event)
 	Entity& b = event.b;
 
 	// Enemy projectile hits the player
-	if (a.HasComponent<ProjectileComponent>() && b.HasComponent<PlayerComponent>()) // Change from "player" || "the_shield"
+	if (a.HasComponent<ProjectileComponent>() && b.HasComponent<PlayerComponent>())
 	{
 		OnPlayerHitsProjectile(a, b);
 		return;
 	}
-	else if (b.HasComponent<ProjectileComponent>() && a.HasComponent<PlayerComponent>()) // Change from "player" || "the_shield"
+	else if (b.HasComponent<ProjectileComponent>() && a.HasComponent<PlayerComponent>())
 	{
 		OnPlayerHitsProjectile(b, a);
 		return;
@@ -314,8 +314,6 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 		}
 
 		health.isHurt = true;
-		// Kill the projectile --> start the projectile death
-		proj.startTime = proj.duration - 500;
 	}
 	else
 	{
@@ -356,10 +354,26 @@ void DamageSystem::OnEnemyHitsPlayerProjectile(Entity enemy, Entity projectile)
 			}
 
 			health.isHurt = true;
-			// Kill the projectile --> start the projectile death
-			proj.startTime = proj.duration - 500;
 		}
 	}
+	
+	if (projectile.BelongsToGroup("beam"))
+	{
+		auto& sprite = projectile.GetComponent<SpriteComponent>();
+		auto& animation = projectile.GetComponent<AnimationComponent>();
+		auto& rigid = projectile.GetComponent<RigidBodyComponent>();
+
+		rigid.velocity = glm::vec2(0);
+		sprite.srcRect.y = 128;
+		animation.vertical = false;
+		animation.numFrames = 4;
+		animation.isLooped = false;
+		animation.startTime = static_cast<int>(SDL_GetTicks());
+		animation.currentFrame = 0;
+	}
+	
+	// Kill the projectile --> start the projectile death
+	proj.startTime = proj.duration - 500;
 }
 
 void DamageSystem::OnEnemyHitsPlayer(Entity enemy, Entity player)

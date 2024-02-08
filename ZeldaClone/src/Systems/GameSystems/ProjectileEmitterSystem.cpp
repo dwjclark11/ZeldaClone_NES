@@ -286,6 +286,11 @@ void ProjectileEmitterSystem::UseItem(ProjectileAttrib attrib)
 		boomerTimer.boomTimer.Start();
 		newItem.Tag(attrib.group);
 	}
+	else if (attrib.group == "beam")
+	{
+		newItem.Group("beam");
+		newItem.Group("projectile");
+	}
 	else
 	{
 		newItem.Group(attrib.group);

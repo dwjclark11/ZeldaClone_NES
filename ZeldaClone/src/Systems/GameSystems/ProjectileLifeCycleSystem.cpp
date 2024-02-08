@@ -57,16 +57,24 @@ void ProjectileLifeCycleSystem::UpdateBombAnimation(Entity entity)
 
 void ProjectileLifeCycleSystem::UpdateBeanAnimation(Entity entity)
 {
-	auto& sprite = entity.GetComponent<SpriteComponent>();
-	auto& animation = entity.GetComponent<AnimationComponent>();
-	auto& projectile = entity.GetComponent<ProjectileComponent>();
+	auto& animation = entity.GetComponent<AnimationComponent>();	
 	auto& rigid = entity.GetComponent<RigidBodyComponent>();
-
 	rigid.velocity = glm::vec2(0);
-	sprite.srcRect.y = 128;
-	animation.vertical = false;
-	animation.numFrames = 4;
-	if (SDL_GetTicks() - projectile.startTime > projectile.duration + 500)
+	
+	if (animation.isLooped)
+	{
+		auto& sprite = entity.GetComponent<SpriteComponent>();
+		auto& animation = entity.GetComponent<AnimationComponent>();
+		
+		sprite.srcRect.y = 128;
+		animation.vertical = false;
+		animation.numFrames = 4;
+		animation.isLooped = false;
+		animation.startTime = static_cast<int>(SDL_GetTicks());
+		animation.currentFrame = 0;
+	}
+
+	if (animation.bFinished)
 		entity.Kill();
 }
 

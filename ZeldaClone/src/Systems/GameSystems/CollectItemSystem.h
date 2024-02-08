@@ -12,7 +12,7 @@ private:
 	class Registry& m_Registry;
 
 private:
-	void OnPlayerGetsItem(Entity item, Entity player);
+	void OnPlayerGetsItem(Entity item);
 	void OnBoomerangGetsItem(Entity& item, Entity& boomerang);
 	void OnCollision(CollisionEvent& event);
 

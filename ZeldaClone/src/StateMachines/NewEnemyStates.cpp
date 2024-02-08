@@ -228,7 +228,7 @@ void EnemyDeathState::OnEnter(Entity& entity)
 	auto& ai = entity.GetComponent<AIComponent>();
 	auto& animation = entity.GetComponent<AnimationComponent>();
 	auto& sprite = entity.GetComponent<SpriteComponent>();
-
+	
 	sprite.assetID = "enemy_death";
 	sprite.height = 16;
 	sprite.width = 16;
@@ -236,11 +236,14 @@ void EnemyDeathState::OnEnter(Entity& entity)
 	sprite.srcRect.y = 0;
 
 	ai.deathTimer.Start();
+
 	animation.frameOffset = 0;
 	animation.numFrames = 8;
-	animation.frameSpeedRate = 20;
+	animation.currentFrame = 0;
+	animation.frameSpeedRate = 15;
 	animation.isLooped = false;
 	animation.vertical = false;
+	animation.startTime = static_cast<int>(SDL_GetTicks());
 
 	srand(SDL_GetTicks());
 
@@ -255,7 +258,7 @@ void EnemyDeathState::Update(Entity& entity)
 {
 	auto& ai = entity.GetComponent<AIComponent>();
 
-	if (ai.deathTimer.GetTicks() > 1000)
+	if (ai.deathTimer.GetTicks() > 500)
 	{
 		entity.Kill();
 	}
