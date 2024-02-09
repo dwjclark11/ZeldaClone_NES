@@ -4,7 +4,6 @@
 * [Introduction](#introduction)
 * [Technologies](#technologies)
 * [Game/Engine](#gameengine)
-* [Desired Additions/Changes](#desired-additionschanges)
 
 ## Introduction
 This game was created for educational purposes and to help develop my skills with C++, Lua, and understanding
@@ -75,7 +74,7 @@ This game/engine includes the following:
 
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
 
-## How to Build **Build my be broken due to most recent changes to c++20 and other changes. I will update the build shortly**
+## How to Build -- **Build my be broken due to most recent changes to c++20 and other changes. I will update the build shortly**
 This project currently uses Visual Studio 2022 Community and has not been tested on different systems/IDEs.
 * Step 1)
     *  Clone the repo
@@ -84,28 +83,6 @@ This project currently uses Visual Studio 2022 Community and has not been tested
     * This should run the premake5.lua file and create a visual studio .sln
 * Step 3)
     *  Open the solution and build and run. It should work from there.
-               
 
-## Desired Additions/Changes
-Some of the desired changes are:
-* Add an animation editor to the tilemap editor that allows the ability to load sprites and change animation speeds on the spot
-* Add enemies to any maps using the editor
-* Add a functional AI state machine with for entities/enemies done in lua
-    *  Currently this is done in C++, Not easy to make small changes!
-* ~~Ability for user to change keys/gamepad controls (Currently Hard Coded)~~ Completed.
-* ~~Remove a lot of static variables~~ 
-* Figure out how to remove the Game Singleton and create a loose coupling amongst concrete classes.
-
-
-## There are still a lot of bugs that must be fixed to have a properly working demo
-Some of the bugs are as follows:
-* Sometimes the player/enemies go through colliders/walls after getting hit.
-* Enemies can leave the screen the player is on 
-    *  Maybe create an enemy collider that reflects them in the opposite direction?
-* Sometimes dropped items are not picked up correctly.
-    *  For instance hearts picked up but not healing, bombs picked up but not adding
-* ~~The sword can hurt enemies when not attacking~~ This has been fixed 
-    *  ~~Currently the sword moves around on the player in the center. Need to add check if attacking or not. Or recreate the sword on all attacks~~      
-
-## Dustin 
+## Keep Coding and Take it Easy!
 
