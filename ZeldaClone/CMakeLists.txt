@@ -106,8 +106,8 @@ add_executable(ZELDA_CLONE
 	
 	"include/Systems/EditorSystems/MouseControlSystem.h"
 	"src/Systems/EditorSystems/MouseControlSystem.cpp"
-	"include/Systems/EditorSystems/RenderEditorGuiSystem.h"
-	"src/Systems/EditorSystems/RenderEditorGuiSystem.cpp"
+	"include/Systems/EditorSystems/RenderEditorGUISystem.h"
+	"src/Systems/EditorSystems/RenderEditorGUISystem.cpp"
 	"include/Systems/EditorSystems/RenderEditorSystem.h"
 	"src/Systems/EditorSystems/RenderEditorSystem.cpp"
 	"include/Systems/GameSystems/AISystem.h"
