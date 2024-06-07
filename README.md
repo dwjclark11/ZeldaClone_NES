@@ -12,13 +12,34 @@ This was a great course and I recommend it to anyone wanting to start learning m
 I have taken what I learned from that course and applied it to creating this Zelda Clone and Tilemap/Quest Editor. 
 The game is not yet finished; There is still plenty of work to be done!
 
-## Technologies
-This project is created with:
-* C++ 
-* Lua 5.3
-* SDL2
-* ImGui
-* Sprites were created/edited using Aseprite!
+# Build
+----
+Requires [CMake 3.26](https://cmake.org/) and [vcpkg](https://github.com/microsoft/vcpkg)
+#### Get VCPKG:
+```ps
+git clone https://github.com/microsoft/vcpkg
+./vcpkg/bootstrap-vcpkg.bat
+```
+#### Make sure the following environment variables are set:
+```
+VCPKG_ROOT=[path_to_vcpkg]
+VCPKG_DEFAULT_TRIPLET=x64-windows
+```
+#### Install dependencies 
+```
+./vcpkg install glm sdl2[alsa] sdl2-mixer[mpg123] lua sol2
+```
+  * For sdl2_mixer you name need to use:
+```
+./vcpkg install sdl2-mixer[mpg123] --recurse
+```
+
+#### Clone the repository 
+```
+git clone https://github.com/dwjclark11/ZeldaClone_NES.git
+cd ZeldaClone_NES
+cmake -S . -B build
+```
 
 ## Game Controls
 | Key |  Button  |   Function  |  
@@ -67,22 +88,9 @@ This game/engine includes the following:
     * Uses Dear ImGui as the user interface
     * The Tilemap/Quest Editor still has some bugs; however, it does work
   
-        
-
 ![Editor_Image](https://user-images.githubusercontent.com/63356975/153037159-f5e464fb-9853-49f6-97a1-916651dd8f92.png)
 
-
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
-
-## How to Build -- **Build my be broken due to most recent changes to c++20 and other changes. I will update the build shortly**
-This project currently uses Visual Studio 2022 Community and has not been tested on different systems/IDEs.
-* Step 1)
-    *  Clone the repo
-* Step 2)
-    * Run the GenerateSolution.bat file
-    * This should run the premake5.lua file and create a visual studio .sln
-* Step 3)
-    *  Open the solution and build and run. It should work from there.
 
 ## Keep Coding and Take it Easy!
 
