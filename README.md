@@ -38,6 +38,7 @@ VCPKG_DEFAULT_TRIPLET=x64-windows
 ```
 ./vcpkg install sdl2-mixer[mpg123] --recurse
 ```
+* I tested this on ```Ubuntu 24``` and the build works. Just adjust default triplet for VCPKG to ```VCPKG_DEFAULT_TRIPLET=x64-linux```
 
 #### Clone the repository 
 ```
