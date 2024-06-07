@@ -3,10 +3,10 @@
 #include <chrono>
 #pragma warning( disable : 4996 ) // This is put in place because the time functions have been depricated
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 bool Logger::debugMode = true;
 #elif NDEBUG
-bool Logger::debugMode = true;
+bool Logger::debugMode = false;
 #endif
 
 std::vector<LogEntry> Logger::messages;

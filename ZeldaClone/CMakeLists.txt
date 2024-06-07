@@ -187,7 +187,12 @@ add_executable(ZELDA_CLONE
 target_include_directories(
     ZELDA_CLONE PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 	
-target_link_libraries(ZELDA_CLONE PRIVATE imgui SDL2::SDL2 SDL2_mixer::SDL2_mixer SDL2_ttf::SDL2_ttf SDL2_image::SDL2_image)
+target_link_libraries(
+	ZELDA_CLONE PRIVATE imgui SDL2::SDL2 
+	$<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static> 
+	$<IF:$<TARGET_EXISTS:SDL2_ttf::SDL2_ttf>,SDL2_ttf::SDL2_ttf,SDL2_ttf::SDL2_ttf-static> 
+	$<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
+	
 target_link_libraries(ZELDA_CLONE PUBLIC sol2 glm::glm)
 
 add_resources(TARGET Assets IN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/assets OUT_DIR assets)

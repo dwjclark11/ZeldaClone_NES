@@ -149,7 +149,7 @@ bool PauseState::OnEnter()
 		m_Registry.AddSystem<RenderPauseSystem>();
 	// =============================================================================================================================
 
-	m_Game.GetAssetManager()->AddTextures( m_Game.GetRenderer(), "pause_hud", "./Assets/HUDSprites/pauseHud.png" );
+	m_Game.GetAssetManager()->AddTextures( m_Game.GetRenderer(), "pause_hud", "./assets/HUDSprites/pauseHud.png" );
 
 	Entity pauseSelector = m_Registry.CreateEntity();
 	pauseSelector.AddComponent<SpriteComponent>( SpriteComponent{ .assetID = "box",

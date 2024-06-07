@@ -8,7 +8,7 @@ void ShowTheConsole( bool bShowConsole )
 {
 	ShowWindow( ::GetConsoleWindow(), bShowConsole );
 }
-#elif
+#else
 void ShowTheConsole( bool bShowConsole )
 {
 	// TODO: Not windows implementation

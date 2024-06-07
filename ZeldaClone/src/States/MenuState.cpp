@@ -78,14 +78,14 @@ void MenuState::EliminateKeys()
 			if ( m_GameData.GetPlayer1Name().size() != 0 )
 			{
 				// Remove file from Saved files
-				const std::string save1File = "./Assets/SavedFiles/slot_1/save1.lua";
+				const std::string save1File = "./assets/SavedFiles/slot_1/save1.lua";
 				if ( std::filesystem::remove( save1File ) )
 				{
 					LevelLoader loader;
 					loader.EliminatePlayerToDefault( 1, m_GameData.GetPlayer1Name() );
 					m_GameData.SetPlayer1Name( "" );
 					m_bEliminate = false;
-					std::filesystem::remove( "./Assets/SavedFiles/slot_1/GameSecrets_1.lua" );
+					std::filesystem::remove( "./assets/SavedFiles/slot_1/GameSecrets_1.lua" );
 				}
 				else
 					Logger::Err( "Error, File could not be deleted" );
@@ -275,20 +275,20 @@ bool MenuState::OnEnter()
 	loader.LoadMenuUIFromLuaTable( lua, "menu_state_load" );
 
 	if ( !game.GetAssetManager()->HasFont( "charriot-font-40" ) )
-		game.GetAssetManager()->AddFonts( "charriot-font-40", "./Assets/Fonts/charriot.ttf", 40 );
+		game.GetAssetManager()->AddFonts( "charriot-font-40", "./assets/Fonts/charriot.ttf", 40 );
 	if ( !game.GetAssetManager()->HasFont( "charriot-font-60" ) )
-		game.GetAssetManager()->AddFonts( "charriot-font-60", "./Assets/Fonts/charriot.ttf", 60 );
+		game.GetAssetManager()->AddFonts( "charriot-font-60", "./assets/Fonts/charriot.ttf", 60 );
 
 	game.GetMusicPlayer().PlayMusic( "Main_Menu", -1 );
 
 	// Check to see if the save file exists, if it does call the loader function
-	fs::path saves( "./Assets/SavedFiles/slot_1/save1.lua" );
+	fs::path saves( "./assets/SavedFiles/slot_1/save1.lua" );
 	if ( fs::status_known( fs::file_status{} ) ? fs::exists( fs::file_status{} ) : fs::exists( saves ) )
 		loader.LoadMenuScreenFromLuaTable( lua, "save1", 1 );
-	saves = "./Assets/SavedFiles/slot_2/save2.lua";
+	saves = "./assets/SavedFiles/slot_2/save2.lua";
 	if ( fs::status_known( fs::file_status{} ) ? fs::exists( fs::file_status{} ) : fs::exists( saves ) )
 		loader.LoadMenuScreenFromLuaTable( lua, "save2", 2 );
-	saves = "./Assets/SavedFiles/slot_3/save3.lua";
+	saves = "./assets/SavedFiles/slot_3/save3.lua";
 	if ( fs::status_known( fs::file_status{} ) ? fs::exists( fs::file_status{} ) : fs::exists( saves ) )
 		loader.LoadMenuScreenFromLuaTable( lua, "save3", 3 );
 

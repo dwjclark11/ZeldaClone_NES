@@ -32,8 +32,8 @@
 
 #include "Utilities/GameData.h"
 #include "Utilities/Camera.h"
-#include "Inputs/InputManager.h"
-#include "Inputs/Gamepad.h"
+#include "inputs/InputManager.h"
+#include "inputs/Gamepad.h"
 #include "Game/Player.h"
 
 void GameState::UpdatePlayerKeys()
@@ -240,9 +240,9 @@ bool GameState::OnEnter()
 
 	// Remove the menu/Game over system for it is not needed in the m_Game state
 	m_Registry.RemoveSystem<RenderMainMenuSystem>();
-	m_Game.GetAssetManager()->AddFonts( "game_font", "./Assets/Fonts/prstart.ttf", 30 );
+	m_Game.GetAssetManager()->AddFonts( "game_font", "./assets/Fonts/prstart.ttf", 30 );
 	m_Game.GetAssetManager()->AddTextures(
-		m_Game.GetRenderer(), "simple_enemies", "./Assets/EnemySprites/simple_enemies.png" );
+		m_Game.GetRenderer(), "simple_enemies", "./assets/EnemySprites/simple_enemies.png" );
 
 	return true;
 }

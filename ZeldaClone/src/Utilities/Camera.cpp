@@ -37,7 +37,7 @@ void Camera::SetCameraPosFromSceneChange( int x, int y )
 	if ( x < 1 || y < 1 )
 	{
 		Logger::Err( "Failed to set Camera Pos during scene change! - x or y must be >= 1!" );
-		__debugbreak();
+		assert( true && "Failed to set Camera Pos during scene change! - x or y must be >= 1!" );
 		return;
 	}
 

@@ -52,9 +52,9 @@ bool NameState::OnEnter()
 	reg.AddSystem<RenderNameStateTextSystem>();
 	reg.AddSystem<RenderNameSystem>();
 
-	game.GetAssetManager()->AddTextures( game.GetRenderer(), "name-letters", "./Assets/HUDSprites/Name_Letters.png" );
-	game.GetAssetManager()->AddTextures( game.GetRenderer(), "box", "./Assets/HUDSprites/box.png" );
-	game.GetAssetManager()->AddFonts( "charriot-font-120", "./Assets/Fonts/charriot.ttf", 120 );
+	game.GetAssetManager()->AddTextures( game.GetRenderer(), "name-letters", "./assets/HUDSprites/Name_Letters.png" );
+	game.GetAssetManager()->AddTextures( game.GetRenderer(), "box", "./assets/HUDSprites/box.png" );
+	game.GetAssetManager()->AddFonts( "charriot-font-120", "./assets/Fonts/charriot.ttf", 120 );
 
 	Entity letters = reg.CreateEntity();
 	letters.AddComponent<SpriteComponent>( SpriteComponent{ .assetID = "name-letters",

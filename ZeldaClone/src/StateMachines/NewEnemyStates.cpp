@@ -55,7 +55,7 @@ void EnemyIdleState::Update( Entity& entity )
 	case EnemyType::GEL: break;
 	case EnemyType::STALFOS: break;
 	case EnemyType::GORIYA: break;
-	case EnemyType::NO_TYPE: __debugbreak(); return;
+	case EnemyType::NO_TYPE: return;
 	}
 }
 
@@ -125,7 +125,7 @@ void PatrolState::Update( Entity& entity )
 	case EnemyType::GEL: break;
 	case EnemyType::STALFOS: break;
 	case EnemyType::GORIYA: break;
-	case EnemyType::NO_TYPE: __debugbreak(); return;
+	case EnemyType::NO_TYPE: return;
 	}
 }
 

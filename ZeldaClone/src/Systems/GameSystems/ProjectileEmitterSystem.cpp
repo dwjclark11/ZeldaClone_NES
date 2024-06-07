@@ -367,7 +367,7 @@ void ProjectileEmitterSystem::UseMagicWand()
 
 void ProjectileEmitterSystem::LoadMapAttributes( sol::state& lua, const std::string& fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/LuaFiles/" + fileName + ".lua" );
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
 	{
@@ -378,7 +378,7 @@ void ProjectileEmitterSystem::LoadMapAttributes( sol::state& lua, const std::str
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	lua.script_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	sol::table atrib = lua[ "items" ];
 

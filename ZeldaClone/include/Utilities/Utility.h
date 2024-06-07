@@ -3,6 +3,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <SDL.h>
+#include <memory>
 
 int GetValue( int num, int digit );
 void ConvertNumberParser( std::string group, int num, int power );
@@ -48,10 +49,16 @@ struct SDL_Wrappers
 	};
 };
 
-typedef std::unique_ptr<SDL_Window, SDL_Wrappers::SDL_Destroyer> Window;
-typedef std::unique_ptr<SDL_Renderer, SDL_Wrappers::SDL_Destroyer> Renderer;
-typedef std::unique_ptr<SDL_Texture, SDL_Wrappers::SDL_Destroyer> Texture;
-typedef std::unique_ptr<SDL_GameController, SDL_Wrappers::SDL_Destroyer> Controller;
+using Window = std::unique_ptr<SDL_Window, SDL_Wrappers::SDL_Destroyer>;
+using Renderer = std::unique_ptr<SDL_Renderer, SDL_Wrappers::SDL_Destroyer>;
+using Texture = std::unique_ptr<SDL_Texture, SDL_Wrappers::SDL_Destroyer>;
+using Controller = std::unique_ptr<SDL_GameController, SDL_Wrappers::SDL_Destroyer>;
+
+static Controller MakeController( SDL_GameController* controller )
+{
+	return std::unique_ptr<SDL_GameController, SDL_Wrappers::SDL_Destroyer>( controller,
+																			 SDL_Wrappers::SDL_Destroyer{} );
+}
 
 // Game Constants
 constexpr int PANEL_WIDTH = 1024;

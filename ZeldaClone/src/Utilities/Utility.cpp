@@ -3,7 +3,7 @@
 #include "Components/SpriteComponent.h"
 #include "Components/TransformComponent.h"
 #include "Components/KeyboardControlComponent.h"
-#include "Components/RigidbodyComponent.h"
+#include "Components/RigidBodyComponent.h"
 #include "Components/BoxColliderComponent.h"
 #include "Components/HUDComponent.h"
 #include "Components/GameComponent.h"

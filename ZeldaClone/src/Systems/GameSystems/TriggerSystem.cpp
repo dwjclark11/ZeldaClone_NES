@@ -273,7 +273,7 @@ void TriggerSystem::ChangeScene( Entity& player, Entity& trigger )
 			// load the tilemap only if there is an image and a corresponding map
 			if ( scene.tileMapName != "no_file" && scene.mapImageName != "no_file" )
 			{
-				std::string mapFile = "Assets/Tilemaps/Maps/" + scene.tileMapName + ".map";
+				std::string mapFile = "assets/Tilemaps/Maps/" + scene.tileMapName + ".map";
 				m_Loader.LoadTilemap( mapFile, scene.mapImageName );
 			}
 

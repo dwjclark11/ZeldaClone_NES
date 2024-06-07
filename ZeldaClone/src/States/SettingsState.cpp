@@ -19,8 +19,8 @@
 #include "inputs/InputManager.h"
 #include "inputs/Keyboard.h"
 #include "inputs/Gamepad.h"
-#include "utilities/Camera.h"
-#include "utilities/GameData.h"
+#include "Utilities/Camera.h"
+#include "Utilities/GameData.h"
 
 #include <string>
 
@@ -61,8 +61,8 @@ void SettingsState::Render()
 bool SettingsState::OnEnter()
 {
 
-	Game::Instance().GetAssetManager()->AddSoundFX( "bomb_drop", "./Assets/sounds/Bomb_Drop.wav" );
-	Game::Instance().GetAssetManager()->AddSoundFX( "get_item", "./Assets/sounds/Get_Item.wav" );
+	Game::Instance().GetAssetManager()->AddSoundFX( "bomb_drop", "./assets/sounds/Bomb_Drop.wav" );
+	Game::Instance().GetAssetManager()->AddSoundFX( "get_item", "./assets/sounds/Get_Item.wav" );
 
 	std::string attackKey = std::string( SDL_GetKeyName( m_InputManager.GetKeyCode( InputManager::Action::ATTACK ) ) );
 	std::string moveUpKey = std::string( SDL_GetKeyName( m_InputManager.GetKeyCode( InputManager::Action::MOVE_UP ) ) );

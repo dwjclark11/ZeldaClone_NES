@@ -9,7 +9,8 @@ Gamepad::Gamepad()
 		return;
 
 	// Load Joystick
-	m_pController = static_cast<Controller>( SDL_GameControllerOpen( 0 ) );
+	m_pController = MakeController(SDL_GameControllerOpen( 0 ));
+
 	if ( m_pController == nullptr )
 	{
 		Logger::Err( "Unable to open game controller!" );

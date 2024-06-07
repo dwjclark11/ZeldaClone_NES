@@ -151,16 +151,16 @@ bool TitleState::OnEnter()
 	Mix_VolumeMusic( 10 );
 
 	// Add Assets to the Asset Manager
-	m_Game.GetAssetManager()->AddMusic( "Title", "Assets/Music/Title_Theme.mp3" );
+	m_Game.GetAssetManager()->AddMusic( "Title", "./assets/Music/Title_Theme.mp3" );
 	if ( !m_Game.GetAssetManager()->HasTexture( "TitleScreen" ) )
 		m_Game.GetAssetManager()->AddTextures(
-			m_Game.GetRenderer(), "TitleScreen", "./Assets/Backgrounds/DemoZeldaTitleScreen.png" );
+			m_Game.GetRenderer(), "TitleScreen", "./assets/Backgrounds/DemoZeldaTitleScreen.png" );
 	if ( !m_Game.GetAssetManager()->HasTexture( "title_scroll" ) )
 		m_Game.GetAssetManager()->AddTextures(
-			m_Game.GetRenderer(), "title_scroll", "./Assets/Backgrounds/titleScroll.png" );
+			m_Game.GetRenderer(), "title_scroll", "./assets/Backgrounds/titleScroll.png" );
 	if ( !m_Game.GetAssetManager()->HasTexture( "waterfall" ) )
 		m_Game.GetAssetManager()->AddTextures(
-			m_Game.GetRenderer(), "waterfall", "./Assets/Backgrounds/waterfall.png" );
+			m_Game.GetRenderer(), "waterfall", "./assets/Backgrounds/waterfall.png" );
 
 	// Start the Title Screen Music
 	m_Game.GetMusicPlayer().PlayMusic( "Title", -1 );

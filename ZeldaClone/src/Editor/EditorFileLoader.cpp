@@ -704,7 +704,7 @@ std::string EditorFileLoader::SetName( std::string filePath, bool wExtension, ch
 
 void EditorFileLoader::LoadEnemiesAttributes( sol::state& lua, std::string& m_sFileName, std::string& enemy_name )
 {
-	sol::load_result script = lua.load_file( "./Assets/EditorFiles/" + m_sFileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/EditorFiles/" + m_sFileName + ".lua" );
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
 	{
@@ -715,7 +715,7 @@ void EditorFileLoader::LoadEnemiesAttributes( sol::state& lua, std::string& m_sF
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/EditorFiles/" + m_sFileName + ".lua" );
+	lua.script_file( "./assets/EditorFiles/" + m_sFileName + ".lua" );
 
 	sol::table enemy = lua[ enemy_name ];
 
@@ -745,7 +745,7 @@ void EditorFileLoader::LoadEnemiesAttributes( sol::state& lua, std::string& m_sF
 void EditorFileLoader::CreateNewEnemy( sol::state& lua, std::string& m_sFileName, std::string& enemy_name,
 									   Entity& newEnemy )
 {
-	sol::load_result script = lua.load_file( "./Assets/EditorFiles/" + m_sFileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/EditorFiles/" + m_sFileName + ".lua" );
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
 	{
@@ -756,7 +756,7 @@ void EditorFileLoader::CreateNewEnemy( sol::state& lua, std::string& m_sFileName
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/EditorFiles/" + m_sFileName + ".lua" );
+	lua.script_file( "./assets/EditorFiles/" + m_sFileName + ".lua" );
 
 	sol::table enemy = lua[ enemy_name ];
 

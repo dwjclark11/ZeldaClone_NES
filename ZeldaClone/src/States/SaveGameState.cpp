@@ -40,7 +40,7 @@ void SaveGameState::Render()
 bool SaveGameState::OnEnter()
 {
 	m_Registry.AddSystem<RenderSaveStateSystem>();
-	m_Game.GetAssetManager()->AddTextures( m_Game.GetRenderer(), "save_gui", "./Assets/HUDSprites/save_state_GUI.png" );
+	m_Game.GetAssetManager()->AddTextures( m_Game.GetRenderer(), "save_gui", "./assets/HUDSprites/save_state_GUI.png" );
 
 	Entity saveText = m_Registry.CreateEntity();
 	saveText.AddComponent<TransformComponent>( glm::vec2( 200, 200 ), glm::vec2( 4, 4 ), 0.0 );

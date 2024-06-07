@@ -151,7 +151,7 @@ void LevelLoader::LoadTilemap( const std::string& fileName, const std::string& i
 void LevelLoader::LoadLevelAssets( std::unique_ptr<AssetManager>& assetManager, const std::string& fileName )
 {
 	std::fstream lvlFile;
-	lvlFile.open( "Assets/LevelAssets/" + fileName );
+	lvlFile.open( "assets/LevelAssets/" + fileName );
 
 	if ( !lvlFile.is_open() )
 	{
@@ -163,7 +163,7 @@ void LevelLoader::LoadLevelAssets( std::unique_ptr<AssetManager>& assetManager, 
 		// Define Variables
 		std::string type = "";
 		std::string assetID = "";
-		std::string path = "./Assets/";
+		std::string path = "./assets/";
 		std::string assetPath = "";
 		AssetType assetType = LevelLoader::AssetType::TEXTURE;
 		lvlFile >> type >> assetID >> assetPath;
@@ -201,7 +201,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable( sol::state& lua, const std::string
 {
 	bool valid = false;
 	sol::load_result script =
-		lua.load_file( "./Assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
+		lua.load_file( "./assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
 	// Check the syntax of the Lua script
 	if ( !script.valid() )
 	{
@@ -212,7 +212,7 @@ void LevelLoader::LoadMenuScreenFromLuaTable( sol::state& lua, const std::string
 	}
 
 	// Execute the script using the sol state
-	lua.script_file( "./Assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
+	lua.script_file( "./assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
 
 	// Read the main table first
 	sol::table data = lua[ "player_data" ];
@@ -505,7 +505,7 @@ void LevelLoader::CreateNewGameSecretsFile( int slotNum )
 
 void LevelLoader::LoadMenuUIFromLuaTable( sol::state& lua, const std::string& fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/LuaFiles/" + fileName + ".lua" );
 	// Check the syntax of the Lua script
 	if ( !script.valid() )
 	{
@@ -516,7 +516,7 @@ void LevelLoader::LoadMenuUIFromLuaTable( sol::state& lua, const std::string& fi
 	}
 
 	// Execute the script using the sol state
-	lua.script_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	lua.script_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	// Read the main table first
 	sol::table data = lua[ "menu" ];
@@ -557,7 +557,7 @@ void LevelLoader::LoadLevel( const std::string& level )
 {
 	// Open and read the thext file
 	std::fstream mapFile;
-	mapFile.open( "./Assets/Levels/overworld.map" );
+	mapFile.open( "./assets/Levels/overworld.map" );
 
 	if ( !mapFile.is_open() )
 	{
@@ -616,7 +616,7 @@ void LevelLoader::LoadColliders( const std::string& filename )
 {
 	// Open and read the text file
 	std::fstream mapFile;
-	mapFile.open( "./Assets/Levels/Colliders/" + filename + ".map" );
+	mapFile.open( "./assets/Levels/Colliders/" + filename + ".map" );
 
 	if ( !mapFile.is_open() )
 	{
@@ -736,7 +736,7 @@ EnemyBossType LevelLoader::ConvertStringToEnemyBossType( const std::string& boss
 
 void LevelLoader::LoadTriggers( sol::state& lua, const std::string& fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/Levels/Triggers/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/Levels/Triggers/" + fileName + ".lua" );
 
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
@@ -748,7 +748,7 @@ void LevelLoader::LoadTriggers( sol::state& lua, const std::string& fileName )
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/Levels/Triggers/" + fileName + ".lua" );
+	lua.script_file( "./assets/Levels/Triggers/" + fileName + ".lua" );
 
 	// =========================================================================================================
 	// Read the Triggers
@@ -778,11 +778,6 @@ void LevelLoader::LoadTriggers( sol::state& lua, const std::string& fileName )
 		{
 
 			std::string tagName = trigger[ "tag" ];
-
-			// if (m_Registry.DoesTagExist(tagName))
-			//	__debugbreak();
-			// else
-			//	Logger::Log("NOPE");
 
 			newTrigger.Tag( tagName );
 		}
@@ -893,7 +888,7 @@ void LevelLoader::SavePlayerDataToLuaTable( const std::string& saveNum )
 	LuaTableWriter m_writer;
 	std::fstream file;
 
-	file.open( "./Assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua", std::ios::out | std::ios::trunc );
+	file.open( "./assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua", std::ios::out | std::ios::trunc );
 
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
@@ -1066,16 +1061,16 @@ void LevelLoader::SavePlayerNameToLuaTable( const std::string& saveNum, std::str
 	LuaTableWriter m_writer;
 
 	// Check to see if the directory exists and if not, create it
-	if ( !std::filesystem::is_directory( "./Assets/SavedFiles/slot_" + saveNum ) ||
-		 !std::filesystem::exists( "./Assets/SavedFiles/slot_" + saveNum ) )
-		std::filesystem::create_directory( "./Assets/SavedFiles/slot_" + saveNum );
+	if ( !std::filesystem::is_directory( "./assets/SavedFiles/slot_" + saveNum ) ||
+		 !std::filesystem::exists( "./assets/SavedFiles/slot_" + saveNum ) )
+		std::filesystem::create_directory( "./assets/SavedFiles/slot_" + saveNum );
 
-	std::ofstream newFile( "./Assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua" );
+	std::ofstream newFile( "./assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua" );
 	newFile.close();
 
 	std::fstream file;
 
-	file.open( "./Assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua" );
+	file.open( "./assets/SavedFiles/slot_" + saveNum + "/save" + saveNum + ".lua" );
 
 	// Start the Lua Table
 	m_writer.WriteStartDocument();
@@ -1183,7 +1178,7 @@ void LevelLoader::SavePlayerNameToLuaTable( const std::string& saveNum, std::str
 
 void LevelLoader::CreatePlayerEntityFromLuaTable( sol::state& lua, std::string fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
@@ -1195,7 +1190,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable( sol::state& lua, std::string f
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	lua.script_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	sol::table data = lua[ "player" ];
 
@@ -1256,7 +1251,7 @@ void LevelLoader::CreatePlayerEntityFromLuaTable( sol::state& lua, std::string f
 void LevelLoader::LoadPlayerDataFromLuaTable( sol::state& lua, const std::string& fileName, int slotNum )
 {
 	sol::load_result script =
-		lua.load_file( "./Assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
+		lua.load_file( "./assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
 
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
@@ -1408,7 +1403,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable( sol::state& lua, const std::string
 
 void LevelLoader::LoadEnemiesFromLuaTable( sol::state& lua, const std::string& fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/Levels/Enemies/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/Levels/Enemies/" + fileName + ".lua" );
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
 	{
@@ -1419,7 +1414,7 @@ void LevelLoader::LoadEnemiesFromLuaTable( sol::state& lua, const std::string& f
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/Levels/Enemies/" + fileName + ".lua" );
+	lua.script_file( "./assets/Levels/Enemies/" + fileName + ".lua" );
 
 	sol::table entities = lua[ "enemies" ];
 
@@ -1530,7 +1525,7 @@ void LevelLoader::SaveSecrets()
 	std::fstream file;
 	auto& m_GameData = GameData::GetInstance();
 	auto playerNum = m_GameData.PlayerNum();
-	file.open( "./Assets/SavedFiles/slot_" + std::to_string( playerNum ) + "/GameSecrets_" +
+	file.open( "./assets/SavedFiles/slot_" + std::to_string( playerNum ) + "/GameSecrets_" +
 				   std::to_string( playerNum ) + ".lua",
 			   std::ios::out );
 	writer.WriteStartDocument();
@@ -1564,7 +1559,7 @@ void LevelLoader::ReadInSecrets( sol::state& lua )
 {
 	auto& m_GameData = GameData::GetInstance();
 	auto playerNum = m_GameData.PlayerNum();
-	sol::load_result script = lua.load_file( "./Assets/SavedFiles/slot_" + std::to_string( playerNum ) +
+	sol::load_result script = lua.load_file( "./assets/SavedFiles/slot_" + std::to_string( playerNum ) +
 											 "/GameSecrets_" + std::to_string( playerNum ) + ".lua" );
 
 	if ( !script.valid() )
@@ -1576,7 +1571,7 @@ void LevelLoader::ReadInSecrets( sol::state& lua )
 	}
 
 	// Execute the script
-	lua.script_file( "./Assets/SavedFiles/slot_" + std::to_string( playerNum ) + "/GameSecrets_" +
+	lua.script_file( "./assets/SavedFiles/slot_" + std::to_string( playerNum ) + "/GameSecrets_" +
 					 std::to_string( playerNum ) + ".lua" );
 	sol::table data = lua[ "secrets" ];
 
@@ -1617,7 +1612,7 @@ void LevelLoader::ReadInSecrets( sol::state& lua )
 
 void LevelLoader::LoadHUDFromLuaTable( sol::state& lua, const std::string& fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
@@ -1629,7 +1624,7 @@ void LevelLoader::LoadHUDFromLuaTable( sol::state& lua, const std::string& fileN
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	lua.script_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	sol::table data = lua[ "hud" ];
 
@@ -1686,7 +1681,7 @@ void LevelLoader::LoadHUDFromLuaTable( sol::state& lua, const std::string& fileN
 
 void LevelLoader::LoadAssetsFromLuaTable( sol::state& lua, const std::string& fileName )
 {
-	sol::load_result script = lua.load_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
@@ -1698,7 +1693,7 @@ void LevelLoader::LoadAssetsFromLuaTable( sol::state& lua, const std::string& fi
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/LuaFiles/" + fileName + ".lua" );
+	lua.script_file( "./assets/LuaFiles/" + fileName + ".lua" );
 
 	sol::table assets = lua[ "Assets" ];
 
@@ -1806,7 +1801,7 @@ bool LevelLoader::CheckForItemInInventory( SpecialItemType& type )
 
 void LevelLoader::LoadEntitiesFromLuaTable( sol::state& lua, const std::string& filename )
 {
-	sol::load_result script = lua.load_file( "./Assets/Levels/Entities/" + filename + ".lua" );
+	sol::load_result script = lua.load_file( "./assets/Levels/Entities/" + filename + ".lua" );
 
 	// This checks the syntax of our script, but it does not execute the script
 	if ( !script.valid() )
@@ -1818,7 +1813,7 @@ void LevelLoader::LoadEntitiesFromLuaTable( sol::state& lua, const std::string& 
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/Levels/Entities/" + filename + ".lua" );
+	lua.script_file( "./assets/Levels/Entities/" + filename + ".lua" );
 
 	sol::table data = lua[ "level" ];
 

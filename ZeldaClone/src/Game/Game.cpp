@@ -134,8 +134,8 @@ void Game::Initialize()
 	m_MouseBox.h = 1;
 
 	// Add the needed sounds, textures, and fonts to the asset manager
-	m_pAssetManager->AddSoundFX( "text_slow", "./Assets/sounds/Text_Slow.wav" );
-	m_pAssetManager->AddTextures( m_pRenderer, "map", "./Assets/Backgrounds/entire_worldmap_single_image.png" );
+	m_pAssetManager->AddSoundFX( "text_slow", "./assets/sounds/Text_Slow.wav" );
+	m_pAssetManager->AddTextures( m_pRenderer, "map", "./assets/Backgrounds/entire_worldmap_single_image.png" );
 
 	// Create the finite Game State Machine
 	m_pGameStateMachine = std::make_unique<GameStateMachine>();

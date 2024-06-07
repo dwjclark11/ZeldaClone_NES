@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <cassert>
+#include <functional>
 
 // Interface class
 class IEventCallback
