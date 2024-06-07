@@ -27,7 +27,7 @@ VCPKG_DEFAULT_TRIPLET=x64-windows
 ```
 #### Install dependencies 
 ```
-./vcpkg install glm sdl2[alsa] sdl2-mixer[mpg123] lua sol2
+./vcpkg install glm sdl2[alsa] sdl2-mixer[mpg123] sdl2-ttf sdl2-image lua sol2
 ```
   * For sdl2_mixer you name need to use:
 ```
