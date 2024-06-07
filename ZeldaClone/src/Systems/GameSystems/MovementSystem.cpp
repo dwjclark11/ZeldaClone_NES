@@ -1,30 +1,30 @@
-#include "MovementSystem.h"
-#include "../../Components/TriggerBoxComponent.h"
-#include "../../Components/TransformComponent.h"
-#include "../../Components/EnemyComponent.h"
-#include "../../Components/PlayerComponent.h"
-#include "../../Components/ColliderComponent.h"
-#include "../../Components/SpriteComponent.h"
-#include "../../Components/ProjectileComponent.h"
-#include "../../Components/HealthComponent.h"
-#include "../../Components/RigidBodyComponent.h"
-#include "../../Components/BoxColliderComponent.h"
-#include "../../Components/KeyboardControlComponent.h"
-#include "../../Components/AIComponent.h"
-#include "../../Systems/SoundFXSystem.h"
-#include "../../Events/EventManager.h"
-#include "../../Events/CollisionEvent.h"
-#include "../../Game/Game.h"
-#include "../../Game/Player.h"
-#include "../../Utilities/Utility.h"
+#include "Systems/GameSystems/MovementSystem.h"
+#include "Components/TriggerBoxComponent.h"
+#include "Components/TransformComponent.h"
+#include "Components/EnemyComponent.h"
+#include "Components/PlayerComponent.h"
+#include "Components/ColliderComponent.h"
+#include "Components/SpriteComponent.h"
+#include "Components/ProjectileComponent.h"
+#include "Components/HealthComponent.h"
+#include "Components/RigidBodyComponent.h"
+#include "Components/BoxColliderComponent.h"
+#include "Components/KeyboardControlComponent.h"
+#include "Components/AIComponent.h"
+#include "Systems/SoundFXSystem.h"
+#include "Events/EventManager.h"
+#include "Events/CollisionEvent.h"
+#include "Game/Game.h"
+#include "Game/Player.h"
+#include "Utilities/Utility.h"
 
 constexpr int MAX_WORLD_WIDTH = 16;
 constexpr int MAX_WORLD_HEIGHT = 8;
 
-void MovementSystem::UpdateBoomerang(const double& deltaTime)
+void MovementSystem::UpdateBoomerang( const double& deltaTime )
 {
 	// If there is no boomerang, nothing to update!
-	if (!Registry::Instance().DoesTagExist("boomerang"))
+	if ( !Registry::Instance().DoesTagExist( "boomerang" ) )
 		return;
 
 	const auto& player = m_Game.GetPlayer();
@@ -33,24 +33,24 @@ void MovementSystem::UpdateBoomerang(const double& deltaTime)
 	const auto& playerSprite = playerEnt.GetComponent<SpriteComponent>();
 
 	// Boomerang variables
-	auto boomerang = Registry::Instance().GetEntityByTag("boomerang");
+	auto boomerang = Registry::Instance().GetEntityByTag( "boomerang" );
 	auto& rigidbody = boomerang.GetComponent<RigidBodyComponent>();
 	auto& proj = boomerang.GetComponent<ProjectileComponent>();
 	auto& transform = boomerang.GetComponent<TransformComponent>();
 
 	// Have the boomerang change direction based on the player position
-	glm::vec2 direction = glm::normalize(
-		((playerPos.position + glm::vec2(playerSprite.width / 2, playerSprite.height / 2)) - transform.position));
+	glm::vec2 direction = glm::normalize( (
+		( playerPos.position + glm::vec2( playerSprite.width / 2, playerSprite.height / 2 ) ) - transform.position ) );
 	bool boomerangReturned = false;
 
-	if (proj.boomTimer.GetTicks() > 300) // TODO: Change the time based on type of boomerang-->wood/magic
+	if ( proj.boomTimer.GetTicks() > 300 ) // TODO: Change the time based on type of boomerang-->wood/magic
 	{
-		rigidbody.velocity.x = direction.x * 500; 
-		rigidbody.velocity.y = direction.y * 500; 
+		rigidbody.velocity.x = direction.x * 500;
+		rigidbody.velocity.y = direction.y * 500;
 		boomerangReturned = true;
 	}
 
-	if (!transform.collision)
+	if ( !transform.bCollision )
 	{
 		transform.position.x += rigidbody.velocity.x * deltaTime;
 		transform.position.y += rigidbody.velocity.y * deltaTime;
@@ -59,28 +59,29 @@ void MovementSystem::UpdateBoomerang(const double& deltaTime)
 	{
 		boomerangReturned = true;
 	}
-		
-	if (boomerangReturned)
+
+	if ( boomerangReturned )
 	{
 		bool setKill = false;
 		transform.position.x += direction.x * deltaTime;
 		transform.position.y += direction.y * deltaTime;
 
 		// If the boomerang position is within any of these given parameters --> Kill it
-		if (transform.position.x <= playerPos.position.x + (playerSprite.width / 2) && transform.position.y <= playerPos.position.y + (playerSprite.height / 2) &&
-			transform.position.x >= playerPos.position.x && transform.position.y >= playerPos.position.y)
+		if ( transform.position.x <= playerPos.position.x + ( playerSprite.width / 2.f ) &&
+			 transform.position.y <= playerPos.position.y + ( playerSprite.height / 2.f ) &&
+			 transform.position.x >= playerPos.position.x && transform.position.y >= playerPos.position.y )
 			setKill = true;
 
-		if (setKill)
-			boomerang.Kill();		
+		if ( setKill )
+			boomerang.Kill();
 	}
 }
 
-void MovementSystem::UpdateEnemies(const double& deltaTime)
+void MovementSystem::UpdateEnemies( const double& deltaTime )
 {
-	const auto& enemies = Registry::Instance().GetEntitiesByGroup("enemies");
+	const auto& enemies = Registry::Instance().GetEntitiesByGroup( "enemies" );
 
-	for (const auto& enemy : enemies)
+	for ( const auto& enemy : enemies )
 	{
 		auto& transform = enemy.GetComponent<TransformComponent>();
 		auto& enemyComponent = enemy.GetComponent<EnemyComponent>();
@@ -88,7 +89,7 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 		const auto& collider = enemy.GetComponent<BoxColliderComponent>();
 
 		// Calculate the min max positions -- TODO: MOVE THIS TO ENEMY COMPONENT
-		if (!enemyComponent.distanceCalculated)
+		if ( !enemyComponent.distanceCalculated )
 		{
 			const int entityXPanel = transform.position.x / PANEL_WIDTH;
 			const int entityYPanel = transform.position.y / PANEL_HEIGHT;
@@ -103,79 +104,71 @@ void MovementSystem::UpdateEnemies(const double& deltaTime)
 			ai.enemyPos = glm::vec2{ entityXPanel, entityYPanel };
 		}
 
-		if (ai.enemyPos != m_Game.GetPlayer()->GetPlayerPos() || ai.enemyType == EnemyType::BLADE_TRAP)
+		if ( ai.enemyPos != m_Game.GetPlayer()->GetPlayerPos() || ai.enemyType == EnemyType::BLADE_TRAP )
 			continue;
-		
+
 		auto& rigidBody = enemy.GetComponent<RigidBodyComponent>();
 		auto& sprite = enemy.GetComponent<SpriteComponent>();
-		auto& collision = enemy.GetComponent<BoxColliderComponent>();
+		auto& bCollision = enemy.GetComponent<BoxColliderComponent>();
 		auto& health = enemy.GetComponent<HealthComponent>();
 
-		if (!transform.collision && !health.isHurt && health.healthPercentage > 0)
+		if ( !transform.bCollision && !health.bIsHurt && health.healthPercentage > 0 )
 		{
 			transform.position.x += rigidBody.velocity.x * deltaTime;
 			transform.position.y += rigidBody.velocity.y * deltaTime;
 
-			if (transform.position.x <= enemyComponent.minDistance.x)
+			if ( transform.position.x <= enemyComponent.minDistance.x )
 			{
 				transform.position.x = enemyComponent.minDistance.x;
 				rigidBody.velocity.x *= -1;
 			}
 
-			if (transform.position.x >= enemyComponent.maxDistance.x)
+			if ( transform.position.x >= enemyComponent.maxDistance.x )
 			{
-				transform.position.x = enemyComponent.maxDistance.x - (collider.width * transform.scale.x);
+				transform.position.x = enemyComponent.maxDistance.x - ( collider.width * transform.scale.x );
 				rigidBody.velocity.x *= -1;
 			}
 
-			if (transform.position.y <= enemyComponent.minDistance.y)
+			if ( transform.position.y <= enemyComponent.minDistance.y )
 			{
 				transform.position.y = enemyComponent.minDistance.y;
 				rigidBody.velocity.y *= -1;
 			}
 
-			if (transform.position.y >= enemyComponent.maxDistance.y)
+			if ( transform.position.y >= enemyComponent.maxDistance.y )
 			{
-				transform.position.y = enemyComponent.maxDistance.y - (collider.height * transform.scale.y);
+				transform.position.y = enemyComponent.maxDistance.y - ( collider.height * transform.scale.y );
 				rigidBody.velocity.y *= -1;
 			}
 		}
-		
-		SetDirection(rigidBody);
 
-		switch (rigidBody.dir)
+		SetDirection( rigidBody );
+
+		switch ( rigidBody.dir )
 		{
-		case RigidBodyDir::UP:
-			sprite.srcRect.x = sprite.width * 2 + sprite.offset.x;
-			break;
-		case RigidBodyDir::RIGHT:
-			sprite.srcRect.x = sprite.width * 3 + sprite.offset.x;
-			break;
-		case RigidBodyDir::DOWN:
-			sprite.srcRect.x = sprite.width * 0 + sprite.offset.x;
-			break;
-		case RigidBodyDir::LEFT:
-			sprite.srcRect.x = sprite.width * 1 + sprite.offset.x;
-			break;
+		case RigidBodyDir::UP: sprite.srcRect.x = sprite.width * 2 + sprite.offset.x; break;
+		case RigidBodyDir::RIGHT: sprite.srcRect.x = sprite.width * 3 + sprite.offset.x; break;
+		case RigidBodyDir::DOWN: sprite.srcRect.x = sprite.width * 0 + sprite.offset.x; break;
+		case RigidBodyDir::LEFT: sprite.srcRect.x = sprite.width * 1 + sprite.offset.x; break;
 		}
 	}
 }
 
-void MovementSystem::UpdatePlayer(const double& deltaTime)
+void MovementSystem::UpdatePlayer( const double& deltaTime )
 {
 	const auto& player = m_Game.GetPlayer();
 	const auto& playerEnt = player->GetPlayer();
 	auto& player_transform = playerEnt.GetComponent<TransformComponent>();
 	auto& player_rigidBody = playerEnt.GetComponent<RigidBodyComponent>();
 	auto& player_sprite = playerEnt.GetComponent<SpriteComponent>();
-	auto& player_collision = playerEnt.GetComponent<BoxColliderComponent>();
-	
+	auto& player_bCollision = playerEnt.GetComponent<BoxColliderComponent>();
+
 	const int playerXPanel = player_transform.position.x / PANEL_WIDTH;
 	const int playerYPanel = player_transform.position.y / PANEL_HEIGHT;
 
-	player->SetPlayerPos(glm::vec2(playerXPanel, playerYPanel));
+	player->SetPlayerPos( glm::vec2( playerXPanel, playerYPanel ) );
 
-	if (!player_transform.collision)
+	if ( !player_transform.bCollision )
 	{
 		player_transform.position.x += player_rigidBody.velocity.x * deltaTime;
 		player_transform.position.y += player_rigidBody.velocity.y * deltaTime;
@@ -187,211 +180,71 @@ void MovementSystem::UpdatePlayer(const double& deltaTime)
 	auto shield = player->GetShield();
 	auto& shieldTransform = shield.GetComponent<TransformComponent>();
 
-	if (player_rigidBody.velocity.x == 0 && player_rigidBody.velocity.y == 0)
+	if ( player_rigidBody.velocity.x == 0 && player_rigidBody.velocity.y == 0 )
 	{
 		swordTransform.position = player_transform.position;
 		shieldTransform.position = player_transform.position;
 	}
 
-	SetDirection(player_rigidBody);
+	SetDirection( player_rigidBody );
 }
 
-void MovementSystem::UpdateProjectiles(const double& deltaTime)
+void MovementSystem::UpdateProjectiles( const double& deltaTime )
 {
-	if (!Registry::Instance().DoesGroupExist("projectile"))
+	if ( !Registry::Instance().DoesGroupExist( "projectile" ) )
 		return;
 
-	const auto& projectiles = Registry::Instance().GetEntitiesByGroup("projectile");
+	const auto& projectiles = Registry::Instance().GetEntitiesByGroup( "projectile" );
 
-	for (const auto& projectile : projectiles)
+	for ( const auto& projectile : projectiles )
 	{
 		auto& transform = projectile.GetComponent<TransformComponent>();
 		auto& rigidBody = projectile.GetComponent<RigidBodyComponent>();
 		auto& sprite = projectile.GetComponent<SpriteComponent>();
-		auto& collision = projectile.GetComponent<BoxColliderComponent>();
+		auto& bCollision = projectile.GetComponent<BoxColliderComponent>();
 
-		if (!transform.collision)
+		if ( !transform.bCollision )
 		{
 			transform.position.x += rigidBody.velocity.x * deltaTime;
 			transform.position.y += rigidBody.velocity.y * deltaTime;
 		}
 
-		SetDirection(rigidBody);
+		SetDirection( rigidBody );
 	}
 }
 
-void MovementSystem::SetDirection(RigidBodyComponent& rigidBody)
+void MovementSystem::SetDirection( RigidBodyComponent& rigidBody )
 {
-	if (rigidBody.velocity.y > 0)
+	if ( rigidBody.velocity.y > 0 )
 	{
 		rigidBody.dir = RigidBodyDir::DOWN;
 	}
-	else if (rigidBody.velocity.y < 0)
+	else if ( rigidBody.velocity.y < 0 )
 	{
 		rigidBody.dir = RigidBodyDir::UP;
 	}
-	else if (rigidBody.velocity.x > 0)
+	else if ( rigidBody.velocity.x > 0 )
 	{
 		rigidBody.dir = RigidBodyDir::RIGHT;
 	}
-	else if (rigidBody.velocity.x < 0)
+	else if ( rigidBody.velocity.x < 0 )
 	{
 		rigidBody.dir = RigidBodyDir::LEFT;
 	}
 }
 
 MovementSystem::MovementSystem()
-	: m_Game(Game::Instance())
+	: m_Game( Game::Instance() )
 {
 	RequiredComponent<TransformComponent>();
 	RequiredComponent<RigidBodyComponent>();
 	RequiredComponent<BoxColliderComponent>();
 }
 
-void MovementSystem::Update(const double& deltaTime)
+void MovementSystem::Update( const double& deltaTime )
 {
-	UpdateBoomerang(deltaTime);
-	UpdatePlayer(deltaTime);
-	UpdateEnemies(deltaTime);
-	UpdateProjectiles(deltaTime);
-}
-
-void MovementSystem::SubscribeToEvents(EventManager& eventManager)
-{
-	eventManager.SubscribeToEvent<CollisionEvent>(this, &MovementSystem::OnCollision);
-}
-
-void MovementSystem::OnCollision(CollisionEvent& colEvent)
-{
-	Entity a = colEvent.a;
-	Entity b = colEvent.b;
-
-	if ((a.HasComponent<ColliderComponent>() || a.BelongsToGroup("tiles")) && (b.HasComponent<PlayerComponent>()))
-	{
-		OnPlayerHitsObstacle(a, b);
-		return;
-	}
-	else if ((b.HasComponent<ColliderComponent>() || b.BelongsToGroup("tiles")) && (a.HasComponent<PlayerComponent>()))
-	{
-		OnPlayerHitsObstacle(b, a);
-		return;
-	}
-		
-
-	if ((b.HasComponent<ColliderComponent>() || b.BelongsToGroup("tiles")) && a.HasComponent<EnemyComponent>())
-	{
-		OnEnemyHitsObstacle(a, b);
-		return;
-	}
-	else if (b.HasComponent<EnemyComponent>() && (a.HasComponent<ColliderComponent>() || a.BelongsToGroup("tiles"))) 
-	{
-		OnEnemyHitsObstacle(b, a);
-		return;
-	}
-
-	if (a.HasComponent<TriggerBoxComponent>() && (b.HasTag("player")))
-	{
-		if (a.GetComponent<TriggerBoxComponent>().collider)
-			OnPlayerHitsObstacle(a, b);
-	}
-
-	if (b.HasComponent<TriggerBoxComponent>() && (a.HasTag("player")))
-	{
-		if (b.GetComponent<TriggerBoxComponent>().collider)
-			OnPlayerHitsObstacle(b, a);
-	}
-}
-
-void MovementSystem::OnEnemyHitsObstacle(Entity enemy, Entity obstacle)
-{
-	auto& enemy1Rigidbody = enemy.GetComponent<RigidBodyComponent>();
-	auto& enemy_transform = enemy.GetComponent<TransformComponent>();
-	auto& enemy_collider = enemy.GetComponent<BoxColliderComponent>();
-
-	auto& obstacle_transform = obstacle.GetComponent<TransformComponent>();
-	auto& obstacle_collider = obstacle.GetComponent<BoxColliderComponent>();
-
-	switch (enemy1Rigidbody.dir)
-	{
-	case RigidBodyDir::UP:
-	{
-		enemy_transform.collision = true;
-		enemy1Rigidbody.velocity.y = 0;
-		enemy_transform.position.y = (obstacle_transform.position.y + obstacle_collider.offset.y) +
-			(obstacle_collider.height * obstacle_transform.scale.y) - enemy_collider.offset.y;
-
-		enemy1Rigidbody.velocity.x = 150;
-
-		break;
-	}
-	case RigidBodyDir::RIGHT:
-	{
-		enemy_transform.collision = true;
-		enemy1Rigidbody.velocity.x = 0;
-		enemy_transform.position.x = (obstacle_transform.position.x + obstacle_collider.offset.x) -
-			(obstacle_collider.width * obstacle_transform.scale.x) - enemy_collider.offset.x;
-
-		enemy1Rigidbody.velocity.y = 150;
-
-		break;
-	}
-	case RigidBodyDir::DOWN:
-	{
-		enemy_transform.collision = true;
-		enemy1Rigidbody.velocity.y = 0;
-		enemy_transform.position.y = (obstacle_transform.position.y + obstacle_collider.offset.y) -
-			(enemy_collider.height * enemy_transform.scale.y) - enemy_collider.offset.y;
-		enemy1Rigidbody.velocity.x = -150;
-
-		break;
-	}
-	case RigidBodyDir::LEFT:
-	{
-		enemy_transform.collision = true;
-		enemy1Rigidbody.velocity.x = 0;
-		enemy_transform.position.x = (obstacle_transform.position.x + obstacle_collider.offset.x) +
-			(enemy_collider.width * enemy_transform.scale.x) - enemy_collider.offset.x;
-
-		enemy1Rigidbody.velocity.y = -150;
-		break;
-	}
-	}
-}
-
-void MovementSystem::OnPlayerHitsObstacle(Entity obstacle, Entity player)
-{
-	auto& playerTransform = player.GetComponent<TransformComponent>();
-	auto& playerCollider = player.GetComponent<BoxColliderComponent>();
-	auto& playerRigidbody = player.GetComponent<RigidBodyComponent>();
-
-	auto& obstacleTransform = obstacle.GetComponent<TransformComponent>();
-	auto& obstacleCollider = obstacle.GetComponent<BoxColliderComponent>();
-
-	switch (playerRigidbody.dir)
-	{
-	case RigidBodyDir::UP:
-		playerTransform.collision = true;
-		playerRigidbody.velocity.y = 0;
-		playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) + (obstacleCollider.height * obstacleTransform.scale.y);
-		playerTransform.position.x = playerTransform.position.x;
-		break;
-	case RigidBodyDir::RIGHT:
-		playerTransform.collision = true;
-		playerRigidbody.velocity.x = 0;
-		playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) - (playerCollider.width * playerTransform.scale.x);
-		playerTransform.position.y = playerTransform.position.y;
-		break;
-	case RigidBodyDir::DOWN:
-		playerTransform.collision = true;
-		playerRigidbody.velocity.y = 0;
-		playerTransform.position.y = (obstacleTransform.position.y - playerCollider.offset.y + obstacleCollider.offset.y) - (playerCollider.height * playerTransform.scale.y);
-		playerTransform.position.x = playerTransform.position.x;
-		break;
-	case RigidBodyDir::LEFT:
-		playerTransform.collision = true;
-		playerRigidbody.velocity.x = 0;
-		playerTransform.position.x = (obstacleTransform.position.x - playerCollider.offset.x + obstacleCollider.offset.x) + (obstacleCollider.width * obstacleTransform.scale.x);
-		playerTransform.position.y = playerTransform.position.y;
-		break;
-	}
+	UpdateBoomerang( deltaTime );
+	UpdatePlayer( deltaTime );
+	UpdateEnemies( deltaTime );
+	UpdateProjectiles( deltaTime );
 }

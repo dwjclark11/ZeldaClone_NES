@@ -1,8 +1,8 @@
-#include "Button.h"
+#include "inputs/Button.h"
 
-void Button::Update(bool pressed)
+void Button::Update( bool pressed )
 {
-	justPressed = !isDown && pressed;
-	justReleased = isDown && !pressed;
-	isDown = pressed;
+	bJustPressed = !bIsDown && pressed;
+	bJustReleased = bIsDown && !pressed;
+	bIsDown = pressed;
 }

@@ -1,69 +1,69 @@
-#include "Timer.h"
+#include "Utilities/Timer.h"
+#include "Logger/Logger.h"
+
 #include <SDL.h>
-#include <iostream>
-#include "../Logger/Logger.h"
-using namespace std::literals::chrono_literals; // Needed to get the 's' in 1s for seconds
 
+using namespace std::literals::chrono_literals;
 
-Timer::Timer() 
-	: mStartTicks(0)
-	, mPausedTicks(0)
-	, mPaused(false)
-	, mStarted(false)
+Timer::Timer()
+	: m_StartTicks( 0 )
+	, m_PausedTicks( 0 )
+	, m_bPaused( false )
+	, m_bStarted( false )
 {
 	// Timer Created
 }
-	
+
 // Various clock actions
 void Timer::Start()
 {
-	//Logger::Log("Timer Started");
-	// Start the timer
-	mStarted = true;
+	// Logger::Log("Timer Started");
+	//  Start the timer
+	m_bStarted = true;
 	// Unpause if paused
-	mPaused = false;
-	
+	m_bPaused = false;
+
 	// Get the current clock time
-	mStartTicks = SDL_GetTicks();
-	mPausedTicks = 0;
+	m_StartTicks = SDL_GetTicks();
+	m_PausedTicks = 0;
 }
 
 void Timer::Stop()
 {
 	// Stop the timer
-	mStarted = false;
-	
+	m_bStarted = false;
+
 	// UnPause the timer
-	mPaused = false;
+	m_bPaused = false;
 	// Clear the tick variables
-	mStartTicks = 0;
-	mPausedTicks = 0;
+	m_StartTicks = 0;
+	m_PausedTicks = 0;
 }
 
 void Timer::Pause()
 {
 	// If the timer is running and isn't already paused
-	if (mStarted && !mPaused)
+	if ( m_bStarted && !m_bPaused )
 	{
 		// Pause the timer
-		mPaused = true;
+		m_bPaused = true;
 		// Calculated the paused ticks
-		mPausedTicks = SDL_GetTicks() - mStartTicks;
-		mStartTicks = 0;
+		m_PausedTicks = SDL_GetTicks() - m_StartTicks;
+		m_StartTicks = 0;
 	}
 }
-	
+
 void Timer::UnPause()
 {
 	// If the timer is running and paused;
-	if (mStarted && mPaused)
+	if ( m_bStarted && m_bPaused )
 	{
 		// Unpause the timer
-		mPaused = false;
+		m_bPaused = false;
 		// Reset the Start ticks
-		mStartTicks = SDL_GetTicks() - mPausedTicks;
+		m_StartTicks = SDL_GetTicks() - m_PausedTicks;
 		// Reset the paused ticks
-		mPausedTicks = 0;
+		m_PausedTicks = 0;
 	}
 }
 
@@ -73,42 +73,41 @@ Uint32 Timer::GetTicks()
 	// The actual timer time
 	Uint32 time = 0;
 	// If the timer is running
-	if (mStarted)
+	if ( m_bStarted )
 	{
 		// If the timer is paused
-		if (mPaused)
+		if ( m_bPaused )
 		{
 			// Return the number of ticks when the timer was paused
-			time = mPausedTicks;
+			time = m_PausedTicks;
 		}
 		else
 		{
 			// Return the currnet time minus the start time
-			time = SDL_GetTicks() - mStartTicks;
+			time = SDL_GetTicks() - m_StartTicks;
 		}
 	}
 	return time;
 }
-	
+
 // Checks the status of the timer
 bool Timer::isStarted()
 {
-	return mStarted;
+	return m_bStarted;
 }
 
 bool Timer::isPaused()
 {
-	return mPaused;
+	return m_bPaused;
 }
 
 void Timer::Update()
 {
 	auto start = std::chrono::high_resolution_clock::now();
 
-	std::this_thread::sleep_for(1s);
+	std::this_thread::sleep_for( 1s );
 
 	auto end = std::chrono::high_resolution_clock::now();
-
 
 	std::chrono::duration<float> duration = end - start;
 	std::cout << duration.count() << std::endl;

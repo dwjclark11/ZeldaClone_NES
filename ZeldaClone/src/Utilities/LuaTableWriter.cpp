@@ -1,157 +1,156 @@
-#include "LuaTableWriter.h"
+#include "Utilities/LuaTableWriter.h"
 
-void LuaTableWriter::WriteIndent(std::fstream& file)
+void LuaTableWriter::WriteIndent( std::fstream& file )
 {
-	for (int level = indent; level; --level)
+	for ( int level = indent; level; --level )
 	{
-		Write("    ", file);
+		Write( "    ", file );
 	}
 }
 
-void LuaTableWriter::WriteNewLine(std::fstream& file)
+void LuaTableWriter::WriteNewLine( std::fstream& file )
 {
-	if (!newLine)
+	if ( !newLine )
 	{
-		if (!minimize)
+		if ( !minimize )
 		{
-			if (suppressNewLines)
+			if ( suppressNewLines )
 			{
-				Write(' ', file);
+				Write( ' ', file );
 			}
 			else
 			{
-				Write('\n', file);
-				WriteIndent(file);
+				Write( '\n', file );
+				WriteIndent( file );
 			}
 		}
 		newLine = true;
 	}
 }
 
-void LuaTableWriter::PrepareNewValue(std::fstream& file)
+void LuaTableWriter::PrepareNewValue( std::fstream& file )
 {
-	if (!valueWritten)
+	if ( !valueWritten )
 	{
-		WriteNewLine(file);
+		WriteNewLine( file );
 	}
 	else
 	{
-		Write(valueSeparator, file);
-		if (!minimize)
+		Write( valueSeparator, file );
+		if ( !minimize )
 		{
-			Write(' ', file);
+			Write( ' ', file );
 		}
 	}
 }
 
-void LuaTableWriter::WriteCommentSeparation(std::fstream& file)
+void LuaTableWriter::WriteCommentSeparation( std::fstream& file )
 {
-	//PrepareNewLine(file);
-	Write("----------------------------------------------------------", file);
-	Write('\n', file);
+	// PrepareNewLine(file);
+	Write( "----------------------------------------------------------", file );
+	Write( '\n', file );
 }
 
 LuaTableWriter::LuaTableWriter()
-	: valueSeparator(',')
-	, valueWritten(false)
-	, minimize(false)
-	, newLine(false)
-	, suppressNewLines(false)
-	, error(false)
-	, indent(0)
+	: valueSeparator( ',' )
+	, valueWritten( false )
+	, minimize( false )
+	, newLine( false )
+	, suppressNewLines( false )
+	, error( false )
+	, indent( 0 )
 {
-
 }
 
 void LuaTableWriter::WriteStartDocument()
 {
-	assert(indent == 0);
+	assert( indent == 0 );
 }
 
-void LuaTableWriter::WriteEndDocument(std::fstream& file)
+void LuaTableWriter::WriteEndDocument( std::fstream& file )
 {
-	assert(indent == 0);
-	Write('\n', file);
+	assert( indent == 0 );
+	Write( '\n', file );
 }
 
-void LuaTableWriter::WriteStartReturnTable(std::fstream& file)
+void LuaTableWriter::WriteStartReturnTable( std::fstream& file )
 {
-	PrepareNewLine(file);
-	Write('{', file);
+	PrepareNewLine( file );
+	Write( '{', file );
 	++indent;
 	newLine = false;
 	valueWritten = false;
 }
-void LuaTableWriter::WriteDeclareTable(const std::string name, std::fstream& file)
+void LuaTableWriter::WriteDeclareTable( const std::string name, std::fstream& file )
 {
-	PrepareNewLine(file);
-	Write(name, file);
-	Write(minimize ? "={" : " = {", file);
+	PrepareNewLine( file );
+	Write( name, file );
+	Write( minimize ? "={" : " = {", file );
 	++indent;
 	newLine = false;
 	valueWritten = false;
 }
 
-void LuaTableWriter::WriteCommentLine(const std::string comment, std::fstream& file)
+void LuaTableWriter::WriteCommentLine( const std::string comment, std::fstream& file )
 {
-	//PrepareNewLine(file);
-	Write("-- " + comment, file);
-	Write('\n', file);
+	// PrepareNewLine(file);
+	Write( "-- " + comment, file );
+	Write( '\n', file );
 }
 
-void LuaTableWriter::WriteEndTable(std::fstream& file)
+void LuaTableWriter::WriteEndTable( std::fstream& file )
 {
-	PrepareNewLine(file);
+	PrepareNewLine( file );
 	--indent;
-	if (valueWritten)
+	if ( valueWritten )
 	{
-		WriteNewLine(file);
+		WriteNewLine( file );
 	}
-	Write('}', file);
+	Write( '}', file );
 	newLine = false;
 	valueWritten = true;
 }
 
-void LuaTableWriter::WriteEndTable(bool sameLine, std::fstream& file)
+void LuaTableWriter::WriteEndTable( bool sameLine, std::fstream& file )
 {
-	//PrepareNewLine(file);
+	// PrepareNewLine(file);
 	--indent;
-	if (valueWritten && !sameLine)
+	if ( valueWritten && !sameLine )
 	{
-		//PrepareNewLine(file);
-		WriteNewLine(file);
-		//WriteIndent(file);
+		// PrepareNewLine(file);
+		WriteNewLine( file );
+		// WriteIndent(file);
 	}
-	Write('}', file);
+	Write( '}', file );
 	newLine = false;
 	valueWritten = true;
 }
 
-void LuaTableWriter::WriteEndTableWithSeparator(bool sameLine, std::fstream& file)
+void LuaTableWriter::WriteEndTableWithSeparator( bool sameLine, std::fstream& file )
 {
-	//PrepareNewLine(file);
+	// PrepareNewLine(file);
 	--indent;
-	if (valueWritten && !sameLine)
+	if ( valueWritten && !sameLine )
 	{
-		WriteNewLine(file);
+		WriteNewLine( file );
 	}
-	Write('}', file);
-	//Write(valueSeparator, file);
+	Write( '}', file );
+	// Write(valueSeparator, file);
 	newLine = false;
 	valueWritten = true;
 }
 
-void LuaTableWriter::PrepareNewLine(std::fstream& file)
+void LuaTableWriter::PrepareNewLine( std::fstream& file )
 {
-	if (valueWritten)
+	if ( valueWritten )
 	{
-		Write(valueSeparator, file);
+		Write( valueSeparator, file );
 		valueWritten = false;
 	}
-	WriteNewLine(file);
+	WriteNewLine( file );
 }
 
-void LuaTableWriter::SetSuppressNewLines(bool suppressNewLines)
+void LuaTableWriter::SetSuppressNewLines( bool suppressNewLines )
 {
 	this->suppressNewLines = suppressNewLines;
 }
@@ -161,8 +160,7 @@ bool LuaTableWriter::SuppressNewLines() const
 	return suppressNewLines;
 }
 
-
-void LuaTableWriter::SetMinimize(bool minimize)
+void LuaTableWriter::SetMinimize( bool minimize )
 {
 	this->minimize = minimize;
 }
@@ -177,19 +175,19 @@ bool LuaTableWriter::HasError() const
 	return minimize;
 }
 
-std::string LuaTableWriter::Quote(const std::string& str)
+std::string LuaTableWriter::Quote( const std::string& str )
 {
 	std::string quoted;
-	quoted.reserve(str.length() + 2);
+	quoted.reserve( str.length() + 2 );
 	quoted += '"';
 
-	for (const char ch : str)
+	for ( const char ch : str )
 	{
-		switch (ch)
+		switch ( ch )
 		{
-		case '\\':	quoted.append("\\\\");	break;
-		case '"':	quoted.append("\\\"");	break;
-		case '\n':  quoted.append("\\n");	break;
+		case '\\': quoted.append( "\\\\" ); break;
+		case '"': quoted.append( "\\\"" ); break;
+		case '\n': quoted.append( "\\n" ); break;
 		default: quoted += ch;
 		}
 	}
@@ -198,4 +196,3 @@ std::string LuaTableWriter::Quote(const std::string& str)
 	return quoted;
 	return std::string();
 }
-

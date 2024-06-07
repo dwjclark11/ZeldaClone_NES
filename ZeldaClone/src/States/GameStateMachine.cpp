@@ -1,62 +1,63 @@
-#include "GameStateMachine.h"
+#include "States/GameStateMachine.h"
+#include "States/State.h"
 
-void GameStateMachine::Update(const float deltaTime)
+void GameStateMachine::Update( const float deltaTime )
 {
-	if (!states.empty())
+	if ( !m_States.empty() )
 	{
-		states.back()->Update(deltaTime);
+		m_States.back()->Update( deltaTime );
 	}
 }
 
 void GameStateMachine::Render()
 {
-	if (!states.empty())
+	if ( !m_States.empty() )
 	{
-		states.back()->Render();
+		m_States.back()->Render();
 	}
 }
 
-void GameStateMachine::PushState(std::unique_ptr<State> state, bool bReplace)
+void GameStateMachine::PushState( std::unique_ptr<State> state, bool bReplace )
 {
-	if (!states.empty() && bReplace)
+	if ( !m_States.empty() && bReplace )
 	{
-		states.back()->OnExit();
-		states.erase(states.end() - 1);
+		m_States.back()->OnExit();
+		m_States.erase( m_States.end() - 1 );
 	}
 
-	states.push_back(std::move(state));
-	states.back()->OnEnter();
+	m_States.push_back( std::move( state ) );
+	m_States.back()->OnEnter();
 }
 
 void GameStateMachine::PopState()
 {
-	if (!states.empty())
+	if ( !m_States.empty() )
 	{
-		if (states.back()->OnExit())
+		if ( m_States.back()->OnExit() )
 		{
-			states.erase(states.end() - 1);
+			m_States.erase( m_States.end() - 1 );
 		}
 	}
 }
 
 void GameStateMachine::ClearStates()
 {
-	if (states.back()->OnExit())
+	if ( m_States.back()->OnExit() )
 	{
-		states.erase(states.end() - 1);
-		states.clear();
+		m_States.erase( m_States.end() - 1 );
+		m_States.clear();
 	}
 }
 
 std::string GameStateMachine::GetCurrentState()
 {
-	return states.back()->GetStateID();
+	return m_States.back()->GetStateID();
 }
 
-void GameStateMachine::ProcessEvents(SDL_Event& event)
+void GameStateMachine::ProcessEvents( SDL_Event& event )
 {
-	if (!states.empty())
+	if ( !m_States.empty() )
 	{
-		states.back()->ProcessEvents(event);
+		m_States.back()->ProcessEvents( event );
 	}
 }

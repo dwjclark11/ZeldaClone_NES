@@ -1,16 +1,20 @@
-#include "RenderEditorGUISystem.h"
-#include "RenderEditorSystem.h"
-#include "../../Components/TransformComponent.h"
-#include "../../Components/SecretComponent.h"
+#include "Systems/EditorSystems/RenderEditorGUISystem.h"
+#include "Systems/EditorSystems/RenderEditorSystem.h"
+#include "Components/TransformComponent.h"
+#include "Components/SecretComponent.h"
 
-#include "../../Utilities/FileManagerUtils.h"
-#include "../../Utilities/Camera.h"
-#include "../../States/MenuState.h"
-#include "../../Game/LevelLoader.h"
+#include "Utilities/FileManagerUtils.h"
+#include "Utilities/Camera.h"
+#include "States/MenuState.h"
+#include "States/GameStateMachine.h"
+#include "Game/LevelLoader.h"
+
 #include <filesystem>
 
-RenderEditorGUISystem::RenderEditorGUISystem(MouseControlSystem& mouseControl)
-	: game(Game::Instance()), m_MouseControl{mouseControl}, m_Loader{m_MouseControl}
+RenderEditorGUISystem::RenderEditorGUISystem( MouseControlSystem& mouseControl )
+	: m_Game( Game::Instance() )
+	, m_MouseControl{ mouseControl }
+	, m_Loader{ m_MouseControl }
 {
 	ImGuiSetup();
 	ImGuiStyle& style = ImGui::GetStyle();
@@ -19,536 +23,555 @@ RenderEditorGUISystem::RenderEditorGUISystem(MouseControlSystem& mouseControl)
 	style.ScrollbarRounding = 0.0f;
 	style.ScrollbarSize = 10.0f;
 	ImVec4* colors = ImGui::GetStyle().Colors;
-	colors[ImGuiCol_Text] = ImVec4(0.95f, 0.95f, 0.95f, 1.00f);
-	colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
-	colors[ImGuiCol_WindowBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
-	colors[ImGuiCol_ChildBg] = ImVec4(0.04f, 0.04f, 0.04f, 0.50f);
-	colors[ImGuiCol_PopupBg] = ImVec4(0.12f, 0.12f, 0.12f, 0.94f);
-	colors[ImGuiCol_Border] = ImVec4(0.25f, 0.25f, 0.27f, 0.50f);
-	colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
-	colors[ImGuiCol_FrameBg] = ImVec4(0.20f, 0.20f, 0.22f, 0.50f);
-	colors[ImGuiCol_FrameBgHovered] = ImVec4(0.25f, 0.25f, 0.27f, 0.75f);
-	colors[ImGuiCol_FrameBgActive] = ImVec4(0.30f, 0.30f, 0.33f, 1.00f);
-	colors[ImGuiCol_TitleBg] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-	colors[ImGuiCol_TitleBgActive] = ImVec4(0.04f, 0.04f, 0.04f, 1.00f);
-	colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.04f, 0.04f, 0.04f, 0.75f);
-	colors[ImGuiCol_MenuBarBg] = ImVec4(0.18f, 0.18f, 0.19f, 1.00f);
-	colors[ImGuiCol_ScrollbarBg] = ImVec4(0.24f, 0.24f, 0.26f, 0.75f);
-	colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.41f, 0.41f, 0.41f, 0.75f);
-	colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.62f, 0.62f, 0.62f, 0.75f);
-	colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.94f, 0.92f, 0.94f, 0.75f);
-	colors[ImGuiCol_CheckMark] = ImVec4(0.60f, 0.60f, 0.60f, 1.00f);
-	colors[ImGuiCol_SliderGrab] = ImVec4(0.41f, 0.41f, 0.41f, 0.75f);
-	colors[ImGuiCol_SliderGrabActive] = ImVec4(0.62f, 0.62f, 0.62f, 0.75f);
-	colors[ImGuiCol_Button] = ImVec4(0.20f, 0.20f, 0.22f, 1.00f);
-	colors[ImGuiCol_ButtonHovered] = ImVec4(0.25f, 0.25f, 0.27f, 1.00f);
-	colors[ImGuiCol_ButtonActive] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-	colors[ImGuiCol_Header] = ImVec4(0.18f, 0.18f, 0.19f, 1.00f);
-	colors[ImGuiCol_HeaderHovered] = ImVec4(0.25f, 0.25f, 0.27f, 1.00f);
-	colors[ImGuiCol_HeaderActive] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-	colors[ImGuiCol_Separator] = ImVec4(0.25f, 0.25f, 0.27f, 1.00f);
-	colors[ImGuiCol_SeparatorHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
-	colors[ImGuiCol_SeparatorActive] = ImVec4(0.62f, 0.62f, 0.62f, 1.00f);
-	colors[ImGuiCol_ResizeGrip] = ImVec4(0.30f, 0.30f, 0.33f, 0.75f);
-	colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.41f, 0.41f, 0.41f, 0.75f);
-	colors[ImGuiCol_ResizeGripActive] = ImVec4(0.62f, 0.62f, 0.62f, 0.75f);
-	colors[ImGuiCol_Tab] = ImVec4(0.21f, 0.21f, 0.22f, 1.00f);
-	colors[ImGuiCol_TabHovered] = ImVec4(0.37f, 0.37f, 0.39f, 1.00f);
-	colors[ImGuiCol_TabActive] = ImVec4(0.30f, 0.30f, 0.33f, 1.00f);
-	colors[ImGuiCol_TabUnfocused] = ImVec4(0.12f, 0.12f, 0.12f, 0.97f);
-	colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.18f, 0.18f, 0.19f, 1.00f);
-	colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
-	colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-	colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-	colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-	colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.50f);
-	colors[ImGuiCol_DragDropTarget] = ImVec4(1.00f, 1.00f, 0.00f, 0.90f);
-	colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
-	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
-	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+	colors[ ImGuiCol_Text ] = ImVec4( 0.95f, 0.95f, 0.95f, 1.00f );
+	colors[ ImGuiCol_TextDisabled ] = ImVec4( 0.50f, 0.50f, 0.50f, 1.00f );
+	colors[ ImGuiCol_WindowBg ] = ImVec4( 0.12f, 0.12f, 0.12f, 1.00f );
+	colors[ ImGuiCol_ChildBg ] = ImVec4( 0.04f, 0.04f, 0.04f, 0.50f );
+	colors[ ImGuiCol_PopupBg ] = ImVec4( 0.12f, 0.12f, 0.12f, 0.94f );
+	colors[ ImGuiCol_Border ] = ImVec4( 0.25f, 0.25f, 0.27f, 0.50f );
+	colors[ ImGuiCol_BorderShadow ] = ImVec4( 0.00f, 0.00f, 0.00f, 0.00f );
+	colors[ ImGuiCol_FrameBg ] = ImVec4( 0.20f, 0.20f, 0.22f, 0.50f );
+	colors[ ImGuiCol_FrameBgHovered ] = ImVec4( 0.25f, 0.25f, 0.27f, 0.75f );
+	colors[ ImGuiCol_FrameBgActive ] = ImVec4( 0.30f, 0.30f, 0.33f, 1.00f );
+	colors[ ImGuiCol_TitleBg ] = ImVec4( 0.04f, 0.04f, 0.04f, 1.00f );
+	colors[ ImGuiCol_TitleBgActive ] = ImVec4( 0.04f, 0.04f, 0.04f, 1.00f );
+	colors[ ImGuiCol_TitleBgCollapsed ] = ImVec4( 0.04f, 0.04f, 0.04f, 0.75f );
+	colors[ ImGuiCol_MenuBarBg ] = ImVec4( 0.18f, 0.18f, 0.19f, 1.00f );
+	colors[ ImGuiCol_ScrollbarBg ] = ImVec4( 0.24f, 0.24f, 0.26f, 0.75f );
+	colors[ ImGuiCol_ScrollbarGrab ] = ImVec4( 0.41f, 0.41f, 0.41f, 0.75f );
+	colors[ ImGuiCol_ScrollbarGrabHovered ] = ImVec4( 0.62f, 0.62f, 0.62f, 0.75f );
+	colors[ ImGuiCol_ScrollbarGrabActive ] = ImVec4( 0.94f, 0.92f, 0.94f, 0.75f );
+	colors[ ImGuiCol_CheckMark ] = ImVec4( 0.60f, 0.60f, 0.60f, 1.00f );
+	colors[ ImGuiCol_SliderGrab ] = ImVec4( 0.41f, 0.41f, 0.41f, 0.75f );
+	colors[ ImGuiCol_SliderGrabActive ] = ImVec4( 0.62f, 0.62f, 0.62f, 0.75f );
+	colors[ ImGuiCol_Button ] = ImVec4( 0.20f, 0.20f, 0.22f, 1.00f );
+	colors[ ImGuiCol_ButtonHovered ] = ImVec4( 0.25f, 0.25f, 0.27f, 1.00f );
+	colors[ ImGuiCol_ButtonActive ] = ImVec4( 0.41f, 0.41f, 0.41f, 1.00f );
+	colors[ ImGuiCol_Header ] = ImVec4( 0.18f, 0.18f, 0.19f, 1.00f );
+	colors[ ImGuiCol_HeaderHovered ] = ImVec4( 0.25f, 0.25f, 0.27f, 1.00f );
+	colors[ ImGuiCol_HeaderActive ] = ImVec4( 0.41f, 0.41f, 0.41f, 1.00f );
+	colors[ ImGuiCol_Separator ] = ImVec4( 0.25f, 0.25f, 0.27f, 1.00f );
+	colors[ ImGuiCol_SeparatorHovered ] = ImVec4( 0.41f, 0.41f, 0.41f, 1.00f );
+	colors[ ImGuiCol_SeparatorActive ] = ImVec4( 0.62f, 0.62f, 0.62f, 1.00f );
+	colors[ ImGuiCol_ResizeGrip ] = ImVec4( 0.30f, 0.30f, 0.33f, 0.75f );
+	colors[ ImGuiCol_ResizeGripHovered ] = ImVec4( 0.41f, 0.41f, 0.41f, 0.75f );
+	colors[ ImGuiCol_ResizeGripActive ] = ImVec4( 0.62f, 0.62f, 0.62f, 0.75f );
+	colors[ ImGuiCol_Tab ] = ImVec4( 0.21f, 0.21f, 0.22f, 1.00f );
+	colors[ ImGuiCol_TabHovered ] = ImVec4( 0.37f, 0.37f, 0.39f, 1.00f );
+	colors[ ImGuiCol_TabActive ] = ImVec4( 0.30f, 0.30f, 0.33f, 1.00f );
+	colors[ ImGuiCol_TabUnfocused ] = ImVec4( 0.12f, 0.12f, 0.12f, 0.97f );
+	colors[ ImGuiCol_TabUnfocusedActive ] = ImVec4( 0.18f, 0.18f, 0.19f, 1.00f );
+	colors[ ImGuiCol_PlotLines ] = ImVec4( 0.61f, 0.61f, 0.61f, 1.00f );
+	colors[ ImGuiCol_PlotLinesHovered ] = ImVec4( 1.00f, 0.43f, 0.35f, 1.00f );
+	colors[ ImGuiCol_PlotHistogram ] = ImVec4( 0.90f, 0.70f, 0.00f, 1.00f );
+	colors[ ImGuiCol_PlotHistogramHovered ] = ImVec4( 1.00f, 0.60f, 0.00f, 1.00f );
+	colors[ ImGuiCol_TextSelectedBg ] = ImVec4( 0.26f, 0.59f, 0.98f, 0.50f );
+	colors[ ImGuiCol_DragDropTarget ] = ImVec4( 1.00f, 1.00f, 0.00f, 0.90f );
+	colors[ ImGuiCol_NavHighlight ] = ImVec4( 0.26f, 0.59f, 0.98f, 1.00f );
+	colors[ ImGuiCol_NavWindowingHighlight ] = ImVec4( 1.00f, 1.00f, 1.00f, 0.70f );
+	colors[ ImGuiCol_NavWindowingDimBg ] = ImVec4( 0.80f, 0.80f, 0.80f, 0.20f );
+	colors[ ImGuiCol_ModalWindowDimBg ] = ImVec4( 0.80f, 0.80f, 0.80f, 0.35f );
 	style.WindowMenuButtonPosition = ImGuiDir_Right;
 }
 
-void RenderEditorGUISystem::Update(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::Update( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer )
 {
 	ImGui::NewFrame();
 
-	if (ImGui::BeginMainMenuBar())
+	if ( ImGui::BeginMainMenuBar() )
 	{
-		if (ImGui::BeginMenu("File"))
+		if ( ImGui::BeginMenu( "File" ) )
 		{
-			ShowMenuFile(assetManager, renderer);
+			ShowMenuFile( assetManager, renderer );
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Edit"))
+		if ( ImGui::BeginMenu( "Edit" ) )
 		{
-			if (ImGui::MenuItem("Canvas Size"))
-				showCanvasProperties = true;
+			if ( ImGui::MenuItem( "Canvas Size" ) )
+				m_bShowCanvasProperties = true;
 
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Tools"))
+		if ( ImGui::BeginMenu( "Tools" ) )
 		{
-			ImGui::Text("Select what to Create");
-			ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+			ImGui::Text( "Select what to Create" );
+			ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Spacing();
 
 			static bool bCreateTile{ false };
-			if (ImGui::Checkbox("Create Tiles", &bCreateTile))
-				m_MouseControl.SetCreateTile(bCreateTile);
-			
+			if ( ImGui::Checkbox( "Create Tiles", &bCreateTile ) )
+				m_MouseControl.SetCreateTile( bCreateTile );
 
 			static bool bCreateObstacle{ false };
-			if (ImGui::Checkbox("Create Obstacles", &bCreateObstacle))
-				m_MouseControl.SetCreateObstacle(bCreateObstacle);
+			if ( ImGui::Checkbox( "Create Obstacles", &bCreateObstacle ) )
+				m_MouseControl.SetCreateObstacle( bCreateObstacle );
 
 			static bool bCreateCollider{ false };
-			if (ImGui::Checkbox("Create Colliders", &bCreateCollider))
-				m_MouseControl.SetCreateBoxCollider(bCreateCollider);
+			if ( ImGui::Checkbox( "Create Colliders", &bCreateCollider ) )
+				m_MouseControl.SetCreateBoxCollider( bCreateCollider );
 
 			static bool bCreateTrigger{ false };
-			if (ImGui::Checkbox("Create Triggers", &bCreateTrigger))
-				m_MouseControl.SetCreateTrigger(bCreateTrigger);
+			if ( ImGui::Checkbox( "Create Triggers", &bCreateTrigger ) )
+				m_MouseControl.SetCreateTrigger( bCreateTrigger );
 
 			static bool bCreateEnemy{ false };
-			if (ImGui::Checkbox("Create Enemies", &bCreateEnemy))
-				m_MouseControl.SetCreateEnemy(bCreateEnemy);
+			if ( ImGui::Checkbox( "Create Enemies", &bCreateEnemy ) )
+				m_MouseControl.SetCreateEnemy( bCreateEnemy );
 
-			// Set the mouse image to snap to the grid 
+			// Set the mouse image to snap to the grid
 			static bool bGridSnap{ false };
-			if (ImGui::Checkbox("Grip Snap", &bGridSnap))
-				m_MouseControl.SetGridSnap(bGridSnap);
+			if ( ImGui::Checkbox( "Grip Snap", &bGridSnap ) )
+				m_MouseControl.SetGridSnap( bGridSnap );
 
 			ImGui::EndMenu();
 		}
 
-		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
 
-		if (m_MouseControl.IsCreatingTiles()) 
-			ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING TILES!");
-		else if (m_MouseControl.IsCreatingObstacles()) 
-			ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING OBSTACLES!");
-		else if (m_MouseControl.IsCreatingColliders())
-			ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING BOX COLLIDERS!");
-		if (m_MouseControl.IsCreatingEnemies())
-			ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING ENEMIES!");
-		if (m_MouseControl.IsCreatingTriggers())
-			ImGui::TextColored(ImVec4(255, 255, 0, 1), "CURRENTLY CREATING TRIGGERS!");
+		if ( m_MouseControl.IsCreatingTiles() )
+			ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "CURRENTLY CREATING TILES!" );
+		else if ( m_MouseControl.IsCreatingObstacles() )
+			ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "CURRENTLY CREATING OBSTACLES!" );
+		else if ( m_MouseControl.IsCreatingColliders() )
+			ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "CURRENTLY CREATING BOX COLLIDERS!" );
+		if ( m_MouseControl.IsCreatingEnemies() )
+			ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "CURRENTLY CREATING ENEMIES!" );
+		if ( m_MouseControl.IsCreatingTriggers() )
+			ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "CURRENTLY CREATING TRIGGERS!" );
 
-		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
 
-		if (m_MouseControl.GridSize() > 0)
+		if ( m_MouseControl.GridSize() > 0 )
 		{
 			ImGui::TextColored(
-				ImVec4(0, 255, 0, 1), "Grid X: %d",
-				static_cast<int>(Game::Instance().GetMouseBox().x +
-					Game::Instance().GetCamera().GetCameraPos().x) / m_MouseControl.GridSize()
-			);
+				ImVec4( 0, 255, 0, 1 ),
+				"Grid X: %d",
+				static_cast<int>( Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().GetCameraPos().x ) /
+					m_MouseControl.GridSize() );
 
 			ImGui::TextColored(
-				ImVec4(0, 255, 0, 1), "Grid Y : %d", 
-				static_cast<int>(Game::Instance().GetMouseBox().y +
-				Game::Instance().GetCamera().GetCameraPos().y) / m_MouseControl.GridSize()
-			);
+				ImVec4( 0, 255, 0, 1 ),
+				"Grid Y : %d",
+				static_cast<int>( Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().GetCameraPos().y ) /
+					m_MouseControl.GridSize() );
 		}
-		
-		
-		ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-		ImGui::TextColored(ImVec4(0, 255, 0, 1), "[Mouse X: %d", static_cast<int>(Game::Instance().GetMouseBox().x +
-			Game::Instance().GetCamera().GetCameraPos().x));
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::Spacing();
+		ImGui::TextColored(
+			ImVec4( 0, 255, 0, 1 ),
+			"[Mouse X: %d",
+			static_cast<int>( Game::Instance().GetMouseBox().x + Game::Instance().GetCamera().GetCameraPos().x ) );
 
 		ImGui::TextColored(
-			ImVec4(0, 255, 0, 1), "Mouse Y : %d]", 
-			static_cast<int>(Game::Instance().GetMouseBox().y + 
-			Game::Instance().GetCamera().GetCameraPos().y)
-		);
-		
+			ImVec4( 0, 255, 0, 1 ),
+			"Mouse Y : %d]",
+			static_cast<int>( Game::Instance().GetMouseBox().y + Game::Instance().GetCamera().GetCameraPos().y ) );
 
 		// Put Above this
 		ImGui::EndMainMenuBar();
 	}
 
 	bool bCreateingTiles = m_MouseControl.IsCreatingTiles();
-	if (bCreateingTiles)
+	if ( bCreateingTiles )
 	{
-		ImageBox(assetManager, renderer);
-		
-		if (ImGui::Begin("Tile Properties", &bCreateingTiles))
+		ImageBox( assetManager, renderer );
+
+		if ( ImGui::Begin( "Tile Properties", &bCreateingTiles ) )
 		{
 			ShowMenuTile();
 
-			if (ImGui::Button("Set Tile Attributes"))
+			if ( ImGui::Button( "Set Tile Attributes" ) )
 			{
-				m_MouseControl.SetSpriteLayer(zIndex);
-				m_MouseControl.SetTransformScale(scaleX, scaleY);
-				m_MouseControl.SetBoxCollider(BoxColliderComponent{ boxColliderWidth, boxColliderHeight, glm::vec2{boxColliderOffsetX, boxColliderOffsetY} });
-				m_MouseControl.SetMouseRect(mouseRectX, mouseRectY);
+				m_MouseControl.SetSpriteLayer( m_ZIndex );
+				m_MouseControl.SetTransformScale( m_ScaleX, m_ScaleY );
+				m_MouseControl.SetBoxCollider( BoxColliderComponent{
+					m_BoxColliderWidth, m_BoxColliderHeight, glm::vec2{ m_BoxColliderOffsetX, m_BoxColliderOffsetY } } );
+				m_MouseControl.SetMouseRect( m_MouseRectX, m_MouseRectY );
 			}
 
 			ImGui::End();
 		}
 	}
 
-	if (showLoadMap)
-		ShowMapLoaderWindow(assetManager, renderer);
+	if ( m_bShowLoadMap )
+		ShowMapLoaderWindow( assetManager, renderer );
 
-	if (showCanvasProperties)
+	if ( m_bShowCanvasProperties )
 		CanvasSize();
-	
-	if (m_MouseControl.IsCreatingEnemies())
-		EnemyProperties(assetManager, renderer);
-	if (m_MouseControl.IsCreatingTriggers())
-		TriggerProperties(assetManager, renderer);
-	if (m_MouseControl.IsCreatingColliders())
+
+	if ( m_MouseControl.IsCreatingEnemies() )
+		EnemyProperties( assetManager, renderer );
+	if ( m_MouseControl.IsCreatingTriggers() )
+		TriggerProperties( assetManager, renderer );
+	if ( m_MouseControl.IsCreatingColliders() )
 		ColliderProperties();
 
 	ImGui::Render();
-	ImGuiSDL::Render(ImGui::GetDrawData());
+	ImGuiSDL::Render( ImGui::GetDrawData() );
 
 	ImGuiIO& io = ImGui::GetIO();
-	if (io.WantCaptureMouse)
-		m_MouseControl.SetOverImGui(true);
+	if ( io.WantCaptureMouse )
+		m_MouseControl.SetOverImGui( true );
 	else
-		m_MouseControl.SetOverImGui(false);
+		m_MouseControl.SetOverImGui( false );
 }
 
-
-void RenderEditorGUISystem::ShowMenuFile(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::ShowMenuFile( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer )
 {
 	FileDialogs dialog;
-	ImGui::MenuItem("(File Menu)", NULL, false, false);
+	ImGui::MenuItem( "(File Menu)", NULL, false, false );
 
 	// Destroy All Entities and reset all variables
-	if (ImGui::MenuItem("New"))
+	if ( ImGui::MenuItem( "New" ) )
 	{
-		if (!GetSystemEntities().empty())
+		if ( !GetSystemEntities().empty() )
 		{
-			for (auto& entity : GetSystemEntities())
+			for ( auto& entity : GetSystemEntities() )
 			{
 				entity.Kill();
-				imageName = "";
-				fileName = "";
+				m_sImageName = "";
+				m_sFileName = "";
 			}
 		}
 	}
 
-	if (ImGui::MenuItem("Load Image"))
+	if ( ImGui::MenuItem( "Load Image" ) )
 	{
-		imageName = dialog.OpenImage();
-		m_MouseControl.SetImageName(imageName);
-		m_Loader.SetImageName(imageName);
+		m_sImageName = dialog.OpenImage();
+		m_MouseControl.SetImageName( m_sImageName );
+		m_Loader.SetImageName( m_sImageName );
 
 		// Check to see if the String is Empty!!
-		if (!imageName.empty())
+		if ( !m_sImageName.empty() )
 		{
 			imageLoaded = true;
 		}
 		else
 		{
-			Logger::Err("Did Not Load Image");
+			Logger::Err( "Did Not Load Image" );
 			return;
 		}
-		Logger::Log("This name " + m_MouseControl.GetImageName());
+		Logger::Log( "This name " + m_MouseControl.GetImageName() );
 	}
 
-	if (ImGui::MenuItem("Load Tileset"))
+	if ( ImGui::MenuItem( "Load Tileset" ) )
 	{
-		std::string sAssetID{m_MouseControl.GetSpriteComponent().assetID};
-		LoadNewImage(assetManager, renderer, sAssetID, imageWidth, imageHeight);
-		m_MouseControl.SetSpriteAssetID(sAssetID);
-		mouseImageLoaded = true;
+		std::string sAssetID{ m_MouseControl.GetSpriteComponent().assetID };
+		LoadNewImage( assetManager, renderer, sAssetID, m_ImageWidth, m_ImageHeight );
+		m_MouseControl.SetSpriteAssetID( sAssetID );
+		m_bMouseImageLoaded = true;
 	}
 
-	if (ImGui::MenuItem("Load Sprite Map", "Creates a map from one texture"))
+	if ( ImGui::MenuItem( "Load Sprite Map", "Creates a map from one texture" ) )
 	{
-		showLoadMap = true;
+		m_bShowLoadMap = true;
 	}
 
-	if (m_MouseControl.IsCreatingTiles())
+	if ( m_MouseControl.IsCreatingTiles() )
 	{
-		if (ImGui::MenuItem("Open Tilemap", "Ctrl+O"))
+		if ( ImGui::MenuItem( "Open Tilemap", "Ctrl+O" ) )
 		{
-			if (!imageName.empty())
+			if ( !m_sImageName.empty() )
 			{
-				fileName = dialog.OpenFile();
+				m_sFileName = dialog.OpenFile();
 
-				m_Loader.SetFileName(fileName);
+				m_Loader.SetFileName( m_sFileName );
 
 				// Check to see if the String is Empty!!
-				if (!fileName.empty())
+				if ( !m_sFileName.empty() )
 				{
-					m_Loader.LoadTilemap(assetManager, renderer);
-					fileLoaded = true;
+					m_Loader.LoadTilemap( assetManager, renderer );
+					m_bFileLoaded = true;
 				}
 			}
 		}
 	}
 
-	if (m_MouseControl.IsCreatingObstacles())
+	if ( m_MouseControl.IsCreatingObstacles() )
 	{
-		if (ImGui::MenuItem("Open Object Map", "Ctrl+O"))
+		if ( ImGui::MenuItem( "Open Object Map", "Ctrl+O" ) )
 		{
-			if (!imageName.empty())
+			if ( !m_sImageName.empty() )
 			{
-				fileName = dialog.OpenFile();
+				m_sFileName = dialog.OpenFile();
 
-				m_Loader.SetFileName(fileName);
+				m_Loader.SetFileName( m_sFileName );
 
 				// Check to see if the String is Empty!!
-				if (!fileName.empty())
+				if ( !m_sFileName.empty() )
 				{
-					m_Loader.LoadObjectMap(assetManager, renderer);
-					fileLoaded = true;
+					m_Loader.LoadObjectMap( assetManager, renderer );
+					m_bFileLoaded = true;
 				}
 			}
 		}
 	}
-	if (m_MouseControl.IsCreatingColliders())
+	if ( m_MouseControl.IsCreatingColliders() )
 	{
-		if (ImGui::MenuItem("Open Collider Map", "Ctrl+O"))
+		if ( ImGui::MenuItem( "Open Collider Map", "Ctrl+O" ) )
 		{
-			fileName = dialog.OpenFile();
+			m_sFileName = dialog.OpenFile();
 
-			std::string extension = std::filesystem::path(fileName).extension().string();
+			std::string extension = std::filesystem::path( m_sFileName ).extension().string();
 
-			Logger::Log("Extension: " + extension);
+			Logger::Log( "Extension: " + extension );
 
-			m_Loader.SetFileName(fileName);
+			m_Loader.SetFileName( m_sFileName );
 
 			// Check to see if the String is Empty!!
-			if (!fileName.empty() && extension == ".map")
+			if ( !m_sFileName.empty() && extension == ".map" )
 			{
-				m_Loader.LoadBoxColliderMap(assetManager, renderer, fileName);
-				fileLoaded = true;
+				m_Loader.LoadBoxColliderMap( assetManager, renderer, m_sFileName );
+				m_bFileLoaded = true;
 			}
 		}
 	}
 
-	if (m_MouseControl.IsCreatingTriggers())
+	if ( m_MouseControl.IsCreatingTriggers() )
 	{
-		if (ImGui::MenuItem("Open Trigger Map", "Ctrl+O"))
+		if ( ImGui::MenuItem( "Open Trigger Map", "Ctrl+O" ) )
 		{
 			LevelLoader load;
-			fileName = dialog.OpenFile();
+			m_sFileName = dialog.OpenFile();
 
-			std::string extension = std::filesystem::path(fileName).extension().string();
-			std::string stem = std::filesystem::path(fileName).stem().string();
+			std::string extension = std::filesystem::path( m_sFileName ).extension().string();
+			std::string stem = std::filesystem::path( m_sFileName ).stem().string();
 
-			m_Loader.SetFileName(fileName);
+			m_Loader.SetFileName( m_sFileName );
 
 			// Check to see if the String is Empty!!
-			if (!fileName.empty() && extension == ".lua")
+			if ( !m_sFileName.empty() && extension == ".lua" )
 			{
-				load.LoadTriggers(game.GetLuaState(), stem);
-				fileLoaded = true;
+				load.LoadTriggers( m_Game.GetLuaState(), stem );
+				m_bFileLoaded = true;
 			}
 		}
 	}
 
-
-	if (m_MouseControl.IsCreatingEnemies())
+	if ( m_MouseControl.IsCreatingEnemies() )
 	{
-		if (ImGui::MenuItem("Open Enemy Map", "Ctrl+O"))
+		if ( ImGui::MenuItem( "Open Enemy Map", "Ctrl+O" ) )
 		{
 			LevelLoader load;
-			fileName = dialog.OpenFile();
+			m_sFileName = dialog.OpenFile();
 
-			std::string extension = std::filesystem::path(fileName).extension().string();
-			std::string stem = std::filesystem::path(fileName).stem().string();
+			std::string extension = std::filesystem::path( m_sFileName ).extension().string();
+			std::string stem = std::filesystem::path( m_sFileName ).stem().string();
 
-			m_Loader.SetFileName(fileName);
+			m_Loader.SetFileName( m_sFileName );
 
 			// Check to see if the String is Empty!!
-			if (!fileName.empty() && extension == ".lua")
+			if ( !m_sFileName.empty() && extension == ".lua" )
 			{
-				load.LoadEnemiesFromLuaTable(game.GetLuaState(), stem);
-				fileLoaded = true;
+				load.LoadEnemiesFromLuaTable( m_Game.GetLuaState(), stem );
+				m_bFileLoaded = true;
 			}
 		}
 	}
 
-
-	if (ImGui::MenuItem("Save", "Ctrl+S"))
+	if ( ImGui::MenuItem( "Save", "Ctrl+S" ) )
 	{
-		std::string extension = std::filesystem::path(fileName).extension().string();
-		if (!fileName.empty())
+		std::string extension = std::filesystem::path( m_sFileName ).extension().string();
+		if ( !m_sFileName.empty() )
 		{
-			if (m_MouseControl.IsCreatingTiles())
+			if ( m_MouseControl.IsCreatingTiles() )
 			{
-				if (extension == ".map")
-					m_Loader.SaveTilemap(fileName, assetManager, renderer);
-				fileLoaded = true;
+				if ( extension == ".map" )
+					m_Loader.SaveTilemap( m_sFileName, assetManager, renderer );
+				m_bFileLoaded = true;
 			}
 
-			if (m_MouseControl.IsCreatingObstacles())
+			if ( m_MouseControl.IsCreatingObstacles() )
 			{
-				if (extension == ".obj")
-					m_Loader.SaveObjectMap(fileName, assetManager, renderer);
-				fileLoaded = true;
+				if ( extension == ".obj" )
+					m_Loader.SaveObjectMap( m_sFileName, assetManager, renderer );
+				m_bFileLoaded = true;
 			}
-			if (m_MouseControl.IsCreatingColliders())
+			if ( m_MouseControl.IsCreatingColliders() )
 			{
-				if (extension == ".map")
-					m_Loader.SaveBoxColliderMap(fileName, assetManager, renderer);
-				else if (extension == ".lua")
-					m_Loader.SaveBoxColliderMapToLuaFile(fileName);
+				if ( extension == ".map" )
+					m_Loader.SaveBoxColliderMap( m_sFileName, assetManager, renderer );
+				else if ( extension == ".lua" )
+					m_Loader.SaveBoxColliderMapToLuaFile( m_sFileName );
 
-				fileLoaded = true;
+				m_bFileLoaded = true;
 			}
-			if (m_MouseControl.IsCreatingTriggers())
+			if ( m_MouseControl.IsCreatingTriggers() )
 			{
-				if (extension == ".lua")
-					m_Loader.SaveTriggersToLuaFile(fileName);
+				if ( extension == ".lua" )
+					m_Loader.SaveTriggersToLuaFile( m_sFileName );
 			}
 		}
 	}
 
-	if (ImGui::MenuItem("Save As.."))
+	if ( ImGui::MenuItem( "Save As.." ) )
 	{
 		std::string saveAsFile = dialog.SaveFile();
-		std::string extension = std::filesystem::path(saveAsFile).extension().string();
+		std::string extension = std::filesystem::path( saveAsFile ).extension().string();
 
-		if (!saveAsFile.empty())
+		if ( !saveAsFile.empty() )
 		{
-			if (m_MouseControl.IsCreatingTiles())
+			if ( m_MouseControl.IsCreatingTiles() )
 			{
 
-				if (extension == ".map")
-					m_Loader.SaveTilemap(saveAsFile, assetManager, renderer);
+				if ( extension == ".map" )
+					m_Loader.SaveTilemap( saveAsFile, assetManager, renderer );
 			}
 
-			else if (m_MouseControl.IsCreatingObstacles())
+			else if ( m_MouseControl.IsCreatingObstacles() )
 			{
-				if (extension == ".obj")
-					m_Loader.SaveObjectMap(saveAsFile, assetManager, renderer);
-				
+				if ( extension == ".obj" )
+					m_Loader.SaveObjectMap( saveAsFile, assetManager, renderer );
 			}
-			else if (m_MouseControl.IsCreatingColliders())
+			else if ( m_MouseControl.IsCreatingColliders() )
 			{
-				if (extension == ".lua")
-					m_Loader.SaveBoxColliderMapToLuaFile(saveAsFile);
-				else if (extension == ".map")
-					m_Loader.SaveBoxColliderMap(saveAsFile, game.GetAssetManager(), game.GetRenderer());	
+				if ( extension == ".lua" )
+					m_Loader.SaveBoxColliderMapToLuaFile( saveAsFile );
+				else if ( extension == ".map" )
+					m_Loader.SaveBoxColliderMap( saveAsFile, m_Game.GetAssetManager(), m_Game.GetRenderer() );
 			}
-			else if (m_MouseControl.IsCreatingEnemies())
+			else if ( m_MouseControl.IsCreatingEnemies() )
 			{
-				if (extension == ".lua")
-					m_Loader.SaveEnemiesToLuaFile(saveAsFile);
+				if ( extension == ".lua" )
+					m_Loader.SaveEnemiesToLuaFile( saveAsFile );
 			}
-			else if (m_MouseControl.IsCreatingTriggers())
+			else if ( m_MouseControl.IsCreatingTriggers() )
 			{
-				if (extension == ".lua")
-					m_Loader.SaveTriggersToLuaFile(saveAsFile);
+				if ( extension == ".lua" )
+					m_Loader.SaveTriggersToLuaFile( saveAsFile );
 			}
 		}
 	}
 
-	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
-	if (ImGui::MenuItem("Play Game!!"))
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
+	if ( ImGui::MenuItem( "Play Game!!" ) )
 	{
-		game.GetStateMachine()->PushState(std::make_unique<MenuState>());
+		m_Game.GetStateMachine()->PushState( std::make_unique<MenuState>() );
 	}
 
-	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
 
-	if (ImGui::MenuItem("Quit"))
+	if ( ImGui::MenuItem( "Quit" ) )
 	{
-		game.SetGameRunning(false);
+		m_Game.SetGameRunning( false );
 	}
 }
 
 void RenderEditorGUISystem::ShowMenuTile()
 {
-	ImGui::Text("Transform Component");
-	ImGui::SliderInt("X Scale", &scaleX, 1, 10);
-	ImGui::SliderInt("Y Scale", &scaleY, 1, 10);
+	ImGui::Text( "Transform Component" );
+	ImGui::SliderInt( "X Scale", &m_ScaleX, 1, 10 );
+	ImGui::SliderInt( "Y Scale", &m_ScaleY, 1, 10 );
 
-	ImGui::Spacing(); ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
 
 	static bool bIsCollider{ false };
-	if (ImGui::Checkbox("Box Collider", &bIsCollider))
-		m_MouseControl.SetCollider(bIsCollider);
+	if ( ImGui::Checkbox( "Box Collider", &bIsCollider ) )
+		m_MouseControl.SetCollider( bIsCollider );
 
-	ImGui::Text("Box Collider Components");
+	ImGui::Text( "Box Collider Components" );
 	ImGui::Spacing();
-	ImGui::TextColored(ImVec4(255, 255, 0, 1), "Box Collider values are multiples of 8");
+	ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "Box Collider values are multiples of 8" );
 
-	if (ImGui::InputInt("Box Width", &boxColliderWidth, 8, 8))
+	if ( ImGui::InputInt( "Box Width", &m_BoxColliderWidth, 8, 8 ) )
 	{
-		boxColliderWidth = (boxColliderWidth / 8) * 8;
-		if (boxColliderWidth <= 0)
-			boxColliderWidth = 0;
-	}
-	
-	if (ImGui::InputInt("Box Height", &boxColliderHeight, 8, 8))
-	{
-		boxColliderHeight = (boxColliderHeight / 8) * 8;
-		if (boxColliderHeight <= 0)
-			boxColliderHeight = 0;
+		m_BoxColliderWidth = ( m_BoxColliderWidth / 8 ) * 8;
+		if ( m_BoxColliderWidth <= 0 )
+			m_BoxColliderWidth = 0;
 	}
 
-	if (ImGui::InputInt("Box OffsetX", &boxColliderOffsetX, 8, 8))
-		boxColliderOffsetX = (boxColliderOffsetX / 8) * 8;
-	
-	if (ImGui::InputInt("Box OffsetY", &boxColliderOffsetY, 8, 8))
-		boxColliderOffsetY = (boxColliderOffsetY / 8) * 8;
-	
-	ImGui::Spacing();
-	ImGui::TextColored(ImVec4(255, 255, 0, 1), "Mouse values are multiples of 8");
-	ImGui::Spacing();
-	ImGui::Text("Mouse Box Size");
-	if (ImGui::InputInt("Mouse Rect X", &mouseRectX, 8, 8))
+	if ( ImGui::InputInt( "Box Height", &m_BoxColliderHeight, 8, 8 ) )
 	{
-		mouseRectX = (mouseRectX / 8) * 8;
+		m_BoxColliderHeight = ( m_BoxColliderHeight / 8 ) * 8;
+		if ( m_BoxColliderHeight <= 0 )
+			m_BoxColliderHeight = 0;
+	}
+
+	if ( ImGui::InputInt( "Box OffsetX", &m_BoxColliderOffsetX, 8, 8 ) )
+		m_BoxColliderOffsetX = ( m_BoxColliderOffsetX / 8 ) * 8;
+
+	if ( ImGui::InputInt( "Box OffsetY", &m_BoxColliderOffsetY, 8, 8 ) )
+		m_BoxColliderOffsetY = ( m_BoxColliderOffsetY / 8 ) * 8;
+
+	ImGui::Spacing();
+	ImGui::TextColored( ImVec4( 255, 255, 0, 1 ), "Mouse values are multiples of 8" );
+	ImGui::Spacing();
+	ImGui::Text( "Mouse Box Size" );
+	if ( ImGui::InputInt( "Mouse Rect X", &m_MouseRectX, 8, 8 ) )
+	{
+		m_MouseRectX = ( m_MouseRectX / 8 ) * 8;
 		// Clamp mouse Rect X at zero
-		if (mouseRectX <= 0)
-			mouseRectX = 0;
+		if ( m_MouseRectX <= 0 )
+			m_MouseRectX = 0;
 	}
-		
-	if (ImGui::InputInt("Mouse Rect Y", &mouseRectY, 8, 8))
+
+	if ( ImGui::InputInt( "Mouse Rect Y", &m_MouseRectY, 8, 8 ) )
 	{
-		mouseRectY = (mouseRectY / 8) * 8;
+		m_MouseRectY = ( m_MouseRectY / 8 ) * 8;
 		// Clamp mouse Rect Y at zero
-		if (mouseRectY <= 0)
-			mouseRectY = 0;
+		if ( m_MouseRectY <= 0 )
+			m_MouseRectY = 0;
 	}
-	ImGui::TextColored(
-		ImVec4(255, 255, 0, 255), "Current Src Rect [X: %d, Y: %d]", 
-		m_MouseControl.GetSpriteComponent().srcRect.x, 
-		m_MouseControl.GetSpriteComponent().srcRect.y
-	);
+	ImGui::TextColored( ImVec4( 255, 255, 0, 255 ),
+						"Current Src Rect [X: %d, Y: %d]",
+						m_MouseControl.GetSpriteComponent().srcRect.x,
+						m_MouseControl.GetSpriteComponent().srcRect.y );
 
 	ImGui::Spacing();
-	ImGui::Text("Set the layer of the tile");
-	ImGui::SliderInt("Z-Index", &zIndex, 0, 10);
+	ImGui::Text( "Set the layer of the tile" );
+	ImGui::SliderInt( "Z-Index", &m_ZIndex, 0, 10 );
 
-	if (zIndex < 0) zIndex = 0;
-	if (zIndex > 10) zIndex = 10;
-	
-	ImGui::Spacing(); ImGui::Spacing();
+	if ( m_ZIndex < 0 )
+		m_ZIndex = 0;
+	if ( m_ZIndex > 10 )
+		m_ZIndex = 10;
+
+	ImGui::Spacing();
+	ImGui::Spacing();
 }
 
-void RenderEditorGUISystem::EnemyProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::EnemyProperties( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer )
 {
-	if (ImGui::Begin("Enemy Properties"))
+	if ( ImGui::Begin( "Enemy Properties" ) )
 	{
-		std::string enemies[] = { "octorok", "moblin", "darknut", "leever", "tektite", "peahat", "armos", "ghini", "lynel", "zora" };
+		std::string enemies[] = {
+			"octorok", "moblin", "darknut", "leever", "tektite", "peahat", "armos", "ghini", "lynel", "zora" };
 		static std::string current_enemy = "";
 
-		ComboLoop("Enemy Type", current_enemy, enemies, sizeof(enemies) / sizeof(enemies[0]));
+		ComboLoop( "Enemy Type", current_enemy, enemies, sizeof( enemies ) / sizeof( enemies[ 0 ] ) );
 		LevelLoader m_Loader;
 
-		
-		//MouseControlSystem::enemyType = m_Loader.ConvertStringToEnemyType(std::string(current_enemy));
+		// MouseControlSystem::enemyType = m_Loader.ConvertStringToEnemyType(std::string(current_enemy));
 
 		////Logger::Log(std::string(current_enemy) + ": " + std::to_string(MouseControlSystem::enemyType));
 
-		//ImGui::Checkbox("Animation", &MouseControlSystem::animation);
+		// ImGui::Checkbox("Animation", &MouseControlSystem::animation);
 
-		//if (MouseControlSystem::animation)
+		// if (MouseControlSystem::animation)
 		//{
 		//	if (ImGui::CollapsingHeader("Animation", ImGuiTreeNodeFlags_DefaultOpen))
 		//	{
@@ -562,23 +585,23 @@ void RenderEditorGUISystem::EnemyProperties(const std::unique_ptr<AssetManager>&
 		//	}
 		//}
 
-		//ImGui::SliderInt("Scale X", &scaleX, 1, 10);
-		//ImGui::SliderInt("Scale Y", &scaleY, 1, 10);
+		// ImGui::SliderInt("Scale X", &m_ScaleX, 1, 10);
+		// ImGui::SliderInt("Scale Y", &m_ScaleY, 1, 10);
 
-
-		//if (ImGui::Button("Set Tile Attributes"))
+		// if (ImGui::Button("Set Tile Attributes"))
 		//{
-		//	MouseControlSystem::transformComponent.scale.x = scaleX;
-		//	MouseControlSystem::transformComponent.scale.y = scaleY;
-		//	MouseControlSystem::mouseRectX = mouseRectX;
-		//	MouseControlSystem::mouseRectY = mouseRectY;
-		//}
-		//ImGui::End();
+		//	MouseControlSystem::transformComponent.scale.x = m_ScaleX;
+		//	MouseControlSystem::transformComponent.scale.y = m_ScaleY;
+		//	MouseControlSystem::m_MouseRectX = m_MouseRectX;
+		//	MouseControlSystem::m_MouseRectY = m_MouseRectY;
+		// }
+		// ImGui::End();
 	}
 }
-void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::TriggerProperties( const std::unique_ptr<AssetManager>& assetManager,
+											   SDL_Renderer* renderer )
 {
-	//if (ImGui::Begin("Trigger Properties", &MouseControlSystem::createTrigger))
+	// if (ImGui::Begin("Trigger Properties", &MouseControlSystem::createTrigger))
 	//{
 	//	static std::string levelMusic{ "stop" };
 	//	static std::string assetFile{ "no_file" };
@@ -605,17 +628,17 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 	//	static std::string newSpriteAssetID { "" };
 	//	static std::string new_trigger { "" };
 
-	//	const std::string triggers[] = { "no_trigger", "secret_area",  "transport", "burn_bushes", "push_rocks", "bomb_secret", "locked_door", "hidden_object" };
-	//	static std::string current_trigger = "";
+	//	const std::string triggers[] = { "no_trigger", "secret_area",  "transport", "burn_bushes", "push_rocks",
+	//"bomb_secret", "locked_door", "hidden_object" }; 	static std::string current_trigger = "";
 
 	//	ComboLoop("Trigger Types", current_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
-	//	
+	//
 	//	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 	//	ImGui::InputFloat("Transport Offset X", &MouseControlSystem::triggerBox.transportOffset.x, 1, 100);
 	//	ImGui::InputFloat("Transport Offset Y", &MouseControlSystem::triggerBox.transportOffset.y, 1, 100);
 	//	ImGui::InputFloat("Camera Offset X", &MouseControlSystem::triggerBox.cameraOffset.x, 1, 100);
 	//	ImGui::InputFloat("Camera Offset Y", &MouseControlSystem::triggerBox.cameraOffset.y, 1, 100);
-	//	
+	//
 	//	ImGui::TextColored(ImVec4(255, 255, 0, 255), "Set the music to the song ID or \"stop\"");
 	//	ImFuncs::MyInputText("Level Music", &levelMusic);
 	//	ImGui::TextColored(ImVec4(255, 255, 0, 255), "Put in the file name or leave as \"no_file\"");
@@ -634,12 +657,12 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 	//	ImGui::Spacing(); ImGui::Spacing(); ImGui::Spacing();
 
 	//	ShowMenuTile();
-	//	
+	//
 	//	ImGui::Checkbox("Sprite Component", &MouseControlSystem::spriteSelected);
 	//	if (MouseControlSystem::spriteSelected)
 	//	{
 	//		ImageBox(assetManager, renderer);
-	//		
+	//
 	//		if (ImGui::InputInt("Sprite Layer", &spriteLayer, 1, 1))
 	//		{
 	//			if (spriteLayer >= 10) spriteLayer = 10;
@@ -648,15 +671,15 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 	//	}
 
 	//	ImGui::Checkbox("Secret", &MouseControlSystem::secretSelected);
-	//	
+	//
 	//	if (MouseControlSystem::secretSelected)
 	//	{
 	//		ComboLoop("New Secret Trigger", new_trigger, triggers, sizeof(triggers) / sizeof(triggers[0]));
 
 	//		ImFuncs::MyInputText("Location ID", &locationID);
-	//		
+	//
 	//		//ImFuncs::MyInputText("New Sprite Asset ID", &newSpriteAssetID);
-	//		
+	//
 	//		if (ImGui::BeginCombo("New Sprite Asset ID", newSpriteAssetID.c_str()))
 	//		{
 	//			std::vector<std::string> mapKey;
@@ -683,7 +706,7 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 	//			if (newSpriteWidth <= 0)
 	//				newSpriteWidth = 0;
 	//		}
-	//		
+	//
 	//		if (ImGui::InputInt("New Sprite Height", &newSpriteHeight, 16, 16))
 	//		{
 	//			newSpriteHeight = (newSpriteHeight / 16) * 16;
@@ -708,14 +731,14 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 
 	//	if (ImGui::Button("Set Trigger Attributes"))
 	//	{
-	//		MouseControlSystem::transformComponent.scale.x = scaleX;
-	//		MouseControlSystem::transformComponent.scale.y = scaleY;
-	//		MouseControlSystem::boxColliderComponent.height = boxColliderHeight;
-	//		MouseControlSystem::boxColliderComponent.width = boxColliderWidth;
-	//		MouseControlSystem::boxColliderComponent.offset.x = boxColliderOffsetX;
-	//		MouseControlSystem::boxColliderComponent.offset.y = boxColliderOffsetY;
-	//		MouseControlSystem::mouseRectX = mouseRectX;
-	//		MouseControlSystem::mouseRectY = mouseRectY;
+	//		MouseControlSystem::transformComponent.scale.x = m_ScaleX;
+	//		MouseControlSystem::transformComponent.scale.y = m_ScaleY;
+	//		MouseControlSystem::boxColliderComponent.height = m_BoxColliderHeight;
+	//		MouseControlSystem::boxColliderComponent.width = m_BoxColliderWidth;
+	//		MouseControlSystem::boxColliderComponent.offset.x = m_BoxColliderOffsetX;
+	//		MouseControlSystem::boxColliderComponent.offset.y = m_BoxColliderOffsetY;
+	//		MouseControlSystem::m_MouseRectX = m_MouseRectX;
+	//		MouseControlSystem::m_MouseRectY = m_MouseRectY;
 
 	//		//MouseControlSystem::triggerBox.levelMusic = levelMusic;
 	//		//MouseControlSystem::triggerBox.assetFile = assetFile;
@@ -731,7 +754,8 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 	//		{
 	//			MouseControlSystem::secretComponent.spriteWidth = newSpriteWidth;
 	//			MouseControlSystem::secretComponent.spriteHeight = newSpriteHeight;
-	//			MouseControlSystem::secretComponent.newSpriteAssetID = newSpriteAssetID; // Change this to the loaded Images
+	//			MouseControlSystem::secretComponent.newSpriteAssetID = newSpriteAssetID; // Change this to the loaded
+	//Images
 
 	//			MouseControlSystem::secretComponent.spriteSrcX = newSpriteSrcX;
 	//			MouseControlSystem::secretComponent.spriteSrcY = newSpriteSrcY;
@@ -744,10 +768,10 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 	//		if (MouseControlSystem::spriteSelected)
 	//		{
 	//			//MouseControlSystem::spriteComponent.assetID = spriteAssetID;
-	//			MouseControlSystem::spriteComponent.width = MouseControlSystem::mouseRectX;
-	//			MouseControlSystem::spriteComponent.height	= MouseControlSystem::mouseRectY;
+	//			MouseControlSystem::spriteComponent.width = MouseControlSystem::m_MouseRectX;
+	//			MouseControlSystem::spriteComponent.height	= MouseControlSystem::m_MouseRectY;
 	//			MouseControlSystem::spriteComponent.layer	= 1;
-	//			MouseControlSystem::spriteComponent.isFixed = false;
+	//			MouseControlSystem::spriteComponent.bIsFixed = false;
 	//			//MouseControlSystem::spriteComponent.srcRect.x = spriteSrcX;
 	//			//MouseControlSystem::spriteComponent.srcRect.y = spriteSrcY;
 	//		}
@@ -780,60 +804,64 @@ void RenderEditorGUISystem::TriggerProperties(const std::unique_ptr<AssetManager
 }
 void RenderEditorGUISystem::ColliderProperties()
 {
-	if (ImGui::Begin("Collider Properties"))
+	if ( ImGui::Begin( "Collider Properties" ) )
 	{
 		ShowMenuTile();
 
-		if (ImGui::Button("Set Collider Attributes"))
+		if ( ImGui::Button( "Set Collider Attributes" ) )
 		{
-			m_MouseControl.SetTransformScale(scaleX, scaleY);
-			m_MouseControl.SetBoxCollider(BoxColliderComponent{ boxColliderWidth, boxColliderHeight, glm::vec2{boxColliderOffsetX, boxColliderOffsetY} });
-			m_MouseControl.SetMouseRect(mouseRectX, mouseRectY);
+			m_MouseControl.SetTransformScale( m_ScaleX, m_ScaleY );
+			m_MouseControl.SetBoxCollider( BoxColliderComponent{
+				m_BoxColliderWidth, m_BoxColliderHeight, glm::vec2{ m_BoxColliderOffsetX, m_BoxColliderOffsetY } } );
+			m_MouseControl.SetMouseRect( m_MouseRectX, m_MouseRectY );
 		}
 
 		ImGui::End();
 	}
 }
-void RenderEditorGUISystem::ImageBox(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::ImageBox( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer )
 {
-	// Set the image Width/Height based on the obtain values from the file and the current game scale
-	if (ImGui::Begin("Texture"), &mouseImageLoaded)
+	// Set the image Width/Height based on the obtain values from the file and the current m_Game scale
+	if ( ImGui::Begin( "Texture" ), &m_bMouseImageLoaded )
 	{
-		int my_image_width = imageWidth * 2;
-		int my_image_height = imageHeight * 2;
+		int my_image_width = m_ImageWidth * 2;
+		int my_image_height = m_ImageHeight * 2;
 
-		ImGui::Image(assetManager->GetTexture(m_MouseControl.GetSpriteComponent().assetID), ImVec2(my_image_width, my_image_height));
+		ImGui::Image( assetManager->GetTexture( m_MouseControl.GetSpriteComponent().assetID ),
+					  ImVec2( my_image_width, my_image_height ) );
 
 		// This is for the mouse Offset for the image --> Still needs to be refined --> Currently Hackish
-		//Logger::Log("x: " + std::to_string(ImGui::GetMousePos().x) + "y: " + std::to_string(ImGui::GetMousePos().y));
+		// Logger::Log("x: " + std::to_string(ImGui::GetMousePos().x) + "y: " + std::to_string(ImGui::GetMousePos().y));
 		int mouseposX = ImGui::GetMousePos().x - ImGui::GetWindowPos().x;
 		int mouseposY = ImGui::GetMousePos().y - ImGui::GetWindowPos().y - 26; // It's a hack I know
 
-		int mouseRectX{ m_MouseControl.GetMouseRectX() };
-		int mouseRectY{m_MouseControl.GetMouseRectY()};
+		int m_MouseRectX{ m_MouseControl.GetMouseRectX() };
+		int m_MouseRectY{ m_MouseControl.GetMouseRectY() };
 
 		// Clamp --> To make sure that we are not dividing by zero value!
-		if (my_image_width > 0 && my_image_height > 0 && mouseRectX > 0 && mouseRectY > 0)
+		if ( my_image_width > 0 && my_image_height > 0 && m_MouseRectX > 0 && m_MouseRectY > 0 )
 		{
-			int rows = (my_image_height / (mouseRectY * 2));
-			int col = (my_image_width / (mouseRectX * 2));
+			int rows = ( my_image_height / ( m_MouseRectY * 2 ) );
+			int col = ( my_image_width / ( m_MouseRectX * 2 ) );
 
-			for (int i = 0; i < col; i++)
+			for ( int i = 0; i < col; i++ )
 			{
-				for (int j = 0; j < rows; j++)
+				for ( int j = 0; j < rows; j++ )
 				{
 					auto draw_list = ImGui::GetWindowDrawList();
 					// Check to see if we are in the area of the desired 2D tile/object
-					if ((mouseposX >= (my_image_width / col) * i && mouseposX <= (my_image_width / col) + ((my_image_width / col) * i)) && 
-						(mouseposY >= (my_image_height / rows) * j && mouseposY <= (my_image_height / rows) + ((my_image_height / rows) * j)))
+					if ( ( mouseposX >= ( my_image_width / col ) * i &&
+						   mouseposX <= ( my_image_width / col ) + ( ( my_image_width / col ) * i ) ) &&
+						 ( mouseposY >= ( my_image_height / rows ) * j &&
+						   mouseposY <= ( my_image_height / rows ) + ( ( my_image_height / rows ) * j ) ) )
 					{
-						if (ImGui::IsItemHovered())
+						if ( ImGui::IsItemHovered() )
 						{
-							if (ImGui::IsMouseClicked(0))
+							if ( ImGui::IsMouseClicked( 0 ) )
 							{
-								m_MouseControl.SetSpriteSrcRect(i * mouseRectX, j * mouseRectY);
+								m_MouseControl.SetSpriteSrcRect( i * m_MouseRectX, j * m_MouseRectY );
 							}
-						}	
+						}
 					}
 				}
 			}
@@ -842,64 +870,66 @@ void RenderEditorGUISystem::ImageBox(const std::unique_ptr<AssetManager>& assetM
 	ImGui::End();
 }
 
-bool RenderEditorGUISystem::LoadNewImage(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer, std::string& image_id, int& image_width, int& image_height)
+bool RenderEditorGUISystem::LoadNewImage( const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer,
+										  std::string& image_id, int& image_width, int& image_height )
 {
 	FileDialogs dialog;
-	// Open a file dialog and assign the return directory to the imageName
+	// Open a file dialog and assign the return directory to the m_sImageName
 	std::string image_name = dialog.OpenImage();
-	//imageName = dialog.OpenImage();
+	// m_sImageName = dialog.OpenImage();
 
-	m_MouseControl.SetImageName(image_name);
-	Logger::Log(m_MouseControl.GetImageName());
+	m_MouseControl.SetImageName( image_name );
+	Logger::Log( m_MouseControl.GetImageName() );
 
-	// Strip the image name of the directory strings leaving just the name 
-	image_id = m_Loader.SetName(image_name);
+	// Strip the image name of the directory strings leaving just the name
+	image_id = m_Loader.SetName( image_name );
 
 	// Check to see if the String is Empty!!
-	if (!image_name.empty())
+	if ( !image_name.empty() )
 	{
-		if (!assetManager->HasTexture(image_id))
+		if ( !assetManager->HasTexture( image_id ) )
 		{
-			Logger::Err("Added new image with the ID  -- " + image_id);
-			assetManager->AddTextures(renderer, image_id, m_MouseControl.GetImageName());
-			Logger::Err(m_MouseControl.GetImageName());
+			Logger::Err( "Added new image with the ID  -- " + image_id );
+			assetManager->AddTextures( renderer, image_id, m_MouseControl.GetImageName() );
+			Logger::Err( m_MouseControl.GetImageName() );
 		}
 		else
 		{
-			Logger::Err("This Image ID Already Exists! -- " + image_id);
-			assetManager->GetTexture(image_id);
+			Logger::Err( "This Image ID Already Exists! -- " + image_id );
+			assetManager->GetTexture( image_id );
 		}
 		imageLoaded = true;
 	}
 	else
 	{
-		Logger::Err("Did Not Load Image");
+		Logger::Err( "Did Not Load Image" );
 		return false;
 	}
 
 	// Get the image width and Height!! --> TEST
-	if (SDL_QueryTexture(assetManager->GetTexture(image_id), NULL, NULL, &image_width, &image_height) == 0)
+	if ( SDL_QueryTexture( assetManager->GetTexture( image_id ), NULL, NULL, &image_width, &image_height ) == 0 )
 		return true;
 	else
 	{
 		const char* message = SDL_GetError();
-		Logger::Err("EDITOR: __FUNC: LoadImage: " + std::string(message));
+		Logger::Err( "EDITOR: __FUNC: LoadImage: " + std::string( message ) );
 		return false;
 	}
 }
 
-void RenderEditorGUISystem::ComboLoop(std::string label, std::string& current_item, const std::string handinArray[], int size)
+void RenderEditorGUISystem::ComboLoop( std::string label, std::string& current_item, const std::string handinArray[],
+									   int size )
 {
-	if (ImGui::BeginCombo(label.c_str(), current_item.c_str()))
+	if ( ImGui::BeginCombo( label.c_str(), current_item.c_str() ) )
 	{
-		for (int n = 0; n < size; n++)
+		for ( int n = 0; n < size; n++ )
 		{
-			bool is_selected = (current_item == handinArray[n]);
-			if (ImGui::Selectable(handinArray[n].c_str(), is_selected))
+			bool is_selected = ( current_item == handinArray[ n ] );
+			if ( ImGui::Selectable( handinArray[ n ].c_str(), is_selected ) )
 			{
-				current_item = handinArray[n];
+				current_item = handinArray[ n ];
 			}
-			if (is_selected)
+			if ( is_selected )
 			{
 				ImGui::SetItemDefaultFocus();
 			}
@@ -914,25 +944,24 @@ void RenderEditorGUISystem::ImGuiSetup()
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 	// Setup ImGui Keys
-	io.KeyMap[ImGuiKey_Backspace] = SDL_SCANCODE_BACKSPACE;
-	io.KeyMap[ImGuiKey_Enter] = SDL_SCANCODE_RETURN;
-	io.KeyMap[ImGuiKey_Space] = SDL_SCANCODE_SPACE;
-	io.KeyMap[ImGuiKey_Tab] = SDL_SCANCODE_TAB;
-	io.KeyMap[ImGuiKey_LeftArrow] = SDL_SCANCODE_LEFT;
-	io.KeyMap[ImGuiKey_RightArrow] = SDL_SCANCODE_RIGHT;
-	io.KeyMap[ImGuiKey_UpArrow] = SDL_SCANCODE_UP;
-	io.KeyMap[ImGuiKey_DownArrow] = SDL_SCANCODE_DOWN;
-	io.KeyMap[ImGuiKey_Home] = SDL_SCANCODE_HOME;
-	io.KeyMap[ImGuiKey_End] = SDL_SCANCODE_END;
-	io.KeyMap[ImGuiKey_Escape] = SDL_SCANCODE_ESCAPE;
-	
-	io.KeyMap[ImGuiKey_A] = SDL_SCANCODE_A;
-	io.KeyMap[ImGuiKey_C] = SDL_SCANCODE_C;
-	io.KeyMap[ImGuiKey_V] = SDL_SCANCODE_V;
-	io.KeyMap[ImGuiKey_X] = SDL_SCANCODE_X;
-	io.KeyMap[ImGuiKey_Y] = SDL_SCANCODE_Y;
-	io.KeyMap[ImGuiKey_Z] = SDL_SCANCODE_Z;
-	
+	io.KeyMap[ ImGuiKey_Backspace ] = SDL_SCANCODE_BACKSPACE;
+	io.KeyMap[ ImGuiKey_Enter ] = SDL_SCANCODE_RETURN;
+	io.KeyMap[ ImGuiKey_Space ] = SDL_SCANCODE_SPACE;
+	io.KeyMap[ ImGuiKey_Tab ] = SDL_SCANCODE_TAB;
+	io.KeyMap[ ImGuiKey_LeftArrow ] = SDL_SCANCODE_LEFT;
+	io.KeyMap[ ImGuiKey_RightArrow ] = SDL_SCANCODE_RIGHT;
+	io.KeyMap[ ImGuiKey_UpArrow ] = SDL_SCANCODE_UP;
+	io.KeyMap[ ImGuiKey_DownArrow ] = SDL_SCANCODE_DOWN;
+	io.KeyMap[ ImGuiKey_Home ] = SDL_SCANCODE_HOME;
+	io.KeyMap[ ImGuiKey_End ] = SDL_SCANCODE_END;
+	io.KeyMap[ ImGuiKey_Escape ] = SDL_SCANCODE_ESCAPE;
+
+	io.KeyMap[ ImGuiKey_A ] = SDL_SCANCODE_A;
+	io.KeyMap[ ImGuiKey_C ] = SDL_SCANCODE_C;
+	io.KeyMap[ ImGuiKey_V ] = SDL_SCANCODE_V;
+	io.KeyMap[ ImGuiKey_X ] = SDL_SCANCODE_X;
+	io.KeyMap[ ImGuiKey_Y ] = SDL_SCANCODE_Y;
+	io.KeyMap[ ImGuiKey_Z ] = SDL_SCANCODE_Z;
 }
 
 void RenderEditorGUISystem::CanvasSize()
@@ -940,30 +969,30 @@ void RenderEditorGUISystem::CanvasSize()
 	static int numTilesWidth = 1;
 	static int numTilesHeight = 1;
 	static int spriteSize = 16;
-	if (ImGui::Begin("Canvas Size"))
+	if ( ImGui::Begin( "Canvas Size" ) )
 	{
-		ImGui::InputInt("Num Tiles Width", &numTilesWidth);
-		ImGui::InputInt("Num Tiles Height", &numTilesHeight);
-		if (ImGui::SliderInt("Sprite Size", &spriteSize, 16, 128))
+		ImGui::InputInt( "Num Tiles Width", &numTilesWidth );
+		ImGui::InputInt( "Num Tiles Height", &numTilesHeight );
+		if ( ImGui::SliderInt( "Sprite Size", &spriteSize, 16, 128 ) )
 		{
-
 		}
 
-		if (ImGui::Button("Set Canvas"))
+		if ( ImGui::Button( "Set Canvas" ) )
 		{
-			showCanvasProperties = false;
+			m_bShowCanvasProperties = false;
 		}
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Cancel"))
-			showCanvasProperties = false;
-		
+		if ( ImGui::Button( "Cancel" ) )
+			m_bShowCanvasProperties = false;
+
 		ImGui::End();
 	}
 }
 
-bool RenderEditorGUISystem::LoadEntireMapSprite(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+bool RenderEditorGUISystem::LoadEntireMapSprite( const std::unique_ptr<AssetManager>& assetManager,
+												 SDL_Renderer* renderer )
 {
 	std::string mapAssetID = "";
 	// Remove all Entities from the Editor
@@ -971,71 +1000,69 @@ bool RenderEditorGUISystem::LoadEntireMapSprite(const std::unique_ptr<AssetManag
 	Registry::Instance().GetSystem<RenderCollisionSystem>().OnExit();
 
 	// Load the image to the asset manager and query the width and height
-	if (!LoadNewImage(assetManager, renderer, mapAssetID, mapWidth, mapHeight))
+	if ( !LoadNewImage( assetManager, renderer, mapAssetID, m_MapWidth, m_MapHeight ) )
 	{
-		Logger::Err("EDITOR: __FUNC: LoadEntireMapSprite: Could not load the Map sprite!");
+		Logger::Err( "EDITOR: __FUNC: LoadEntireMapSprite: Could not load the Map sprite!" );
 		return false;
 	}
 
 	// If the image has been loaded successfully, Create a new map entity
 	auto newMap = Registry::Instance().CreateEntity();
-	newMap.Group("map");
-	newMap.AddComponent<TransformComponent>(glm::vec2(0), glm::vec2(scaleX, scaleY), 0);
-	newMap.AddComponent<SpriteComponent>(
-		SpriteComponent{
-			.assetID = mapAssetID,
-			.width = mapWidth,
-			.height = mapHeight,
-			.layer = 0,
-			.isFixed = false,
-			.srcRect = SDL_Rect{0, 0, mapWidth, mapHeight} 
-		}
-	);
+	newMap.Group( "map" );
+	newMap.AddComponent<TransformComponent>( glm::vec2( 0 ), glm::vec2( m_ScaleX, m_ScaleY ), 0 );
+	newMap.AddComponent<SpriteComponent>( SpriteComponent{ .assetID = mapAssetID,
+														   .width = m_MapWidth,
+														   .height = m_MapHeight,
+														   .layer = 0,
+														   .bIsFixed = false,
+														   .srcRect = SDL_Rect{ 0, 0, m_MapWidth, m_MapHeight } } );
 
 	newMap.AddComponent<EditorComponent>();
 
-	Logger::Log("Created Map!!");
+	Logger::Log( "Created Map!!" );
+	return true;
 }
 
-void RenderEditorGUISystem::ShowMapLoaderWindow(const std::unique_ptr<AssetManager>& assetManager, SDL_Renderer* renderer)
+void RenderEditorGUISystem::ShowMapLoaderWindow( const std::unique_ptr<AssetManager>& assetManager,
+												 SDL_Renderer* renderer )
 {
 	static bool mapLoadPopUp = false;
 
-	if (ImGui::Begin("Load Map Sprite"))
+	if ( ImGui::Begin( "Load Map Sprite" ) )
 	{
-		ImGui::SliderInt("X Scale", &scaleX, 1, 10);
-		ImGui::SliderInt("Y Scale", &scaleY, 1, 10);
+		ImGui::SliderInt( "X Scale", &m_ScaleX, 1, 10 );
+		ImGui::SliderInt( "Y Scale", &m_ScaleY, 1, 10 );
 
-		if (ImGui::Button("Next"))
+		if ( ImGui::Button( "Next" ) )
 		{
 			mapLoadPopUp = true;
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("cancel"))
+		if ( ImGui::Button( "cancel" ) )
 		{
-			showLoadMap = false;
+			m_bShowLoadMap = false;
 		}
 		ImGui::End();
 	}
 
-	if (mapLoadPopUp)
+	if ( mapLoadPopUp )
 	{
-		if (ImGui::Begin("Load"), &mapLoadPopUp)
+		if ( ImGui::Begin( "Load" ), &mapLoadPopUp )
 		{
-			ImGui::Text("This will erase all of you have done so far!");
-			ImGui::Text("Are you sure?");
+			ImGui::Text( "This will erase all of you have done so far!" );
+			ImGui::Text( "Are you sure?" );
 
-			if (ImGui::Button("Yes"))
+			if ( ImGui::Button( "Yes" ) )
 			{
-				LoadEntireMapSprite(assetManager, renderer);
+				LoadEntireMapSprite( assetManager, renderer );
 				mapLoadPopUp = false;
-				showLoadMap = false;
+				m_bShowLoadMap = false;
 			}
 
 			ImGui::SameLine();
 
 			// Close the pop-up and go back to the Load window
-			if (ImGui::Button("Cancel"))
+			if ( ImGui::Button( "Cancel" ) )
 				mapLoadPopUp = false;
 
 			ImGui::End();

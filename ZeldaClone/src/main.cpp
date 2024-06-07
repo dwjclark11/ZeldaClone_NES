@@ -4,25 +4,25 @@
 bool bShowConsole{ true };
 #ifdef _WIN32
 #include <Windows.h>
-void ShowTheConsole(bool bShowConsole)
+void ShowTheConsole( bool bShowConsole )
 {
-	ShowWindow(::GetConsoleWindow(), bShowConsole);
+	ShowWindow( ::GetConsoleWindow(), bShowConsole );
 }
 #elif
-void ShowTheConsole(bool bShowConsole)
+void ShowTheConsole( bool bShowConsole )
 {
 	// TODO: Not windows implementation
 }
 #endif
 
-int main(int argc, char* argv[])
+int main( int argc, char* argv[] )
 {
 #ifdef NDEBUG
 	bShowConsole = false;
 #endif
-	ShowTheConsole(bShowConsole);
+	ShowTheConsole( bShowConsole );
 
 	Game::Instance().Run();
 	Game::Instance().Shutdown();
 	return 0;
-}	
+}
