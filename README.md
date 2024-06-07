@@ -40,7 +40,7 @@ git clone https://github.com/dwjclark11/ZeldaClone_NES.git
 cd ZeldaClone_NES
 cmake -S . -B build
 ```
-
+---- 
 ## Game Controls
 | Key |  Button  |   Function  |  
 | --- |  ------- | ----------- | 
@@ -61,23 +61,27 @@ cmake -S . -B build
 * This is a small video where I demonstrate the current status of the game/editor, I will update this as development continues.
 - New Video - Basic Gameplay
 
-
+----
 https://user-images.githubusercontent.com/63356975/163869073-acae6d9b-0948-48d3-aecb-b369309f7278.mp4
 
-
+----
 - Fairy Fountain
 
 
 https://user-images.githubusercontent.com/63356975/164451922-1915021e-952e-4653-a596-64e2b1feb660.mp4
 
-
+----
 
 - Oldest Video
 
 https://user-images.githubusercontent.com/63356975/153033167-88800d4c-b702-4609-9451-782682668e28.mp4
 
+----
+
 ## Tilemap Editor Controls
        * Under Construction!!
+
+ ----
 ## Game/Engine
 This game/engine includes the following:
 * An ECS (Entity Component System) to help manage entities, components, and systems that are in the game.
@@ -92,6 +96,7 @@ This game/engine includes the following:
 
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
 
+----
 # Issues
 There are still tonnes of issues in order to have a proper working game. 
 * Needs proper AI for enemies.
