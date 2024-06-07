@@ -50,7 +50,7 @@ bool GameOverState::OnEnter()
 	m_Game.GetMusicPlayer().PlayMusic( "Main_Menu", -1 );
 
 	m_Game.GetAssetManager()->AddTextures(
-		m_Game.GetRenderer(), "game_over_words", "./Assets/HUDSprites/game_over_words.png" );
+		m_Game.GetRenderer(), "game_over_words", "./assets/HUDSprites/game_over_words.png" );
 
 	Entity game_over_text = Registry::Instance().CreateEntity();
 	game_over_text.AddComponent<TransformComponent>( glm::vec2( 185, 50 ), glm::vec2( 4, 4 ), 0.0 );

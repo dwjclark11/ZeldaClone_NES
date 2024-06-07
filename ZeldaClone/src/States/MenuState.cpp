@@ -97,14 +97,14 @@ void MenuState::EliminateKeys()
 			if ( m_GameData.GetPlayer2Name().size() != 0 )
 			{
 				// Remove file from Saved files
-				const std::string save2File = "./Assets/SavedFiles/slot_2/save2.lua";
+				const std::string save2File = "./assets/SavedFiles/slot_2/save2.lua";
 				if ( std::filesystem::remove( save2File ) )
 				{
 					LevelLoader loader;
 					loader.EliminatePlayerToDefault( 2, m_GameData.GetPlayer2Name() );
 					m_GameData.SetPlayer2Name( "" );
 					m_bEliminate = false;
-					std::filesystem::remove( "./Assets/SavedFiles/slot_2/GameSecrets_2.lua" );
+					std::filesystem::remove( "./assets/SavedFiles/slot_2/GameSecrets_2.lua" );
 				}
 				else
 					Logger::Err( "Error, File could not be deleted" );
@@ -115,14 +115,14 @@ void MenuState::EliminateKeys()
 			if ( m_GameData.GetPlayer3Name().size() != 0 )
 			{
 				// Remove file from Saved files
-				const std::string save3File = "./Assets/SavedFiles/slot_3/save3.lua";
+				const std::string save3File = "./assets/SavedFiles/slot_3/save3.lua";
 				if ( std::filesystem::remove( save3File ) )
 				{
 					LevelLoader loader;
 					loader.EliminatePlayerToDefault( 3, m_GameData.GetPlayer3Name() );
 					m_GameData.SetPlayer3Name( "" );
 					m_bEliminate = false;
-					std::filesystem::remove( "./Assets/SavedFiles/slot_3/GameSecrets_3.lua" );
+					std::filesystem::remove( "./assets/SavedFiles/slot_3/GameSecrets_3.lua" );
 				}
 				else
 					Logger::Err( "Error, File could not be deleted" );

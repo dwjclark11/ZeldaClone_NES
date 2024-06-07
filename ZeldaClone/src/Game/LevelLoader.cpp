@@ -444,13 +444,13 @@ void LevelLoader::CreateNewGameSecretsFile( int slotNum )
 {
 	LuaTableWriter m_writer;
 
-	std::ofstream newFile( "./Assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/GameSecrets_" +
+	std::ofstream newFile( "./assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/GameSecrets_" +
 						   std::to_string( slotNum ) + ".lua" );
 	newFile.close();
 
 	std::fstream file;
 
-	file.open( "./Assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/GameSecrets_" + std::to_string( slotNum ) +
+	file.open( "./assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/GameSecrets_" + std::to_string( slotNum ) +
 			   ".lua" );
 
 	// Start the Lua Table
@@ -1263,7 +1263,7 @@ void LevelLoader::LoadPlayerDataFromLuaTable( sol::state& lua, const std::string
 	}
 
 	// Executes the script using the sol State
-	lua.script_file( "./Assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
+	lua.script_file( "./assets/SavedFiles/slot_" + std::to_string( slotNum ) + "/" + fileName + ".lua" );
 
 	sol::table data = lua[ "player_data" ];
 
