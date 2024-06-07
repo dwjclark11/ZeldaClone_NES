@@ -7,10 +7,15 @@
 
 ## Introduction
 This game was created for educational purposes and to help develop my skills with C++, Lua, and understanding
-of data management. It uses the Pikuma Game Engine from the course https://courses.pikuma.com/courses/2dgameengine. 
+of data management. 
+
+It uses the Pikuma Game Engine from the course https://courses.pikuma.com/courses/2dgameengine. 
 This was a great course and I recommend it to anyone wanting to start learning more on creating Game Engines. 
+
 I have taken what I learned from that course and applied it to creating this Zelda Clone and Tilemap/Quest Editor. 
-The game is not yet finished; There is still plenty of work to be done!
+This is not a finished game and the quest editor does not really work; however, it was fun to make. 
+
+There are also many changes that I would like to make if I had more time, but I have other projects that have a higher priority. 
 
 # Build
 ----
