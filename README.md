@@ -92,5 +92,13 @@ This game/engine includes the following:
 
 ![gameplayPic](https://user-images.githubusercontent.com/63356975/133914504-5e2f6078-f494-4db0-890c-bf3d42004f6f.png)
 
+# Issues
+There are still tonnes of issues in order to have a proper working game. 
+* Needs proper AI for enemies.
+* Quest editor is currently broken.
+* Needs proper animations when going into caves.
+* Player can still move after getting triforce.
+* Titlescreen does not reset properly and will eventually crash.
+
 ## Keep Coding and Take it Easy!
 
